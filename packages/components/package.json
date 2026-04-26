@@ -1,0 +1,13 @@
+{
+  "name": "@batoi/uif-components",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.js --format esm --clean"
+  }
+}
