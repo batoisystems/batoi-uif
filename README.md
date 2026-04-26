@@ -77,6 +77,20 @@ pnpm add @batoi/uif-core @batoi/uif-components @batoi/uif-rad-adapter
 <div id="kpi" data-uif="ajax" data-uif-action="reload" data-uif-src="/dashboard/kpi" data-uif-target="#kpi"></div>
 ```
 
+
+## Where the code is
+
+If you are browsing the repository root, the framework source code is under `packages/*/src/`.
+
+- `packages/core/src/index.js`
+- `packages/dom/src/index.js`
+- `packages/net/src/index.js`
+- `packages/forms/src/index.js`
+- `packages/components/src/index.js`
+- `packages/rad-adapter/src/index.js`
+
+A root `index.js` is also provided as a convenience entry point for quick discovery.
+
 ## Development
 
 ```bash
