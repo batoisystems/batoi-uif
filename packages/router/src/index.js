@@ -15,7 +15,7 @@ export function initRouter(root = document, options = {}) {
     const link = event.target.closest('a[data-uif="route"]');
     if (!link || link.origin !== window.location.origin || event.metaKey || event.ctrlKey) return;
     event.preventDefault();
-    const target = resolveTarget(link, link.dataset.uifTarget ?? 'self') || defaultTarget;
+    const target = link.dataset.uifTarget ? resolveTarget(link, link.dataset.uifTarget) : defaultTarget;
     await loadRoute(link.href, target);
     history.pushState({ uifTarget: link.dataset.uifTarget || options.target || null }, '', link.href);
   });
