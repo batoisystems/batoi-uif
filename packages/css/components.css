@@ -1,0 +1,3 @@
+.uif-card{background:var(--uif-surface);border:1px solid var(--uif-border);border-radius:var(--uif-radius-md);padding:var(--uif-space-4);box-shadow:var(--uif-shadow-sm)}
+.uif-btn{background:var(--uif-color-primary);color:#fff;border:none;border-radius:var(--uif-radius-sm);padding:.5rem .875rem;cursor:pointer}
+.uif-toast{position:fixed;right:1rem;bottom:1rem;padding:.75rem 1rem;background:var(--uif-surface);border:1px solid var(--uif-border);border-radius:var(--uif-radius-md);z-index:var(--uif-z-toast)}

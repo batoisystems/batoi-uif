@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RAD CRUD Example</title>
+    <link rel="stylesheet" href="../../packages/css/index.css" />
+  </head>
+  <body>
+    <main class="uif-container uif-stack uif-p-4">
+      <h1>Customer CRUD</h1>
+      <div class="uif-cluster">
+        <button class="uif-btn" data-uif-action="open" data-uif-target="#add-customer">Add customer</button>
+        <button data-uif="ajax" data-uif-action="reload" data-uif-src="/customers/list" data-uif-target="#customers">Reload list</button>
+      </div>
+
+      <section id="customers" class="uif-card">
+        <h2>Customers</h2>
+        <article class="uif-cluster">
+          <span>Ada Lovelace</span>
+          <button data-uif-action="open" data-uif-target="#edit-customer">Edit</button>
+          <button data-uif="ajax" data-uif-action="delete" data-uif-confirm="Delete customer?" data-uif-src="/customers/1/delete" data-uif-target="#customers" data-uif-swap="inner">Delete</button>
+        </article>
+      </section>
+
+      <div id="add-customer" data-uif="modal" data-uif-state="closed" hidden>
+        <form class="uif-card" data-uif="form" data-uif-src="/customers" data-uif-method="POST" data-uif-target="#customers">
+          <h2>Add customer</h2>
+          <label>Name <input name="name" data-uif-rule="required|minLength:2" /></label>
+          <label>Email <input name="email" data-uif-rule="required|email" /></label>
+          <button class="uif-btn">Save</button>
+          <button type="button" data-uif-action="close">Cancel</button>
+        </form>
+      </div>
+
+      <div id="edit-customer" data-uif="modal" data-uif-state="closed" hidden>
+        <form class="uif-card" data-uif="form" data-uif-src="/customers/1" data-uif-method="POST" data-uif-target="#customers">
+          <h2>Edit customer</h2>
+          <label>Name <input name="name" value="Ada Lovelace" data-uif-rule="required|minLength:2" /></label>
+          <button class="uif-btn">Save</button>
+          <button type="button" data-uif-action="close">Cancel</button>
+        </form>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mobile Shell Example</title>
+    <link rel="stylesheet" href="../../packages/css/index.css" />
+  </head>
+  <body>
+    <main class="uif-container uif-stack uif-p-4">
+      <header class="uif-cluster">
+        <button data-uif-action="toggle" data-uif-target="#mobile-drawer">Menu</button>
+        <h1>Mobile Shell</h1>
+      </header>
+
+      <aside id="mobile-drawer" data-uif="drawer" data-uif-mode="left" data-uif-state="closed" hidden>
+        <nav class="uif-stack uif-card">
+          <a href="#home">Home</a>
+          <a href="#tasks">Tasks</a>
+          <a href="#settings">Settings</a>
+        </nav>
+      </aside>
+
+      <section class="uif-card">
+        <h2>Responsive content</h2>
+        <p>This shell uses a drawer, bottom navigation, offline indicator, and install placeholder.</p>
+      </section>
+
+      <div id="offline-indicator" role="status" hidden>Offline</div>
+      <button id="install-app" class="uif-btn">Install app</button>
+
+      <nav class="uif-cluster" aria-label="Bottom navigation">
+        <a href="#home">Home</a>
+        <a href="#search">Search</a>
+        <a href="#account">Account</a>
+      </nav>
+    </main>
+  </body>
+</html>
