@@ -1,2 +1,101 @@
-<!doctype html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Batoi UIF Docs</title><link rel='stylesheet' href='../../packages/css/index.css'></head><body><main class='uif-container uif-stack uif-p-4'><h1>Batoi UIF Docs</h1><nav class='uif-cluster'><a href='#home'>Home</a><a href='#getting-started'>Getting Started</a><a href='#core'>Core Concepts</a><a href='#attrs'>Data Attributes</a><a href='#components'>Components</a><a href='#ajax'>AJAX and RAD Adapter</a><a href='#forms'>Forms</a><a href='#pwa'>PWA</a><a href='#theming'>Theming</a><a href='#a11y'>Accessibility</a><a href='#examples'>Examples</a></nav><section id='home'><h2>Home</h2><p>HTML-first, JavaScript-enhanced UIF.</p></section><section id='getting-started'><h2>Getting Started</h2><pre><code>pnpm install
-pnpm build</code></pre></section><section id='core'><h2>Core Concepts</h2><div data-uif='modal' data-uif-state='closed' class='uif-card'>Modal contract example</div></section><section id='attrs'><h2>Data Attributes</h2><code>data-uif data-uif-target data-uif-action</code></section><section id='components'><h2>Components</h2><div data-uif='tabs'><button data-uif-role='tab'>A</button><button data-uif-role='tab'>B</button><div data-uif-role='tabpanel'>Panel A</div><div data-uif-role='tabpanel'>Panel B</div></div></section><section id='ajax'><h2>AJAX and RAD Adapter</h2><button data-uif='ajax' data-uif-action='reload' data-uif-src='/partials/list'>Reload list</button></section><section id='forms'><h2>Forms</h2><form data-uif='form'><input name='email' data-uif-rule='required|email'><button>Submit</button></form></section><section id='pwa'><h2>PWA</h2><button>Install</button></section><section id='theming'><h2>Theming</h2><div data-theme='dark' class='uif-card'>Dark theme sample</div></section><section id='a11y'><h2>Accessibility</h2><p>ARIA defaults and keyboard support built-in.</p></section><section id='examples'><h2>Examples</h2><ul><li>RAD CRUD</li><li>RAD Dashboard</li><li>Mobile Shell</li></ul></section></main></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Batoi UIF Docs</title>
+    <link rel="stylesheet" href="../../packages/css/index.css" />
+  </head>
+  <body>
+    <main class="uif-container uif-stack uif-p-4">
+      <h1>Batoi UIF Documentation</h1>
+      <p>Dependency-free, HTML-first UI primitives for server-rendered and progressive apps.</p>
+
+      <nav class="uif-cluster" aria-label="Documentation sections">
+        <a href="#getting-started">Getting Started</a>
+        <a href="#core">Core Concepts</a>
+        <a href="#data-attributes">Data Attributes</a>
+        <a href="#components">Components</a>
+        <a href="#rad">AJAX and RAD Adapter</a>
+        <a href="#forms">Forms</a>
+        <a href="#pwa">PWA</a>
+        <a href="#theming">Theming</a>
+        <a href="#accessibility">Accessibility</a>
+        <a href="#examples">Examples</a>
+      </nav>
+
+      <section id="getting-started" class="uif-card">
+        <h2>Getting Started</h2>
+        <pre><code>pnpm install
+pnpm test
+pnpm build</code></pre>
+      </section>
+
+      <section id="core" class="uif-card">
+        <h2>Core Concepts</h2>
+        <p>Initialize once, enhance progressively, and emit lifecycle events from plain DOM nodes.</p>
+        <pre><code>&lt;script type="module"&gt;
+  import { init } from '@batoi/uif-core';
+  init(document);
+&lt;/script&gt;</code></pre>
+      </section>
+
+      <section id="data-attributes" class="uif-card">
+        <h2>Data Attributes</h2>
+        <p>UIF behavior is declared with attributes such as <code>data-uif</code>, <code>data-uif-action</code>, and <code>data-uif-target</code>.</p>
+        <pre><code>&lt;button data-uif-action="toggle" data-uif-target="#drawer"&gt;Menu&lt;/button&gt;</code></pre>
+      </section>
+
+      <section id="components" class="uif-card">
+        <h2>Components</h2>
+        <div id="docs-tabs" data-uif="tabs">
+          <button data-uif-role="tab">Overview</button>
+          <button data-uif-role="tab">Markup</button>
+          <div data-uif-role="tabpanel">Tabs use ARIA roles and arrow-key navigation.</div>
+          <div data-uif-role="tabpanel"><code>data-uif="tabs"</code></div>
+        </div>
+      </section>
+
+      <section id="rad" class="uif-card">
+        <h2>AJAX and RAD Adapter</h2>
+        <pre><code>&lt;button data-uif="ajax" data-uif-action="reload" data-uif-src="/customers/list" data-uif-target="#customers"&gt;
+  Reload customers
+&lt;/button&gt;
+&lt;div id="customers"&gt;&lt;/div&gt;</code></pre>
+      </section>
+
+      <section id="forms" class="uif-card">
+        <h2>Forms</h2>
+        <form data-uif="form" data-uif-validate="true">
+          <label>Email <input name="email" data-uif-rule="required|email" /></label>
+          <button class="uif-btn">Validate</button>
+        </form>
+      </section>
+
+      <section id="pwa" class="uif-card">
+        <h2>PWA</h2>
+        <pre><code>import { registerServiceWorker } from '@batoi/uif-pwa';
+registerServiceWorker('/sw.js');</code></pre>
+      </section>
+
+      <section id="theming" class="uif-card" data-theme="dark">
+        <h2>Theming</h2>
+        <p>Theme tokens are CSS custom properties and support light/dark contexts.</p>
+      </section>
+
+      <section id="accessibility" class="uif-card">
+        <h2>Accessibility</h2>
+        <p>Components add ARIA roles, keyboard navigation, and reduced-motion friendly behavior.</p>
+      </section>
+
+      <section id="examples" class="uif-card">
+        <h2>Examples</h2>
+        <ul>
+          <li>RAD CRUD</li>
+          <li>RAD Dashboard</li>
+          <li>Mobile Shell</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>

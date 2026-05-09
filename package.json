@@ -2,7 +2,7 @@
   "name": "batoi-uif",
   "private": true,
   "version": "0.0.0",
-  "description": "Batoi UIF \u2014 Unified Interface Framework",
+  "description": "Batoi UIF — Unified Interface Framework",
   "license": "Apache-2.0",
   "packageManager": "pnpm@10.0.0",
   "type": "module",
@@ -21,7 +21,9 @@
     "eslint-config-prettier": "^10.1.2",
     "prettier": "^3.5.3",
     "tsup": "^8.4.0",
+    "typescript": "^5.8.3",
     "vite": "^5.4.19",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "jsdom": "^25.0.1"
   }
 }

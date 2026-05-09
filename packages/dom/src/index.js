@@ -25,8 +25,13 @@ export function resolveTarget(sourceEl, targetExpression = 'self') {
   return null;
 }
 
+function candidates(root) {
+  const nodes = root instanceof HTMLElement && root.matches('[data-uif]') ? [root] : [];
+  return nodes.concat(qsa('[data-uif]', root));
+}
+
 export function mount(root = document) {
-  qsa('[data-uif]', root).forEach((el) => {
+  candidates(root).forEach((el) => {
     if (initialized.has(el)) return;
     const key = el.getAttribute('data-uif');
     if (!key) return;
@@ -38,7 +43,7 @@ export function mount(root = document) {
 }
 
 export function unmount(root = document) {
-  qsa('[data-uif]', root).forEach((el) => {
+  candidates(root).forEach((el) => {
     const comp = initialized.get(el);
     if (comp?.destroy) comp.destroy(el);
     initialized.delete(el);

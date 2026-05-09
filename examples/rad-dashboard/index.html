@@ -1,1 +1,35 @@
-<!doctype html><html><body><h1>RAD Dashboard</h1><div class='uif-grid'><div class='uif-card'>Card A <button data-uif='ajax' data-uif-action='reload' data-uif-src='/widget/a'>Refresh</button></div><div class='uif-card'>Card B</div></div><div data-uif='tabs'><button data-uif-role='tab'>Revenue</button><button data-uif-role='tab'>Ops</button><div data-uif-role='tabpanel'>Revenue widget</div><div data-uif-role='tabpanel'>Ops widget</div></div><button data-uif-action='toast'>Notify</button></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RAD Dashboard Example</title>
+    <link rel="stylesheet" href="../../packages/css/index.css" />
+  </head>
+  <body>
+    <main class="uif-container uif-stack uif-p-4">
+      <h1>Dashboard</h1>
+      <section class="uif-grid">
+        <article id="sales-card" class="uif-card">
+          <h2>Sales</h2>
+          <p>$24,800</p>
+          <button data-uif="ajax" data-uif-action="reload" data-uif-src="/dashboard/sales" data-uif-target="#sales-card">Refresh</button>
+        </article>
+        <article id="tickets-card" class="uif-card">
+          <h2>Tickets</h2>
+          <p>18 open</p>
+          <button data-uif="ajax" data-uif-action="reload" data-uif-src="/dashboard/tickets" data-uif-target="#tickets-card">Refresh</button>
+        </article>
+      </section>
+
+      <section class="uif-card" data-uif="tabs">
+        <button data-uif-role="tab">Revenue</button>
+        <button data-uif-role="tab">Operations</button>
+        <div data-uif-role="tabpanel">Revenue widget partial.</div>
+        <div data-uif-role="tabpanel">Operations widget partial.</div>
+      </section>
+
+      <button class="uif-btn" data-uif-action="toast" data-uif-message="Dashboard refreshed" data-uif-type="success">Toast notification</button>
+    </main>
+  </body>
+</html>

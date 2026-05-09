@@ -91,6 +91,20 @@ If you are browsing the repository root, the framework source code is under `pac
 
 A root `index.js` is also provided as a convenience entry point for quick discovery.
 
+
+## Implementation status
+
+The repository now includes a working JavaScript scaffold for the initial UIF plan:
+
+- Core lifecycle and events.
+- DOM scanning, target resolution, and rehydration helpers.
+- Fetch wrapper, form validation/submission, small state store, minimal router, and PWA helpers.
+- Attribute-driven components with ARIA defaults and keyboard support for modal, drawer, dropdown, tabs, toast, accordion, and button actions.
+- RAD adapter load/swap/rehydrate flow with HTML and JSON response support.
+- Docs, playground, and static examples for CRUD, dashboard, and mobile shell scenarios.
+
+Remaining work before a stable public release is tracked in `ROADMAP.md`: API hardening, browser QA, richer docs, and more edge-case test coverage.
+
 ## Development
 
 ```bash

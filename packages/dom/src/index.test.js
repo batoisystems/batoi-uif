@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { resolveTarget } from './index.js';
+import { describe, expect, it, vi } from 'vitest';
+import { mount, registerComponent, resolveTarget } from './index.js';
 
 describe('dom target resolver', () => {
   it('resolves target expressions', () => {
@@ -11,5 +11,14 @@ describe('dom target resolver', () => {
     expect(resolveTarget(el, 'self')).toBe(el);
     expect(resolveTarget(el, 'parent')).toBe(parent);
     expect(resolveTarget(el, '#x')).toBe(el);
+  });
+
+  it('mounts the root node when it has data-uif', () => {
+    const init = vi.fn();
+    registerComponent({ name: 'sample', init });
+    const el = document.createElement('div');
+    el.dataset.uif = 'sample';
+    mount(el);
+    expect(init).toHaveBeenCalledWith(el);
   });
 });
