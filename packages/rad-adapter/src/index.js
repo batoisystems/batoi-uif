@@ -3,6 +3,7 @@ import { autoInit, resolveTarget } from '@batoi/uif-dom';
 import { request } from '@batoi/uif-net';
 
 const swapModes = new Set(['inner', 'outer', 'append', 'prepend', 'before', 'after']);
+const bodylessMethods = new Set(['GET', 'HEAD']);
 
 function normalizeSwapMode(mode) {
   return swapModes.has(mode) ? mode : 'inner';
@@ -23,9 +24,19 @@ function notify(message, type = 'status') {
   emit(type === 'error' ? 'uif:error' : 'uif:success', { message });
 }
 
-function requestPayload(sourceEl) {
+function requestUrl(src, sourceEl, method) {
+  if (!(sourceEl instanceof HTMLFormElement) || !bodylessMethods.has(method)) return src;
+  const url = new URL(src, window.location.href);
+  new FormData(sourceEl).forEach((value, key) => {
+    url.searchParams.append(key, value);
+  });
+  return url.toString();
+}
+
+function requestPayload(sourceEl, method) {
+  if (bodylessMethods.has(method)) return undefined;
   if (sourceEl instanceof HTMLFormElement) return new FormData(sourceEl);
-  if (sourceEl.dataset.uifMethod?.toUpperCase() === 'POST') return new FormData();
+  if (method === 'POST') return new FormData();
   return undefined;
 }
 
@@ -56,10 +67,11 @@ export async function loadPartial(sourceEl) {
   if (sourceEl.dataset.uifConfirm && !confirm(sourceEl.dataset.uifConfirm)) return null;
 
   const method = (sourceEl.dataset.uifMethod || sourceEl.getAttribute('method') || 'GET').toUpperCase();
+  const url = requestUrl(src, sourceEl, method);
   setLoading(sourceEl, true);
-  emit('uif:before-load', { source: sourceEl, src, method }, sourceEl);
+  emit('uif:before-load', { source: sourceEl, src: url, method }, sourceEl);
   try {
-    const result = await request(src, { method, body: requestPayload(sourceEl) });
+    const result = await request(url, { method, body: requestPayload(sourceEl, method) });
     const fallbackTarget = resolveTarget(sourceEl, sourceEl.dataset.uifTarget ?? 'self');
     const payload = typeof result === 'string' ? { ok: true, html: result } : result;
     if (payload?.ok === false) throw new Error(payload.message || 'Request failed');
