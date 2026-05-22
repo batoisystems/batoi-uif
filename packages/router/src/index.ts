@@ -16,9 +16,10 @@ async function loadRoute(url: string, target: HTMLElement | null): Promise<void>
 export function initRouter(root: Document | HTMLElement = document, options: RouterOptions = {}): void {
   const defaultTarget = options.target ? document.querySelector<HTMLElement>(options.target) : null;
   root.addEventListener('click', (event) => {
+    const mouseEvent = event as MouseEvent;
     const target = event.target instanceof HTMLElement ? event.target : null;
     const link = target?.closest<HTMLAnchorElement>('a[data-uif="route"]');
-    if (!link || link.origin !== window.location.origin || event.metaKey || event.ctrlKey) return;
+    if (!link || link.origin !== window.location.origin || mouseEvent.metaKey || mouseEvent.ctrlKey) return;
     event.preventDefault();
     const routeTarget = link.dataset.uifTarget ? resolveTarget(link, link.dataset.uifTarget) : defaultTarget;
     void loadRoute(link.href, routeTarget);

@@ -13,15 +13,21 @@
 
       <nav class="uif-cluster" aria-label="Documentation sections" data-uif="nav">
         <a href="#getting-started">Getting Started</a>
+        <a href="#installation">Installation</a>
+        <a href="#core">Core Concepts</a>
         <a href="#attributes">Data Attributes</a>
+        <a href="#tokens">CSS Tokens</a>
         <a href="#components">Components</a>
+        <a href="#forms">Forms</a>
         <a href="#rad">RAD Adapter</a>
         <a href="#charts">Charts</a>
         <a href="#realtime">Realtime</a>
         <a href="#push">Push</a>
         <a href="#mobile">Mobile UI</a>
+        <a href="#pwa">PWA</a>
         <a href="#ai">AI UI</a>
         <a href="#mcp">MCP Approval</a>
+        <a href="#examples">Examples</a>
         <a href="#roadmap">Roadmap</a>
       </nav>
 
@@ -33,9 +39,29 @@ npm test
 npm run build</code></pre>
       </section>
 
+      <section id="installation" class="uif-card">
+        <h2>Installation</h2>
+        <pre><code>&lt;link rel="stylesheet" href="/assets/uif/uif.css"&gt;
+&lt;script type="module" src="/assets/uif/uif.esm.js"&gt;&lt;/script&gt;</code></pre>
+      </section>
+
+      <section id="core" class="uif-card">
+        <h2>Core Concepts</h2>
+        <pre><code>import { init } from '@batoi/uif-core';
+init(document);</code></pre>
+      </section>
+
       <section id="attributes" class="uif-card">
         <h2>Data Attributes</h2>
         <p>Use <code>data-uif</code>, <code>data-uif-action</code>, <code>data-uif-target</code>, <code>data-uif-src</code>, <code>data-uif-swap</code>, and package-specific attributes to enhance server-rendered HTML.</p>
+      </section>
+
+      <section id="tokens" class="uif-card">
+        <h2>CSS Tokens</h2>
+        <pre><code>:root {
+  --uif-color-primary: #2563eb;
+  --uif-space-4: 1rem;
+}</code></pre>
       </section>
 
       <section id="components" class="uif-card">
@@ -74,7 +100,14 @@ npm run build</code></pre>
 
       <section id="push" class="uif-card">
         <h2>Push</h2>
-        <button data-uif="push" data-uif-action="subscribe">Enable Notifications</button>
+        <button data-uif="push" data-uif-action="subscribe" data-uif-src="/api/push/subscribe">Enable Notifications</button>
+      </section>
+
+      <section id="pwa" class="uif-card">
+        <h2>PWA</h2>
+        <pre><code>import { registerServiceWorker, onOffline } from '@batoi/uif-pwa';
+registerServiceWorker('/sw.js');
+onOffline(() =&gt; document.body.dataset.offline = 'true');</code></pre>
       </section>
 
       <section id="mobile" class="uif-card">
@@ -95,6 +128,17 @@ npm run build</code></pre>
       <section id="accessibility" class="uif-card">
         <h2>Accessibility</h2>
         <p>Components include keyboard behavior, focus handling, ARIA attributes, and reduced-motion awareness.</p>
+      </section>
+
+      <section id="examples" class="uif-card">
+        <h2>Examples</h2>
+        <ul>
+          <li><a href="../../examples/rad-crud/index.html">RAD CRUD</a></li>
+          <li><a href="../../examples/rad-dashboard/index.html">RAD Dashboard</a></li>
+          <li><a href="../../examples/mobile-shell/index.html">Mobile Shell</a></li>
+          <li><a href="../../examples/realtime-feed/index.html">Realtime Feed</a></li>
+          <li><a href="../../examples/ai-tool-approval/index.html">AI Tool Approval</a></li>
+        </ul>
       </section>
 
       <section id="roadmap" class="uif-card">

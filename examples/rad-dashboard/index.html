@@ -22,6 +22,23 @@
         </article>
       </section>
 
+      <section class="uif-card">
+        <h2>Revenue Chart</h2>
+        <div
+          data-uif="chart"
+          data-uif-chart="bar"
+          data-uif-refresh="interval"
+          data-uif-interval="30000"
+          data-uif-data='[{"label":"Jan","value":120},{"label":"Feb","value":180},{"label":"Mar","value":150}]'>
+        </div>
+      </section>
+
+      <section class="uif-card">
+        <h2>Activity Feed</h2>
+        <div data-uif="realtime" data-uif-channel="dashboard" data-uif-mode="poll" data-uif-src="/mock/activity" data-uif-target="#dashboard-feed"></div>
+        <div id="dashboard-feed" aria-live="polite">Waiting for updates...</div>
+      </section>
+
       <section class="uif-card" data-uif="tabs">
         <button data-uif-role="tab">Revenue</button>
         <button data-uif-role="tab">Operations</button>

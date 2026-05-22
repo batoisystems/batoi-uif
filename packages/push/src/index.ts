@@ -25,10 +25,28 @@ export function showInAppNotification(message: string, options: { type?: string 
   return showToast(message, { type: options.type ?? 'info' });
 }
 
+async function postSubscription(src: string | undefined, payload: unknown): Promise<void> {
+  if (!src) return;
+  await fetch(src, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+}
+
 export function initPush(el: HTMLElement): void {
-  el.addEventListener('click', () => {
+  el.addEventListener('click', async () => {
     const action = el.dataset.uifAction || 'notify';
-    if (action === 'subscribe') void requestNotificationPermission();
+    if (action === 'subscribe') {
+      const permission = await requestNotificationPermission();
+      await postSubscription(el.dataset.uifSrc, { action, permission });
+      showInAppNotification(permission === 'granted' ? 'Notifications enabled' : 'Notification permission not granted');
+    }
+    if (action === 'unsubscribe') {
+      const ok = await unsubscribeFromPush();
+      await postSubscription(el.dataset.uifSrc, { action, ok });
+      showInAppNotification(ok ? 'Notifications disabled' : 'Unable to disable notifications');
+    }
     if (action === 'notify') showInAppNotification(el.dataset.uifMessage || el.textContent?.trim() || 'Notification');
   });
 }

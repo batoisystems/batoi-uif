@@ -28,6 +28,13 @@ export interface ChartOptions {
   y?: string;
 }
 
+interface ChartController {
+  refresh(): Promise<void>;
+  destroy(): void;
+}
+
+const controllers = new WeakMap<HTMLElement, ChartController>();
+
 function parseData(raw: string | null): ChartDatum[] {
   if (!raw) return [];
   const parsed = JSON.parse(raw) as ChartDatum[];
@@ -88,20 +95,47 @@ export function renderChart(data: ChartDatum[], options: ChartOptions = {}): str
   return svg(width, height, renderBars(normalized, width, height));
 }
 
-export async function initChart(el: HTMLElement): Promise<void> {
+async function loadChartData(el: HTMLElement): Promise<ChartDatum[]> {
+  return el.dataset.uifSrc
+    ? request<ChartDatum[]>(el.dataset.uifSrc, { method: 'GET' })
+    : Promise.resolve(parseData(el.dataset.uifData || null));
+}
+
+export function initChart(el: HTMLElement): ChartController {
+  controllers.get(el)?.destroy();
   const options = JSON.parse(el.dataset.uifOptions || '{}') as ChartOptions;
   options.type = (el.dataset.uifChart as ChartType) || options.type || 'bar';
-  const data = el.dataset.uifSrc
-    ? await request<ChartDatum[]>(el.dataset.uifSrc, { method: 'GET' })
-    : parseData(el.dataset.uifData || null);
-  el.innerHTML = renderChart(data, options);
+  let data: ChartDatum[] = [];
+  let timer: number | undefined;
+
+  const refresh = async () => {
+    data = await loadChartData(el);
+    el.innerHTML = renderChart(data, options);
+  };
+
   const resize = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => (el.innerHTML = renderChart(data, options))) : null;
   resize?.observe(el);
+  if (el.dataset.uifRefresh === 'interval' || el.dataset.uifInterval) {
+    timer = window.setInterval(() => void refresh(), Number(el.dataset.uifInterval || 30000));
+  }
+
+  const controller = {
+    refresh,
+    destroy() {
+      resize?.disconnect();
+      if (timer) window.clearInterval(timer);
+      controllers.delete(el);
+    },
+  };
+  controllers.set(el, controller);
+  void refresh();
+  return controller;
 }
 
 export const chart = {
   name: 'chart',
   init: (el: HTMLElement) => {
-    void initChart(el);
+    initChart(el);
   },
+  destroy: (el: HTMLElement) => controllers.get(el)?.destroy(),
 };

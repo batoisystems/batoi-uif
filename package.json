@@ -12,7 +12,7 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm --workspace @batoi/uif-core run build && npm --workspace @batoi/uif-dom run build && npm --workspace @batoi/uif-net run build && npm --workspace @batoi/uif-components run build && npm --workspace @batoi/uif-forms run build && npm --workspace @batoi/uif-router run build && npm --workspace @batoi/uif-rad-adapter run build && npm --workspace @batoi/uif-pwa run build && npm --workspace @batoi/uif-charts run build && npm --workspace @batoi/uif-realtime run build && npm --workspace @batoi/uif-push run build && npm --workspace @batoi/uif-mobile run build && npm --workspace @batoi/uif-ai run build && npm --workspace @batoi/uif-mcp run build && npm --workspace @batoi/uif-docs run build && npm --workspace @batoi/uif-playground run build",
     "dev:docs": "npm --workspace @batoi/uif-docs run dev",
     "dev:playground": "npm --workspace @batoi/uif-playground run dev",
     "lint": "eslint .",
