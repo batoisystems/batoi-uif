@@ -4,10 +4,17 @@
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.js --format esm,iife --global-name BatoiUIF --clean"
+    "build": "tsup src/index.ts --format esm,iife --dts --global-name BatoiUIF --clean"
   }
 }

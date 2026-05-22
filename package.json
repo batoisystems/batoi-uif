@@ -4,12 +4,17 @@
   "version": "0.0.0",
   "description": "Batoi UIF — Unified Interface Framework",
   "license": "Apache-2.0",
-  "packageManager": "pnpm@10.0.0",
+  "packageManager": "npm@10.0.0",
   "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "examples/*"
+  ],
   "scripts": {
-    "build": "pnpm -r --filter './packages/*' run build && pnpm --filter @batoi/uif-docs run build && pnpm --filter @batoi/uif-playground run build",
-    "dev:docs": "pnpm --filter @batoi/uif-docs run dev",
-    "dev:playground": "pnpm --filter @batoi/uif-playground run dev",
+    "build": "npm run build --workspaces --if-present",
+    "dev:docs": "npm --workspace @batoi/uif-docs run dev",
+    "dev:playground": "npm --workspace @batoi/uif-playground run dev",
     "lint": "eslint .",
     "format": "prettier --check .",
     "test": "vitest run"

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Tool Approval Example</title>
+    <link rel="stylesheet" href="../../packages/css/index.css" />
+  </head>
+  <body>
+    <main class="uif-container uif-stack uif-p-4">
+      <h1>AI Tool Approval</h1>
+      <section class="uif-card">
+        <div data-uif="ai-action" data-uif-agent="rad-builder" data-uif-tool="create_app" data-uif-src="/api/ai/tools/create-app"></div>
+        <div data-uif="tool-approval" data-uif-tool="create_database" data-uif-risk="high"></div>
+        <div id="tool-result" role="status">Approve or reject events are emitted for server-mediated handling.</div>
+      </section>
+    </main>
+  </body>
+</html>

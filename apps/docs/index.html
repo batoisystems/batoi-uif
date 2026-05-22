@@ -9,59 +9,48 @@
   <body>
     <main class="uif-container uif-stack uif-p-4">
       <h1>Batoi UIF Documentation</h1>
-      <p>Dependency-free, HTML-first UI primitives for server-rendered and progressive apps.</p>
+      <p>Dependency-free, HTML-first interface framework for server-rendered, RAD, mobile, realtime, push, and AI-assisted applications.</p>
 
-      <nav class="uif-cluster" aria-label="Documentation sections">
+      <nav class="uif-cluster" aria-label="Documentation sections" data-uif="nav">
         <a href="#getting-started">Getting Started</a>
-        <a href="#core">Core Concepts</a>
-        <a href="#data-attributes">Data Attributes</a>
+        <a href="#attributes">Data Attributes</a>
         <a href="#components">Components</a>
-        <a href="#rad">AJAX and RAD Adapter</a>
-        <a href="#forms">Forms</a>
-        <a href="#pwa">PWA</a>
-        <a href="#theming">Theming</a>
-        <a href="#accessibility">Accessibility</a>
-        <a href="#examples">Examples</a>
+        <a href="#rad">RAD Adapter</a>
+        <a href="#charts">Charts</a>
+        <a href="#realtime">Realtime</a>
+        <a href="#push">Push</a>
+        <a href="#mobile">Mobile UI</a>
+        <a href="#ai">AI UI</a>
+        <a href="#mcp">MCP Approval</a>
+        <a href="#roadmap">Roadmap</a>
       </nav>
 
       <section id="getting-started" class="uif-card">
         <h2>Getting Started</h2>
-        <pre><code>pnpm install
-pnpm test
-pnpm build</code></pre>
+        <pre><code>npm install
+npm run lint
+npm test
+npm run build</code></pre>
       </section>
 
-      <section id="core" class="uif-card">
-        <h2>Core Concepts</h2>
-        <p>Initialize once, enhance progressively, and emit lifecycle events from plain DOM nodes.</p>
-        <pre><code>&lt;script type="module"&gt;
-  import { init } from '@batoi/uif-core';
-  init(document);
-&lt;/script&gt;</code></pre>
-      </section>
-
-      <section id="data-attributes" class="uif-card">
+      <section id="attributes" class="uif-card">
         <h2>Data Attributes</h2>
-        <p>UIF behavior is declared with attributes such as <code>data-uif</code>, <code>data-uif-action</code>, and <code>data-uif-target</code>.</p>
-        <pre><code>&lt;button data-uif-action="toggle" data-uif-target="#drawer"&gt;Menu&lt;/button&gt;</code></pre>
+        <p>Use <code>data-uif</code>, <code>data-uif-action</code>, <code>data-uif-target</code>, <code>data-uif-src</code>, <code>data-uif-swap</code>, and package-specific attributes to enhance server-rendered HTML.</p>
       </section>
 
       <section id="components" class="uif-card">
         <h2>Components</h2>
-        <div id="docs-tabs" data-uif="tabs">
-          <button data-uif-role="tab">Overview</button>
-          <button data-uif-role="tab">Markup</button>
-          <div data-uif-role="tabpanel">Tabs use ARIA roles and arrow-key navigation.</div>
-          <div data-uif-role="tabpanel"><code>data-uif="tabs"</code></div>
+        <div data-uif="tabs">
+          <button data-uif-role="tab">Modal</button>
+          <button data-uif-role="tab">Dropdown</button>
+          <div data-uif-role="tabpanel">Components initialize from declarative markup and include ARIA defaults.</div>
+          <div data-uif-role="tabpanel"><code>data-uif="dropdown"</code> closes on outside click and Escape.</div>
         </div>
       </section>
 
       <section id="rad" class="uif-card">
         <h2>AJAX and RAD Adapter</h2>
-        <pre><code>&lt;button data-uif="ajax" data-uif-action="reload" data-uif-src="/customers/list" data-uif-target="#customers"&gt;
-  Reload customers
-&lt;/button&gt;
-&lt;div id="customers"&gt;&lt;/div&gt;</code></pre>
+        <pre><code>&lt;button data-uif="ajax" data-uif-action="reload" data-uif-src="/customers/list" data-uif-target="#customers"&gt;Reload&lt;/button&gt;</code></pre>
       </section>
 
       <section id="forms" class="uif-card">
@@ -72,29 +61,45 @@ pnpm build</code></pre>
         </form>
       </section>
 
-      <section id="pwa" class="uif-card">
-        <h2>PWA</h2>
-        <pre><code>import { registerServiceWorker } from '@batoi/uif-pwa';
-registerServiceWorker('/sw.js');</code></pre>
+      <section id="charts" class="uif-card">
+        <h2>Charts</h2>
+        <div data-uif="chart" data-uif-chart="bar" data-uif-data='[{"label":"Jan","value":120},{"label":"Feb","value":180}]'></div>
       </section>
 
-      <section id="theming" class="uif-card" data-theme="dark">
-        <h2>Theming</h2>
-        <p>Theme tokens are CSS custom properties and support light/dark contexts.</p>
+      <section id="realtime" class="uif-card">
+        <h2>Realtime</h2>
+        <div data-uif="realtime" data-uif-channel="demo" data-uif-mode="poll" data-uif-src="/mock/feed" data-uif-target="#docs-feed"></div>
+        <div id="docs-feed">Polling fallback is first-class for shared hosting deployments.</div>
+      </section>
+
+      <section id="push" class="uif-card">
+        <h2>Push</h2>
+        <button data-uif="push" data-uif-action="subscribe">Enable Notifications</button>
+      </section>
+
+      <section id="mobile" class="uif-card">
+        <h2>Mobile UI</h2>
+        <pre><code>&lt;div data-uif="mobile-shell"&gt;...&lt;/div&gt;</code></pre>
+      </section>
+
+      <section id="ai" class="uif-card">
+        <h2>AI UI</h2>
+        <div data-uif="ai-action" data-uif-agent="rad-builder" data-uif-tool="create_app"></div>
+      </section>
+
+      <section id="mcp" class="uif-card">
+        <h2>MCP Tool Approval</h2>
+        <div data-uif="tool-approval" data-uif-tool="create_database" data-uif-risk="high"></div>
       </section>
 
       <section id="accessibility" class="uif-card">
         <h2>Accessibility</h2>
-        <p>Components add ARIA roles, keyboard navigation, and reduced-motion friendly behavior.</p>
+        <p>Components include keyboard behavior, focus handling, ARIA attributes, and reduced-motion awareness.</p>
       </section>
 
-      <section id="examples" class="uif-card">
-        <h2>Examples</h2>
-        <ul>
-          <li>RAD CRUD</li>
-          <li>RAD Dashboard</li>
-          <li>Mobile Shell</li>
-        </ul>
+      <section id="roadmap" class="uif-card">
+        <h2>Roadmap</h2>
+        <p>v0 moves from core foundation through RAD adapter, components, charts, realtime, push, mobile, and server-mediated AI/MCP UI.</p>
       </section>
     </main>
   </body>

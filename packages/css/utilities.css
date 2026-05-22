@@ -2,4 +2,5 @@
 .uif-text-sm{font-size:var(--uif-text-sm)}.uif-text-md{font-size:var(--uif-text-md)}.uif-text-lg{font-size:var(--uif-text-lg)}
 .uif-m-0{margin:0}.uif-m-1{margin:var(--uif-space-1)}.uif-m-2{margin:var(--uif-space-2)}.uif-m-3{margin:var(--uif-space-3)}.uif-m-4{margin:var(--uif-space-4)}
 .uif-p-0{padding:0}.uif-p-1{padding:var(--uif-space-1)}.uif-p-2{padding:var(--uif-space-2)}.uif-p-3{padding:var(--uif-space-3)}.uif-p-4{padding:var(--uif-space-4)}
+.uif-safe-top{padding-top:env(safe-area-inset-top)}.uif-safe-bottom{padding-bottom:env(safe-area-inset-bottom)}.uif-touch-target{min-height:44px;min-width:44px}
 @container (max-width: 40rem){.uif-grid{grid-template-columns:1fr}}

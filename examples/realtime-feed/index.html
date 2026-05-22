@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Realtime Feed Example</title>
+    <link rel="stylesheet" href="../../packages/css/index.css" />
+  </head>
+  <body>
+    <main class="uif-container uif-stack uif-p-4">
+      <h1>Realtime Feed</h1>
+      <section class="uif-card">
+        <div data-uif="realtime" data-uif-channel="workspace:123" data-uif-src="/mock/activity" data-uif-mode="poll" data-uif-target="#activity-feed"></div>
+        <div id="activity-feed" aria-live="polite">Waiting for activity...</div>
+      </section>
+    </main>
+  </body>
+</html>
