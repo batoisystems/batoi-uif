@@ -26,11 +26,27 @@
         <h2>Revenue Chart</h2>
         <div
           data-uif="chart"
-          data-uif-chart="bar"
+          data-uif-chart="grouped-bar"
           data-uif-refresh="interval"
           data-uif-interval="30000"
-          data-uif-data='[{"label":"Jan","value":120},{"label":"Feb","value":180},{"label":"Mar","value":150}]'>
+          data-uif-options='{"legend":true,"grid":true}'
+          data-uif-data='[{"label":"Jan","values":{"New":120,"Renewal":80}},{"label":"Feb","values":{"New":180,"Renewal":92}},{"label":"Mar","values":{"New":150,"Renewal":110}}]'>
         </div>
+      </section>
+
+      <section class="uif-grid-3">
+        <article class="uif-card">
+          <h2>Pipeline Mix</h2>
+          <div data-uif="chart" data-uif-chart="donut" data-uif-options='{"legend":true}' data-uif-data='[{"label":"Won","value":45},{"label":"Open","value":35},{"label":"Risk","value":20}]'></div>
+        </article>
+        <article class="uif-card">
+          <h2>Readiness</h2>
+          <div data-uif="chart" data-uif-chart="radar" data-uif-data='[{"label":"Security","value":82},{"label":"Performance","value":74},{"label":"Reliability","value":91},{"label":"Cost","value":68}]'></div>
+        </article>
+        <article class="uif-card">
+          <h2>Target</h2>
+          <div data-uif="chart" data-uif-chart="bullet" data-uif-data='[{"label":"Revenue","value":72,"target":85,"max":100}]'></div>
+        </article>
       </section>
 
       <section class="uif-card">

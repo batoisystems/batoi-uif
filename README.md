@@ -154,6 +154,22 @@ Planned application capability packages:
 </div>
 ```
 
+Supported core chart types include `line`, `area`, `bar`, `horizontal-bar`, `grouped-bar`, `stacked-bar`, `pie`, `donut`, `doughnut`, `radar`, and `sparkline`. Compact app charts include `metric`, `progress`, `ring`, `gauge`, `timeline`, `heatmap`, and `bullet`.
+
+Multi-series charts use a compact `values` contract:
+
+```html
+<div
+  data-uif="chart"
+  data-uif-chart="grouped-bar"
+  data-uif-options='{"legend":true}'
+  data-uif-data='[
+    {"label":"Jan","values":{"New":120,"Renewal":80}},
+    {"label":"Feb","values":{"New":140,"Renewal":90}}
+  ]'>
+</div>
+```
+
 ### Realtime feed with polling fallback
 
 ```html

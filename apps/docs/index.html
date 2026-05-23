@@ -132,7 +132,10 @@ init(document);</code></pre>
 
       <section id="charts" class="uif-card">
         <h2>Charts</h2>
-        <div data-uif="chart" data-uif-chart="bar" data-uif-data='[{"label":"Jan","value":120},{"label":"Feb","value":180}]'></div>
+        <p>Charts are dependency-free SVG and support line, area, bar, horizontal bar, grouped bar, stacked bar, pie, donut/doughnut, radar, sparkline, metric, progress/ring, gauge, timeline, heatmap, and bullet patterns.</p>
+        <div data-uif="chart" data-uif-chart="bar" data-uif-options='{"axes":true,"grid":true}' data-uif-data='[{"label":"Jan","value":120},{"label":"Feb","value":180}]'></div>
+        <pre><code>&lt;div data-uif="chart" data-uif-chart="radar"
+  data-uif-data='[{"label":"Security","value":82},{"label":"Performance","value":74}]'&gt;&lt;/div&gt;</code></pre>
       </section>
 
       <section id="realtime" class="uif-card">
