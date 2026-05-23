@@ -14,6 +14,7 @@
       <nav class="uif-cluster" aria-label="Documentation sections" data-uif="nav">
         <a href="#getting-started">Getting Started</a>
         <a href="#installation">Installation</a>
+        <a href="#browser-distribution">Browser Distribution</a>
         <a href="#core">Core Concepts</a>
         <a href="#attributes">Data Attributes</a>
         <a href="#tokens">CSS Tokens</a>
@@ -49,6 +50,13 @@ npm run build</code></pre>
 &lt;script type="module" src="/assets/uif/uif.esm.js"&gt;&lt;/script&gt;</code></pre>
       </section>
 
+      <section id="browser-distribution" class="uif-card">
+        <h2>Simple JS/CSS Distribution</h2>
+        <p>Build output includes plain browser files for apps that do not use TypeScript or a bundler: <code>dist/uif.css</code>, <code>dist/uif.esm.js</code>, and <code>dist/uif.iife.js</code>.</p>
+        <pre><code>&lt;link rel="stylesheet" href="/assets/uif/uif.css"&gt;
+&lt;script src="/assets/uif/uif.iife.js"&gt;&lt;/script&gt;</code></pre>
+      </section>
+
       <section id="core" class="uif-card">
         <h2>Core Concepts</h2>
         <pre><code>import { init } from '@batoi/uif-core';
@@ -70,6 +78,7 @@ init(document);</code></pre>
 
       <section id="components" class="uif-card">
         <h2>Components</h2>
+        <p>Component coverage includes modal, drawer, dropdown, tabs, toast, accordion, alert, badge, breadcrumb, collapse, tooltip, popover, progress, spinner, skeleton, pagination, command menu, navbar/sidebar, stepper/wizard, file upload, and combobox.</p>
         <div data-uif="tabs">
           <button data-uif-role="tab">Modal</button>
           <button data-uif-role="tab">Dropdown</button>
@@ -81,6 +90,14 @@ init(document);</code></pre>
       <section id="rad" class="uif-card">
         <h2>AJAX and RAD Adapter</h2>
         <pre><code>&lt;button data-uif="ajax" data-uif-action="reload" data-uif-src="/customers/list" data-uif-target="#customers"&gt;Reload&lt;/button&gt;</code></pre>
+        <pre><code>{
+  "ok": true,
+  "html": "&lt;div&gt;Updated&lt;/div&gt;",
+  "target": "#customers",
+  "events": [{"name": "customer:saved"}],
+  "actions": [{"type": "toast", "message": "Saved"}],
+  "focus": "#first-row"
+}</code></pre>
       </section>
 
       <section id="forms" class="uif-card">
@@ -171,6 +188,12 @@ uif('.item').addClass('active').text('Ready');</code></pre>
           <li><a href="../../examples/mobile-shell/index.html">Mobile Shell</a></li>
           <li><a href="../../examples/realtime-feed/index.html">Realtime Feed</a></li>
           <li><a href="../../examples/ai-tool-approval/index.html">AI Tool Approval</a></li>
+          <li><a href="../../examples/saas-settings/index.html">SaaS Settings</a></li>
+          <li><a href="../../examples/commerce-checkout/index.html">Commerce Checkout</a></li>
+          <li><a href="../../examples/content-site/index.html">Content Site</a></li>
+          <li><a href="../../examples/realtime-ops/index.html">Realtime Ops</a></li>
+          <li><a href="../../examples/mobile-pwa/index.html">Mobile PWA</a></li>
+          <li><a href="../../examples/ai-assisted-rad/index.html">AI Assisted RAD</a></li>
         </ul>
       </section>
 

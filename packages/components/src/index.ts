@@ -1,4 +1,6 @@
 import { emit } from '@batoi/uif-core';
+import { collapse, expand, hide, show } from '@batoi/uif-effects';
+import { closeOverlay, openOverlay, positionOverlay, toggleOverlay } from '@batoi/uif-overlays';
 
 export interface ComponentInstance {
   destroy(): void;
@@ -42,12 +44,14 @@ function initModal(el: HTMLElement): ComponentInstance {
   const mode = el.dataset.uifMode ?? 'dismissible';
   const dialog = el.dataset.uifRole === 'dialog' ? el : el.querySelector<HTMLElement>('[data-uif-role="dialog"]') || el;
   const open = () => {
+    void openOverlay(el, { modal: true, restoreFocus: true });
     setState(el, true);
     document.body.classList.add('uif-modal-open');
     dialog.querySelector<HTMLElement>(focusableSelector)?.focus();
   };
   const close = () => {
     if (mode === 'locked') return;
+    void closeOverlay(el);
     setState(el, false);
     document.body.classList.remove('uif-modal-open');
   };
@@ -95,9 +99,18 @@ function initDrawer(el: HTMLElement): ComponentInstance {
   if (!el.dataset.uifState) setState(el, false);
   return {
     destroy: () => undefined,
-    open: () => setState(el, true),
-    close: () => setState(el, false),
-    toggle: () => setState(el, el.dataset.uifState !== 'open'),
+    open: () => {
+      void openOverlay(el, { modal: true, restoreFocus: true });
+      setState(el, true);
+    },
+    close: () => {
+      void closeOverlay(el);
+      setState(el, false);
+    },
+    toggle: () => {
+      void toggleOverlay(el, { modal: true, restoreFocus: true });
+      setState(el, el.dataset.uifState !== 'open');
+    },
   };
 }
 
@@ -105,11 +118,12 @@ function initDropdown(el: HTMLElement): ComponentInstance {
   const trigger = el.querySelector<HTMLElement>('[data-uif-role="trigger"]');
   const panel = el.querySelector<HTMLElement>('[data-uif-role="panel"]');
   const open = () => {
-    panel?.removeAttribute('hidden');
+    if (trigger && panel) positionOverlay(trigger, panel);
+    if (panel) void show(panel);
     trigger?.setAttribute('aria-expanded', 'true');
   };
   const close = () => {
-    panel?.setAttribute('hidden', '');
+    if (panel) void hide(panel);
     trigger?.setAttribute('aria-expanded', 'false');
   };
   const toggle = () => (panel?.hasAttribute('hidden') ? open() : close());
@@ -197,7 +211,7 @@ function initAccordion(el: HTMLElement): ComponentInstance {
   const setExpanded = (expanded: boolean) => {
     el.dataset.uifState = expanded ? 'expanded' : 'collapsed';
     trigger?.setAttribute('aria-expanded', String(expanded));
-    if (panel) panel.hidden = !expanded;
+    if (panel) void (expanded ? expand(panel) : collapse(panel));
   };
   const toggle = () => setExpanded(trigger?.getAttribute('aria-expanded') !== 'true');
   const onKey = (event: KeyboardEvent) => {
@@ -230,6 +244,183 @@ function initPassive(el: HTMLElement): ComponentInstance {
   return { destroy: () => undefined };
 }
 
+function initDismissible(el: HTMLElement): ComponentInstance {
+  const close = () => {
+    void hide(el);
+    el.dataset.uifState = 'closed';
+  };
+  const onClick = (event: MouseEvent) => {
+    const action = eventElement(event)?.closest<HTMLElement>('[data-uif-action]');
+    if (action?.dataset.uifAction === 'close') close();
+  };
+  el.addEventListener('click', onClick);
+  return { destroy: () => el.removeEventListener('click', onClick), close };
+}
+
+function initCollapse(el: HTMLElement): ComponentInstance {
+  if (!el.dataset.uifState) el.dataset.uifState = el.hidden ? 'collapsed' : 'expanded';
+  const toggle = () => {
+    const expanded = el.dataset.uifState !== 'expanded';
+    el.dataset.uifState = expanded ? 'expanded' : 'collapsed';
+    void (expanded ? expand(el) : collapse(el));
+  };
+  return { destroy: () => undefined, toggle };
+}
+
+function initTooltip(el: HTMLElement): ComponentInstance {
+  const panel = document.createElement('div');
+  panel.className = 'uif-tooltip';
+  panel.id = el.getAttribute('aria-describedby') || `${el.id || 'uif-tooltip'}-panel`;
+  panel.setAttribute('role', 'tooltip');
+  panel.textContent = el.dataset.uifMessage || el.getAttribute('title') || '';
+  panel.hidden = true;
+  el.removeAttribute('title');
+  el.setAttribute('aria-describedby', panel.id);
+  document.body.appendChild(panel);
+  const open = () => {
+    positionOverlay(el, panel);
+    void show(panel);
+  };
+  const close = () => void hide(panel);
+  el.addEventListener('mouseenter', open);
+  el.addEventListener('focus', open);
+  el.addEventListener('mouseleave', close);
+  el.addEventListener('blur', close);
+  return {
+    destroy: () => {
+      el.removeEventListener('mouseenter', open);
+      el.removeEventListener('focus', open);
+      el.removeEventListener('mouseleave', close);
+      el.removeEventListener('blur', close);
+      panel.remove();
+    },
+    open,
+    close,
+  };
+}
+
+function initPopover(el: HTMLElement): ComponentInstance {
+  const trigger = el.querySelector<HTMLElement>('[data-uif-role="trigger"]') || el;
+  const panel = el.querySelector<HTMLElement>('[data-uif-role="panel"]');
+  const open = () => {
+    if (!panel) return;
+    positionOverlay(trigger, panel);
+    void openOverlay(panel, { restoreFocus: true });
+  };
+  const close = () => {
+    if (panel) void closeOverlay(panel);
+  };
+  const toggle = () => (panel?.dataset.uifState === 'open' ? close() : open());
+  trigger.addEventListener('click', toggle);
+  panel?.setAttribute('role', panel.getAttribute('role') || 'dialog');
+  panel?.setAttribute('hidden', '');
+  return { destroy: () => trigger.removeEventListener('click', toggle), open, close, toggle };
+}
+
+function initProgress(el: HTMLElement): ComponentInstance {
+  const value = Number(el.dataset.uifValue || el.getAttribute('aria-valuenow') || 0);
+  const max = Number(el.dataset.uifMax || el.getAttribute('aria-valuemax') || 100);
+  el.setAttribute('role', 'progressbar');
+  el.setAttribute('aria-valuemin', '0');
+  el.setAttribute('aria-valuemax', String(max));
+  el.setAttribute('aria-valuenow', String(value));
+  el.style.setProperty('--uif-progress', `${Math.max(0, Math.min(100, (value / max) * 100))}%`);
+  return { destroy: () => undefined };
+}
+
+function initPagination(el: HTMLElement): ComponentInstance {
+  el.setAttribute('role', 'navigation');
+  el.querySelectorAll<HTMLAnchorElement | HTMLButtonElement>('[data-uif-page]').forEach((item) => {
+    const active = item.dataset.uifState === 'active' || item.getAttribute('aria-current') === 'page';
+    item.setAttribute('aria-current', active ? 'page' : 'false');
+  });
+  return { destroy: () => undefined };
+}
+
+function initCommandMenu(el: HTMLElement): ComponentInstance {
+  const input = el.querySelector<HTMLInputElement>('[data-uif-role="search"]');
+  const items = Array.from(el.querySelectorAll<HTMLElement>('[data-uif-role="item"]'));
+  let active = 0;
+  const activate = (idx: number) => {
+    active = (idx + items.length) % Math.max(1, items.length);
+    items.forEach((item, i) => {
+      item.tabIndex = i === active ? 0 : -1;
+      item.dataset.uifState = i === active ? 'active' : 'inactive';
+    });
+    items[active]?.focus();
+  };
+  const filter = () => {
+    const query = input?.value.trim().toLowerCase() || '';
+    items.forEach((item) => {
+      item.hidden = query !== '' && !item.textContent?.toLowerCase().includes(query);
+    });
+  };
+  const onKey = (event: KeyboardEvent) => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      activate(active + 1);
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      activate(active - 1);
+    }
+    if (event.key === 'Home') activate(0);
+    if (event.key === 'End') activate(items.length - 1);
+  };
+  el.setAttribute('role', 'menu');
+  input?.addEventListener('input', filter);
+  el.addEventListener('keydown', onKey);
+  if (items.length) activate(0);
+  return {
+    destroy: () => {
+      input?.removeEventListener('input', filter);
+      el.removeEventListener('keydown', onKey);
+    },
+  };
+}
+
+function initFileUpload(el: HTMLElement): ComponentInstance {
+  const input = el.querySelector<HTMLInputElement>('input[type="file"]');
+  const label = el.querySelector<HTMLElement>('[data-uif-role="file-list"]');
+  const update = () => {
+    if (!label || !input) return;
+    label.textContent = Array.from(input.files || [])
+      .map((file) => file.name)
+      .join(', ');
+  };
+  input?.addEventListener('change', update);
+  return { destroy: () => input?.removeEventListener('change', update) };
+}
+
+function initCombobox(el: HTMLElement): ComponentInstance {
+  const input = el.querySelector<HTMLInputElement>('input,[data-uif-role="input"]');
+  const options = Array.from(el.querySelectorAll<HTMLElement>('[data-uif-role="option"]'));
+  const filter = () => {
+    const query = input?.value.toLowerCase() || '';
+    options.forEach((option) => {
+      option.hidden = query !== '' && !option.textContent?.toLowerCase().includes(query);
+    });
+  };
+  const select = (option: HTMLElement) => {
+    if (input) input.value = option.dataset.uifValue || option.textContent?.trim() || '';
+    emit('uif:select', { value: input?.value, option }, el);
+  };
+  const onClick = (event: MouseEvent) => {
+    const option = eventElement(event)?.closest<HTMLElement>('[data-uif-role="option"]');
+    if (option) select(option);
+  };
+  el.setAttribute('role', 'combobox');
+  input?.setAttribute('aria-autocomplete', 'list');
+  input?.addEventListener('input', filter);
+  el.addEventListener('click', onClick);
+  return {
+    destroy: () => {
+      input?.removeEventListener('input', filter);
+      el.removeEventListener('click', onClick);
+    },
+  };
+}
+
 function handleAction(event: Event): void {
   const actionEl = eventElement(event)?.closest<HTMLElement>('[data-uif-action]');
   if (!actionEl) return;
@@ -256,6 +447,23 @@ const inits: Record<string, ComponentInit> = {
   tabs: initTabs,
   toast: initToast,
   accordion: initAccordion,
+  alert: initDismissible,
+  badge: initPassive,
+  breadcrumb: initPassive,
+  collapse: initCollapse,
+  tooltip: initTooltip,
+  popover: initPopover,
+  progress: initProgress,
+  spinner: initPassive,
+  skeleton: initPassive,
+  pagination: initPagination,
+  'command-menu': initCommandMenu,
+  navbar: initPassive,
+  sidebar: initPassive,
+  stepper: initPassive,
+  wizard: initPassive,
+  'file-upload': initFileUpload,
+  combobox: initCombobox,
   button: initButton,
   card: initPassive,
   nav: initPassive,
@@ -303,6 +511,23 @@ export const dropdown = { name: 'dropdown', init: initDropdown, destroy: destroy
 export const tabs = { name: 'tabs', init: initTabs, destroy: destroyComponent };
 export const toast = { name: 'toast', init: initToast, destroy: destroyComponent };
 export const accordion = { name: 'accordion', init: initAccordion, destroy: destroyComponent };
+export const alert = { name: 'alert', init: initDismissible, destroy: destroyComponent };
+export const badge = { name: 'badge', init: initPassive, destroy: destroyComponent };
+export const breadcrumb = { name: 'breadcrumb', init: initPassive, destroy: destroyComponent };
+export const collapseComponent = { name: 'collapse', init: initCollapse, destroy: destroyComponent };
+export const tooltip = { name: 'tooltip', init: initTooltip, destroy: destroyComponent };
+export const popover = { name: 'popover', init: initPopover, destroy: destroyComponent };
+export const progress = { name: 'progress', init: initProgress, destroy: destroyComponent };
+export const spinner = { name: 'spinner', init: initPassive, destroy: destroyComponent };
+export const skeleton = { name: 'skeleton', init: initPassive, destroy: destroyComponent };
+export const pagination = { name: 'pagination', init: initPagination, destroy: destroyComponent };
+export const commandMenu = { name: 'command-menu', init: initCommandMenu, destroy: destroyComponent };
+export const navbar = { name: 'navbar', init: initPassive, destroy: destroyComponent };
+export const sidebar = { name: 'sidebar', init: initPassive, destroy: destroyComponent };
+export const stepper = { name: 'stepper', init: initPassive, destroy: destroyComponent };
+export const wizard = { name: 'wizard', init: initPassive, destroy: destroyComponent };
+export const fileUpload = { name: 'file-upload', init: initFileUpload, destroy: destroyComponent };
+export const combobox = { name: 'combobox', init: initCombobox, destroy: destroyComponent };
 export const card = { name: 'card', init: initPassive, destroy: destroyComponent };
 export const nav = { name: 'nav', init: initPassive, destroy: destroyComponent };
 export const table = { name: 'table', init: initPassive, destroy: destroyComponent };

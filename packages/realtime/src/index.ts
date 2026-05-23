@@ -1,4 +1,5 @@
 export type RealtimeMode = 'sse' | 'websocket' | 'poll';
+export type RealtimeState = 'connecting' | 'connected' | 'reconnecting' | 'disconnected' | 'stale' | 'error';
 export type RealtimeHandler = (payload: unknown) => void;
 
 export interface RealtimeOptions {
@@ -6,10 +7,31 @@ export interface RealtimeOptions {
   src?: string;
   mode?: RealtimeMode;
   interval?: number;
+  reconnect?: boolean;
+  backoff?: number;
+  heartbeat?: number;
 }
 
 const handlers = new Map<string, Set<RealtimeHandler>>();
 const connections = new Map<string, { close(): void }>();
+const states = new Map<string, RealtimeState>();
+
+function setState(channel: string, state: RealtimeState): void {
+  states.set(channel, state);
+  window.dispatchEvent(new CustomEvent('uif:realtime-state', { detail: { channel, state } }));
+}
+
+export function getConnectionState(channel: string): RealtimeState {
+  return states.get(channel) ?? 'disconnected';
+}
+
+function parsePayload(data: string): unknown {
+  try {
+    return JSON.parse(data);
+  } catch {
+    return data;
+  }
+}
 
 export function subscribe(channel: string, handler: RealtimeHandler): () => void {
   if (!handlers.has(channel)) handlers.set(channel, new Set());
@@ -21,32 +43,64 @@ export function publishLocal(channel: string, payload: unknown): void {
   handlers.get(channel)?.forEach((handler) => handler(payload));
 }
 
+export function publishBatched(channel: string, payload: unknown): void {
+  window.requestAnimationFrame(() => publishLocal(channel, payload));
+}
+
 export function connect(options: RealtimeOptions): void {
   const mode = options.mode ?? 'poll';
   disconnect(options.channel);
+  setState(options.channel, 'connecting');
+  let attempts = 0;
+  const reconnect = () => {
+    if (options.reconnect === false) {
+      setState(options.channel, 'disconnected');
+      return;
+    }
+    attempts += 1;
+    setState(options.channel, 'reconnecting');
+    window.setTimeout(() => connect(options), (options.backoff ?? 500) * attempts);
+  };
   if (mode === 'sse' && options.src && 'EventSource' in window) {
     const source = new EventSource(options.src);
-    source.onmessage = (event) => publishLocal(options.channel, JSON.parse(event.data));
+    source.onopen = () => setState(options.channel, 'connected');
+    source.onmessage = (event) => publishLocal(options.channel, parsePayload(event.data));
+    source.onerror = reconnect;
     connections.set(options.channel, { close: () => source.close() });
     return;
   }
   if (mode === 'websocket' && options.src && 'WebSocket' in window) {
     const socket = new WebSocket(options.src);
-    socket.onmessage = (event) => publishLocal(options.channel, JSON.parse(event.data));
+    socket.onopen = () => setState(options.channel, 'connected');
+    socket.onmessage = (event) => publishLocal(options.channel, parsePayload(event.data));
+    socket.onerror = reconnect;
+    socket.onclose = reconnect;
     connections.set(options.channel, { close: () => socket.close() });
     return;
   }
   const timer = window.setInterval(async () => {
     if (!options.src) return;
-    const response = await fetch(options.src);
-    publishLocal(options.channel, await response.json());
+    try {
+      const response = await fetch(options.src);
+      setState(options.channel, 'connected');
+      publishLocal(options.channel, await response.json());
+    } catch {
+      setState(options.channel, 'error');
+      reconnect();
+    }
   }, options.interval ?? 5000);
+  if (options.heartbeat) {
+    window.setTimeout(() => {
+      if (getConnectionState(options.channel) === 'connecting') setState(options.channel, 'stale');
+    }, options.heartbeat);
+  }
   connections.set(options.channel, { close: () => window.clearInterval(timer) });
 }
 
 export function disconnect(channel: string): void {
   connections.get(channel)?.close();
   connections.delete(channel);
+  setState(channel, 'disconnected');
 }
 
 export function initRealtime(el: HTMLElement): void {
@@ -62,6 +116,7 @@ export function initRealtime(el: HTMLElement): void {
     src: el.dataset.uifSrc,
     mode: (el.dataset.uifMode as RealtimeMode) || 'poll',
     interval: Number(el.dataset.uifInterval || 5000),
+    reconnect: el.dataset.uifReconnect !== 'false',
   });
 }
 

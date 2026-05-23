@@ -18,7 +18,8 @@
     "dev:playground": "npm --workspace @batoi/uif-playground run dev",
     "lint": "eslint .",
     "format": "prettier --check .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "verify:release": "node scripts/verify-release.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

@@ -1,7 +1,12 @@
+import { emit } from '@batoi/uif-core';
 import { request } from '@batoi/uif-net';
 
 export type FormErrors = Record<string, string[]>;
 type RuleHandler = (value: string, arg: string | undefined, form: HTMLFormElement) => boolean;
+type AsyncRuleHandler = (
+  field: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
+  form: HTMLFormElement,
+) => Promise<string[]>;
 
 const ruleHandlers: Record<string, RuleHandler> = {
   required: (value) => value.trim().length > 0,
@@ -18,6 +23,12 @@ const ruleHandlers: Record<string, RuleHandler> = {
     return other instanceof HTMLInputElement || other instanceof HTMLTextAreaElement ? value === other.value : false;
   },
 };
+
+const asyncRuleHandlers = new Map<string, AsyncRuleHandler>();
+
+export function registerAsyncRule(name: string, handler: AsyncRuleHandler): void {
+  asyncRuleHandlers.set(name, handler);
+}
 
 function fieldName(fieldEl: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): string {
   return fieldEl.name || fieldEl.id || 'field';
@@ -65,6 +76,7 @@ export function validateForm(formEl: HTMLFormElement): FormErrors {
 
 export function clearErrors(formEl: HTMLFormElement): void {
   formEl.querySelectorAll('.uif-error').forEach((el) => el.remove());
+  formEl.querySelectorAll('.uif-error-summary').forEach((el) => el.remove());
   formEl.querySelectorAll('[aria-invalid="true"]').forEach((el) => el.setAttribute('aria-invalid', 'false'));
 }
 
@@ -84,30 +96,98 @@ export function showErrors(formEl: HTMLFormElement, errors: FormErrors): void {
   });
 }
 
+export function showErrorSummary(formEl: HTMLFormElement, errors: FormErrors): HTMLElement | null {
+  const entries = Object.entries(errors);
+  if (!entries.length) return null;
+  const summary = document.createElement('div');
+  summary.className = 'uif-error-summary';
+  summary.setAttribute('role', 'alert');
+  summary.innerHTML = `<strong>Please correct ${entries.length} field${entries.length === 1 ? '' : 's'}.</strong><ul>${entries
+    .map(([name, messages]) => `<li><a href="#${CSS.escape(name)}">${messages[0] ?? 'Invalid value'}</a></li>`)
+    .join('')}</ul>`;
+  formEl.prepend(summary);
+  return summary;
+}
+
+export async function validateFormAsync(formEl: HTMLFormElement): Promise<FormErrors> {
+  const errors = validateForm(formEl);
+  const asyncFields = Array.from(
+    formEl.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[data-uif-validate-async]'),
+  );
+  await Promise.all(
+    asyncFields.map(async (field) => {
+      const name = fieldName(field);
+      const handler = asyncRuleHandlers.get(field.dataset.uifValidateAsync || '');
+      const fieldErrors = handler ? await handler(field, formEl) : [];
+      if (fieldErrors.length) errors[name] = [...(errors[name] ?? []), ...fieldErrors];
+    }),
+  );
+  return errors;
+}
+
+function setFormState(formEl: HTMLFormElement, state: 'idle' | 'submitting' | 'success' | 'error'): void {
+  formEl.dataset.uifState = state;
+  formEl.toggleAttribute('aria-busy', state === 'submitting');
+  emit(`uif:form-${state}`, { form: formEl }, formEl);
+}
+
+export function initRepeatableGroup(root: HTMLElement): void {
+  root.addEventListener('click', (event) => {
+    const action = event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('[data-uif-repeat-action]') : null;
+    if (!action) return;
+    const template = root.querySelector<HTMLTemplateElement>('template[data-uif-role="template"]');
+    const list = root.querySelector<HTMLElement>('[data-uif-role="items"]') || root;
+    if (action.dataset.uifRepeatAction === 'add' && template) list.append(template.content.cloneNode(true));
+    if (action.dataset.uifRepeatAction === 'remove') action.closest<HTMLElement>('[data-uif-role="item"]')?.remove();
+  });
+}
+
 export function initForm(formEl: HTMLFormElement): void {
+  formEl.dataset.uifState ||= 'idle';
+  formEl.querySelectorAll<HTMLElement>('[data-uif="repeatable"]').forEach(initRepeatableGroup);
+  formEl.addEventListener('input', (event) => {
+    const field = event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('input,select,textarea') : null;
+    field?.setAttribute('data-uif-touched', 'true');
+    formEl.dataset.uifDirty = 'true';
+  });
   formEl.addEventListener('submit', async (event) => {
     event.preventDefault();
     clearErrors(formEl);
     if (formEl.dataset.uifValidate !== 'false') {
-      const errors = validateForm(formEl);
+      const errors = await validateFormAsync(formEl);
       if (Object.keys(errors).length) {
         showErrors(formEl, errors);
+        showErrorSummary(formEl, errors);
+        setFormState(formEl, 'error');
         return;
       }
     }
 
+    setFormState(formEl, 'submitting');
     const url = formEl.dataset.uifSrc || formEl.getAttribute('action') || window.location.href;
     const method = (formEl.dataset.uifMethod || formEl.getAttribute('method') || 'POST').toUpperCase();
-    const result = await request<string | { html?: string; target?: string; swap?: string }>(url, {
-      method,
-      body: new FormData(formEl),
-    });
-    const target = resolveFormTarget(formEl);
-    const mode = formEl.dataset.uifSwap || 'inner';
-    if (typeof result === 'string') {
-      swap(target, result, mode);
-    } else if (result?.html) {
-      swap(result.target ? document.querySelector<HTMLElement>(result.target) : target, result.html, result.swap || mode);
+    try {
+      const result = await request<string | { html?: string; target?: string; swap?: string; errors?: FormErrors; focus?: string }>(url, {
+        method,
+        body: new FormData(formEl),
+      });
+      const target = resolveFormTarget(formEl);
+      const mode = formEl.dataset.uifSwap || 'inner';
+      if (typeof result === 'string') {
+        swap(target, result, mode);
+      } else if (result?.errors) {
+        showErrors(formEl, result.errors);
+        showErrorSummary(formEl, result.errors);
+        setFormState(formEl, 'error');
+        return;
+      } else if (result?.html) {
+        swap(result.target ? document.querySelector<HTMLElement>(result.target) : target, result.html, result.swap || mode);
+      }
+      if (typeof result !== 'string' && result?.focus) document.querySelector<HTMLElement>(result.focus)?.focus();
+      setFormState(formEl, 'success');
+    } catch (error) {
+      setFormState(formEl, 'error');
+      throw error;
     }
   });
 }

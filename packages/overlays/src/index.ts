@@ -3,6 +3,7 @@ import { hide, show } from '@batoi/uif-effects';
 export interface OverlayOptions {
   opener?: HTMLElement | null;
   modal?: boolean;
+  restoreFocus?: boolean;
   placement?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end';
 }
 
@@ -28,7 +29,7 @@ export function getOverlayStack(): HTMLElement[] {
 
 export async function openOverlay(el: HTMLElement, options: OverlayOptions = {}): Promise<void> {
   if (!stack.length) document.addEventListener('keydown', onKey);
-  if (!stack.some((entry) => entry.el === el)) stack.push({ el, opener: options.opener ?? document.activeElement as HTMLElement, options });
+  if (!stack.some((entry) => entry.el === el)) stack.push({ el, opener: options.opener ?? (document.activeElement as HTMLElement), options });
   if (options.modal) document.body.classList.add('uif-overlay-open');
   el.setAttribute('aria-hidden', 'false');
   await show(el);
@@ -41,7 +42,7 @@ export async function closeOverlay(el: HTMLElement | undefined = top()?.el): Pro
   const [entry] = index >= 0 ? stack.splice(index, 1) : [];
   el.setAttribute('aria-hidden', 'true');
   await hide(el);
-  entry?.opener?.focus?.();
+  if (entry?.options.restoreFocus !== false) entry?.opener?.focus?.();
   if (!stack.length) {
     document.removeEventListener('keydown', onKey);
     document.body.classList.remove('uif-overlay-open');

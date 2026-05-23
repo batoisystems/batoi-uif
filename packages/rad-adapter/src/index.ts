@@ -10,6 +10,11 @@ export interface RadResponse {
   target?: string;
   swap?: SwapMode;
   message?: string;
+  focus?: string;
+  redirect?: string;
+  errors?: Record<string, string[]>;
+  events?: Array<{ name: string; detail?: unknown; target?: string }>;
+  actions?: Array<{ type: string; [key: string]: unknown }>;
 }
 
 const swapModes = new Set<string>(['inner', 'outer', 'append', 'prepend', 'before', 'after']);
@@ -28,6 +33,21 @@ function setLoading(sourceEl: HTMLElement, loading: boolean): void {
 function notify(message: string | undefined, type: 'success' | 'error' = 'success'): void {
   if (!message) return;
   emit(type === 'error' ? 'uif:error' : 'uif:success', { message });
+}
+
+function applyEvents(events: RadResponse['events']): void {
+  events?.forEach((event) => {
+    const target = event.target ? document.querySelector(event.target) : document;
+    emit(event.name, event.detail, target ?? document);
+  });
+}
+
+function applyActions(actions: RadResponse['actions']): void {
+  actions?.forEach((action) => {
+    if (action.type === 'toast') notify(String(action.message ?? ''), (action.level as 'success' | 'error') || 'success');
+    if (action.type === 'focus' && typeof action.target === 'string') document.querySelector<HTMLElement>(action.target)?.focus();
+    if (action.type === 'redirect' && typeof action.url === 'string') window.location.assign(action.url);
+  });
 }
 
 function getAttr(sourceEl: HTMLElement, name: string): string | null {
@@ -86,12 +106,20 @@ export async function loadPartial(sourceEl: HTMLElement): Promise<RadResponse | 
     const fallbackTarget = resolveTarget(sourceEl, sourceEl.dataset.uifTarget ?? 'self');
     const payload: RadResponse = typeof result === 'string' ? { ok: true, html: result } : result;
     if (payload?.ok === false) throw new Error(payload.message || 'Request failed');
+    if (payload.redirect) {
+      window.location.assign(payload.redirect);
+      return payload;
+    }
 
     const target = payload?.target ? document.querySelector<HTMLElement>(payload.target) : fallbackTarget;
     if (target && payload?.html) {
       const updated = swapContent(target, payload.html, payload.swap || sourceEl.dataset.uifSwap || 'inner');
       rehydrate(updated);
     }
+    if (payload.errors) emit('uif:field-errors', { source: sourceEl, errors: payload.errors }, sourceEl);
+    applyEvents(payload.events);
+    applyActions(payload.actions);
+    if (payload.focus) document.querySelector<HTMLElement>(payload.focus)?.focus();
     notify(payload?.message || sourceEl.dataset.uifSuccess);
     emit('uif:load', { source: sourceEl, payload }, sourceEl);
     return payload;

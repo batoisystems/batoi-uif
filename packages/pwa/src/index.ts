@@ -1,4 +1,5 @@
 let deferredPrompt: BeforeInstallPromptEvent | null = null;
+const offlineQueue: Array<() => Promise<void>> = [];
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -52,3 +53,37 @@ export const cacheStrategies = {
   staleWhileRevalidate:
     "caches.match(event.request).then((cached) => { const fresh = fetch(event.request); return cached || fresh; })",
 };
+
+export function createCacheStrategy(name: keyof typeof cacheStrategies): string {
+  return cacheStrategies[name];
+}
+
+export function queueOfflineTask(task: () => Promise<void>): void {
+  offlineQueue.push(task);
+}
+
+export async function flushOfflineQueue(): Promise<void> {
+  while (offlineQueue.length) await offlineQueue.shift()?.();
+}
+
+export function initOfflineQueue(): () => void {
+  const flush = () => void flushOfflineQueue();
+  window.addEventListener('online', flush);
+  return () => window.removeEventListener('online', flush);
+}
+
+export function onAppUpdate(handler: (registration: ServiceWorkerRegistration) => void): () => void {
+  if (!('serviceWorker' in navigator)) return () => undefined;
+  const listener = () => {
+    navigator.serviceWorker.ready.then((registration) => {
+      if (registration.waiting) handler(registration);
+    });
+  };
+  navigator.serviceWorker.addEventListener('controllerchange', listener);
+  return () => navigator.serviceWorker.removeEventListener('controllerchange', listener);
+}
+
+export function initInstallPrompt(el: HTMLElement): void {
+  const prompt = setupInstallPrompt();
+  el.addEventListener('click', () => void prompt());
+}
