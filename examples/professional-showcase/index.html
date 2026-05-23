@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Batoi UIF Professional Showcase</title>
+    <title>Command Center · Batoi UIF Professional Showcase</title>
     <link rel="stylesheet" href="../../packages/css/index.css">
     <link rel="stylesheet" href="./showcase.css">
   </head>
@@ -11,96 +11,55 @@
     <div class="uif-app-shell-fixed showcase-shell">
       <aside class="uif-sidebar uif-sidebar-fixed showcase-sidebar">
         <div class="uif-sidebar-brand">
-          <span class="showcase-brand-dot">B</span>
-          <span>
-            <strong>Batoi UIF</strong>
-            <span class="uif-text-sm uif-text-muted">Professional examples</span>
-          </span>
+          <img class="showcase-brand-mark" src="https://www.batoi.com/pub/assets/2022/03/05/batoi-green-favicon-622345836cf01.png" alt="Batoi">
+          <span><strong>Batoi UIF</strong><span class="uif-text-sm uif-text-muted">Examples · v2.6</span></span>
+          <button class="uif-btn uif-btn-secondary uif-icon-btn showcase-collapse" type="button" aria-label="Collapse sidebar">⌃</button>
         </div>
-        <div class="uif-px-3 uif-py-3">
-          <label class="uif-search">
-            <span aria-hidden="true">⌕</span>
-            <input type="search" placeholder="Search pages..." data-showcase-filter=".showcase-section,[data-row]">
-            <kbd>⌘K</kbd>
-          </label>
-        </div>
+        <div class="uif-px-3 uif-py-3"><label class="uif-search"><span data-uif-icon="search" aria-hidden="true"></span><input type="search" placeholder="Search pages..." data-showcase-filter=".showcase-section,[data-row],[data-deal]"><kbd>⌘K</kbd></label></div>
         <nav class="uif-sidebar-nav" aria-label="Showcase scenarios">
           <div class="uif-sidebar-section">Operate</div>
-          <a href="#command" aria-current="page"><span class="showcase-nav-label">▦ Command Center</span><span class="uif-badge uif-badge-info">Live</span></a>
-          <a href="#crm"><span class="showcase-nav-label">◎ CRM Pipeline</span><span class="uif-badge">24</span></a>
-          <a href="#ai"><span class="showcase-nav-label">◇ AI Approval</span><span class="uif-badge uif-badge-warning">12</span></a>
+          <a href="./" aria-current="page"><span class="showcase-nav-label"><span data-uif-icon="grid" aria-hidden="true"></span>Command Center</span></a>
+          <a href="./crm-pipeline.html"><span class="showcase-nav-label"><span data-uif-icon="users" aria-hidden="true"></span>CRM Pipeline</span><span class="uif-badge">24</span></a>
+          <a href="./ai-approval.html"><span class="showcase-nav-label"><span data-uif-icon="approval" aria-hidden="true"></span>AI Approval</span><span class="uif-badge uif-badge-warning">12</span></a>
           <div class="uif-sidebar-section">Build</div>
-          <a href="#mobile"><span class="showcase-nav-label">▯ Mobile Field</span></a>
-          <a href="#rad"><span class="showcase-nav-label">▤ RAD Admin</span></a>
-          <a href="#analytics"><span class="showcase-nav-label">⌁ Analytics</span></a>
+          <a href="./rad-admin.html"><span class="showcase-nav-label"><span data-uif-icon="layers" aria-hidden="true"></span>RAD Admin</span></a>
+          <a href="./mobile-field.html"><span class="showcase-nav-label"><span data-uif-icon="phone" aria-hidden="true"></span>Mobile Field</span></a>
+          <div class="uif-sidebar-section">Library</div>
+          <a class="is-disabled" href="#" aria-disabled="true"><span class="showcase-nav-label"><span data-uif-icon="layers" aria-hidden="true"></span>Components</span><span data-uif-icon="lock" aria-hidden="true"></span></a>
+          <a class="is-disabled" href="#" aria-disabled="true"><span class="showcase-nav-label"><span data-uif-icon="file" aria-hidden="true"></span>Patterns</span><span data-uif-icon="lock" aria-hidden="true"></span></a>
+          <a class="is-disabled" href="#" aria-disabled="true"><span class="showcase-nav-label"><span data-uif-icon="theme" aria-hidden="true"></span>Design Tokens</span><span data-uif-icon="lock" aria-hidden="true"></span></a>
         </nav>
-        <div class="uif-sidebar-footer">
-          <div class="uif-flex uif-items-center uif-gap-3">
-            <span class="uif-avatar">AR</span>
-            <span class="uif-cell-stack">
-              <strong>Ashwini Rath</strong>
-              <span class="uif-text-sm uif-text-muted">Platform Admin</span>
-            </span>
-            <button class="uif-btn uif-btn-secondary uif-icon-btn" type="button" data-showcase-toast="Settings opened" aria-label="Settings">⚙</button>
-          </div>
-        </div>
+        <div class="uif-sidebar-footer"><div class="uif-flex uif-items-center uif-gap-3"><span class="uif-avatar">AR</span><span class="uif-cell-stack"><strong>Ashwini Rath</strong><span class="uif-text-sm uif-text-muted">Platform Admin</span></span><button class="uif-btn uif-btn-secondary uif-icon-btn" type="button" data-showcase-toast="Settings opened" aria-label="Settings"><span data-uif-icon="settings" aria-hidden="true"></span></button></div></div>
       </aside>
-
       <div class="uif-shell-content showcase-content">
-        <header class="uif-topbar showcase-topbar">
-          <div class="showcase-topbar-title">
-            <div class="uif-breadcrumbs"><span>Workspace</span><span>/</span><strong>Examples</strong></div>
-            <h1 class="uif-text-xl">Professional Product Surfaces</h1>
-          </div>
-          <label class="uif-search showcase-search">
-            <span aria-hidden="true">⌕</span>
-            <input type="search" placeholder="Search records, deals, users...">
-            <kbd>⌘K</kbd>
-          </label>
-          <div class="uif-page-actions">
-            <button class="uif-btn uif-btn-secondary uif-icon-btn" type="button" data-showcase-toast="Notifications reviewed" aria-label="Notifications">◌</button>
-            <button class="uif-btn uif-btn-secondary" type="button" data-showcase-theme>Theme</button>
-            <button class="uif-btn" type="button" data-showcase-toast="New workflow started">+ New</button>
-          </div>
-        </header>
-
-        <section class="uif-page-head">
-          <div class="uif-page-title">
-            <h2>Lean UIF, full application confidence</h2>
-            <p>Dense dashboards, workflow queues, CRUD workspaces, mobile shells, governed approvals, and statistical analytics using Batoi UIF primitives.</p>
-          </div>
-          <div class="uif-page-actions">
-            <button class="uif-btn uif-btn-secondary" type="button" data-showcase-toast="Scenario export queued">Export</button>
-            <button class="uif-btn" type="button" data-showcase-toast="Executive brief prepared">Run brief</button>
-          </div>
-        </section>
-
+        <header class="uif-topbar showcase-topbar"><div class="showcase-topbar-title"><div class="uif-breadcrumbs"><span>Workspace</span><span>/</span><span>Operate</span><span>/</span><strong>Command Center</strong></div><h1 class="uif-text-xl">Command Center</h1></div><label class="uif-search showcase-search"><span data-uif-icon="search" aria-hidden="true"></span><input type="search" placeholder="Search records, deals, users..."><kbd>⌘K</kbd></label><div class="uif-page-actions"><button class="uif-btn uif-btn-secondary uif-icon-btn" type="button" data-showcase-toast="Notifications reviewed" aria-label="Notifications"><span data-uif-icon="bell" aria-hidden="true"></span></button><button class="uif-btn uif-btn-secondary uif-icon-btn" type="button" data-showcase-toast="Workspace switcher opened" aria-label="Workspace"><span data-uif-icon="grid" aria-hidden="true"></span></button><button class="uif-btn uif-btn-secondary" type="button" data-showcase-theme><span data-uif-icon="theme" aria-hidden="true"></span>Theme</button><button class="uif-btn" type="button" data-showcase-toast="New workflow started"><span data-uif-icon="plus" aria-hidden="true"></span>New</button></div></header>
+        <section class="uif-page-head showcase-command-head"><div class="uif-page-title"><div class="showcase-eyebrow">Operate · Quarter-to-date</div><h2>Command Center</h2><p>Executive operating view for revenue, incidents, and delivery health across all workspaces.</p></div><div class="uif-page-actions"><button class="uif-btn uif-btn-secondary" type="button" data-showcase-toast="Quarter filter applied"><span data-uif-icon="calendar" aria-hidden="true"></span>This quarter</button><button class="uif-btn uif-btn-secondary" type="button" data-showcase-toast="Scenario export queued"><span data-uif-icon="download" aria-hidden="true"></span>Export</button><button class="uif-btn" type="button" data-showcase-toast="Executive brief prepared"><span data-uif-icon="spark" aria-hidden="true"></span>Run brief</button></div></section>
         <main class="uif-scroll-region showcase-page-grid">
-          <section id="command" class="showcase-section showcase-page-grid">
+          <section class="showcase-section showcase-page-grid">
             <div class="showcase-grid-4">
-              <article class="uif-card uif-stat">
+              <article class="uif-card uif-stat showcase-kpi showcase-kpi-blue">
                 <div class="uif-stat-head"><span class="uif-stat-meta">Net Revenue</span><span class="uif-stat-icon">$</span></div>
                 <strong class="uif-stat-value">$248.7K</strong>
                 <div class="uif-stat-footer"><span class="uif-badge uif-badge-success">+14.2%</span><span>vs. $217.8K</span></div>
-                <div class="uif-sparkline" aria-hidden="true"><span style="height:38%"></span><span style="height:52%"></span><span style="height:46%"></span><span style="height:68%"></span><span style="height:82%"></span></div>
+                <div class="showcase-mini-line" aria-hidden="true"><svg viewBox="0 0 220 48"><path d="M4 38 L28 34 L52 35 L76 30 L100 28 L124 26 L148 21 L172 24 L196 19 L216 12"></path></svg></div>
               </article>
-              <article class="uif-card uif-stat">
-                <div class="uif-stat-head"><span class="uif-stat-meta">Active Workspaces</span><span class="uif-stat-icon">▦</span></div>
+              <article class="uif-card uif-stat showcase-kpi showcase-kpi-green">
+                <div class="uif-stat-head"><span class="uif-stat-meta">Active Workspaces</span><span class="uif-stat-icon" data-uif-icon="grid" aria-hidden="true"></span></div>
                 <strong class="uif-stat-value">1,482</strong>
-                <div class="uif-stat-footer"><span class="uif-badge uif-badge-success">+63</span><span>98.4% retained</span></div>
-                <div class="uif-sparkline" aria-hidden="true"><span style="height:45%"></span><span style="height:54%"></span><span style="height:56%"></span><span style="height:70%"></span><span style="height:88%"></span></div>
+                <div class="uif-stat-footer"><span class="uif-badge uif-badge-success">+63 this week</span><span>98.4% retained</span></div>
+                <div class="showcase-mini-line" aria-hidden="true"><svg viewBox="0 0 220 48"><path d="M4 38 L34 34 L64 31 L94 26 L124 22 L154 19 L184 17 L216 16"></path></svg></div>
               </article>
-              <article class="uif-card uif-stat">
+              <article class="uif-card uif-stat showcase-kpi showcase-kpi-amber">
                 <div class="uif-stat-head"><span class="uif-stat-meta">Open Incidents</span><span class="uif-stat-icon">!</span></div>
                 <strong class="uif-stat-value">3</strong>
-                <div class="uif-stat-footer"><span class="uif-badge uif-badge-warning">1 critical</span><span>MTTR 18m</span></div>
-                <div class="uif-sparkline" aria-hidden="true"><span style="height:72%"></span><span style="height:60%"></span><span style="height:40%"></span><span style="height:52%"></span><span style="height:34%"></span></div>
+                <div class="uif-stat-footer"><span class="uif-badge uif-badge-warning">1 critical path</span><span>MTTR 18m</span></div>
+                <div class="showcase-mini-line" aria-hidden="true"><svg viewBox="0 0 220 48"><path d="M4 16 L26 22 L46 10 L66 28 L86 16 L112 22 L138 29 L164 38 L188 30 L216 38"></path></svg></div>
               </article>
-              <article class="uif-card uif-stat">
-                <div class="uif-stat-head"><span class="uif-stat-meta">SLA Health</span><span class="uif-stat-icon">✓</span></div>
+              <article class="uif-card uif-stat showcase-kpi showcase-kpi-green">
+                <div class="uif-stat-head"><span class="uif-stat-meta">SLA Health</span><span class="uif-stat-icon" data-uif-icon="check" aria-hidden="true"></span></div>
                 <strong class="uif-stat-value">99.94%</strong>
-                <div class="uif-stat-footer"><span class="uif-badge uif-badge-success">On target</span><span>30-day rolling</span></div>
-                <div class="uif-sparkline" aria-hidden="true"><span style="height:78%"></span><span style="height:76%"></span><span style="height:82%"></span><span style="height:80%"></span><span style="height:86%"></span></div>
+                <div class="uif-stat-footer"><span class="uif-badge uif-badge-success">Within target</span><span>30-day rolling</span></div>
+                <div class="showcase-mini-line" aria-hidden="true"><svg viewBox="0 0 220 48"><path d="M4 38 L44 26 L64 34 L104 22 L144 16 L184 22 L216 18"></path></svg></div>
               </article>
             </div>
 
@@ -109,180 +68,61 @@
                 <div class="uif-card-head">
                   <div>
                     <h2 class="uif-text-lg">Revenue Trend</h2>
-                    <p>Quarter-to-date bookings by week with a live SVG chart.</p>
+                    <p>Quarter-to-date bookings by week, with green dashed line showing weekly target.</p>
                   </div>
-                  <div class="uif-segmented" role="group" aria-label="Chart range"><button type="button">Day</button><button type="button" aria-pressed="true">Week</button><button type="button">Month</button></div>
+                  <div class="uif-cluster"><span class="uif-badge uif-badge-success">● Live</span><div class="uif-segmented" role="group" aria-label="Chart range"><button type="button">Day</button><button type="button" aria-pressed="true">Week</button><button type="button">Month</button></div></div>
                 </div>
                 <div class="uif-card-body">
                   <div class="showcase-chart-summary">
-                    <div><strong class="showcase-chart-number">$2.48M</strong><span class="uif-text-sm uif-text-muted">12-week bookings</span></div>
-                    <span class="uif-badge uif-badge-success">Live</span>
+                    <div><strong class="showcase-chart-number">$2.48M</strong><span class="uif-text-muted">Quarter-to-date bookings · 12 weeks</span></div>
+                    <div class="uif-cluster uif-text-sm uif-text-muted showcase-chart-legend"><span><i class="is-blue"></i> Bookings</span><span><i class="is-green"></i> Target</span></div>
                   </div>
-                  <div data-uif="chart" data-uif-chart="bar" data-uif-options='{"grid":true,"focusable":true,"height":260}' data-uif-data='[{"label":"W14","value":86},{"label":"W15","value":104},{"label":"W16","value":94},{"label":"W17","value":124},{"label":"W18","value":112},{"label":"W19","value":137},{"label":"W20","value":128},{"label":"W21","value":148},{"label":"W22","value":142},{"label":"W23","value":158},{"label":"W24","value":152},{"label":"W25","value":176}]'></div>
+                  <div class="showcase-revenue-chart">
+                    <div data-uif="chart" data-uif-chart="bar" data-uif-options='{"grid":true,"focusable":true,"height":260,"max":300}' data-uif-data='[{"label":"W14","value":140},{"label":"W15","value":168},{"label":"W16","value":154},{"label":"W17","value":192},{"label":"W18","value":178},{"label":"W19","value":212},{"label":"W20","value":198},{"label":"W21","value":226},{"label":"W22","value":218},{"label":"W23","value":242},{"label":"W24","value":232},{"label":"W25","value":268}]'></div>
+                    <svg class="showcase-target-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M10 58 L28 58 L44 54 L60 54 L78 50 L92 50"></path></svg>
+                  </div>
                 </div>
               </article>
 
               <article class="uif-card uif-card-flush">
                 <div class="uif-card-head">
                   <div><h2 class="uif-text-lg">Incident Queue</h2><p>Prioritized operational exceptions.</p></div>
-                  <button class="uif-btn uif-btn-secondary" type="button" data-showcase-toast="Incident queue refreshed">Refresh</button>
+                  <button class="uif-btn uif-btn-secondary showcase-link-btn" type="button" data-showcase-toast="Incident queue refreshed">↻ Refresh</button>
                 </div>
                 <div class="uif-card-body uif-queue">
-                  <div class="uif-queue-row uif-risk-band-high" data-row><span class="uif-queue-main"><strong>Checkout latency</strong><span class="uif-text-sm uif-text-muted">payments · 15 min · PN</span></span><span class="uif-badge uif-badge-danger">P1</span></div>
-                  <div class="uif-queue-row uif-risk-band" data-row><span class="uif-queue-main"><strong>Delayed invoice sync</strong><span class="uif-text-sm uif-text-muted">finance · 38 min · RI</span></span><span class="uif-badge uif-badge-warning">P2</span></div>
-                  <div class="uif-queue-row uif-risk-band" data-row><span class="uif-queue-main"><strong>Webhook retry backlog</strong><span class="uif-text-sm uif-text-muted">integrations · 1 hr · MS</span></span><span class="uif-badge uif-badge-warning">P2</span></div>
+                  <div class="uif-queue-row uif-risk-band-high showcase-incident-row" data-row><span class="uif-queue-main"><strong>Checkout latency</strong><span class="uif-text-sm uif-text-muted"><code>payments</code> · 15 min · <span class="uif-avatar uif-avatar-sm">PN</span></span></span><span class="uif-badge uif-badge-danger">P1</span></div>
+                  <div class="uif-queue-row uif-risk-band showcase-incident-row" data-row><span class="uif-queue-main"><strong>Delayed invoice sync</strong><span class="uif-text-sm uif-text-muted"><code>finance</code> · 38 min · <span class="uif-avatar uif-avatar-sm">RI</span></span></span><span class="uif-badge uif-badge-warning">P2</span></div>
+                  <div class="uif-queue-row uif-risk-band showcase-incident-row" data-row><span class="uif-queue-main"><strong>Webhook retry backlog</strong><span class="uif-text-sm uif-text-muted"><code>integrations</code> · 1 hr · <span class="uif-avatar uif-avatar-sm">MS</span></span></span><span class="uif-badge uif-badge-warning">P2</span></div>
                 </div>
-                <footer class="uif-panel-footer"><span>3 open · 1 critical · MTTR 18m</span><a href="#ai">View all</a></footer>
+                <footer class="uif-panel-footer"><span>3 open · 1 critical · MTTR 18m</span><a href="./ai-approval.html">View all →</a></footer>
               </article>
             </div>
-          </section>
 
-          <section id="crm" class="showcase-section showcase-page-grid">
-            <div class="uif-page-title">
-              <h2>CRM Pipeline Workspace</h2>
-              <p>Stage board, deal register, and follow-up form for server-rendered sales operations.</p>
-            </div>
-            <article class="uif-card uif-card-flush">
-              <div class="uif-card-head">
-                <div><h2 class="uif-text-lg">Pipeline Board</h2><p>Stage-based account movement with searchable cards.</p></div>
-                <label class="uif-search"><span>⌕</span><input type="search" placeholder="Filter deals..." data-showcase-filter="[data-deal]"></label>
-              </div>
-              <div class="uif-card-body uif-kanban">
-                <section class="uif-kanban-column">
-                  <div class="showcase-stage-head"><strong><span class="showcase-stage-dot"></span> Qualified <span class="uif-badge">2</span></strong><span class="uif-text-sm uif-text-muted">$140K</span></div>
-                  <article class="uif-kanban-card" data-deal><div class="showcase-deal-head"><strong>Nimbus Health</strong><strong>$86K</strong></div><span class="uif-text-sm uif-text-muted">Discovery call tomorrow</span><div class="showcase-deal-head"><span class="showcase-owner"><span class="uif-avatar uif-avatar-sm">AR</span> Anita</span><span class="showcase-time">4d</span></div></article>
-                  <article class="uif-kanban-card" data-deal><div class="showcase-deal-head"><strong>Riverline Foods</strong><strong>$54K</strong></div><span class="uif-text-sm uif-text-muted">Send capabilities deck</span><div class="showcase-deal-head"><span class="showcase-owner"><span class="uif-avatar uif-avatar-sm">DP</span> Dev</span><span class="showcase-time">6d</span></div></article>
-                </section>
-                <section class="uif-kanban-column">
-                  <div class="showcase-stage-head"><strong><span class="showcase-stage-dot" style="background:#b76100"></span> Proposal <span class="uif-badge">2</span></strong><span class="uif-text-sm uif-text-muted">$170K</span></div>
-                  <article class="uif-kanban-card" data-deal><div class="showcase-deal-head"><strong>Metro Finance</strong><strong>$42K</strong></div><span class="uif-text-sm uif-text-muted">Procurement review</span><div class="showcase-deal-head"><span class="showcase-owner"><span class="uif-avatar uif-avatar-sm">RI</span> Rahul</span><span class="showcase-time">9d</span></div></article>
-                  <article class="uif-kanban-card" data-deal><div class="showcase-deal-head"><strong>Apex Learning</strong><strong>$128K</strong></div><span class="uif-text-sm uif-text-muted">Pricing v2 due Thu</span><div class="showcase-deal-head"><span class="showcase-owner"><span class="uif-avatar uif-avatar-sm">MS</span> Mira</span><span class="showcase-time">12d</span></div></article>
-                </section>
-                <section class="uif-kanban-column">
-                  <div class="showcase-stage-head"><strong><span class="showcase-stage-dot" style="background:#7c3aed"></span> Negotiation <span class="uif-badge">1</span></strong><span class="uif-text-sm uif-text-muted">$118K</span></div>
-                  <article class="uif-kanban-card" data-deal><div class="showcase-deal-head"><strong>Kalinga Retail</strong><strong>$118K</strong></div><span class="uif-text-sm uif-text-muted">Legal redlines</span><div class="showcase-deal-head"><span class="showcase-owner"><span class="uif-avatar uif-avatar-sm">MS</span> Mira</span><span class="showcase-time">18d</span></div></article>
-                </section>
-                <section class="uif-kanban-column">
-                  <div class="showcase-stage-head"><strong><span class="showcase-stage-dot" style="background:#148849"></span> Review <span class="uif-badge">2</span></strong><span class="uif-text-sm uif-text-muted">$156K</span></div>
-                  <article class="uif-kanban-card" data-deal><div class="showcase-deal-head"><strong>Sundial Energy</strong><strong>$64K</strong></div><span class="uif-text-sm uif-text-muted">Security review</span><div class="showcase-deal-head"><span class="showcase-owner"><span class="uif-avatar uif-avatar-sm">DP</span> Dev</span><span class="showcase-time">21d</span></div></article>
-                </section>
-              </div>
-            </article>
-
-            <div class="showcase-grid-2">
-              <article class="uif-card uif-card-flush">
-                <div class="uif-card-head">
-                  <div><h2 class="uif-text-lg">Deal Register</h2><p>Professional data-grid pattern using UIF table classes.</p></div>
-                  <button class="uif-btn uif-btn-secondary" type="button">All stages</button>
-                </div>
-                <div class="uif-overflow-auto">
-                  <table class="uif-table uif-data-grid" data-uif="table">
-                    <thead><tr><th><input type="checkbox" aria-label="Select all deals"></th><th>Account</th><th>Value</th><th>Stage</th><th>Owner</th><th>Updated</th></tr></thead>
-                    <tbody>
-                      <tr data-row><td><input type="checkbox" aria-label="Select Nimbus Health"></td><td><span class="uif-cell-stack"><strong>Nimbus Health</strong><span class="uif-text-sm uif-text-muted">ops@nimbushealth.io</span></span></td><td><strong>$86K</strong></td><td><span class="uif-badge uif-badge-info">Qualified</span></td><td><span class="showcase-owner"><span class="uif-avatar uif-avatar-sm">AR</span>Anita</span></td><td class="uif-text-muted">2h ago</td></tr>
-                      <tr data-row><td><input type="checkbox" aria-label="Select Metro Finance"></td><td><span class="uif-cell-stack"><strong>Metro Finance</strong><span class="uif-text-sm uif-text-muted">deal@metrofin.co</span></span></td><td><strong>$42K</strong></td><td><span class="uif-badge uif-badge-warning">Proposal</span></td><td><span class="showcase-owner"><span class="uif-avatar uif-avatar-sm">RI</span>Rahul</span></td><td class="uif-text-muted">5h ago</td></tr>
-                      <tr data-row><td><input type="checkbox" aria-label="Select Apex Learning"></td><td><span class="uif-cell-stack"><strong>Apex Learning</strong><span class="uif-text-sm uif-text-muted">rev@apexlearn.in</span></span></td><td><strong>$128K</strong></td><td><span class="uif-badge uif-badge-warning">Proposal</span></td><td><span class="showcase-owner"><span class="uif-avatar uif-avatar-sm">MS</span>Mira</span></td><td class="uif-text-muted">Yesterday</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-                <footer class="uif-panel-footer"><span>Showing 3 of 24 deals</span><div class="uif-cluster"><button class="uif-btn uif-btn-secondary" type="button">Prev</button><button class="uif-btn uif-btn-secondary" type="button">Next</button></div></footer>
+            <div class="showcase-grid-3">
+              <article class="uif-card showcase-summary-card showcase-kpi-blue">
+                <div class="showcase-summary-head"><span class="uif-stat-icon" data-uif-icon="activity" aria-hidden="true"></span><h2 class="uif-text-lg">Delivery Health</h2><a href="./rad-admin.html" aria-label="Open delivery health"><span data-uif-icon="external-link" aria-hidden="true"></span></a></div>
+                <p><strong class="showcase-chart-number">18</strong> <span class="uif-text-muted">deployments</span></p>
+                <div class="showcase-mini-line showcase-summary-line" aria-hidden="true"><svg viewBox="0 0 220 58"><path d="M4 44 L44 36 L84 40 L124 24 L164 28 L216 14"></path></svg></div>
+                <div class="showcase-metric-list"><div><span>Rollbacks</span><strong class="uif-text-primary">0</strong></div><div><span>Pending reviews</span><strong>4</strong></div><div><span>Lead time</span><strong>2.4d</strong></div></div>
               </article>
-
-              <article class="uif-card">
-                <h2 class="uif-text-lg uif-m-0">Follow-up</h2>
-                <p class="uif-text-sm uif-text-muted">Log next action against the selected deal.</p>
-                <form class="uif-stack uif-mt-3" data-uif="form">
-                  <div class="uif-note"><span>i</span><span><strong>Metro Finance</strong><br>Procurement review is the active blocker.</span></div>
-                  <label class="uif-field"><span class="uif-field-label">Account</span><select class="uif-input"><option>Metro Finance</option></select></label>
-                  <div class="uif-form-grid">
-                    <label class="uif-field"><span class="uif-field-label">Due</span><input class="uif-input" type="date" value="2026-05-28"></label>
-                    <label class="uif-field"><span class="uif-field-label">Priority</span><select class="uif-input"><option>High</option><option>Medium</option></select></label>
-                  </div>
-                  <label class="uif-field"><span class="uif-field-label">Notes</span><textarea class="uif-input" rows="4">Send proposal revision with implementation timeline.</textarea></label>
-                  <div class="uif-cluster uif-justify-between"><button class="uif-btn uif-btn-secondary" type="button">Cancel</button><button class="uif-btn" type="button" data-showcase-toast="Follow-up saved">Save follow-up</button></div>
-                </form>
+              <article class="uif-card showcase-summary-card showcase-kpi-amber">
+                <div class="showcase-summary-head"><span class="uif-stat-icon" data-uif-icon="users" aria-hidden="true"></span><h2 class="uif-text-lg">Customer Risk</h2><a href="./crm-pipeline.html" aria-label="Open customer risk"><span data-uif-icon="external-link" aria-hidden="true"></span></a></div>
+                <p><strong class="showcase-chart-number">7</strong> <span class="uif-text-muted">accounts need follow-up</span></p>
+                <div class="showcase-mini-line showcase-summary-line" aria-hidden="true"><svg viewBox="0 0 220 58"><path d="M4 14 L40 24 L78 30 L112 36 L150 24 L184 36 L216 44"></path></svg></div>
+                <div class="showcase-metric-list"><div><span>High churn risk</span><strong class="uif-badge-danger">2</strong></div><div><span>Renewal &lt; 30d</span><strong>5</strong></div><div><span>NPS this week</span><strong class="uif-text-primary">62</strong></div></div>
+              </article>
+              <article class="uif-card showcase-summary-card showcase-kpi-green">
+                <div class="showcase-summary-head"><span class="uif-stat-icon" data-uif-icon="tool" aria-hidden="true"></span><h2 class="uif-text-lg">Automation</h2><a href="./ai-approval.html" aria-label="Open automation"><span data-uif-icon="external-link" aria-hidden="true"></span></a></div>
+                <p><strong class="showcase-chart-number">82%</strong> <span class="uif-text-muted">routine checks autonomous</span></p>
+                <div class="showcase-mini-line showcase-summary-line" aria-hidden="true"><svg viewBox="0 0 220 58"><path d="M4 44 L40 36 L78 32 L116 30 L150 24 L184 20 L216 15"></path></svg></div>
+                <div class="showcase-metric-list"><div><span>Tasks resolved</span><strong class="uif-text-primary">1,284</strong></div><div><span>Human escalations</span><strong>228</strong></div><div><span>Token spend</span><strong>$412</strong></div></div>
               </article>
             </div>
-          </section>
-
-          <section id="ai" class="showcase-section showcase-grid-2">
-            <article class="uif-card uif-card-flush">
-              <div class="uif-card-head"><div><h2 class="uif-text-lg">AI Approval Desk</h2><p>Governed tool approvals with risk classification and audit context.</p></div><span class="uif-badge uif-badge-warning">12 pending</span></div>
-              <div class="uif-card-body uif-queue">
-                <div class="uif-queue-row uif-risk-band-high" data-row><span class="uif-queue-main"><strong>Refund subscription credit</strong><span class="uif-text-sm uif-text-muted">finance.refund · customer balance write</span></span><span class="uif-badge uif-badge-danger">High</span></div>
-                <div class="uif-queue-row uif-risk-band" data-row><span class="uif-queue-main"><strong>Update workspace plan</strong><span class="uif-text-sm uif-text-muted">billing.plan.update · requires policy check</span></span><span class="uif-badge uif-badge-warning">Medium</span></div>
-                <div class="uif-queue-row uif-risk-band-low" data-row><span class="uif-queue-main"><strong>Read invoice ledger</strong><span class="uif-text-sm uif-text-muted">finance.invoice.read · read only</span></span><span class="uif-badge uif-badge-success">Low</span></div>
-              </div>
-            </article>
-            <article class="uif-card">
-              <h2 class="uif-text-lg uif-m-0">Payload Preview</h2>
-              <pre class="showcase-code"><code>{
-  "tool": "finance.refund",
-  "workspace": "Metro Finance",
-  "amount": 4200,
-  "requiresApproval": true,
-  "policy": "finance.high_risk_write"
-}</code></pre>
-              <div class="uif-timeline uif-mt-3">
-                <div class="uif-timeline-item"><strong>Policy matched</strong><div class="uif-text-sm uif-text-muted">High-risk financial write</div></div>
-                <div class="uif-timeline-item"><strong>Approver required</strong><div class="uif-text-sm uif-text-muted">Finance administrator or workspace owner</div></div>
-              </div>
-              <div class="uif-cluster uif-mt-4"><button class="uif-btn uif-btn-danger" type="button" data-showcase-toast="Request rejected" data-showcase-tone="danger">Reject</button><button class="uif-btn" type="button" data-showcase-toast="Request approved">Approve</button></div>
-            </article>
-          </section>
-
-          <section id="mobile" class="showcase-section showcase-grid-2">
-            <div class="showcase-phone-frame">
-              <div class="showcase-phone-screen">
-                <div class="uif-mobile-shell">
-                  <header class="uif-mobile-topbar"><strong>Field Console</strong><div class="uif-text-sm uif-text-muted">Offline ready</div></header>
-                  <main class="uif-mobile-content uif-stack">
-                    <div class="uif-alert uif-badge-warning">3 jobs pending sync</div>
-                    <article class="uif-card"><strong>Replace sensor array</strong><p class="uif-text-sm uif-text-muted">Plant 4 · Bay 12 · Due 14:30</p><button class="uif-btn uif-w-full" type="button">Start job</button></article>
-                    <article class="uif-card"><strong>Inspect coolant line</strong><p class="uif-text-sm uif-text-muted">Plant 2 · Bay 08 · Due 16:00</p></article>
-                  </main>
-                  <nav class="uif-mobile-bottom-nav"><span>Jobs</span><span>Map</span><span>Sync</span></nav>
-                </div>
-              </div>
-            </div>
-            <article class="uif-card">
-              <h2 class="uif-text-lg uif-m-0">Mobile Field Console</h2>
-              <p class="uif-text-sm uif-text-muted">Touch-first operational workflow with bottom navigation, offline state, and sheet-ready job cards.</p>
-              <div data-uif="chart" data-uif-chart="ring" data-uif-options='{"label":"Sync health"}' data-uif-data='[{"label":"Synced","value":86,"max":100}]'></div>
-            </article>
-          </section>
-
-          <section id="rad" class="showcase-section showcase-grid-2">
-            <article class="uif-card uif-card-flush">
-              <div class="uif-card-head"><div><h2 class="uif-text-lg">RAD Admin CRUD</h2><p>Bulk users, guarded actions, and server-friendly table markup.</p></div><button class="uif-btn" type="button" data-showcase-toast="Invite drawer opened">Invite user</button></div>
-              <div class="uif-card-body uif-alert uif-badge-info"><strong>3 selected</strong><span class="uif-text-sm"> Bulk role update and delete actions are ready.</span></div>
-              <table class="uif-table uif-data-grid">
-                <thead><tr><th>User</th><th>Role</th><th>Status</th><th>Last active</th></tr></thead>
-                <tbody>
-                  <tr><td><span class="uif-cell-stack"><strong>Anita Rao</strong><span>anita@example.test</span></span></td><td>Admin</td><td><span class="uif-badge uif-badge-success">Active</span></td><td>12 min ago</td></tr>
-                  <tr><td><span class="uif-cell-stack"><strong>Rahul Iyer</strong><span>rahul@example.test</span></span></td><td>Finance</td><td><span class="uif-badge uif-badge-warning">Review</span></td><td>Yesterday</td></tr>
-                </tbody>
-              </table>
-            </article>
-            <article class="uif-card">
-              <h2 class="uif-text-lg uif-m-0">UIF Markup Contract</h2>
-              <pre class="showcase-code"><code>&lt;table class="uif-table uif-data-grid" data-uif="table"&gt;
-  &lt;tr data-uif-action="delete" data-uif-confirm="Delete user?"&gt;
-    ...
-  &lt;/tr&gt;
-&lt;/table&gt;</code></pre>
-            </article>
-          </section>
-
-          <section id="analytics" class="showcase-section showcase-grid-3">
-            <article class="uif-card"><h2 class="uif-text-lg uif-m-0">Histogram</h2><div data-uif="chart" data-uif-chart="histogram" data-uif-options='{"bins":5,"height":180}' data-uif-data='[12,18,19,22,22,25,31,33,35,38,42,45]'></div></article>
-            <article class="uif-card"><h2 class="uif-text-lg uif-m-0">Regression</h2><div data-uif="chart" data-uif-chart="regression" data-uif-x="users" data-uif-y="tickets" data-uif-options='{"height":180}' data-uif-data='[{"label":"Mon","users":120,"tickets":8},{"label":"Tue","users":180,"tickets":13},{"label":"Wed","users":220,"tickets":19},{"label":"Thu","users":280,"tickets":24}]'></div></article>
-            <article class="uif-card"><h2 class="uif-text-lg uif-m-0">Control Chart</h2><div data-uif="chart" data-uif-chart="control-chart" data-uif-options='{"height":180}' data-uif-data='[{"label":"1","value":22},{"label":"2","value":24},{"label":"3","value":21},{"label":"4","value":25},{"label":"5","value":23},{"label":"6","value":31},{"label":"7","value":24}]'></div></article>
           </section>
         </main>
       </div>
     </div>
-
-    <script type="module" src="./showcase.js"></script>
+    <script src="../../dist/index.global.js"></script>
+    <script src="./showcase.js"></script>
   </body>
 </html>

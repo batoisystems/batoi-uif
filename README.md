@@ -33,7 +33,7 @@ Classic script usage:
 <script>BatoiUIF.autoStart();</script>
 ```
 
-For PHP, RAD, and other server-rendered pages, `BatoiUIF.autoStart()` initializes common `data-uif` components, forms, tables, charts, RAD AJAX actions, realtime regions, push controls, mobile shells, AI actions, and MCP approval widgets without a bundler.
+For PHP, RAD, and other server-rendered pages, `BatoiUIF.autoStart()` initializes common `data-uif` components, forms, tables, charts, icons, RAD AJAX actions, realtime regions, push controls, mobile shells, AI actions, and MCP approval widgets without a bundler.
 
 ## Positioning
 
@@ -96,6 +96,7 @@ Core framework packages:
 - `@batoi/uif-css` for reset, tokens, utilities, themes, and component CSS.
 - `@batoi/uif-dom` for DOM helpers, target resolution, mounting, auto-init, observers, and component registry.
 - `@batoi/uif-net` for native `fetch` helpers, form submission, upload, timeout, interceptors, and normalized errors.
+- `@batoi/uif-icons` for first-party dependency-free SVG icons and declarative icon mounting.
 - `@batoi/uif-state` for small state stores and declarative bindings.
 - `@batoi/uif-forms` for validation, async submission, and accessible error rendering.
 - `@batoi/uif-router` for lightweight route behavior.
@@ -156,7 +157,18 @@ Planned application capability packages:
 
 Supported core chart types include `line`, `area`, `bar`, `horizontal-bar`, `grouped-bar`, `stacked-bar`, `pie`, `donut`, `doughnut`, `radar`, and `sparkline`. Compact app charts include `metric`, `progress`, `ring`, `gauge`, `timeline`, `heatmap`, and `bullet`. Statistical visualizations include `histogram`, `box-plot`, `scatter`, `regression`, `control-chart`, `distribution`, and `pareto`, backed by dependency-free helpers such as `summaryStats()`, `histogramBins()`, `movingAverage()`, `linearRegression()`, and `correlation()`.
 
-See `examples/chart-gallery/` for one declarative example of every supported chart type. See `examples/professional-showcase/` for a richer product-grade app surface with a fixed shell, KPI dashboard, CRM pipeline, governed AI approval desk, mobile field console, RAD admin table, and statistical analytics using the same lean JS/CSS library.
+Open `examples/index.html` for a landing page that links to every bundled example. See `examples/chart-gallery/` for one declarative example of every supported chart type. See `examples/professional-showcase/` for a richer product-grade app surface with a fixed shell, KPI dashboard, CRM pipeline, governed AI approval desk, mobile field console, RAD admin table, and statistical analytics using the same lean JS/CSS library.
+
+### Dependency-free SVG icon
+
+```html
+<button class="uif-btn">
+  <span data-uif-icon="plus" aria-hidden="true"></span>
+  New record
+</button>
+```
+
+`BatoiUIF.autoStart()` hydrates `[data-uif-icon]` placeholders into inline SVG. Icons use `currentColor`, the `.uif-icon` CSS primitive, and no icon font or third-party runtime package. Use `data-uif-icon-title` when an icon itself needs an accessible name.
 
 Multi-series charts use a compact `values` contract:
 
@@ -221,6 +233,11 @@ Important attributes include:
 - `data-uif-validate`
 - `data-uif-rule`
 - `data-uif-refresh`
+- `data-uif-icon`
+- `data-uif-icon-title`
+- `data-uif-icon-size`
+- `data-uif-icon-class`
+- `data-uif-icon-hidden`
 
 Expected v1 `data-uif` values include `button`, `modal`, `drawer`, `dropdown`, `tabs`, `toast`, `accordion`, `table`, `form`, `ajax`, `route`, `shell`, `nav`, `chart`, `realtime`, `push`, `mobile-shell`, `ai-action`, and `tool-approval`.
 

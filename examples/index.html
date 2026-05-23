@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Examples</title>
+    <link rel="stylesheet" href="../packages/css/index.css">
+    <style>
+      body {
+        margin: 0;
+        background: var(--uif-bg);
+        color: var(--uif-text);
+      }
+
+      .examples-shell {
+        min-height: 100dvh;
+        background:
+          linear-gradient(180deg, color-mix(in srgb, var(--uif-color-primary), transparent 94%), transparent 20rem),
+          var(--uif-bg);
+      }
+
+      .examples-head {
+        display: grid;
+        gap: 1rem;
+        padding-block: 3rem 1.25rem;
+      }
+
+      .examples-head h1,
+      .examples-head p {
+        margin: 0;
+      }
+
+      .examples-head h1 {
+        max-width: 54rem;
+        font-size: clamp(2rem, 4vw, 3.75rem);
+        line-height: 1;
+      }
+
+      .examples-head p {
+        max-width: 48rem;
+        color: var(--uif-text-muted);
+        font-size: 1rem;
+        line-height: 1.55;
+      }
+
+      .examples-feature {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.65fr);
+        gap: 1rem;
+        align-items: stretch;
+      }
+
+      .examples-card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+      }
+
+      .examples-card {
+        display: grid;
+        gap: 0.65rem;
+        min-height: 11rem;
+        text-decoration: none;
+        color: inherit;
+        transition:
+          border-color var(--uif-motion-fast),
+          box-shadow var(--uif-motion-fast),
+          transform var(--uif-motion-fast);
+      }
+
+      .examples-card:hover {
+        border-color: color-mix(in srgb, var(--uif-accent), transparent 65%);
+        box-shadow: var(--uif-shadow-md);
+        transform: translateY(-2px);
+      }
+
+      .examples-card h2 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .examples-card p {
+        margin: 0;
+        color: var(--uif-text-muted);
+        font-size: 0.875rem;
+        line-height: 1.45;
+      }
+
+      .examples-card footer {
+        margin-top: auto;
+      }
+
+      .examples-feature .examples-card {
+        min-height: 18rem;
+      }
+
+      .examples-feature .examples-card h2 {
+        font-size: 1.55rem;
+      }
+
+      .examples-preview {
+        display: grid;
+        gap: 0.5rem;
+        align-content: start;
+      }
+
+      .examples-preview-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.65rem 0.75rem;
+        border: 1px solid var(--uif-border);
+        border-radius: var(--uif-radius-md);
+        background: var(--uif-surface-elevated);
+      }
+
+      .examples-preview-bars {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 0.35rem;
+        align-items: end;
+        height: 5rem;
+        margin-top: auto;
+      }
+
+      .examples-preview-bars span {
+        display: block;
+        border-radius: 999px 999px 0 0;
+        background: var(--uif-color-primary);
+      }
+
+      @media (max-width: 56rem) {
+        .examples-feature,
+        .examples-card-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .examples-feature .examples-card {
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="examples-shell">
+      <div class="uif-container uif-stack uif-gap-5">
+        <header class="examples-head">
+          <span class="uif-badge uif-badge-info">Batoi UIF examples</span>
+          <h1>Practical examples for lean, dependency-free product interfaces.</h1>
+          <p>Use these examples to evaluate Batoi UIF across admin workspaces, RAD flows, charts, realtime interfaces, mobile shells, AI approval patterns, content pages, commerce flows, and full professional product surfaces.</p>
+        </header>
+
+        <section class="examples-feature" aria-label="Featured examples">
+          <a class="uif-card examples-card" href="./professional-showcase/">
+            <span class="uif-badge uif-badge-success">Featured</span>
+            <h2>Professional Showcase</h2>
+            <p>A full product-grade shell with KPI dashboard, CRM pipeline, AI approval desk, mobile field console, RAD admin table, and statistical analytics.</p>
+            <div class="examples-preview">
+              <div class="examples-preview-row"><strong>Net Revenue</strong><span class="uif-badge uif-badge-success">+14.2%</span></div>
+              <div class="examples-preview-row"><strong>Incident Queue</strong><span class="uif-badge uif-badge-warning">3 open</span></div>
+              <div class="examples-preview-bars" aria-hidden="true">
+                <span style="height:44%"></span><span style="height:58%"></span><span style="height:51%"></span><span style="height:68%"></span><span style="height:62%"></span><span style="height:74%"></span><span style="height:80%"></span><span style="height:92%"></span>
+              </div>
+            </div>
+            <footer><span class="uif-text-primary">Open showcase →</span></footer>
+          </a>
+
+          <a class="uif-card examples-card" href="./chart-gallery/">
+            <span class="uif-badge uif-badge-info">Charts</span>
+            <h2>Chart Gallery</h2>
+            <p>Every supported SVG chart type, including statistical charts such as histogram, box plot, regression, control chart, and Pareto.</p>
+            <footer><span class="uif-text-primary">Open charts →</span></footer>
+          </a>
+        </section>
+
+        <section class="examples-card-grid" aria-label="Application examples">
+          <a class="uif-card examples-card" href="./admin-workspace/"><span class="uif-badge">Admin</span><h2>Admin Workspace</h2><p>Workspace shell, navigation, cards, tables, and repeated admin actions.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+          <a class="uif-card examples-card" href="./rad-dashboard/"><span class="uif-badge">Dashboard</span><h2>RAD Dashboard</h2><p>Dashboard layout for server-rendered RAD applications with charts and workflow summaries.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+          <a class="uif-card examples-card" href="./rad-crud/"><span class="uif-badge">CRUD</span><h2>RAD CRUD</h2><p>Forms, tables, confirmation actions, and server-friendly partial update patterns.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+          <a class="uif-card examples-card" href="./ai-assisted-rad/"><span class="uif-badge uif-badge-info">AI</span><h2>AI-Assisted RAD</h2><p>AI action UI patterns for guided, auditable application workflows.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+          <a class="uif-card examples-card" href="./ai-tool-approval/"><span class="uif-badge uif-badge-warning">Approval</span><h2>AI Tool Approval</h2><p>MCP-style approval cards, risk display, and tool execution review surfaces.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+          <a class="uif-card examples-card" href="./realtime-ops/"><span class="uif-badge">Realtime</span><h2>Realtime Ops</h2><p>Operational monitoring pattern with live status, queue rows, and updates.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+          <a class="uif-card examples-card" href="./realtime-feed/"><span class="uif-badge">Feed</span><h2>Realtime Feed</h2><p>SSE, WebSocket, and polling fallback patterns for server-friendly realtime views.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+          <a class="uif-card examples-card" href="./mobile-shell/"><span class="uif-badge">Mobile</span><h2>Mobile Shell</h2><p>Mobile topbar, content region, bottom navigation, and safe-area conventions.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+          <a class="uif-card examples-card" href="./mobile-pwa/"><span class="uif-badge">PWA</span><h2>Mobile PWA</h2><p>Install prompts, offline state, and mobile-first application structure.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+          <a class="uif-card examples-card" href="./commerce-checkout/"><span class="uif-badge">Commerce</span><h2>Commerce Checkout</h2><p>Checkout forms, summaries, validation-ready fields, and action controls.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+          <a class="uif-card examples-card" href="./saas-settings/"><span class="uif-badge">SaaS</span><h2>SaaS Settings</h2><p>Settings sections, form controls, plan details, and account configuration patterns.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+          <a class="uif-card examples-card" href="./content-site/"><span class="uif-badge">Content</span><h2>Content Site</h2><p>Content-oriented layout using the same small CSS foundation.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

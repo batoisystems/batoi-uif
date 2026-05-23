@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-uif-density="default">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Analytics · Batoi UIF Professional Showcase</title>
+    <link rel="stylesheet" href="../../packages/css/index.css">
+    <link rel="stylesheet" href="./showcase.css">
+  </head>
+  <body>
+    <div class="uif-app-shell-fixed showcase-shell">
+      <aside class="uif-sidebar uif-sidebar-fixed showcase-sidebar">
+        <div class="uif-sidebar-brand">
+          <img class="showcase-brand-mark" src="https://www.batoi.com/pub/assets/2022/03/05/batoi-green-favicon-622345836cf01.png" alt="Batoi">
+          <span><strong>Batoi UIF</strong><span class="uif-text-sm uif-text-muted">Examples · v2.6</span></span>
+          <button class="uif-btn uif-btn-secondary uif-icon-btn showcase-collapse" type="button" aria-label="Collapse sidebar">⌃</button>
+        </div>
+        <div class="uif-px-3 uif-py-3"><label class="uif-search"><span data-uif-icon="search" aria-hidden="true"></span><input type="search" placeholder="Search pages..." data-showcase-filter=".showcase-section,[data-row],[data-deal]"><kbd>⌘K</kbd></label></div>
+        <nav class="uif-sidebar-nav" aria-label="Showcase scenarios">
+          <div class="uif-sidebar-section">Operate</div>
+          <a href="./"><span class="showcase-nav-label"><span data-uif-icon="grid" aria-hidden="true"></span>Command Center</span></a>
+          <a href="./crm-pipeline.html"><span class="showcase-nav-label"><span data-uif-icon="users" aria-hidden="true"></span>CRM Pipeline</span><span class="uif-badge">24</span></a>
+          <a href="./ai-approval.html"><span class="showcase-nav-label"><span data-uif-icon="approval" aria-hidden="true"></span>AI Approval</span><span class="uif-badge uif-badge-warning">12</span></a>
+          <div class="uif-sidebar-section">Build</div>
+          <a href="./rad-admin.html"><span class="showcase-nav-label"><span data-uif-icon="layers" aria-hidden="true"></span>RAD Admin</span></a>
+          <a href="./mobile-field.html"><span class="showcase-nav-label"><span data-uif-icon="phone" aria-hidden="true"></span>Mobile Field</span></a>
+          <div class="uif-sidebar-section">Library</div>
+          <a class="is-disabled" href="#" aria-disabled="true"><span class="showcase-nav-label"><span data-uif-icon="layers" aria-hidden="true"></span>Components</span><span data-uif-icon="lock" aria-hidden="true"></span></a>
+          <a class="is-disabled" href="#" aria-disabled="true"><span class="showcase-nav-label"><span data-uif-icon="file" aria-hidden="true"></span>Patterns</span><span data-uif-icon="lock" aria-hidden="true"></span></a>
+          <a class="is-disabled" href="#" aria-disabled="true"><span class="showcase-nav-label"><span data-uif-icon="theme" aria-hidden="true"></span>Design Tokens</span><span data-uif-icon="lock" aria-hidden="true"></span></a>
+        </nav>
+        <div class="uif-sidebar-footer"><div class="uif-flex uif-items-center uif-gap-3"><span class="uif-avatar">AR</span><span class="uif-cell-stack"><strong>Ashwini Rath</strong><span class="uif-text-sm uif-text-muted">Platform Admin</span></span><button class="uif-btn uif-btn-secondary uif-icon-btn" type="button" data-showcase-toast="Settings opened" aria-label="Settings"><span data-uif-icon="settings" aria-hidden="true"></span></button></div></div>
+      </aside>
+      <div class="uif-shell-content showcase-content">
+        <header class="uif-topbar showcase-topbar"><div class="showcase-topbar-title"><div class="uif-breadcrumbs"><span>Workspace</span><span>/</span><span>Library</span><span>/</span><strong>Analytics</strong></div><h1 class="uif-text-xl">Analytics</h1></div><label class="uif-search showcase-search"><span data-uif-icon="search" aria-hidden="true"></span><input type="search" placeholder="Search records, deals, users..."><kbd>⌘K</kbd></label><div class="uif-page-actions"><button class="uif-btn uif-btn-secondary uif-icon-btn" type="button" data-showcase-toast="Notifications reviewed" aria-label="Notifications"><span data-uif-icon="bell" aria-hidden="true"></span></button><button class="uif-btn uif-btn-secondary uif-icon-btn" type="button" data-showcase-toast="Workspace switcher opened" aria-label="Workspace"><span data-uif-icon="grid" aria-hidden="true"></span></button><button class="uif-btn uif-btn-secondary" type="button" data-showcase-theme><span data-uif-icon="theme" aria-hidden="true"></span>Theme</button><button class="uif-btn" type="button" data-showcase-toast="New workflow started"><span data-uif-icon="plus" aria-hidden="true"></span>New</button></div></header>
+        <section class="uif-page-head showcase-command-head"><div class="uif-page-title"><div class="showcase-eyebrow">Library · Statistical charts</div><h2>Analytics and Statistical Charts</h2><p>Dependency-free SVG charts for distribution, regression, control limits, and operational decision support.</p></div><div class="uif-page-actions"><button class="uif-btn uif-btn-secondary" type="button" data-showcase-toast="Analytics export queued">Export</button><button class="uif-btn" type="button" data-showcase-toast="Analytics refreshed">Refresh</button></div></section>
+        <main class="uif-scroll-region showcase-page-grid">
+          <section class="showcase-section showcase-grid-3">
+            <article class="uif-card"><h2 class="uif-text-lg uif-m-0">Histogram</h2><div data-uif="chart" data-uif-chart="histogram" data-uif-options='{"bins":5,"height":180}' data-uif-data='[12,18,19,22,22,25,31,33,35,38,42,45]'></div></article>
+            <article class="uif-card"><h2 class="uif-text-lg uif-m-0">Regression</h2><div data-uif="chart" data-uif-chart="regression" data-uif-x="users" data-uif-y="tickets" data-uif-options='{"height":180}' data-uif-data='[{"label":"Mon","users":120,"tickets":8},{"label":"Tue","users":180,"tickets":13},{"label":"Wed","users":220,"tickets":19},{"label":"Thu","users":280,"tickets":24}]'></div></article>
+            <article class="uif-card"><h2 class="uif-text-lg uif-m-0">Control Chart</h2><div data-uif="chart" data-uif-chart="control-chart" data-uif-options='{"height":180}' data-uif-data='[{"label":"1","value":22},{"label":"2","value":24},{"label":"3","value":21},{"label":"4","value":25},{"label":"5","value":23},{"label":"6","value":31},{"label":"7","value":24}]'></div></article>
+          </section>
+        </main>
+      </div>
+    </div>
+    <script src="../../dist/index.global.js"></script>
+    <script src="./showcase.js"></script>
+  </body>
+</html>

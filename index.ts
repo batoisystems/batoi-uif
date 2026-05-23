@@ -2,6 +2,7 @@ import { renderAIAction } from './packages/ai/src/index.js';
 import { initChart } from './packages/charts/src/index.js';
 import { initAll as initComponents } from './packages/components/src/index.js';
 import { initForm } from './packages/forms/src/index.js';
+import { mountIcons } from './packages/icons/src/index.js';
 import { renderToolApproval } from './packages/mcp/src/index.js';
 import { initMobileShell } from './packages/mobile/src/index.js';
 import { initInstallPrompt } from './packages/pwa/src/index.js';
@@ -17,6 +18,7 @@ export * from './packages/effects/src/index.js';
 export * from './packages/overlays/src/index.js';
 export * from './packages/net/src/index.js';
 export * from './packages/forms/src/index.js';
+export * from './packages/icons/src/index.js';
 export * from './packages/components/src/index.js';
 export * from './packages/table/src/index.js';
 export * from './packages/rad-adapter/src/index.js';
@@ -31,6 +33,7 @@ export * from './packages/ai/src/index.js';
 export * from './packages/mcp/src/index.js';
 
 export function start(root: Document | HTMLElement = document): void {
+  mountIcons(root);
   initComponents(root);
   bindRadActions(root);
   initDeclarativeFilters(root);
