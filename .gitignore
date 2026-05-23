@@ -144,4 +144,5 @@ vite.config.ts.timestamp-*
 .vite/
 
 # Local agent plans and notes
+AGENTS.md
 specs/

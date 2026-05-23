@@ -103,6 +103,27 @@ export function exportTable(table: HTMLTableElement, options: TableOptions = {})
   return sourceRows.map((row) => Array.from(row.cells).map((cell) => cell.textContent?.trim() ?? ''));
 }
 
+export function filterElements(targetSelector: string, query: string, mode: 'contains' | 'startsWith' | 'token' = 'contains'): void {
+  const normalized = query.trim().toLowerCase();
+  document.querySelectorAll<HTMLElement>(targetSelector).forEach((item) => {
+    const text = item.textContent?.trim().toLowerCase() ?? '';
+    const matched =
+      normalized === '' ||
+      (mode === 'startsWith' ? text.startsWith(normalized) : mode === 'token' ? text.split(/\s+/).includes(normalized) : text.includes(normalized));
+    item.hidden = !matched;
+  });
+}
+
+export function initDeclarativeFilters(root: Document | HTMLElement = document): void {
+  root.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-uif-filter-target]').forEach((filterInput) => {
+    const target = filterInput.dataset.uifFilterTarget;
+    if (!target) return;
+    const mode = (filterInput.dataset.uifFilterMode as 'contains' | 'startsWith' | 'token') || 'contains';
+    filterInput.addEventListener('input', () => filterElements(target, filterInput.value, mode));
+    filterInput.addEventListener('change', () => filterElements(target, filterInput.value, mode));
+  });
+}
+
 export function initTable(table: HTMLTableElement, options: TableOptions = {}): void {
   table.dataset.uifState = table.dataset.uifState || 'idle';
   applyResponsiveColumns(table);

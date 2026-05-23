@@ -30,7 +30,10 @@ Classic script usage:
 ```html
 <link rel="stylesheet" href="/assets/uif/uif.css">
 <script src="/assets/uif/uif.iife.js"></script>
+<script>BatoiUIF.autoStart();</script>
 ```
+
+For PHP, RAD, and other server-rendered pages, `BatoiUIF.autoStart()` initializes common `data-uif` components, forms, tables, charts, RAD AJAX actions, realtime regions, push controls, mobile shells, AI actions, and MCP approval widgets without a bundler.
 
 ## Positioning
 

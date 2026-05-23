@@ -19,7 +19,9 @@
         <a href="#attributes">Data Attributes</a>
         <a href="#tokens">CSS Tokens</a>
         <a href="#components">Components</a>
+        <a href="#app-primitives">App Primitives</a>
         <a href="#forms">Forms</a>
+        <a href="#declarative-filtering">Filtering</a>
         <a href="#rad">RAD Adapter</a>
         <a href="#charts">Charts</a>
         <a href="#realtime">Realtime</a>
@@ -54,7 +56,8 @@ npm run build</code></pre>
         <h2>Simple JS/CSS Distribution</h2>
         <p>Build output includes plain browser files for apps that do not use TypeScript or a bundler: <code>dist/uif.css</code>, <code>dist/uif.esm.js</code>, and <code>dist/uif.iife.js</code>.</p>
         <pre><code>&lt;link rel="stylesheet" href="/assets/uif/uif.css"&gt;
-&lt;script src="/assets/uif/uif.iife.js"&gt;&lt;/script&gt;</code></pre>
+&lt;script src="/assets/uif/uif.iife.js"&gt;&lt;/script&gt;
+&lt;script&gt;BatoiUIF.autoStart();&lt;/script&gt;</code></pre>
       </section>
 
       <section id="core" class="uif-card">
@@ -87,6 +90,19 @@ init(document);</code></pre>
         </div>
       </section>
 
+      <section id="app-primitives" class="uif-card">
+        <h2>App Primitives</h2>
+        <p>Production app layouts can use fixed shells, sidebar nav, page heads, scroll regions, stat cards, kanban boards, queue rows, timelines, risk bands, semantic badges, density modes, and accent switching.</p>
+        <pre><code>&lt;html data-uif-density="compact"&gt;
+&lt;main class="uif-app-shell-fixed"&gt;
+  &lt;aside class="uif-sidebar"&gt;&lt;nav class="uif-sidebar-nav"&gt;...&lt;/nav&gt;&lt;/aside&gt;
+  &lt;section class="uif-shell-content"&gt;
+    &lt;header class="uif-page-head"&gt;...&lt;/header&gt;
+    &lt;div class="uif-scroll-region"&gt;...&lt;/div&gt;
+  &lt;/section&gt;
+&lt;/main&gt;</code></pre>
+      </section>
+
       <section id="rad" class="uif-card">
         <h2>AJAX and RAD Adapter</h2>
         <pre><code>&lt;button data-uif="ajax" data-uif-action="reload" data-uif-src="/customers/list" data-uif-target="#customers"&gt;Reload&lt;/button&gt;</code></pre>
@@ -106,6 +122,12 @@ init(document);</code></pre>
           <label>Email <input name="email" data-uif-rule="required|email" /></label>
           <button class="uif-btn">Validate</button>
         </form>
+      </section>
+
+      <section id="declarative-filtering" class="uif-card">
+        <h2>Declarative Filtering</h2>
+        <pre><code>&lt;input class="uif-input" data-uif-filter-target="[data-account-row]"&gt;
+&lt;article class="uif-queue-row" data-account-row&gt;Metro Finance&lt;/article&gt;</code></pre>
       </section>
 
       <section id="charts" class="uif-card">

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { emit, init, on, parseOptions, registerPlugin } from './index.js';
+import { emit, init, on, parseOptions, registerPlugin, setAccent, setDensity } from './index.js';
 
 describe('core', () => {
   it('parses json options', () => {
@@ -27,5 +27,12 @@ describe('core', () => {
     registerPlugin({ name: 'test-plugin', setup });
     const app = init(document.createElement('main'), { mode: 'test' });
     expect(setup).toHaveBeenCalledWith(app);
+  });
+
+  it('applies density and accent hooks', () => {
+    setDensity('compact');
+    setAccent('#123456');
+    expect(document.documentElement.dataset.uifDensity).toBe('compact');
+    expect(document.documentElement.style.getPropertyValue('--uif-accent')).toBe('#123456');
   });
 });

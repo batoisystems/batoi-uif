@@ -44,7 +44,7 @@ for (const file of ['dist/uif.esm.js', 'dist/uif.iife.js', 'dist/uif.css']) {
 }
 
 const dom = new JSDOM(
-  '<!doctype html><button data-uif="button" data-uif-action="open" data-uif-target="#modal">Open</button><div id="modal" data-uif="modal" hidden><button>Close</button></div><div data-uif="progress" data-uif-value="50"></div>',
+  '<!doctype html><button data-uif="button" data-uif-action="open" data-uif-target="#modal">Open</button><div id="modal" data-uif="modal" hidden><button>Close</button></div><div data-uif="progress" data-uif-value="50"></div><input data-uif-filter-target="[data-row]"><article data-row>Alpha</article><article data-row>Beta</article>',
   { url: 'http://localhost/' },
 );
 globalThis.window = dom.window;
@@ -58,15 +58,19 @@ globalThis.matchMedia = dom.window.matchMedia;
 
 const uif = await import(new URL('dist/uif.esm.js', root).href);
 const started = performance.now();
-uif.initAll(dom.window.document);
+uif.start(dom.window.document);
 const elapsed = performance.now() - started;
 const modal = dom.window.document.querySelector('#modal');
 const progress = dom.window.document.querySelector('[data-uif="progress"]');
+const filter = dom.window.document.querySelector('[data-uif-filter-target]');
 
 assert(elapsed < 50, `component init smoke test exceeded 50 ms: ${elapsed.toFixed(2)} ms`);
 assert(modal?.getAttribute('role') === 'dialog', 'modal smoke test did not set dialog role');
 assert(progress?.getAttribute('role') === 'progressbar', 'progress smoke test did not set progressbar role');
 assert(progress?.getAttribute('aria-valuenow') === '50', 'progress smoke test did not set aria-valuenow');
+filter.value = 'alpha';
+filter.dispatchEvent(new dom.window.Event('input'));
+assert(dom.window.document.querySelectorAll('[data-row]')[1].hidden, 'declarative filter smoke test did not hide unmatched row');
 
 if (failures.length) {
   process.stderr.write(`${failures.map((failure) => `- ${failure}`).join('\n')}\n`);

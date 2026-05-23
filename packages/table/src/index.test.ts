@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { filterTable, selectedRows, sortTable } from './index.js';
+import { filterElements, filterTable, initDeclarativeFilters, selectedRows, sortTable } from './index.js';
 
 describe('table', () => {
   it('sorts, filters, and returns selected rows', () => {
@@ -14,5 +14,20 @@ describe('table', () => {
     filterTable(table, 'Beta');
     expect(table.tBodies[0].rows[0].hidden).toBe(true);
     expect(selectedRows(table)).toHaveLength(1);
+  });
+
+  it('filters arbitrary declarative targets', () => {
+    document.body.innerHTML = `
+      <input data-uif-filter-target="[data-row]" value="">
+      <article data-row>Alpha account</article>
+      <article data-row>Beta account</article>`;
+    const input = document.querySelector('input') as HTMLInputElement;
+    initDeclarativeFilters(document);
+    input.value = 'alpha';
+    input.dispatchEvent(new Event('input'));
+    expect((document.querySelectorAll('[data-row]')[0] as HTMLElement).hidden).toBe(false);
+    expect((document.querySelectorAll('[data-row]')[1] as HTMLElement).hidden).toBe(true);
+    filterElements('[data-row]', '');
+    expect((document.querySelectorAll('[data-row]')[1] as HTMLElement).hidden).toBe(false);
   });
 });

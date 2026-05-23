@@ -64,6 +64,15 @@ export function registerPlugin(plugin: UIFPlugin): void {
   plugins.set(plugin.name, plugin);
 }
 
+export function setDensity(density: 'compact' | 'default' | 'roomy', target: HTMLElement = document.documentElement): void {
+  target.dataset.uifDensity = density;
+}
+
+export function setAccent(color: string, target: HTMLElement = document.documentElement): void {
+  target.style.setProperty('--uif-accent', color);
+  target.style.setProperty('--uif-color-primary', color);
+}
+
 export function init(root: Document | HTMLElement = document, options: UIFOptions = {}): UIFApp {
   emit('uif:before-init', { root, options }, root);
   const app: UIFApp = {
