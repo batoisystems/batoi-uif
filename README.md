@@ -156,6 +156,8 @@ Planned application capability packages:
 
 Supported core chart types include `line`, `area`, `bar`, `horizontal-bar`, `grouped-bar`, `stacked-bar`, `pie`, `donut`, `doughnut`, `radar`, and `sparkline`. Compact app charts include `metric`, `progress`, `ring`, `gauge`, `timeline`, `heatmap`, and `bullet`.
 
+See `examples/chart-gallery/` for one declarative example of every supported chart type.
+
 Multi-series charts use a compact `values` contract:
 
 ```html
