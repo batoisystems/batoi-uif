@@ -27,6 +27,10 @@
         <a href="#pwa">PWA</a>
         <a href="#ai">AI UI</a>
         <a href="#mcp">MCP Approval</a>
+        <a href="#attribute-registry">Attribute Registry</a>
+        <a href="#jquery-migration">jQuery Migration</a>
+        <a href="#bootstrap-migration">Bootstrap Migration</a>
+        <a href="#tailwind-migration">Tailwind Migration</a>
         <a href="#examples">Examples</a>
         <a href="#roadmap">Roadmap</a>
       </nav>
@@ -125,6 +129,34 @@ onOffline(() =&gt; document.body.dataset.offline = 'true');</code></pre>
         <div data-uif="tool-approval" data-uif-tool="create_database" data-uif-risk="high"></div>
       </section>
 
+      <section id="attribute-registry" class="uif-card">
+        <h2>Attribute Registry</h2>
+        <p>UIF standardizes attributes such as <code>data-uif</code>, <code>data-uif-action</code>, <code>data-uif-target</code>, <code>data-uif-src</code>, <code>data-uif-state</code>, <code>data-uif-model</code>, <code>data-uif-options</code>, and <code>data-uif-persist</code>.</p>
+        <pre><code>&lt;button data-uif-action="toggle" data-uif-target="#drawer"&gt;Toggle&lt;/button&gt;</code></pre>
+      </section>
+
+      <section id="jquery-migration" class="uif-card">
+        <h2>jQuery Migration</h2>
+        <pre><code>// Before
+$('.item').addClass('active').text('Ready');
+
+// UIF
+uif('.item').addClass('active').text('Ready');</code></pre>
+      </section>
+
+      <section id="bootstrap-migration" class="uif-card">
+        <h2>Bootstrap Migration</h2>
+        <pre><code>&lt;button class="uif-btn" data-uif-action="open" data-uif-target="#modal"&gt;Open&lt;/button&gt;
+&lt;div id="modal" data-uif="modal" hidden&gt;...&lt;/div&gt;</code></pre>
+      </section>
+
+      <section id="tailwind-migration" class="uif-card">
+        <h2>Tailwind Migration</h2>
+        <pre><code>&lt;section class="uif-grid-3 uif-gap-4 uif-p-4"&gt;
+  &lt;article class="uif-card"&gt;...&lt;/article&gt;
+&lt;/section&gt;</code></pre>
+      </section>
+
       <section id="accessibility" class="uif-card">
         <h2>Accessibility</h2>
         <p>Components include keyboard behavior, focus handling, ARIA attributes, and reduced-motion awareness.</p>
@@ -134,6 +166,7 @@ onOffline(() =&gt; document.body.dataset.offline = 'true');</code></pre>
         <h2>Examples</h2>
         <ul>
           <li><a href="../../examples/rad-crud/index.html">RAD CRUD</a></li>
+          <li><a href="../../examples/admin-workspace/index.html">Admin Workspace</a></li>
           <li><a href="../../examples/rad-dashboard/index.html">RAD Dashboard</a></li>
           <li><a href="../../examples/mobile-shell/index.html">Mobile Shell</a></li>
           <li><a href="../../examples/realtime-feed/index.html">Realtime Feed</a></li>

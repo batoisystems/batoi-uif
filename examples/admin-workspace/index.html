@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Workspace Example</title>
+    <link rel="stylesheet" href="../../packages/css/index.css" />
+  </head>
+  <body>
+    <div class="uif-app-shell">
+      <aside class="uif-sidebar">
+        <h1 class="uif-text-lg">Workspace</h1>
+        <nav class="uif-stack" data-uif="nav" aria-label="Workspace">
+          <a href="#dashboard">Dashboard</a>
+          <a href="#customers">Customers</a>
+          <a href="#settings">Settings</a>
+        </nav>
+      </aside>
+      <div>
+        <header class="uif-topbar">
+          <div>
+            <strong>Customers</strong>
+            <span class="uif-badge">RAD</span>
+          </div>
+          <button class="uif-btn" data-uif-action="open" data-uif-target="#customer-drawer">Add Customer</button>
+        </header>
+        <main class="uif-main uif-stack">
+          <section class="uif-toolbar">
+            <label class="uif-field">
+              <span class="uif-sr-only">Filter customers</span>
+              <input class="uif-input" type="search" placeholder="Filter customers" data-uif-table-filter="#customer-table" />
+            </label>
+            <div class="uif-cluster">
+              <button class="uif-btn uif-btn-secondary" data-uif="ajax" data-uif-action="reload" data-uif-src="/customers/list" data-uif-target="#customer-region">Reload</button>
+              <button class="uif-btn uif-btn-danger" data-uif="ajax" data-uif-action="delete" data-uif-confirm="Delete selected customers?" data-uif-src="/customers/bulk-delete">Bulk Delete</button>
+            </div>
+          </section>
+          <section id="customer-region" class="uif-card">
+            <table id="customer-table" class="uif-table" data-uif="table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" aria-label="Select all" /></th>
+                  <th data-uif-sort="asc">Name</th>
+                  <th data-uif-sort="asc">Plan</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input data-uif-role="row-select" type="checkbox" /></td>
+                  <td>Ada Lovelace</td>
+                  <td>Pro</td>
+                  <td><span class="uif-badge">Active</span></td>
+                  <td><button data-uif-action="open" data-uif-target="#customer-drawer">Edit</button></td>
+                </tr>
+                <tr>
+                  <td><input data-uif-role="row-select" type="checkbox" /></td>
+                  <td>Grace Hopper</td>
+                  <td>Team</td>
+                  <td><span class="uif-badge">Trial</span></td>
+                  <td><button data-uif-action="open" data-uif-target="#customer-drawer">Edit</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+          <section class="uif-grid-3">
+            <article class="uif-card"><strong>24</strong><p class="uif-text-muted">Open tasks</p></article>
+            <article class="uif-card"><strong>8</strong><p class="uif-text-muted">Pending approvals</p></article>
+            <article class="uif-card"><strong>99.9%</strong><p class="uif-text-muted">Uptime</p></article>
+          </section>
+        </main>
+      </div>
+    </div>
+    <aside id="customer-drawer" data-uif="drawer" data-uif-mode="right" data-uif-state="closed" hidden>
+      <form class="uif-card" data-uif="form" data-uif-src="/customers/save" data-uif-method="POST" data-uif-target="#customer-region">
+        <h2>Customer</h2>
+        <label class="uif-field">Name <input class="uif-input" name="name" data-uif-rule="required|minLength:2" /></label>
+        <label class="uif-field">Email <input class="uif-input" name="email" data-uif-rule="required|email" /></label>
+        <div class="uif-cluster">
+          <button class="uif-btn">Save</button>
+          <button type="button" class="uif-btn uif-btn-secondary" data-uif-action="close">Cancel</button>
+        </div>
+      </form>
+    </aside>
+  </body>
+</html>
