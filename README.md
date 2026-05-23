@@ -6,6 +6,32 @@ It is designed as the frontend foundation for Batoi RAD and as a future open-sou
 
 > Status: **v0 experimental**
 
+## Browser Distribution
+
+Batoi UIF is available as plain JavaScript and CSS files for direct use in server-rendered apps, Batoi RAD apps, PHP apps, and static HTML pages. No TypeScript, bundler, jQuery, Bootstrap, Tailwind, React, Vue, or other runtime library is required in the consuming application.
+
+Build output:
+
+```text
+dist/uif.esm.js
+dist/uif.iife.js
+dist/uif.css
+```
+
+ES module usage:
+
+```html
+<link rel="stylesheet" href="/assets/uif/uif.css">
+<script type="module" src="/assets/uif/uif.esm.js"></script>
+```
+
+Classic script usage:
+
+```html
+<link rel="stylesheet" href="/assets/uif/uif.css">
+<script src="/assets/uif/uif.iife.js"></script>
+```
+
 ## Positioning
 
 Batoi UIF is not a Bootstrap clone, a jQuery replacement, a React/Vue/Angular competitor, a Chart.js replacement, or a native mobile framework.
@@ -30,7 +56,7 @@ Do not add runtime dependencies such as Bootstrap, jQuery, Chart.js, D3, ECharts
 
 Development tools are allowed for building, testing, linting, formatting, documentation, and packaging. The target toolchain is npm workspaces, TypeScript, tsup or equivalent small bundler, Vite for docs/playground, Vitest, ESLint, and Prettier.
 
-## Source and Distribution
+## Source Model
 
 The target implementation uses TypeScript as framework source and distributes plain JavaScript and CSS:
 
