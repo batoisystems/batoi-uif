@@ -19,7 +19,14 @@ export type ChartType =
   | 'timeline'
   | 'heatmap'
   | 'status-heatmap'
-  | 'bullet';
+  | 'bullet'
+  | 'histogram'
+  | 'box-plot'
+  | 'scatter'
+  | 'regression'
+  | 'control-chart'
+  | 'distribution'
+  | 'pareto';
 
 export interface ChartDatum {
   label?: string;
@@ -64,6 +71,13 @@ export interface ChartOptions {
   responsive?: boolean;
   exportable?: boolean;
   sparklineType?: 'line' | 'bar';
+  id?: string;
+  aspectRatio?: number;
+  bins?: number;
+  regression?: boolean;
+  thresholds?: Array<{ value: number; label?: string; color?: string }>;
+  ranges?: Array<{ min?: number; max: number; label?: string; color?: string }>;
+  target?: number;
 }
 
 export interface ChartController {
@@ -72,9 +86,56 @@ export interface ChartController {
 }
 
 export interface TableAdapterOptions {
-  labelColumn?: number;
-  valueColumn?: number;
-  seriesColumns?: number[];
+  labelColumn?: number | string;
+  valueColumn?: number | string;
+  seriesColumns?: Array<number | string>;
+}
+
+export interface RecordAdapterOptions {
+  label?: string;
+  value?: string;
+  x?: string;
+  y?: string;
+  series?: string[];
+}
+
+export interface SummaryStats {
+  count: number;
+  min: number;
+  max: number;
+  sum: number;
+  mean: number;
+  median: number;
+  variance: number;
+  stddev: number;
+  q1: number;
+  q3: number;
+  iqr: number;
+}
+
+export interface HistogramOptions {
+  bins?: number;
+  min?: number;
+  max?: number;
+}
+
+export interface HistogramBin {
+  x0: number;
+  x1: number;
+  count: number;
+}
+
+export interface RegressionPoint {
+  x: number;
+  y: number;
+}
+
+export interface RegressionResult {
+  slope: number;
+  intercept: number;
+  r: number;
+  r2: number;
+  predict: (x: number) => number;
 }
 
 const controllers = new WeakMap<HTMLElement, ChartController>();
@@ -89,6 +150,8 @@ const defaultPalette = [
   'var(--uif-chart-8,#9333ea)',
 ];
 
+let chartIdCounter = 0;
+
 function esc(value: unknown): string {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -98,9 +161,121 @@ function esc(value: unknown): string {
 }
 
 function uid(options: ChartOptions, type: ChartType): string {
-  const seed = `${options.label || type}-${options.width || 0}-${options.height || 0}`.toLowerCase();
+  const seed = `${options.id || options.label || type}-${options.width || 0}-${options.height || 0}`.toLowerCase();
   const clean = seed.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   return `uif-chart-${clean || type}`;
+}
+
+function cleanValues(values: number[]): number[] {
+  return values.map(Number).filter(Number.isFinite);
+}
+
+export function quantile(values: number[], q: number): number {
+  const sorted = cleanValues(values).sort((a, b) => a - b);
+  if (!sorted.length) return 0;
+  const pos = (sorted.length - 1) * Math.max(0, Math.min(1, q));
+  const base = Math.floor(pos);
+  const rest = pos - base;
+  return sorted[base] + ((sorted[base + 1] ?? sorted[base]) - sorted[base]) * rest;
+}
+
+export function summaryStats(values: number[]): SummaryStats {
+  const nums = cleanValues(values);
+  const count = nums.length;
+  const sum = nums.reduce((total, value) => total + value, 0);
+  const mean = count ? sum / count : 0;
+  const variance = count ? nums.reduce((total, value) => total + (value - mean) ** 2, 0) / count : 0;
+  const q1 = quantile(nums, 0.25);
+  const q3 = quantile(nums, 0.75);
+  return {
+    count,
+    min: count ? Math.min(...nums) : 0,
+    max: count ? Math.max(...nums) : 0,
+    sum,
+    mean,
+    median: quantile(nums, 0.5),
+    variance,
+    stddev: Math.sqrt(variance),
+    q1,
+    q3,
+    iqr: q3 - q1,
+  };
+}
+
+export function movingAverage(values: number[], windowSize: number): number[] {
+  const nums = cleanValues(values);
+  const size = Math.max(1, Math.floor(windowSize));
+  return nums.map((_, index) => {
+    const slice = nums.slice(Math.max(0, index - size + 1), index + 1);
+    return slice.reduce((sum, value) => sum + value, 0) / slice.length;
+  });
+}
+
+export function cumulativeSum(values: number[]): number[] {
+  let total = 0;
+  return cleanValues(values).map((value) => {
+    total += value;
+    return total;
+  });
+}
+
+export function percentChange(values: number[]): number[] {
+  const nums = cleanValues(values);
+  return nums.map((value, index) => {
+    const previous = nums[index - 1];
+    return index === 0 || !previous ? 0 : ((value - previous) / Math.abs(previous)) * 100;
+  });
+}
+
+export function zScores(values: number[]): number[] {
+  const stats = summaryStats(values);
+  return cleanValues(values).map((value) => (stats.stddev ? (value - stats.mean) / stats.stddev : 0));
+}
+
+export function histogramBins(values: number[], options: HistogramOptions = {}): HistogramBin[] {
+  const nums = cleanValues(values);
+  if (!nums.length) return [];
+  const min = options.min ?? Math.min(...nums);
+  const max = options.max ?? Math.max(...nums);
+  const binCount = Math.max(1, Math.floor(options.bins ?? Math.ceil(Math.sqrt(nums.length))));
+  const span = max - min || 1;
+  const bins = Array.from({ length: binCount }, (_, index) => ({
+    x0: min + (span / binCount) * index,
+    x1: min + (span / binCount) * (index + 1),
+    count: 0,
+  }));
+  nums.forEach((value) => {
+    const index = value === max ? binCount - 1 : Math.floor(((value - min) / span) * binCount);
+    bins[Math.max(0, Math.min(binCount - 1, index))].count += 1;
+  });
+  return bins;
+}
+
+export function correlation(pointsOrX: RegressionPoint[] | number[], yValues?: number[]): number {
+  const points = Array.isArray(yValues)
+    ? (pointsOrX as number[]).map((x, index) => ({ x, y: yValues[index] }))
+    : (pointsOrX as RegressionPoint[]);
+  const clean = points.filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+  if (clean.length < 2) return 0;
+  const xMean = clean.reduce((sum, point) => sum + point.x, 0) / clean.length;
+  const yMean = clean.reduce((sum, point) => sum + point.y, 0) / clean.length;
+  const numerator = clean.reduce((sum, point) => sum + (point.x - xMean) * (point.y - yMean), 0);
+  const xDen = Math.sqrt(clean.reduce((sum, point) => sum + (point.x - xMean) ** 2, 0));
+  const yDen = Math.sqrt(clean.reduce((sum, point) => sum + (point.y - yMean) ** 2, 0));
+  return xDen && yDen ? numerator / (xDen * yDen) : 0;
+}
+
+export function linearRegression(points: RegressionPoint[]): RegressionResult {
+  const clean = points.filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+  if (clean.length < 2) return { slope: 0, intercept: clean[0]?.y ?? 0, r: 0, r2: 0, predict: (x) => clean[0]?.y ?? x * 0 };
+  const xMean = clean.reduce((sum, point) => sum + point.x, 0) / clean.length;
+  const yMean = clean.reduce((sum, point) => sum + point.y, 0) / clean.length;
+  const numerator = clean.reduce((sum, point) => sum + (point.x - xMean) * (point.y - yMean), 0);
+  const denominator = clean.reduce((sum, point) => sum + (point.x - xMean) ** 2, 0);
+  const slope = denominator ? numerator / denominator : 0;
+  const intercept = yMean - slope * xMean;
+  const r = correlation(clean);
+  return { slope, intercept, r, r2: r * r, predict: (x) => slope * x + intercept };
 }
 
 function margins(options: ChartOptions): ChartMargin {
@@ -119,6 +294,10 @@ function labelOf(datum: ChartDatum, options: ChartOptions): string {
 
 function normalizeData(data: ChartDatum[], options: ChartOptions): ChartDatum[] {
   return data.map((item) => ({ ...item, label: labelOf(item, options), value: valueOf(item, options) }));
+}
+
+function coerceData(data: Array<ChartDatum | number>): ChartDatum[] {
+  return data.map((item, index) => (typeof item === 'number' ? { label: String(index + 1), value: item } : item));
 }
 
 function inferSeries(data: ChartDatum[], options: ChartOptions): string[] {
@@ -167,10 +346,14 @@ function arcPath(cx: number, cy: number, outer: number, start: number, end: numb
   return `M ${sx} ${sy} A ${outer} ${outer} 0 ${large} 1 ${ex} ${ey} L ${isx} ${isy} A ${inner} ${inner} 0 ${large} 0 ${iex} ${iey} Z`;
 }
 
+function fullDonutPath(cx: number, cy: number, outer: number, inner: number): string {
+  return `M ${cx - outer} ${cy} A ${outer} ${outer} 0 1 0 ${cx + outer} ${cy} A ${outer} ${outer} 0 1 0 ${cx - outer} ${cy} M ${cx - inner} ${cy} A ${inner} ${inner} 0 1 1 ${cx + inner} ${cy} A ${inner} ${inner} 0 1 1 ${cx - inner} ${cy} Z`;
+}
+
 function markAttrs(label: string, options: ChartOptions): string {
   const focus = options.focusable ? ' tabindex="0"' : '';
   const aria = options.focusable ? ` aria-label="${esc(label)}"` : '';
-  return `class="uif-chart-mark"${focus}${aria}`;
+  return `class="uif-chart-mark"${focus}${aria} data-uif-chart-label="${esc(label)}"`;
 }
 
 function axisAndGrid(width: number, height: number, plot: ChartMargin, domain: [number, number], options: ChartOptions): string {
@@ -182,6 +365,20 @@ function axisAndGrid(width: number, height: number, plot: ChartMargin, domain: [
       const yy = y(tick);
       const grid = options.grid === false ? '' : `<line class="uif-chart-grid" x1="${plot.left}" y1="${yy}" x2="${width - plot.right}" y2="${yy}"></line>`;
       const label = options.axes === false ? '' : `<text class="uif-chart-axis-label" x="${plot.left - 8}" y="${yy + 4}" text-anchor="end">${esc(fmt(tick, options))}</text>`;
+      return `${grid}${label}`;
+    })
+    .join('');
+}
+
+function verticalValueGrid(width: number, height: number, plot: ChartMargin, domain: [number, number], options: ChartOptions): string {
+  if (options.axes === false && options.grid === false) return '';
+  const x = scaleLinear(domain, [plot.left, width - plot.right]);
+  const ticks = Array.from({ length: 5 }, (_, i) => domain[0] + ((domain[1] - domain[0]) / 4) * i);
+  return ticks
+    .map((tick) => {
+      const xx = x(tick);
+      const grid = options.grid === false ? '' : `<line class="uif-chart-grid" x1="${xx}" y1="${plot.top}" x2="${xx}" y2="${height - plot.bottom}"></line>`;
+      const label = options.axes === false ? '' : `<text class="uif-chart-axis-label" x="${xx}" y="${height - 8}" text-anchor="middle">${esc(fmt(tick, options))}</text>`;
       return `${grid}${label}`;
     })
     .join('');
@@ -243,7 +440,16 @@ function renderBars(data: ChartDatum[], options: ChartOptions, mode: 'bar' | 'ho
   const palette = options.palette ?? defaultPalette;
   const values =
     series.length && mode === 'stacked-bar'
-      ? normalized.map((d) => series.reduce((sum, key) => sum + Math.max(0, Number(d.values?.[key] ?? 0)), 0))
+      ? normalized.flatMap((d) => {
+          let positive = 0;
+          let negative = 0;
+          series.forEach((key) => {
+            const value = Number(d.values?.[key] ?? 0);
+            if (value >= 0) positive += value;
+            else negative += value;
+          });
+          return [negative, positive];
+        })
       : series.length
         ? normalized.flatMap((d) => series.map((key) => Number(d.values?.[key] ?? 0)))
         : normalized.map((d) => d.value ?? 0);
@@ -258,13 +464,17 @@ function renderBars(data: ChartDatum[], options: ChartOptions, mode: 'bar' | 'ho
   const bars = normalized
     .map((d, i) => {
       if (series.length && mode === 'stacked-bar') {
-        let offset = 0;
+        let positiveOffset = 0;
+        let negativeOffset = 0;
         return series
           .map((key, s) => {
-            const value = Math.max(0, Number(d.values?.[key] ?? 0));
-            const y0 = yScale(offset);
-            offset += value;
-            const y1 = yScale(offset);
+            const value = Number(d.values?.[key] ?? 0);
+            const start = value >= 0 ? positiveOffset : negativeOffset;
+            const end = start + value;
+            if (value >= 0) positiveOffset = end;
+            else negativeOffset = end;
+            const y0 = yScale(start);
+            const y1 = yScale(end);
             const x = plot.left + i * band + band * 0.18;
             const w = band * 0.64;
             const h = Math.abs(y1 - y0);
@@ -307,7 +517,7 @@ function renderBars(data: ChartDatum[], options: ChartOptions, mode: 'bar' | 'ho
               : `<text class="uif-chart-axis-label" x="${plot.left - 8}" y="${round(plot.top + i * band + band / 2 + 4)}" text-anchor="end">${esc(d.label)}</text>`,
           )
           .join('');
-  const grid = vertical ? axisAndGrid(width, height, plot, domain, options) : '';
+  const grid = vertical ? axisAndGrid(width, height, plot, domain, options) : verticalValueGrid(width, height, plot, domain, options);
   return `${svgWrap(mode, width, height, `${grid}${bars}${labels}`, normalized, options)}${legend(series, options)}`;
 }
 
@@ -317,6 +527,7 @@ function renderPie(data: ChartDatum[], options: ChartOptions, donut = false): st
   const normalized = normalizeData(data, options).filter((d) => (d.value ?? 0) > 0);
   const palette = options.palette ?? defaultPalette;
   const total = normalized.reduce((sum, d) => sum + (d.value ?? 0), 0);
+  if (!total) return `<div class="uif-chart-state" data-uif-state="empty">${esc(options.description || 'No positive values to chart')}</div>`;
   const radius = Math.min(width, height) / 2 - 10;
   const inner = donut ? radius * 0.55 : 0;
   let angle = -Math.PI / 2;
@@ -324,7 +535,11 @@ function renderPie(data: ChartDatum[], options: ChartOptions, donut = false): st
     .map((d, i) => {
       const next = angle + ((d.value ?? 0) / total) * Math.PI * 2;
       const label = `${d.label ?? ''}: ${fmt(d.value ?? 0, options)}`;
-      const path = `<path ${markAttrs(label, options)} d="${arcPath(width / 2, height / 2, radius, angle, next, inner)}" style="fill:${d.color || palette[i % palette.length]}"><title>${esc(label)}</title></path>`;
+      const fill = d.color || palette[i % palette.length];
+      const path =
+        normalized.length === 1 && !donut
+          ? `<circle ${markAttrs(label, options)} cx="${width / 2}" cy="${height / 2}" r="${radius}" style="fill:${fill}"><title>${esc(label)}</title></circle>`
+          : `<path ${markAttrs(label, options)} d="${normalized.length === 1 && donut ? fullDonutPath(width / 2, height / 2, radius, inner) : arcPath(width / 2, height / 2, radius, angle, next, inner)}" ${normalized.length === 1 && donut ? 'fill-rule="evenodd" ' : ''}style="fill:${fill}"><title>${esc(label)}</title></path>`;
       angle = next;
       return path;
     })
@@ -431,9 +646,110 @@ function renderHeatmap(data: ChartDatum[], options: ChartOptions): string {
   return svgWrap('heatmap', width, height, cells, normalized, options);
 }
 
-export function renderChart(data: ChartDatum[], options: ChartOptions = {}): string {
-  const type = options.type ?? 'bar';
+function renderHistogram(data: ChartDatum[], options: ChartOptions, distribution = false): string {
+  const width = options.width ?? 360;
+  const height = options.height ?? 220;
+  const plot = margins(options);
   const normalized = normalizeData(data, options);
+  const bins = histogramBins(normalized.map((d) => d.value ?? 0), { bins: options.bins, min: options.min, max: options.max });
+  if (!bins.length) return `<div class="uif-chart-state" data-uif-state="empty">${esc(options.description || 'No data')}</div>`;
+  const x = scaleLinear([bins[0].x0, bins[bins.length - 1].x1], [plot.left, width - plot.right]);
+  const y = scaleLinear([0, Math.max(1, ...bins.map((bin) => bin.count))], [height - plot.bottom, plot.top]);
+  if (distribution) {
+    const points = bins.map((bin) => [x((bin.x0 + bin.x1) / 2), y(bin.count)] as [number, number]);
+    const body = `${axisAndGrid(width, height, plot, [0, Math.max(1, ...bins.map((bin) => bin.count))], options)}<polyline class="uif-chart-series uif-chart-line" points="${pointString(points)}" fill="none"></polyline>`;
+    return svgWrap('distribution', width, height, body, normalized, { ...options, description: options.description || 'Binned distribution line' });
+  }
+  const bars = bins
+    .map((bin) => {
+      const x0 = x(bin.x0);
+      const x1 = x(bin.x1);
+      const yy = y(bin.count);
+      const label = `${fmt(bin.x0, options)}-${fmt(bin.x1, options)}: ${bin.count}`;
+      return `<rect ${markAttrs(label, options)} x="${round(x0 + 1)}" y="${round(yy)}" width="${round(Math.max(1, x1 - x0 - 2))}" height="${round(height - plot.bottom - yy)}" rx="2"><title>${esc(label)}</title></rect>`;
+    })
+    .join('');
+  return svgWrap('histogram', width, height, `${axisAndGrid(width, height, plot, [0, Math.max(1, ...bins.map((bin) => bin.count))], options)}${bars}`, normalized, options);
+}
+
+function renderBoxPlot(data: ChartDatum[], options: ChartOptions): string {
+  const width = options.width ?? 320;
+  const height = options.height ?? 160;
+  const plot = margins({ ...options, margin: { top: 18, right: 20, bottom: 28, left: 34, ...options.margin } });
+  const normalized = normalizeData(data, options);
+  const stats = summaryStats(normalized.map((d) => d.value ?? 0));
+  if (!stats.count) return `<div class="uif-chart-state" data-uif-state="empty">${esc(options.description || 'No data')}</div>`;
+  const domain = extent([stats.min, stats.max], options);
+  const x = scaleLinear(domain, [plot.left, width - plot.right]);
+  const cy = (height - plot.bottom + plot.top) / 2;
+  const boxTop = cy - 22;
+  const boxHeight = 44;
+  const content = `${verticalValueGrid(width, height, plot, domain, options)}<line class="uif-chart-grid" x1="${round(x(stats.min))}" y1="${cy}" x2="${round(x(stats.max))}" y2="${cy}"></line><rect ${markAttrs(`Q1 ${fmt(stats.q1, options)} to Q3 ${fmt(stats.q3, options)}`, options).replace('class="uif-chart-mark"', 'class="uif-chart-mark uif-chart-box"')} x="${round(x(stats.q1))}" y="${boxTop}" width="${round(Math.max(1, x(stats.q3) - x(stats.q1)))}" height="${boxHeight}" rx="3"><title>Q1 ${esc(fmt(stats.q1, options))}, median ${esc(fmt(stats.median, options))}, Q3 ${esc(fmt(stats.q3, options))}</title></rect><line class="uif-chart-target" x1="${round(x(stats.median))}" y1="${boxTop - 4}" x2="${round(x(stats.median))}" y2="${boxTop + boxHeight + 4}"></line><line class="uif-chart-target" x1="${round(x(stats.min))}" y1="${cy - 14}" x2="${round(x(stats.min))}" y2="${cy + 14}"></line><line class="uif-chart-target" x1="${round(x(stats.max))}" y1="${cy - 14}" x2="${round(x(stats.max))}" y2="${cy + 14}"></line>`;
+  return svgWrap('box-plot', width, height, content, normalized, { ...options, description: options.description || `Median ${fmt(stats.median, options)}, IQR ${fmt(stats.iqr, options)}` });
+}
+
+function pointsFromData(data: ChartDatum[], options: ChartOptions): RegressionPoint[] {
+  return normalizeData(data, options).map((d, index) => ({
+    x: Number(options.x && d[options.x] != null ? d[options.x] : d.x ?? index + 1),
+    y: Number(options.y && d[options.y] != null ? d[options.y] : d.y ?? d.value ?? 0),
+  }));
+}
+
+function renderScatter(data: ChartDatum[], options: ChartOptions, forceRegression = false): string {
+  const width = options.width ?? 360;
+  const height = options.height ?? 220;
+  const plot = margins(options);
+  const normalized = normalizeData(data, options);
+  const points = pointsFromData(data, options).filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+  if (!points.length) return `<div class="uif-chart-state" data-uif-state="empty">${esc(options.description || 'No plottable points')}</div>`;
+  const xDomain = extent(points.map((point) => point.x), { min: options.min });
+  const yDomain = extent(points.map((point) => point.y), { max: options.max });
+  const x = scaleLinear(xDomain, [plot.left, width - plot.right]);
+  const y = scaleLinear(yDomain, [height - plot.bottom, plot.top]);
+  const marks = points
+    .map((point, index) => {
+      const label = `${normalized[index]?.label || `Point ${index + 1}`}: ${fmt(point.x, options)}, ${fmt(point.y, options)}`;
+      return `<circle ${markAttrs(label, options)} cx="${round(x(point.x))}" cy="${round(y(point.y))}" r="4"><title>${esc(label)}</title></circle>`;
+    })
+    .join('');
+  const reg = options.regression || forceRegression ? linearRegression(points) : null;
+  const line = reg
+    ? `<line class="uif-chart-regression" x1="${round(x(xDomain[0]))}" y1="${round(y(reg.predict(xDomain[0])))}" x2="${round(x(xDomain[1]))}" y2="${round(y(reg.predict(xDomain[1])))}"><title>y = ${esc(fmt(reg.slope, options))}x + ${esc(fmt(reg.intercept, options))}, R2 ${esc(fmt(reg.r2, options))}</title></line>`
+    : '';
+  return svgWrap(forceRegression ? 'regression' : 'scatter', width, height, `${axisAndGrid(width, height, plot, yDomain, options)}${verticalValueGrid(width, height, plot, xDomain, options)}${marks}${line}`, normalized, options);
+}
+
+function renderControlChart(data: ChartDatum[], options: ChartOptions): string {
+  const normalized = normalizeData(data, options);
+  const stats = summaryStats(normalized.map((d) => d.value ?? 0));
+  const sigma = stats.stddev || 1;
+  const min = Math.min(stats.min, stats.mean - sigma * 3);
+  const max = Math.max(stats.max, stats.mean + sigma * 3);
+  const referenceLines = [stats.mean, stats.mean + sigma * 3, stats.mean - sigma * 3];
+  const html = renderLineLike(normalized, { ...options, min, max, description: options.description || 'Control chart with mean and three sigma limits' });
+  return html.replace(
+    '</svg>',
+    `${referenceLines.map((value, index) => `<line class="uif-chart-reference ${index === 0 ? 'uif-chart-mean' : ''}" x1="42" y1="${round(scaleLinear([min, max], [(options.height ?? 200) - margins(options).bottom, margins(options).top])(value))}" x2="${(options.width ?? 360) - margins(options).right}" y2="${round(scaleLinear([min, max], [(options.height ?? 200) - margins(options).bottom, margins(options).top])(value))}"><title>${index === 0 ? 'Mean' : 'Control limit'} ${esc(fmt(value, options))}</title></line>`).join('')}</svg>`,
+  );
+}
+
+function renderPareto(data: ChartDatum[], options: ChartOptions): string {
+  const sorted = normalizeData(data, options).sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
+  const total = sorted.reduce((sum, item) => sum + Math.max(0, item.value ?? 0), 0) || 1;
+  let running = 0;
+  const cumulative = sorted.map((item) => {
+    running += Math.max(0, item.value ?? 0);
+    return { ...item, values: { Count: item.value ?? 0, Cumulative: (running / total) * 100 } };
+  });
+  return `${renderBars(cumulative, { ...options, type: 'bar', series: [], y: undefined }, 'bar')}${renderLineLike(
+    cumulative.map((item) => ({ label: item.label, value: Number(item.values?.Cumulative ?? 0) })),
+    { ...options, label: options.label || 'Cumulative percent', min: 0, max: 100 },
+  )}`;
+}
+
+export function renderChart(data: Array<ChartDatum | number>, options: ChartOptions = {}): string {
+  const type = options.type ?? 'bar';
+  const normalized = normalizeData(coerceData(data), options);
   if (!normalized.length) return `<div class="uif-chart-state" data-uif-state="empty">${esc(options.description || 'No data')}</div>`;
   if (type === 'metric') return renderMetric(normalized, options);
   if (type === 'line') return renderLineLike(normalized, options);
@@ -449,29 +765,63 @@ export function renderChart(data: ChartDatum[], options: ChartOptions = {}): str
   if (type === 'bullet') return renderBullet(normalized, options);
   if (type === 'heatmap' || type === 'status-heatmap') return renderHeatmap(normalized, options);
   if (type === 'timeline') return renderBars(normalized, { ...options, axes: false }, 'bar');
+  if (type === 'histogram') return renderHistogram(normalized, options);
+  if (type === 'box-plot') return renderBoxPlot(normalized, options);
+  if (type === 'scatter') return renderScatter(normalized, options);
+  if (type === 'regression') return renderScatter(normalized, options, true);
+  if (type === 'control-chart') return renderControlChart(normalized, options);
+  if (type === 'distribution') return renderHistogram(normalized, options, true);
+  if (type === 'pareto') return renderPareto(normalized, options);
   return renderBars(normalized, options, 'bar');
 }
 
 export function parseChartData(el: HTMLElement): ChartDatum[] {
   const raw = el.dataset.uifData;
   if (!raw) return [];
-  const parsed = JSON.parse(raw) as unknown;
-  return Array.isArray(parsed) ? (parsed as ChartDatum[]) : [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (Array.isArray(parsed)) return coerceData(parsed as Array<ChartDatum | number>);
+    if (parsed && typeof parsed === 'object' && Array.isArray((parsed as { data?: unknown[] }).data)) return coerceData((parsed as { data: Array<ChartDatum | number> }).data);
+    if (parsed && typeof parsed === 'object' && Array.isArray((parsed as { rows?: unknown[] }).rows)) return coerceData((parsed as { rows: Array<ChartDatum | number> }).rows);
+    return [];
+  } catch {
+    return [];
+  }
 }
 
 export function adaptTable(table: HTMLTableElement, options: TableAdapterOptions = {}): ChartDatum[] {
-  const labelColumn = options.labelColumn ?? 0;
-  const valueColumn = options.valueColumn ?? 1;
+  const headers = Array.from(table.tHead?.rows[0]?.cells ?? []).map((cell) => cell.textContent?.trim() ?? '');
+  const columnIndex = (column: number | string | undefined, fallback: number) =>
+    typeof column === 'number' ? column : typeof column === 'string' ? Math.max(0, headers.indexOf(column)) : fallback;
+  const labelColumn = columnIndex(options.labelColumn, 0);
+  const valueColumn = columnIndex(options.valueColumn, 1);
   const seriesColumns = options.seriesColumns ?? [];
   return Array.from(table.tBodies[0]?.rows ?? []).map((row) => {
     const label = row.cells[labelColumn]?.textContent?.trim() ?? '';
     if (seriesColumns.length) {
       const values = Object.fromEntries(
-        seriesColumns.map((column) => [table.tHead?.rows[0]?.cells[column]?.textContent?.trim() || `Series ${column}`, Number(row.cells[column]?.textContent?.replace(/[^0-9.-]/g, '') || 0)]),
+        seriesColumns.map((column) => {
+          const index = columnIndex(column, 1);
+          return [headers[index] || `Series ${index}`, Number(row.cells[index]?.textContent?.replace(/[^0-9.-]/g, '') || 0)];
+        }),
       );
       return { label, values };
     }
     return { label, value: Number(row.cells[valueColumn]?.textContent?.replace(/[^0-9.-]/g, '') || 0) };
+  });
+}
+
+export function adaptRecords(records: Array<Record<string, unknown>>, mapping: RecordAdapterOptions = {}): ChartDatum[] {
+  const labelKey = mapping.label ?? mapping.x ?? 'label';
+  const valueKey = mapping.value ?? mapping.y ?? 'value';
+  return records.map((record, index) => {
+    const values = mapping.series?.length ? Object.fromEntries(mapping.series.map((key) => [key, Number(record[key]) || 0])) : undefined;
+    return {
+      ...record,
+      label: String(record[labelKey] ?? index + 1),
+      value: values ? undefined : Number(record[valueKey]) || 0,
+      values,
+    };
   });
 }
 
@@ -480,19 +830,37 @@ async function loadChartData(el: HTMLElement): Promise<ChartDatum[]> {
     const table = document.querySelector<HTMLTableElement>(el.dataset.uifTable);
     if (table) return adaptTable(table);
   }
-  return el.dataset.uifSrc ? request<ChartDatum[]>(el.dataset.uifSrc, { method: 'GET' }) : Promise.resolve(parseChartData(el));
+  if (el.dataset.uifSrc) {
+    const response = await request<ChartDatum[] | { data?: ChartDatum[]; rows?: ChartDatum[] }>(el.dataset.uifSrc, { method: 'GET' });
+    if (Array.isArray(response)) return response;
+    return response.data ?? response.rows ?? [];
+  }
+  return Promise.resolve(parseChartData(el));
 }
 
 function optionsFromElement(el: HTMLElement): ChartOptions {
-  const parsed = JSON.parse(el.dataset.uifOptions || '{}') as ChartOptions;
+  let parsed: ChartOptions = {};
+  try {
+    parsed = JSON.parse(el.dataset.uifOptions || '{}') as ChartOptions;
+  } catch {
+    parsed = {};
+  }
   return {
     ...parsed,
     type: (el.dataset.uifChart as ChartType) || parsed.type || 'bar',
     x: el.dataset.uifX || parsed.x,
     y: el.dataset.uifY || parsed.y,
     label: el.dataset.uifLabel || parsed.label,
+    id: el.dataset.uifId || parsed.id || `instance-${++chartIdCounter}`,
     series: el.dataset.uifSeries ? el.dataset.uifSeries.split(',').map((item) => item.trim()).filter(Boolean) : parsed.series,
   };
+}
+
+function responsiveOptions(el: HTMLElement, options: ChartOptions): ChartOptions {
+  if (options.responsive === false || options.width) return options;
+  const width = Math.round(el.getBoundingClientRect().width || el.clientWidth || 0);
+  if (!width) return options;
+  return { ...options, width, height: options.height ?? Math.round(width / (options.aspectRatio || 1.8)) };
 }
 
 export function initChart(el: HTMLElement): ChartController {
@@ -507,7 +875,7 @@ export function initChart(el: HTMLElement): ChartController {
     try {
       data = await loadChartData(el);
       options = optionsFromElement(el);
-      el.innerHTML = renderChart(data, options);
+      el.innerHTML = renderChart(data, responsiveOptions(el, options));
       el.dataset.uifState = data.length ? 'refreshed' : 'empty';
       el.dispatchEvent(new CustomEvent('uif:chart-refresh', { detail: { data, options }, bubbles: true }));
     } catch (error) {
@@ -521,11 +889,29 @@ export function initChart(el: HTMLElement): ChartController {
   const resize = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => {
     if (resizeTimer) window.clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(() => {
-      el.innerHTML = renderChart(data, options);
+      el.innerHTML = renderChart(data, responsiveOptions(el, options));
     }, 80);
   }) : null;
   resize?.observe(el);
   if (el.dataset.uifRefresh === 'interval' || el.dataset.uifInterval) timer = window.setInterval(() => void refresh(), Number(el.dataset.uifInterval || 30000));
+
+  const select = (event: Event) => {
+    const target = event.target instanceof Element ? event.target.closest<SVGElement>('.uif-chart-mark') : null;
+    if (!target) return;
+    if (event instanceof KeyboardEvent && !['Enter', ' '].includes(event.key)) return;
+    el.dispatchEvent(
+      new CustomEvent('uif:chart-select', {
+        detail: {
+          label: target.getAttribute('data-uif-chart-label') || target.getAttribute('aria-label') || '',
+          series: target.getAttribute('data-uif-series') || undefined,
+          type: options.type ?? 'bar',
+        },
+        bubbles: true,
+      }),
+    );
+  };
+  el.addEventListener('click', select);
+  el.addEventListener('keydown', select);
 
   const controller = {
     refresh,
@@ -533,6 +919,8 @@ export function initChart(el: HTMLElement): ChartController {
       resize?.disconnect();
       if (timer) window.clearInterval(timer);
       if (resizeTimer) window.clearTimeout(resizeTimer);
+      el.removeEventListener('click', select);
+      el.removeEventListener('keydown', select);
       controllers.delete(el);
     },
   };
