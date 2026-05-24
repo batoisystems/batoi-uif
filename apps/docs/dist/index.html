@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Batoi UIF Docs</title>
+    <link rel="stylesheet" crossorigin href="/assets/index-LsmJ3K_c.css">
+  </head>
+  <body>
+    <main class="uif-container uif-stack uif-p-4">
+      <h1>Batoi UIF Documentation</h1>
+      <p>Dependency-free, HTML-first interface framework for server-rendered, RAD, mobile, realtime, push, and AI-assisted applications.</p>
+
+      <nav class="uif-cluster" aria-label="Documentation sections" data-uif="nav">
+        <a href="#getting-started">Getting Started</a>
+        <a href="#installation">Installation</a>
+        <a href="#browser-distribution">Browser Distribution</a>
+        <a href="#core">Core Concepts</a>
+        <a href="#attributes">Data Attributes</a>
+        <a href="#tokens">CSS Tokens</a>
+        <a href="#components">Components</a>
+        <a href="#app-primitives">App Primitives</a>
+        <a href="#forms">Forms</a>
+        <a href="#declarative-filtering">Filtering</a>
+        <a href="#rad">RAD Adapter</a>
+        <a href="#charts">Charts</a>
+        <a href="#realtime">Realtime</a>
+        <a href="#push">Push</a>
+        <a href="#mobile">Mobile UI</a>
+        <a href="#pwa">PWA</a>
+        <a href="#ai">AI UI</a>
+        <a href="#mcp">MCP Approval</a>
+        <a href="#attribute-registry">Attribute Registry</a>
+        <a href="#jquery-migration">jQuery Migration</a>
+        <a href="#bootstrap-migration">Bootstrap Migration</a>
+        <a href="#tailwind-migration">Tailwind Migration</a>
+        <a href="#examples">Examples</a>
+        <a href="#roadmap">Roadmap</a>
+      </nav>
+
+      <section id="getting-started" class="uif-card">
+        <h2>Getting Started</h2>
+        <pre><code>npm install
+npm run lint
+npm test
+npm run build</code></pre>
+      </section>
+
+      <section id="installation" class="uif-card">
+        <h2>Installation</h2>
+        <pre><code>&lt;link rel="stylesheet" href="/assets/uif/uif.css"&gt;
+&lt;script type="module" src="/assets/uif/uif.esm.js"&gt;&lt;/script&gt;</code></pre>
+      </section>
+
+      <section id="browser-distribution" class="uif-card">
+        <h2>Simple JS/CSS Distribution</h2>
+        <p>Build output includes plain browser files for apps that do not use TypeScript or a bundler: <code>dist/uif.css</code>, <code>dist/uif.esm.js</code>, and <code>dist/uif.iife.js</code>.</p>
+        <pre><code>&lt;link rel="stylesheet" href="/assets/uif/uif.css"&gt;
+&lt;script src="/assets/uif/uif.iife.js"&gt;&lt;/script&gt;
+&lt;script&gt;BatoiUIF.autoStart();&lt;/script&gt;</code></pre>
+      </section>
+
+      <section id="core" class="uif-card">
+        <h2>Core Concepts</h2>
+        <pre><code>import { init } from '@batoi/uif-core';
+init(document);</code></pre>
+      </section>
+
+      <section id="attributes" class="uif-card">
+        <h2>Data Attributes</h2>
+        <p>Use <code>data-uif</code>, <code>data-uif-action</code>, <code>data-uif-target</code>, <code>data-uif-src</code>, <code>data-uif-swap</code>, and package-specific attributes to enhance server-rendered HTML.</p>
+      </section>
+
+      <section id="tokens" class="uif-card">
+        <h2>CSS Tokens</h2>
+        <pre><code>:root {
+  --uif-color-primary: #2563eb;
+  --uif-space-4: 1rem;
+}</code></pre>
+      </section>
+
+      <section id="components" class="uif-card">
+        <h2>Components</h2>
+        <p>Component coverage includes modal, drawer, dropdown, tabs, toast, accordion, alert, badge, breadcrumb, collapse, tooltip, popover, progress, spinner, skeleton, pagination, command menu, navbar/sidebar, stepper/wizard, file upload, and combobox.</p>
+        <div data-uif="tabs">
+          <button data-uif-role="tab">Modal</button>
+          <button data-uif-role="tab">Dropdown</button>
+          <div data-uif-role="tabpanel">Components initialize from declarative markup and include ARIA defaults.</div>
+          <div data-uif-role="tabpanel"><code>data-uif="dropdown"</code> closes on outside click and Escape.</div>
+        </div>
+      </section>
+
+      <section id="app-primitives" class="uif-card">
+        <h2>App Primitives</h2>
+        <p>Production app layouts can use fixed shells, sidebar nav, page heads, scroll regions, stat cards, kanban boards, queue rows, timelines, risk bands, semantic badges, density modes, and accent switching.</p>
+        <pre><code>&lt;html data-uif-density="compact"&gt;
+&lt;main class="uif-app-shell-fixed"&gt;
+  &lt;aside class="uif-sidebar"&gt;&lt;nav class="uif-sidebar-nav"&gt;...&lt;/nav&gt;&lt;/aside&gt;
+  &lt;section class="uif-shell-content"&gt;
+    &lt;header class="uif-page-head"&gt;...&lt;/header&gt;
+    &lt;div class="uif-scroll-region"&gt;...&lt;/div&gt;
+  &lt;/section&gt;
+&lt;/main&gt;</code></pre>
+      </section>
+
+      <section id="rad" class="uif-card">
+        <h2>AJAX and RAD Adapter</h2>
+        <pre><code>&lt;button data-uif="ajax" data-uif-action="reload" data-uif-src="/customers/list" data-uif-target="#customers"&gt;Reload&lt;/button&gt;</code></pre>
+        <pre><code>{
+  "ok": true,
+  "html": "&lt;div&gt;Updated&lt;/div&gt;",
+  "target": "#customers",
+  "events": [{"name": "customer:saved"}],
+  "actions": [{"type": "toast", "message": "Saved"}],
+  "focus": "#first-row"
+}</code></pre>
+      </section>
+
+      <section id="forms" class="uif-card">
+        <h2>Forms</h2>
+        <form data-uif="form" data-uif-validate="true">
+          <label>Email <input name="email" data-uif-rule="required|email" /></label>
+          <button class="uif-btn">Validate</button>
+        </form>
+      </section>
+
+      <section id="declarative-filtering" class="uif-card">
+        <h2>Declarative Filtering</h2>
+        <pre><code>&lt;input class="uif-input" data-uif-filter-target="[data-account-row]"&gt;
+&lt;article class="uif-queue-row" data-account-row&gt;Metro Finance&lt;/article&gt;</code></pre>
+      </section>
+
+      <section id="charts" class="uif-card">
+        <h2>Charts</h2>
+        <p>Charts are dependency-free SVG and support line, area, bar, horizontal bar, grouped bar, stacked bar, pie, donut/doughnut, radar, sparkline, metric, progress/ring, gauge, timeline, heatmap, bullet, and statistical charts such as histogram, box plot, scatter, regression, control chart, distribution, and Pareto.</p>
+        <div data-uif="chart" data-uif-chart="bar" data-uif-options='{"axes":true,"grid":true}' data-uif-data='[{"label":"Jan","value":120},{"label":"Feb","value":180}]'></div>
+        <pre><code>&lt;div data-uif="chart" data-uif-chart="radar"
+  data-uif-data='[{"label":"Security","value":82},{"label":"Performance","value":74}]'&gt;&lt;/div&gt;</code></pre>
+      </section>
+
+      <section id="realtime" class="uif-card">
+        <h2>Realtime</h2>
+        <div data-uif="realtime" data-uif-channel="demo" data-uif-mode="poll" data-uif-src="/mock/feed" data-uif-target="#docs-feed"></div>
+        <div id="docs-feed">Polling fallback is first-class for shared hosting deployments.</div>
+      </section>
+
+      <section id="push" class="uif-card">
+        <h2>Push</h2>
+        <button data-uif="push" data-uif-action="subscribe" data-uif-src="/api/push/subscribe">Enable Notifications</button>
+      </section>
+
+      <section id="pwa" class="uif-card">
+        <h2>PWA</h2>
+        <pre><code>import { registerServiceWorker, onOffline } from '@batoi/uif-pwa';
+registerServiceWorker('/sw.js');
+onOffline(() =&gt; document.body.dataset.offline = 'true');</code></pre>
+      </section>
+
+      <section id="mobile" class="uif-card">
+        <h2>Mobile UI</h2>
+        <pre><code>&lt;div data-uif="mobile-shell"&gt;...&lt;/div&gt;</code></pre>
+      </section>
+
+      <section id="ai" class="uif-card">
+        <h2>AI UI</h2>
+        <div data-uif="ai-action" data-uif-agent="rad-builder" data-uif-tool="create_app"></div>
+      </section>
+
+      <section id="mcp" class="uif-card">
+        <h2>MCP Tool Approval</h2>
+        <div data-uif="tool-approval" data-uif-tool="create_database" data-uif-risk="high"></div>
+      </section>
+
+      <section id="attribute-registry" class="uif-card">
+        <h2>Attribute Registry</h2>
+        <p>UIF standardizes attributes such as <code>data-uif</code>, <code>data-uif-action</code>, <code>data-uif-target</code>, <code>data-uif-src</code>, <code>data-uif-state</code>, <code>data-uif-model</code>, <code>data-uif-options</code>, and <code>data-uif-persist</code>.</p>
+        <pre><code>&lt;button data-uif-action="toggle" data-uif-target="#drawer"&gt;Toggle&lt;/button&gt;</code></pre>
+      </section>
+
+      <section id="jquery-migration" class="uif-card">
+        <h2>jQuery Migration</h2>
+        <pre><code>// Before
+$('.item').addClass('active').text('Ready');
+
+// UIF
+uif('.item').addClass('active').text('Ready');</code></pre>
+      </section>
+
+      <section id="bootstrap-migration" class="uif-card">
+        <h2>Bootstrap Migration</h2>
+        <pre><code>&lt;button class="uif-btn" data-uif-action="open" data-uif-target="#modal"&gt;Open&lt;/button&gt;
+&lt;div id="modal" data-uif="modal" hidden&gt;...&lt;/div&gt;</code></pre>
+      </section>
+
+      <section id="tailwind-migration" class="uif-card">
+        <h2>Tailwind Migration</h2>
+        <pre><code>&lt;section class="uif-grid-3 uif-gap-4 uif-p-4"&gt;
+  &lt;article class="uif-card"&gt;...&lt;/article&gt;
+&lt;/section&gt;</code></pre>
+      </section>
+
+      <section id="accessibility" class="uif-card">
+        <h2>Accessibility</h2>
+        <p>Components include keyboard behavior, focus handling, ARIA attributes, and reduced-motion awareness.</p>
+      </section>
+
+      <section id="examples" class="uif-card">
+        <h2>Examples</h2>
+        <ul>
+          <li><a href="../../examples/rad-crud/index.html">RAD CRUD</a></li>
+          <li><a href="../../examples/admin-workspace/index.html">Admin Workspace</a></li>
+          <li><a href="../../examples/rad-dashboard/index.html">RAD Dashboard</a></li>
+          <li><a href="../../examples/chart-gallery/index.html">Chart Gallery</a></li>
+          <li><a href="../../examples/mobile-shell/index.html">Mobile Shell</a></li>
+          <li><a href="../../examples/realtime-feed/index.html">Realtime Feed</a></li>
+          <li><a href="../../examples/ai-tool-approval/index.html">AI Tool Approval</a></li>
+          <li><a href="../../examples/saas-settings/index.html">SaaS Settings</a></li>
+          <li><a href="../../examples/commerce-checkout/index.html">Commerce Checkout</a></li>
+          <li><a href="../../examples/content-site/index.html">Content Site</a></li>
+          <li><a href="../../examples/realtime-ops/index.html">Realtime Ops</a></li>
+          <li><a href="../../examples/mobile-pwa/index.html">Mobile PWA</a></li>
+          <li><a href="../../examples/ai-assisted-rad/index.html">AI Assisted RAD</a></li>
+        </ul>
+      </section>
+
+      <section id="roadmap" class="uif-card">
+        <h2>Roadmap</h2>
+        <p>v0 moves from core foundation through RAD adapter, components, charts, realtime, push, mobile, and server-mediated AI/MCP UI.</p>
+      </section>
+    </main>
+  </body>
+</html>

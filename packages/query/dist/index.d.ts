@@ -1,0 +1,44 @@
+type QueryInput = string | Element | Iterable<Element> | NodeListOf<Element> | null | undefined;
+type QueryHandler = (event: Event, match: Element) => void;
+declare class UIFQuery {
+    readonly elements: Element[];
+    constructor(input: QueryInput, root?: ParentNode);
+    get length(): number;
+    at(index: number): Element | undefined;
+    each(handler: (el: Element, index: number) => void): this;
+    map<T>(handler: (el: Element, index: number) => T): T[];
+    find(selector: string): UIFQuery;
+    closest(selector: string): UIFQuery;
+    parent(): UIFQuery;
+    children(selector?: string): UIFQuery;
+    addClass(...names: string[]): this;
+    removeClass(...names: string[]): this;
+    toggleClass(name: string, force?: boolean): this;
+    attr(name: string): string | null;
+    attr(name: string, value: string | null): this;
+    data(name: string): string | undefined;
+    data(name: string, value: string | null): this;
+    css(name: string): string;
+    css(name: string, value: string): this;
+    on(eventName: string, handler: EventListener): this;
+    off(eventName: string, handler: EventListener): this;
+    trigger(name: string, detail?: unknown): this;
+    html(): string;
+    html(value: string): this;
+    text(): string;
+    text(value: string): this;
+    append(content: string | Node): this;
+    prepend(content: string | Node): this;
+    remove(): this;
+    show(): this;
+    hide(): this;
+    toggle(force?: boolean): this;
+}
+declare function uif(input: QueryInput, root?: ParentNode): UIFQuery;
+declare function ready(handler: () => void): void;
+declare function delegate(root: Element | Document, eventName: string, selector: string, handler: QueryHandler): () => void;
+declare function trigger(target: EventTarget, name: string, detail?: unknown): void;
+declare function serialize(form: HTMLFormElement): Record<string, FormDataEntryValue | FormDataEntryValue[]>;
+declare function fragment(html: string): DocumentFragment;
+
+export { type QueryHandler, type QueryInput, UIFQuery, delegate, fragment, ready, serialize, trigger, uif };

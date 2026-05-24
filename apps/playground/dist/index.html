@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Batoi UIF Playground</title>
+    <link rel="stylesheet" crossorigin href="/assets/index-LsmJ3K_c.css">
+  </head>
+  <body>
+    <main class="uif-container uif-stack uif-p-4">
+      <h1>UIF Playground</h1>
+
+      <section class="uif-card">
+        <h2>Modal</h2>
+        <button class="uif-btn" data-uif-action="open" data-uif-target="#demo-modal">Open modal</button>
+        <div id="demo-modal" data-uif="modal" data-uif-state="closed" hidden>
+          <div data-uif-role="dialog" class="uif-card">
+            <p>Modal content with Escape and focus trapping.</p>
+            <button data-uif-action="close">Close</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="uif-card">
+        <h2>Tabs, Dropdown, Toast</h2>
+        <div data-uif="tabs">
+          <button data-uif-role="tab">One</button>
+          <button data-uif-role="tab">Two</button>
+          <div data-uif-role="tabpanel">One content</div>
+          <div data-uif-role="tabpanel">Two content</div>
+        </div>
+        <div data-uif="dropdown">
+          <button data-uif-role="trigger">Menu</button>
+          <div data-uif-role="panel"><button data-uif-role="item">Item</button></div>
+        </div>
+        <button class="uif-btn" data-uif-action="toast" data-uif-message="Saved!" data-uif-type="success">Show toast</button>
+      </section>
+
+      <section class="uif-card">
+        <h2>AJAX and Form Mock</h2>
+        <button data-uif="ajax" data-uif-src="/mock/partial" data-uif-target="#partial-result">Load mock partial</button>
+        <div id="partial-result"></div>
+        <form data-uif="form" data-uif-validate="true">
+          <label>Name <input name="name" data-uif-rule="required|minLength:2" /></label>
+          <button class="uif-btn">Validate</button>
+        </form>
+      </section>
+
+      <section class="uif-card">
+        <h2>Chart and Realtime</h2>
+        <div data-uif="chart" data-uif-chart="line" data-uif-data='[{"label":"1","value":2},{"label":"2","value":6},{"label":"3","value":4}]'></div>
+        <div data-uif="realtime" data-uif-channel="playground" data-uif-mode="poll" data-uif-src="/mock/feed" data-uif-target="#activity-feed"></div>
+        <div id="activity-feed">Mock activity feed</div>
+      </section>
+
+      <section class="uif-card" data-uif="mobile-shell">
+        <h2>Mobile Shell</h2>
+        <header data-uif-role="topbar">Topbar</header>
+        <main data-uif-role="content">Touch-friendly content</main>
+        <nav data-uif-role="bottom-nav"><a href="#home">Home</a><a href="#tasks">Tasks</a></nav>
+      </section>
+
+      <section class="uif-card">
+        <h2>AI Tool Approval</h2>
+        <div data-uif="ai-action" data-uif-agent="rad-builder" data-uif-tool="create_app"></div>
+        <div data-uif="tool-approval" data-uif-tool="create_database" data-uif-risk="high"></div>
+      </section>
+    </main>
+  </body>
+</html>
