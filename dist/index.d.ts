@@ -40,12 +40,21 @@ interface UIFDomComponent {
     destroy?(el: HTMLElement): void;
 }
 type Root = Document | HTMLElement | DocumentFragment;
+type HTMLSwapMode = 'inner' | 'outer' | 'append' | 'prepend' | 'before' | 'after';
+interface TrustedHTMLRenderOptions {
+    trusted?: boolean;
+    context?: string;
+}
 declare function registerComponent(name: string, component: Omit<UIFDomComponent, 'name'>): void;
 declare function registerComponent(component: UIFDomComponent): void;
 declare function qs<T extends Element = Element>(selector: string, root?: ParentNode): T | null;
 declare function qsa<T extends Element = Element>(selector: string, root?: ParentNode): T[];
 declare function closest<T extends Element = Element>(el: Element, selector: string): T | null;
 declare function resolveTarget(sourceEl: HTMLElement, targetExpression?: string): HTMLElement | null;
+declare function setText(target: Element | null, value: unknown): void;
+declare function appendTextElement<K extends keyof HTMLElementTagNameMap>(parent: Element, tagName: K, text: unknown, className?: string): HTMLElementTagNameMap[K];
+declare function setTrustedHTML(target: Element | null, html: string, options?: TrustedHTMLRenderOptions): void;
+declare function swapTrustedHTML(targetEl: HTMLElement, html: string, mode?: HTMLSwapMode): HTMLElement;
 declare function mount(root?: Root): void;
 declare function unmount(root?: Root): void;
 declare function autoInit(root?: Root): void;
@@ -641,7 +650,7 @@ declare function initFileUpload(el: HTMLElement): ComponentInstance;
 declare function initCombobox(el: HTMLElement): ComponentInstance;
 declare function initComponent(el: HTMLElement): void;
 declare function destroyComponent(el: HTMLElement): void;
-declare function initAll(root?: Document | HTMLElement): void;
+declare function initAll(root?: Document | HTMLElement): () => void;
 declare function showToast(message: string, options?: {
     type?: string;
     duration?: number;
@@ -837,7 +846,7 @@ interface RadResponse {
 declare function swapContent(targetEl: HTMLElement, html: string, mode?: string): HTMLElement;
 declare function rehydrate(targetEl: HTMLElement): void;
 declare function loadPartial(sourceEl: HTMLElement): Promise<RadResponse | null>;
-declare function bindRadActions(root?: Document | HTMLElement): void;
+declare function bindRadActions(root?: Document | HTMLElement): () => void;
 
 interface RouterOptions {
     target?: string;
@@ -1197,7 +1206,12 @@ declare const toolApproval: {
     init: typeof renderToolApproval;
 };
 
-declare function start(root?: Document | HTMLElement): void;
+interface BatoiUIFApp {
+    root: Document | HTMLElement;
+    refresh(root?: Document | HTMLElement): void;
+    destroy(): void;
+}
+declare function start(root?: Document | HTMLElement): BatoiUIFApp;
 declare function autoStart(root?: Document | HTMLElement): void;
 
-export { type ArtifactStoreOptions, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type DrilldownOptions, type EffectOptions, type FormErrors, type HistogramBin, type HistogramOptions, type IconDefinition, type IconName, type IconOptions, type IconRegistry, type MicroAppStoreOptions, type MountIconsOptions, type NotificationItem, type OverlayOptions, type QueryHandler, type QueryInput, type RadResponse, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RequestOptions, type RouterOptions, type StoreOptions, type SummaryStats, type SwapMode, type TableAdapterOptions, type TableOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFValue, accordion, adaptRecords, adaptTable, addNotification, aiAction, alert, appendStreamingChunk, applyResponsiveColumns, autoInit, autoStart, badge, bindChartExports, bindRadActions, breadcrumb, button, cacheStrategies, cancelRequest, card, chart, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, connect, correlation, createAdvancedStore, createArtifactStore, createCacheStrategy, createMicroAppStore, createStore, createStreamSurface, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, disconnect, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, fragment, get, getConnectionState, getNotifications, getOverlayStack, getPushSubscription, hasIcon, hide, histogramBins, icon, iconElement, icons, init, initAll, initChart, initComponent, initDeclarativeFilters, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, isInitialized, linearRegression, loadPartial, loadRemoteTable, markNotificationsRead, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseChartData, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queueOfflineTask, ready, realtime, refreshChart, registerAsyncRule, registerComponent, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, rehydrate, renderAIAction, renderAIResultCard, renderAssistantResponse, renderChart, renderDiff, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolTimeline, request, requestNotificationPermission, resolveTarget, selectedRows, serialize, setAccent, setDensity, setTableState, setupInstallPrompt, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, start, stepper, submitForm, subscribe, subscribeToPush, summaryStats, swapContent, table, tabs, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterServiceWorker, unsubscribeFromPush, upload, useRequestInterceptor, useResponseInterceptor, validateField, validateForm, validateFormAsync, wizard, zScores };
+export { type ArtifactStoreOptions, type BatoiUIFApp, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type DrilldownOptions, type EffectOptions, type FormErrors, type HTMLSwapMode, type HistogramBin, type HistogramOptions, type IconDefinition, type IconName, type IconOptions, type IconRegistry, type MicroAppStoreOptions, type MountIconsOptions, type NotificationItem, type OverlayOptions, type QueryHandler, type QueryInput, type RadResponse, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RequestOptions, type RouterOptions, type StoreOptions, type SummaryStats, type SwapMode, type TableAdapterOptions, type TableOptions, type TrustedHTMLRenderOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFValue, accordion, adaptRecords, adaptTable, addNotification, aiAction, alert, appendStreamingChunk, appendTextElement, applyResponsiveColumns, autoInit, autoStart, badge, bindChartExports, bindRadActions, breadcrumb, button, cacheStrategies, cancelRequest, card, chart, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, connect, correlation, createAdvancedStore, createArtifactStore, createCacheStrategy, createMicroAppStore, createStore, createStreamSurface, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, disconnect, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, fragment, get, getConnectionState, getNotifications, getOverlayStack, getPushSubscription, hasIcon, hide, histogramBins, icon, iconElement, icons, init, initAll, initChart, initComponent, initDeclarativeFilters, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, isInitialized, linearRegression, loadPartial, loadRemoteTable, markNotificationsRead, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseChartData, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queueOfflineTask, ready, realtime, refreshChart, registerAsyncRule, registerComponent, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, rehydrate, renderAIAction, renderAIResultCard, renderAssistantResponse, renderChart, renderDiff, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolTimeline, request, requestNotificationPermission, resolveTarget, selectedRows, serialize, setAccent, setDensity, setTableState, setText, setTrustedHTML, setupInstallPrompt, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, start, stepper, submitForm, subscribe, subscribeToPush, summaryStats, swapContent, swapTrustedHTML, table, tabs, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterServiceWorker, unsubscribeFromPush, upload, useRequestInterceptor, useResponseInterceptor, validateField, validateForm, validateFormAsync, wizard, zScores };

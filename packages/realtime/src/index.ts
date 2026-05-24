@@ -1,3 +1,6 @@
+import { appendTextElement } from '@batoi/uif-dom';
+import { request } from '@batoi/uif-net';
+
 export type RealtimeMode = 'sse' | 'websocket' | 'poll';
 export type RealtimeState = 'connecting' | 'connected' | 'reconnecting' | 'disconnected' | 'stale' | 'error';
 export type RealtimeHandler = (payload: unknown) => void;
@@ -15,6 +18,7 @@ export interface RealtimeOptions {
 const handlers = new Map<string, Set<RealtimeHandler>>();
 const connections = new Map<string, { close(): void }>();
 const states = new Map<string, RealtimeState>();
+const elementSubscriptions = new WeakMap<HTMLElement, () => void>();
 
 function setState(channel: string, state: RealtimeState): void {
   states.set(channel, state);
@@ -78,15 +82,20 @@ export function connect(options: RealtimeOptions): void {
     connections.set(options.channel, { close: () => socket.close() });
     return;
   }
+  let inFlight = false;
   const timer = window.setInterval(async () => {
     if (!options.src) return;
+    if (inFlight) return;
+    inFlight = true;
     try {
-      const response = await fetch(options.src);
+      const response = await request<unknown>(options.src, { method: 'GET', parseAs: 'json', key: `realtime:${options.channel}`, timeout: options.interval ?? 5000 });
       setState(options.channel, 'connected');
-      publishLocal(options.channel, await response.json());
+      publishLocal(options.channel, response);
     } catch {
       setState(options.channel, 'error');
       reconnect();
+    } finally {
+      inFlight = false;
     }
   }, options.interval ?? 5000);
   if (options.heartbeat) {
@@ -106,11 +115,15 @@ export function disconnect(channel: string): void {
 export function initRealtime(el: HTMLElement): void {
   const channel = el.dataset.uifChannel;
   if (!channel) return;
+  elementSubscriptions.get(el)?.();
   const target = el.dataset.uifTarget ? document.querySelector<HTMLElement>(el.dataset.uifTarget) : el;
-  subscribe(channel, (payload) => {
+  const unsubscribe = subscribe(channel, (payload) => {
     const items = Array.isArray(payload) ? payload : [payload];
-    if (target) target.innerHTML = items.map((item) => `<div class="uif-feed-item">${JSON.stringify(item)}</div>`).join('');
+    if (!target) return;
+    target.replaceChildren();
+    items.forEach((item) => appendTextElement(target, 'div', typeof item === 'string' ? item : JSON.stringify(item), 'uif-feed-item'));
   });
+  elementSubscriptions.set(el, unsubscribe);
   connect({
     channel,
     src: el.dataset.uifSrc,

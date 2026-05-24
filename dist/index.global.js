@@ -29,6 +29,7 @@ var BatoiUIF = (() => {
     aiAction: () => aiAction,
     alert: () => alert,
     appendStreamingChunk: () => appendStreamingChunk,
+    appendTextElement: () => appendTextElement2,
     applyResponsiveColumns: () => applyResponsiveColumns,
     autoInit: () => autoInit2,
     autoStart: () => autoStart,
@@ -170,6 +171,8 @@ var BatoiUIF = (() => {
     setAccent: () => setAccent,
     setDensity: () => setDensity,
     setTableState: () => setTableState,
+    setText: () => setText2,
+    setTrustedHTML: () => setTrustedHTML2,
     setupInstallPrompt: () => setupInstallPrompt,
     show: () => show2,
     showErrorSummary: () => showErrorSummary,
@@ -188,6 +191,7 @@ var BatoiUIF = (() => {
     subscribeToPush: () => subscribeToPush,
     summaryStats: () => summaryStats,
     swapContent: () => swapContent,
+    swapTrustedHTML: () => swapTrustedHTML2,
     table: () => table,
     tabs: () => tabs,
     toast: () => toast,
@@ -216,22 +220,117 @@ var BatoiUIF = (() => {
     zScores: () => zScores
   });
 
+  // packages/dom/dist/index.js
+  var initialized = /* @__PURE__ */ new WeakMap();
+  var registry = /* @__PURE__ */ new Map();
+  function qsa(selector, root = document) {
+    return Array.from(root.querySelectorAll(selector));
+  }
+  function resolveTarget(sourceEl, targetExpression = "self") {
+    if (targetExpression === "self") return sourceEl;
+    if (targetExpression === "parent") return sourceEl.parentElement;
+    if (targetExpression.startsWith("closest:")) return sourceEl.closest(targetExpression.slice(8));
+    if (targetExpression.startsWith("#") || targetExpression.startsWith(".")) {
+      return document.querySelector(targetExpression);
+    }
+    return document.querySelector(targetExpression);
+  }
+  function setText(target, value) {
+    if (!target) return;
+    target.textContent = value == null ? "" : String(value);
+  }
+  function appendTextElement(parent, tagName, text, className) {
+    const el = document.createElement(tagName);
+    if (className) el.className = className;
+    setText(el, text);
+    parent.append(el);
+    return el;
+  }
+  function setTrustedHTML(target, html, options = {}) {
+    if (!target) return;
+    if (!options.trusted) {
+      throw new Error(`Batoi UIF refused untrusted HTML${options.context ? ` for ${options.context}` : ""}`);
+    }
+    target.innerHTML = html;
+  }
+  function swapTrustedHTML(targetEl, html, mode = "inner") {
+    if (mode === "inner") {
+      setTrustedHTML(targetEl, html, { trusted: true, context: "swap" });
+      return targetEl;
+    }
+    if (mode === "append") targetEl.insertAdjacentHTML("beforeend", html);
+    if (mode === "prepend") targetEl.insertAdjacentHTML("afterbegin", html);
+    if (mode === "before") targetEl.insertAdjacentHTML("beforebegin", html);
+    if (mode === "after") targetEl.insertAdjacentHTML("afterend", html);
+    if (mode === "outer") {
+      targetEl.insertAdjacentHTML("afterend", html);
+      const updated = targetEl.nextElementSibling;
+      targetEl.remove();
+      return updated instanceof HTMLElement ? updated : document.body;
+    }
+    return targetEl;
+  }
+  function candidates(root) {
+    const own = root instanceof HTMLElement && root.matches("[data-uif]") ? [root] : [];
+    return own.concat(qsa("[data-uif]", root));
+  }
+  function mount(root = document) {
+    candidates(root).forEach((el) => {
+      if (initialized.has(el)) return;
+      const key = el.getAttribute("data-uif");
+      if (!key) return;
+      const component = registry.get(key);
+      if (!component) return;
+      component.init(el);
+      initialized.set(el, component);
+    });
+  }
+  function autoInit(root = document) {
+    mount(root);
+  }
+
   // packages/ai/src/index.ts
   function renderAIAction(el) {
     const agent = el.dataset.uifAgent || "assistant";
     const tool = el.dataset.uifTool || "action";
-    el.innerHTML = `<div class="uif-ai-card"><strong>${agent}</strong><p>${tool}</p><button data-uif-action="open">Start</button></div>`;
+    const card2 = document.createElement("div");
+    card2.className = "uif-ai-card";
+    appendTextElement(card2, "strong", agent);
+    appendTextElement(card2, "p", tool);
+    const button2 = document.createElement("button");
+    button2.type = "button";
+    button2.dataset.uifAction = "open";
+    button2.textContent = "Start";
+    card2.append(button2);
+    el.replaceChildren(card2);
   }
   function renderPromptPanel(el, history2 = []) {
-    el.innerHTML = `
-    <form class="uif-ai-prompt" data-uif-role="prompt">
-      <textarea name="prompt" data-uif-role="input"></textarea>
-      <div class="uif-ai-history">${history2.map((item) => `<button type="button">${item}</button>`).join("")}</div>
-      <button type="submit">Send</button>
-    </form>`;
+    const form2 = document.createElement("form");
+    form2.className = "uif-ai-prompt";
+    form2.dataset.uifRole = "prompt";
+    const textarea = document.createElement("textarea");
+    textarea.name = "prompt";
+    textarea.dataset.uifRole = "input";
+    const historyEl = document.createElement("div");
+    historyEl.className = "uif-ai-history";
+    history2.forEach((item) => {
+      const button2 = document.createElement("button");
+      button2.type = "button";
+      button2.textContent = item;
+      historyEl.append(button2);
+    });
+    const submit = document.createElement("button");
+    submit.type = "submit";
+    submit.textContent = "Send";
+    form2.append(textarea, historyEl, submit);
+    el.replaceChildren(form2);
   }
   function renderAssistantResponse(el, content) {
-    el.innerHTML = `<div class="uif-ai-response" role="status">${content}</div>`;
+    const response = document.createElement("div");
+    response.className = "uif-ai-response";
+    response.textContent = content;
+    response.setAttribute("role", "status");
+    el.replaceChildren(response);
   }
   function appendStreamingChunk(el, chunk) {
     el.textContent = `${el.textContent || ""}${chunk}`;
@@ -250,14 +349,19 @@ var BatoiUIF = (() => {
     };
   }
   function renderAIResultCard(el, content) {
-    el.innerHTML = `
-    <div class="uif-ai-result" role="region">
-      <div data-uif-role="content">${content}</div>
-      <button data-uif-action="accept">Accept</button>
-      <button data-uif-action="reject">Reject</button>
-      <button data-uif-action="copy">Copy</button>
-      <button data-uif-action="insert">Insert</button>
-    </div>`;
+    const card2 = document.createElement("div");
+    card2.className = "uif-ai-result";
+    card2.setAttribute("role", "region");
+    const contentEl = appendTextElement(card2, "div", content);
+    contentEl.dataset.uifRole = "content";
+    ["accept", "reject", "copy", "insert"].forEach((action) => {
+      const button2 = document.createElement("button");
+      button2.type = "button";
+      button2.dataset.uifAction = action;
+      button2.textContent = action.charAt(0).toUpperCase() + action.slice(1);
+      card2.append(button2);
+    });
+    el.replaceChildren(card2);
   }
   var aiAction = { name: "ai-action", init: renderAIAction };
 
@@ -1376,6 +1480,7 @@ ${serialized}`;
 
   // packages/components/src/index.ts
   var instances = /* @__PURE__ */ new WeakMap();
+  var actionBindings = /* @__PURE__ */ new WeakMap();
   var focusableSelector = [
     "a[href]",
     "button:not([disabled])",
@@ -1823,7 +1928,15 @@ ${serialized}`;
   }
   function initAll(root = document) {
     root.querySelectorAll("[data-uif]").forEach(initComponent);
+    const existing = actionBindings.get(root);
+    if (existing) return existing;
     root.addEventListener("click", handleAction);
+    const dispose = () => {
+      root.removeEventListener("click", handleAction);
+      actionBindings.delete(root);
+    };
+    actionBindings.set(root, dispose);
+    return dispose;
   }
   function showToast(message, options = {}) {
     const toastEl = document.createElement("div");
@@ -1877,18 +1990,29 @@ ${serialized}`;
     max: (value, arg) => value === "" || Number(value) <= Number(arg),
     minLength: (value, arg) => value.length >= Number(arg),
     maxLength: (value, arg) => value.length <= Number(arg),
-    pattern: (value, arg) => new RegExp(arg ?? "").test(value),
+    pattern: (value, arg) => {
+      try {
+        return new RegExp(arg ?? "").test(value);
+      } catch {
+        return false;
+      }
+    },
     sameAs: (value, arg, form2) => {
       const other = arg ? form2.elements.namedItem(arg) : null;
       return other instanceof HTMLInputElement || other instanceof HTMLTextAreaElement ? value === other.value : false;
     }
   };
   var asyncRuleHandlers = /* @__PURE__ */ new Map();
+  var initializedForms = /* @__PURE__ */ new WeakSet();
+  var initializedRepeatables = /* @__PURE__ */ new WeakSet();
   function registerAsyncRule(name, handler) {
     asyncRuleHandlers.set(name, handler);
   }
   function fieldName(fieldEl) {
     return fieldEl.name || fieldEl.id || "field";
+  }
+  function cssEscape(value) {
+    return typeof CSS !== "undefined" && typeof CSS.escape === "function" ? CSS.escape(value) : value.replace(/["\\#.;,[\]=:]/g, "\\$&");
   }
   function resolveFormTarget(formEl) {
     const expr = formEl.dataset.uifTarget;
@@ -1900,10 +2024,8 @@ ${serialized}`;
   }
   function swap(target, html, mode = "inner") {
     if (!target) return;
-    if (mode === "outer") target.outerHTML = html;
-    else if (mode === "append") target.insertAdjacentHTML("beforeend", html);
-    else if (mode === "prepend") target.insertAdjacentHTML("afterbegin", html);
-    else target.innerHTML = html;
+    const safeMode = ["inner", "outer", "append", "prepend", "before", "after"].includes(mode) ? mode : "inner";
+    swapTrustedHTML(target, html, safeMode);
   }
   function validateField(fieldEl) {
     const form2 = fieldEl.form;
@@ -1934,11 +2056,11 @@ ${serialized}`;
   function showErrors(formEl, errors) {
     Object.entries(errors).forEach(([name, messages]) => {
       const field = formEl.elements.namedItem(name);
-      const fieldEl = field instanceof HTMLElement ? field : formEl.querySelector(`#${CSS.escape(name)}`);
+      const fieldEl = field instanceof HTMLElement ? field : formEl.querySelector(`#${cssEscape(name)}`);
       if (!fieldEl) return;
       const msg = document.createElement("div");
       msg.className = "uif-error";
-      msg.id = `${name}-error`;
+      msg.id = `${fieldEl.id || name}-error`;
       msg.textContent = messages[0] ?? "Invalid value";
       msg.setAttribute("role", "alert");
       fieldEl.setAttribute("aria-invalid", "true");
@@ -1952,7 +2074,18 @@ ${serialized}`;
     const summary = document.createElement("div");
     summary.className = "uif-error-summary";
     summary.setAttribute("role", "alert");
-    summary.innerHTML = `<strong>Please correct ${entries.length} field${entries.length === 1 ? "" : "s"}.</strong><ul>${entries.map(([name, messages]) => `<li><a href="#${CSS.escape(name)}">${messages[0] ?? "Invalid value"}</a></li>`).join("")}</ul>`;
+    const heading = document.createElement("strong");
+    heading.textContent = `Please correct ${entries.length} field${entries.length === 1 ? "" : "s"}.`;
+    const list = document.createElement("ul");
+    entries.forEach(([name, messages]) => {
+      const item = document.createElement("li");
+      const link = document.createElement("a");
+      link.href = `#${cssEscape(name)}`;
+      link.textContent = messages[0] ?? "Invalid value";
+      item.append(link);
+      list.append(item);
+    });
+    summary.append(heading, list);
     formEl.prepend(summary);
     return summary;
   }
@@ -1977,6 +2110,8 @@ ${serialized}`;
     emit(`uif:form-${state}`, { form: formEl }, formEl);
   }
   function initRepeatableGroup(root) {
+    if (initializedRepeatables.has(root)) return;
+    initializedRepeatables.add(root);
     root.addEventListener("click", (event) => {
       const action = event.target instanceof HTMLElement ? event.target.closest("[data-uif-repeat-action]") : null;
       if (!action) return;
@@ -1987,6 +2122,8 @@ ${serialized}`;
     });
   }
   function initForm(formEl) {
+    if (initializedForms.has(formEl)) return;
+    initializedForms.add(formEl);
     formEl.dataset.uifState ||= "idle";
     formEl.querySelectorAll('[data-uif="repeatable"]').forEach(initRepeatableGroup);
     formEl.addEventListener("input", (event) => {
@@ -2277,14 +2414,25 @@ ${serialized}`;
     const tool = el.dataset.uifTool || "tool";
     const risk = el.dataset.uifRisk || "medium";
     const irreversible = el.dataset.uifIrreversible === "true";
-    el.innerHTML = `
-    <div class="uif-tool-approval" data-risk="${risk}">
-      <strong>${tool}</strong>
-      <span class="uif-risk-badge">${risk}${irreversible ? " irreversible" : ""}</span>
-      ${irreversible ? '<input data-uif-role="confirm" placeholder="Type APPROVE">' : ""}
-      <button data-uif-action="approve">Approve</button>
-      <button data-uif-action="reject">Reject</button>
-    </div>`;
+    const card2 = document.createElement("div");
+    card2.className = "uif-tool-approval";
+    card2.dataset.risk = risk;
+    appendTextElement(card2, "strong", tool);
+    appendTextElement(card2, "span", `${risk}${irreversible ? " irreversible" : ""}`, "uif-risk-badge");
+    if (irreversible) {
+      const input = document.createElement("input");
+      input.dataset.uifRole = "confirm";
+      input.placeholder = "Type APPROVE";
+      card2.append(input);
+    }
+    ["approve", "reject"].forEach((action) => {
+      const button2 = document.createElement("button");
+      button2.type = "button";
+      button2.dataset.uifAction = action;
+      button2.textContent = action.charAt(0).toUpperCase() + action.slice(1);
+      card2.append(button2);
+    });
+    el.replaceChildren(card2);
     el.addEventListener("click", (event) => {
       const target = event.target instanceof HTMLElement ? event.target.closest("[data-uif-action]") : null;
       const action = target?.dataset.uifAction;
@@ -2297,19 +2445,43 @@ ${serialized}`;
     });
   }
   function renderToolProgress(el, message) {
-    el.innerHTML = `<div class="uif-tool-progress" role="status">${message}</div>`;
+    const progress2 = appendTextElement(document.createElement("div"), "div", message, "uif-tool-progress");
+    progress2.setAttribute("role", "status");
+    el.replaceChildren(progress2);
   }
   function renderToolTimeline(el, steps) {
-    el.innerHTML = `<ol class="uif-tool-timeline">${steps.map((step) => `<li data-uif-state="${step.state ?? "pending"}">${step.label}</li>`).join("")}</ol>`;
+    const list = document.createElement("ol");
+    list.className = "uif-tool-timeline";
+    steps.forEach((step) => {
+      const item = appendTextElement(list, "li", step.label);
+      item.dataset.uifState = step.state ?? "pending";
+    });
+    el.replaceChildren(list);
   }
   function renderToolAuditTrail(el, entries) {
-    el.innerHTML = `<ol class="uif-tool-audit">${entries.map((entry) => `<li><strong>${entry.actor ?? "system"}</strong> ${entry.action} <time>${entry.at ?? ""}</time></li>`).join("")}</ol>`;
+    const list = document.createElement("ol");
+    list.className = "uif-tool-audit";
+    entries.forEach((entry) => {
+      const item = document.createElement("li");
+      appendTextElement(item, "strong", entry.actor ?? "system");
+      item.append(` ${entry.action} `);
+      appendTextElement(item, "time", entry.at ?? "");
+      list.append(item);
+    });
+    el.replaceChildren(list);
   }
   function renderDiff(el, before, after) {
-    el.innerHTML = `<div class="uif-diff"><pre data-uif-role="before">${before}</pre><pre data-uif-role="after">${after}</pre></div>`;
+    const diff = document.createElement("div");
+    diff.className = "uif-diff";
+    const beforeEl = appendTextElement(diff, "pre", before);
+    beforeEl.dataset.uifRole = "before";
+    const afterEl = appendTextElement(diff, "pre", after);
+    afterEl.dataset.uifRole = "after";
+    el.replaceChildren(diff);
   }
   function renderToolResult(el, result) {
-    el.innerHTML = `<pre class="uif-tool-result">${JSON.stringify(result, null, 2)}</pre>`;
+    const pre = appendTextElement(document.createElement("div"), "pre", JSON.stringify(result, null, 2), "uif-tool-result");
+    el.replaceChildren(pre);
   }
   var toolApproval = { name: "tool-approval", init: renderToolApproval };
 
@@ -2525,43 +2697,10 @@ ${serialized}`;
   }
   var push = { name: "push", init: initPush };
 
-  // packages/dom/dist/index.js
-  var initialized = /* @__PURE__ */ new WeakMap();
-  var registry = /* @__PURE__ */ new Map();
-  function qsa(selector, root = document) {
-    return Array.from(root.querySelectorAll(selector));
-  }
-  function resolveTarget(sourceEl, targetExpression = "self") {
-    if (targetExpression === "self") return sourceEl;
-    if (targetExpression === "parent") return sourceEl.parentElement;
-    if (targetExpression.startsWith("closest:")) return sourceEl.closest(targetExpression.slice(8));
-    if (targetExpression.startsWith("#") || targetExpression.startsWith(".")) {
-      return document.querySelector(targetExpression);
-    }
-    return document.querySelector(targetExpression);
-  }
-  function candidates(root) {
-    const own = root instanceof HTMLElement && root.matches("[data-uif]") ? [root] : [];
-    return own.concat(qsa("[data-uif]", root));
-  }
-  function mount(root = document) {
-    candidates(root).forEach((el) => {
-      if (initialized.has(el)) return;
-      const key = el.getAttribute("data-uif");
-      if (!key) return;
-      const component = registry.get(key);
-      if (!component) return;
-      component.init(el);
-      initialized.set(el, component);
-    });
-  }
-  function autoInit(root = document) {
-    mount(root);
-  }
-
   // packages/rad-adapter/src/index.ts
   var swapModes = /* @__PURE__ */ new Set(["inner", "outer", "append", "prepend", "before", "after"]);
   var bodylessMethods = /* @__PURE__ */ new Set(["GET", "HEAD"]);
+  var boundRoots = /* @__PURE__ */ new WeakMap();
   function normalizeSwapMode(mode) {
     return swapModes.has(mode ?? "") ? mode : "inner";
   }
@@ -2605,19 +2744,7 @@ ${serialized}`;
     return void 0;
   }
   function swapContent(targetEl, html, mode = "inner") {
-    const safeMode = normalizeSwapMode(mode);
-    if (safeMode === "inner") targetEl.innerHTML = html;
-    if (safeMode === "append") targetEl.insertAdjacentHTML("beforeend", html);
-    if (safeMode === "prepend") targetEl.insertAdjacentHTML("afterbegin", html);
-    if (safeMode === "before") targetEl.insertAdjacentHTML("beforebegin", html);
-    if (safeMode === "after") targetEl.insertAdjacentHTML("afterend", html);
-    if (safeMode === "outer") {
-      targetEl.insertAdjacentHTML("afterend", html);
-      const updated = targetEl.nextElementSibling;
-      targetEl.remove();
-      return updated instanceof HTMLElement ? updated : document.body;
-    }
-    return targetEl;
+    return swapTrustedHTML(targetEl, html, normalizeSwapMode(mode));
   }
   function rehydrate(targetEl) {
     autoInit(targetEl);
@@ -2660,7 +2787,9 @@ ${serialized}`;
     }
   }
   function bindRadActions(root = document) {
-    root.addEventListener("click", (event) => {
+    const existing = boundRoots.get(root);
+    if (existing) return existing;
+    const onClick = (event) => {
       const target = event.target instanceof HTMLElement ? event.target : null;
       const el = target?.closest(
         '[data-uif="ajax"],[data-uif-action="load"],[data-uif-action="reload"],[data-uif-action="delete"],[data-uif-action="save"],[data-uif-action="swap"]'
@@ -2668,20 +2797,30 @@ ${serialized}`;
       if (!el) return;
       event.preventDefault();
       void loadPartial(el).catch(() => void 0);
-    });
-    root.addEventListener("submit", (event) => {
+    };
+    const onSubmit = (event) => {
       const target = event.target instanceof HTMLElement ? event.target : null;
       const form2 = target?.closest('form[data-uif="ajax"],form[data-uif-action="submit"],form[data-uif-action="save"]');
       if (!form2) return;
       event.preventDefault();
       void loadPartial(form2).catch(() => void 0);
-    });
+    };
+    root.addEventListener("click", onClick);
+    root.addEventListener("submit", onSubmit);
+    const dispose = () => {
+      root.removeEventListener("click", onClick);
+      root.removeEventListener("submit", onSubmit);
+      boundRoots.delete(root);
+    };
+    boundRoots.set(root, dispose);
+    return dispose;
   }
 
   // packages/realtime/src/index.ts
   var handlers = /* @__PURE__ */ new Map();
   var connections = /* @__PURE__ */ new Map();
   var states = /* @__PURE__ */ new Map();
+  var elementSubscriptions = /* @__PURE__ */ new WeakMap();
   function setState2(channel, state) {
     states.set(channel, state);
     window.dispatchEvent(new CustomEvent("uif:realtime-state", { detail: { channel, state } }));
@@ -2738,15 +2877,20 @@ ${serialized}`;
       connections.set(options.channel, { close: () => socket.close() });
       return;
     }
+    let inFlight = false;
     const timer = window.setInterval(async () => {
       if (!options.src) return;
+      if (inFlight) return;
+      inFlight = true;
       try {
-        const response = await fetch(options.src);
+        const response = await request(options.src, { method: "GET", parseAs: "json", key: `realtime:${options.channel}`, timeout: options.interval ?? 5e3 });
         setState2(options.channel, "connected");
-        publishLocal(options.channel, await response.json());
+        publishLocal(options.channel, response);
       } catch {
         setState2(options.channel, "error");
         reconnect();
+      } finally {
+        inFlight = false;
       }
     }, options.interval ?? 5e3);
     if (options.heartbeat) {
@@ -2764,11 +2908,15 @@ ${serialized}`;
   function initRealtime(el) {
     const channel = el.dataset.uifChannel;
     if (!channel) return;
+    elementSubscriptions.get(el)?.();
     const target = el.dataset.uifTarget ? document.querySelector(el.dataset.uifTarget) : el;
-    subscribe(channel, (payload) => {
+    const unsubscribe = subscribe(channel, (payload) => {
       const items = Array.isArray(payload) ? payload : [payload];
-      if (target) target.innerHTML = items.map((item) => `<div class="uif-feed-item">${JSON.stringify(item)}</div>`).join("");
+      if (!target) return;
+      target.replaceChildren();
+      items.forEach((item) => appendTextElement(target, "div", typeof item === "string" ? item : JSON.stringify(item), "uif-feed-item"));
     });
+    elementSubscriptions.set(el, unsubscribe);
     connect({
       channel,
       src: el.dataset.uifSrc,
@@ -2780,6 +2928,8 @@ ${serialized}`;
   var realtime = { name: "realtime", init: initRealtime };
 
   // packages/table/src/index.ts
+  var initializedTables = /* @__PURE__ */ new WeakSet();
+  var initializedFilters = /* @__PURE__ */ new WeakSet();
   function rows(table2) {
     return Array.from(table2.tBodies[0]?.rows ?? []);
   }
@@ -2806,7 +2956,14 @@ ${serialized}`;
     const body = table2.tBodies[0];
     if (!body || !["empty", "loading", "error"].includes(state)) return;
     const columns = Math.max(1, table2.tHead?.rows[0]?.cells.length ?? 1);
-    body.innerHTML = `<tr data-uif-state="${state}"><td colspan="${columns}" class="uif-table-state">${state}</td></tr>`;
+    const row = document.createElement("tr");
+    row.dataset.uifState = state;
+    const cell = document.createElement("td");
+    cell.colSpan = columns;
+    cell.className = "uif-table-state";
+    cell.textContent = state;
+    row.append(cell);
+    body.replaceChildren(row);
   }
   function applyResponsiveColumns(table2) {
     table2.querySelectorAll("[data-uif-hide]").forEach((cell) => {
@@ -2816,7 +2973,7 @@ ${serialized}`;
   function renderRemoteRows(table2, data, columns) {
     const body = table2.tBodies[0] || table2.createTBody();
     if (data.html) {
-      body.innerHTML = data.html;
+      setTrustedHTML(body, data.html, { trusted: true, context: "remote table rows" });
       return;
     }
     const sourceRows = data.rows ?? [];
@@ -2824,7 +2981,17 @@ ${serialized}`;
       setTableState(table2, "empty");
       return;
     }
-    body.innerHTML = sourceRows.map((row) => `<tr>${columns.map((column) => `<td>${String(row[column] ?? "")}</td>`).join("")}</tr>`).join("");
+    body.replaceChildren(
+      ...sourceRows.map((row) => {
+        const tr = document.createElement("tr");
+        columns.forEach((column) => {
+          const td = document.createElement("td");
+          td.textContent = String(row[column] ?? "");
+          tr.append(td);
+        });
+        return tr;
+      })
+    );
   }
   async function loadRemoteTable(table2, options = {}) {
     const src = options.src || table2.dataset.uifSrc;
@@ -2863,6 +3030,8 @@ ${serialized}`;
   }
   function initDeclarativeFilters(root = document) {
     root.querySelectorAll("[data-uif-filter-target]").forEach((filterInput) => {
+      if (initializedFilters.has(filterInput)) return;
+      initializedFilters.add(filterInput);
       const target = filterInput.dataset.uifFilterTarget;
       if (!target) return;
       const mode = filterInput.dataset.uifFilterMode || "contains";
@@ -2871,6 +3040,8 @@ ${serialized}`;
     });
   }
   function initTable(table2, options = {}) {
+    if (initializedTables.has(table2)) return;
+    initializedTables.add(table2);
     table2.dataset.uifState = table2.dataset.uifState || "idle";
     applyResponsiveColumns(table2);
     table2.querySelectorAll("th[data-uif-sort]").forEach((header, index) => {
@@ -3109,6 +3280,41 @@ ${serialized}`;
       return document.querySelector(targetExpression);
     }
     return document.querySelector(targetExpression);
+  }
+  function setText2(target, value) {
+    if (!target) return;
+    target.textContent = value == null ? "" : String(value);
+  }
+  function appendTextElement2(parent, tagName, text, className) {
+    const el = document.createElement(tagName);
+    if (className) el.className = className;
+    setText2(el, text);
+    parent.append(el);
+    return el;
+  }
+  function setTrustedHTML2(target, html, options = {}) {
+    if (!target) return;
+    if (!options.trusted) {
+      throw new Error(`Batoi UIF refused untrusted HTML${options.context ? ` for ${options.context}` : ""}`);
+    }
+    target.innerHTML = html;
+  }
+  function swapTrustedHTML2(targetEl, html, mode = "inner") {
+    if (mode === "inner") {
+      setTrustedHTML2(targetEl, html, { trusted: true, context: "swap" });
+      return targetEl;
+    }
+    if (mode === "append") targetEl.insertAdjacentHTML("beforeend", html);
+    if (mode === "prepend") targetEl.insertAdjacentHTML("afterbegin", html);
+    if (mode === "before") targetEl.insertAdjacentHTML("beforebegin", html);
+    if (mode === "after") targetEl.insertAdjacentHTML("afterend", html);
+    if (mode === "outer") {
+      targetEl.insertAdjacentHTML("afterend", html);
+      const updated = targetEl.nextElementSibling;
+      targetEl.remove();
+      return updated instanceof HTMLElement ? updated : document.body;
+    }
+    return targetEl;
   }
   function candidates2(root) {
     const own = root instanceof HTMLElement && root.matches("[data-uif]") ? [root] : [];
@@ -3727,21 +3933,47 @@ ${serialized}`;
   }
 
   // index.ts
-  function start(root = document) {
+  var apps = /* @__PURE__ */ new WeakMap();
+  function hydrate(root, disposers) {
     mountIcons(root);
-    initAll(root);
-    bindRadActions(root);
+    disposers.add(initAll(root));
+    disposers.add(bindRadActions(root));
     initDeclarativeFilters(root);
-    root.querySelectorAll('table[data-uif="table"]').forEach((el) => initTable(el));
-    root.querySelectorAll('form[data-uif="form"]').forEach((el) => initForm(el));
-    root.querySelectorAll('[data-uif="chart"]').forEach((el) => initChart(el));
-    bindChartExports(root);
-    root.querySelectorAll('[data-uif="realtime"]').forEach((el) => initRealtime(el));
-    root.querySelectorAll('[data-uif="push"]').forEach((el) => initPush(el));
-    root.querySelectorAll('[data-uif="mobile-shell"]').forEach((el) => initMobileShell(el));
-    root.querySelectorAll('[data-uif="ai-action"]').forEach((el) => renderAIAction(el));
-    root.querySelectorAll('[data-uif="tool-approval"]').forEach((el) => renderToolApproval(el));
-    root.querySelectorAll('[data-uif="install-prompt"]').forEach((el) => initInstallPrompt(el));
+    disposers.add(bindChartExports(root));
+    root.querySelectorAll("[data-uif]").forEach((el) => {
+      const type = el.dataset.uif;
+      if (type === "table" && el.tagName === "TABLE") initTable(el);
+      if (type === "form" && el.tagName === "FORM") initForm(el);
+      if (type === "chart") initChart(el);
+      if (type === "realtime") initRealtime(el);
+      if (type === "push") initPush(el);
+      if (type === "mobile-shell") initMobileShell(el);
+      if (type === "ai-action") renderAIAction(el);
+      if (type === "tool-approval") renderToolApproval(el);
+      if (type === "install-prompt") initInstallPrompt(el);
+    });
+  }
+  function start(root = document) {
+    const existing = apps.get(root);
+    if (existing) {
+      existing.refresh(root);
+      return existing;
+    }
+    const disposers = /* @__PURE__ */ new Set();
+    const app = {
+      root,
+      refresh(target = root) {
+        hydrate(target, disposers);
+      },
+      destroy() {
+        disposers.forEach((dispose) => dispose());
+        disposers.clear();
+        apps.delete(root);
+      }
+    };
+    apps.set(root, app);
+    app.refresh(root);
+    return app;
   }
   function autoStart(root = document) {
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => start(root), { once: true });

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Batoi UIF Docs</title>
-    <link rel="stylesheet" crossorigin href="/assets/index-LsmJ3K_c.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-CK8pxw81.css">
   </head>
   <body>
     <main class="uif-container uif-stack uif-p-4">
@@ -31,6 +31,7 @@
         <a href="#ai">AI UI</a>
         <a href="#mcp">MCP Approval</a>
         <a href="#attribute-registry">Attribute Registry</a>
+        <a href="#security">Security Model</a>
         <a href="#jquery-migration">jQuery Migration</a>
         <a href="#bootstrap-migration">Bootstrap Migration</a>
         <a href="#tailwind-migration">Tailwind Migration</a>
@@ -81,7 +82,7 @@ init(document);</code></pre>
 
       <section id="components" class="uif-card">
         <h2>Components</h2>
-        <p>Component coverage includes modal, drawer, dropdown, tabs, toast, accordion, alert, badge, breadcrumb, collapse, tooltip, popover, progress, spinner, skeleton, pagination, command menu, navbar/sidebar, stepper/wizard, file upload, and combobox.</p>
+        <p>Component coverage includes modal, drawer, dropdown, tabs, toast, accordion, alert, badge, breadcrumb, collapse, tooltip, popover, progress, spinner, skeleton, pagination, command menu, navbar/sidebar, stepper/wizard, file upload, and combobox. The component gallery also demonstrates professional app-pattern primitives such as button matrices, toolbars, form sections, metric rows, hero banners, summary blocks, inspectors, stat cards, empty states, filter builders, notification panels, and picker wrappers.</p>
         <div data-uif="tabs">
           <button data-uif-role="tab">Modal</button>
           <button data-uif-role="tab">Dropdown</button>
@@ -177,6 +178,17 @@ onOffline(() =&gt; document.body.dataset.offline = 'true');</code></pre>
         <pre><code>&lt;button data-uif-action="toggle" data-uif-target="#drawer"&gt;Toggle&lt;/button&gt;</code></pre>
       </section>
 
+      <section id="security" class="uif-card">
+        <h2>Security Model</h2>
+        <p>Dynamic text in forms, realtime feeds, AI UI, MCP UI, and generated table rows is rendered as text by default. Server-rendered partial swaps remain supported for RAD workflows and are treated as trusted backend HTML.</p>
+        <pre><code>import { setText, setTrustedHTML, swapTrustedHTML } from '@batoi/uif-dom';
+
+setText(el, userControlledValue);
+setTrustedHTML(el, serverRenderedHtml, { trusted: true });
+swapTrustedHTML(target, serverRenderedPartial, 'inner');</code></pre>
+        <p>Browser-side AI and MCP packages are UI-only. Database access, file writes, email, payments, deployments, MCP invocation, permissions, and audit logging must remain server-side.</p>
+      </section>
+
       <section id="jquery-migration" class="uif-card">
         <h2>jQuery Migration</h2>
         <pre><code>// Before
@@ -210,6 +222,7 @@ uif('.item').addClass('active').text('Ready');</code></pre>
           <li><a href="../../examples/rad-crud/index.html">RAD CRUD</a></li>
           <li><a href="../../examples/admin-workspace/index.html">Admin Workspace</a></li>
           <li><a href="../../examples/rad-dashboard/index.html">RAD Dashboard</a></li>
+          <li><a href="../../examples/component-gallery/index.html">Component Gallery</a></li>
           <li><a href="../../examples/chart-gallery/index.html">Chart Gallery</a></li>
           <li><a href="../../examples/mobile-shell/index.html">Mobile Shell</a></li>
           <li><a href="../../examples/realtime-feed/index.html">Realtime Feed</a></li>

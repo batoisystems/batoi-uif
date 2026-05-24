@@ -12,6 +12,7 @@ export interface ComponentInstance {
 type ComponentInit = (el: HTMLElement) => ComponentInstance;
 
 const instances = new WeakMap<HTMLElement, ComponentInstance>();
+const actionBindings = new WeakMap<Document | HTMLElement, () => void>();
 const focusableSelector = [
   'a[href]',
   'button:not([disabled])',
@@ -484,9 +485,17 @@ export function destroyComponent(el: HTMLElement): void {
   emit('uif:destroy', { el }, el);
 }
 
-export function initAll(root: Document | HTMLElement = document): void {
+export function initAll(root: Document | HTMLElement = document): () => void {
   root.querySelectorAll<HTMLElement>('[data-uif]').forEach(initComponent);
+  const existing = actionBindings.get(root);
+  if (existing) return existing;
   root.addEventListener('click', handleAction);
+  const dispose = () => {
+    root.removeEventListener('click', handleAction);
+    actionBindings.delete(root);
+  };
+  actionBindings.set(root, dispose);
+  return dispose;
 }
 
 export function showToast(message: string, options: { type?: string; duration?: number } = {}): HTMLElement {

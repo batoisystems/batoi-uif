@@ -1,22 +1,96 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Batoi UIF SaaS Settings</title>
     <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/app-showcase.css">
   </head>
-  <body>
-    <main class="uif-app-shell">
-      <aside class="uif-sidebar" data-uif="sidebar"><h1>Settings</h1><nav data-uif="nav">Profile Billing Security</nav></aside>
-      <section class="uif-main">
-        <div class="uif-toolbar"><h2>Workspace Settings</h2><span class="uif-badge">Pro</span></div>
-        <form class="uif-card" data-uif="form" data-uif-validate="false">
-          <label class="uif-field">Workspace <input class="uif-input" name="workspace" value="Acme"></label>
-          <label class="uif-field">Seats <input class="uif-input" type="number" name="seats" value="12"></label>
-          <button class="uif-btn">Save</button>
-        </form>
-      </section>
+  <body class="app-example-page" data-accent="slate" data-density="comfortable" data-surface="raised">
+    <main class="app-shell">
+      <div class="app-frame">
+        <header class="app-topbar">
+          <a class="app-brand" href="../">
+            <span class="app-brand-mark" data-uif-icon="batoi" data-uif-icon-title="Batoi"></span>
+            <span><strong>Batoi UIF</strong><span>Examples · SaaS</span></span>
+          </a>
+          <nav class="app-actions" aria-label="Example shortcuts">
+            <a class="app-pill" href="../"><span data-uif-icon="home"></span>All examples</a>
+            <a class="app-pill" href="../professional-showcase/"><span data-uif-icon="dashboard"></span>Showcase</a>
+            <a class="app-pill" href="../component-gallery/"><span data-uif-icon="grid"></span>Components</a>
+            <a class="app-pill" href="../chart-gallery/"><span data-uif-icon="chart"></span>Charts</a>
+            <a class="app-pill" href="../icon-gallery/"><span data-uif-icon="spark"></span>Icons</a>
+            <a class="app-pill is-primary" href="../../dist/uif.esm.js"><span data-uif-icon="download"></span>Distribution</a>
+          </nav>
+        </header>
+
+        <section class="app-hero">
+          <div>
+            <div class="app-eyebrow">SaaS · Settings</div>
+            <h1>Account settings screen with plan, billing, security, and form sections.</h1>
+            <p>A practical settings console for workspace profile updates, seats, plan status, and guarded save actions.</p>
+          </div>
+          <div class="app-hero-metrics" aria-label="Example highlights">
+            <div class="app-stat"><span class="app-icon" data-uif-icon="settings"></span><div><strong>UIF</strong><span>Declarative behavior</span></div></div>
+            <div class="app-stat"><span class="app-icon" data-uif-icon="code"></span><div><strong>Copy</strong><span>Starter markup</span></div></div>
+            <div class="app-stat"><span class="app-icon" data-uif-icon="shield"></span><div><strong>0 deps</strong><span>Runtime footprint</span></div></div>
+          </div>
+        </section>
+
+        <section class="app-layout">
+          <div class="app-workspace">
+            <section class="app-section-head">
+              <div>
+                <div class="app-eyebrow">Live example</div>
+                <h2>Workspace settings</h2>
+                <p>Organize repeated configuration sections with form-ready controls.</p>
+              </div>
+              <div class="app-actions"><button class="app-copy" type="button" data-uif-action="toast" data-uif-message="Example action triggered" data-uif-type="success"><span data-uif-icon="play"></span>Run action</button><button class="app-copy is-primary" type="button" data-example-copy><span data-uif-icon="copy"></span>Copy starter</button></div>
+            </section>
+            
+            <section class="app-grid two"><form class="app-card" data-uif="form" data-uif-validate="false"><h2>Workspace Profile</h2><div class="app-form-grid"><label class="uif-field">Workspace <input class="uif-input" value="Acme"></label><label class="uif-field">Seats <input class="uif-input" type="number" value="12"></label></div><button class="uif-btn app-btn-primary" type="button">Save settings</button></form><article class="app-card"><h2>Plan Summary</h2><div class="app-mini-list"><div class="app-mini-row"><span>Plan</span><strong>Pro</strong></div><div class="app-mini-row"><span>Security</span><strong>2FA enabled</strong></div><div class="app-mini-row"><span>Billing</span><strong>Current</strong></div></div></article></section>
+          </div>
+
+          <aside class="app-builder" aria-label="Tweak and copy this example">
+            <div>
+              <div class="app-eyebrow">Builder</div>
+              <h2>Tweak and copy</h2>
+              <p>Adjust the presentation of this example, then copy the starter markup for your own page.</p>
+            </div>
+            <label>Accent
+              <select class="app-select" data-example-tweak="accent">
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="violet">Violet</option>
+                <option value="slate">Slate</option>
+              </select>
+            </label>
+            <label>Density
+              <select class="app-select" data-example-tweak="density">
+                <option value="comfortable">Comfortable</option>
+                <option value="compact">Compact</option>
+                <option value="spacious">Spacious</option>
+              </select>
+            </label>
+            <label>Surface
+              <select class="app-select" data-example-tweak="surface">
+                <option value="raised">Raised</option>
+                <option value="flat">Flat</option>
+                <option value="tinted">Tinted</option>
+              </select>
+            </label>
+            <label>Starter markup
+              <textarea readonly data-example-code>&lt;form data-uif=&quot;form&quot;&gt;&lt;input class=&quot;uif-input&quot; name=&quot;workspace&quot;&gt;&lt;/form&gt;</textarea>
+            </label>
+            <div class="app-builder-actions">
+              <button class="app-copy is-primary" type="button" data-example-copy><span data-uif-icon="copy"></span>Copy code</button>
+              <a class="app-pill" href="../../dist/uif.css"><span data-uif-icon="download"></span>CSS</a>
+            </div>
+          </aside>
+        </section>
+      </div>
     </main>
+    <script type="module" src="../shared/app-showcase.js"></script>
   </body>
 </html>

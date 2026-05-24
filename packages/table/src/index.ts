@@ -1,3 +1,5 @@
+import { setTrustedHTML } from '@batoi/uif-dom';
+
 export interface TableOptions {
   filterInput?: HTMLInputElement | null;
   page?: number;
@@ -16,6 +18,9 @@ export interface RemoteTableResponse {
   total?: number;
   page?: number;
 }
+
+const initializedTables = new WeakSet<HTMLTableElement>();
+const initializedFilters = new WeakSet<HTMLInputElement | HTMLSelectElement>();
 
 function rows(table: HTMLTableElement): HTMLTableRowElement[] {
   return Array.from(table.tBodies[0]?.rows ?? []);
@@ -49,7 +54,14 @@ export function setTableState(table: HTMLTableElement, state: 'idle' | 'loading'
   const body = table.tBodies[0];
   if (!body || !['empty', 'loading', 'error'].includes(state)) return;
   const columns = Math.max(1, table.tHead?.rows[0]?.cells.length ?? 1);
-  body.innerHTML = `<tr data-uif-state="${state}"><td colspan="${columns}" class="uif-table-state">${state}</td></tr>`;
+  const row = document.createElement('tr');
+  row.dataset.uifState = state;
+  const cell = document.createElement('td');
+  cell.colSpan = columns;
+  cell.className = 'uif-table-state';
+  cell.textContent = state;
+  row.append(cell);
+  body.replaceChildren(row);
 }
 
 export function applyResponsiveColumns(table: HTMLTableElement): void {
@@ -61,7 +73,7 @@ export function applyResponsiveColumns(table: HTMLTableElement): void {
 function renderRemoteRows(table: HTMLTableElement, data: RemoteTableResponse, columns: string[]): void {
   const body = table.tBodies[0] || table.createTBody();
   if (data.html) {
-    body.innerHTML = data.html;
+    setTrustedHTML(body, data.html, { trusted: true, context: 'remote table rows' });
     return;
   }
   const sourceRows = data.rows ?? [];
@@ -69,9 +81,17 @@ function renderRemoteRows(table: HTMLTableElement, data: RemoteTableResponse, co
     setTableState(table, 'empty');
     return;
   }
-  body.innerHTML = sourceRows
-    .map((row) => `<tr>${columns.map((column) => `<td>${String(row[column] ?? '')}</td>`).join('')}</tr>`)
-    .join('');
+  body.replaceChildren(
+    ...sourceRows.map((row) => {
+      const tr = document.createElement('tr');
+      columns.forEach((column) => {
+        const td = document.createElement('td');
+        td.textContent = String(row[column] ?? '');
+        tr.append(td);
+      });
+      return tr;
+    }),
+  );
 }
 
 export async function loadRemoteTable(table: HTMLTableElement, options: TableOptions = {}): Promise<RemoteTableResponse | null> {
@@ -116,6 +136,8 @@ export function filterElements(targetSelector: string, query: string, mode: 'con
 
 export function initDeclarativeFilters(root: Document | HTMLElement = document): void {
   root.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-uif-filter-target]').forEach((filterInput) => {
+    if (initializedFilters.has(filterInput)) return;
+    initializedFilters.add(filterInput);
     const target = filterInput.dataset.uifFilterTarget;
     if (!target) return;
     const mode = (filterInput.dataset.uifFilterMode as 'contains' | 'startsWith' | 'token') || 'contains';
@@ -125,6 +147,8 @@ export function initDeclarativeFilters(root: Document | HTMLElement = document):
 }
 
 export function initTable(table: HTMLTableElement, options: TableOptions = {}): void {
+  if (initializedTables.has(table)) return;
+  initializedTables.add(table);
   table.dataset.uifState = table.dataset.uifState || 'idle';
   applyResponsiveColumns(table);
   table.querySelectorAll<HTMLTableCellElement>('th[data-uif-sort]').forEach((header, index) => {

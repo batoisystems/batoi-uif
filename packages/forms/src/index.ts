@@ -1,4 +1,5 @@
 import { emit } from '@batoi/uif-core';
+import { swapTrustedHTML } from '@batoi/uif-dom';
 import { request } from '@batoi/uif-net';
 
 export type FormErrors = Record<string, string[]>;
@@ -17,7 +18,13 @@ const ruleHandlers: Record<string, RuleHandler> = {
   max: (value, arg) => value === '' || Number(value) <= Number(arg),
   minLength: (value, arg) => value.length >= Number(arg),
   maxLength: (value, arg) => value.length <= Number(arg),
-  pattern: (value, arg) => new RegExp(arg ?? '').test(value),
+  pattern: (value, arg) => {
+    try {
+      return new RegExp(arg ?? '').test(value);
+    } catch {
+      return false;
+    }
+  },
   sameAs: (value, arg, form) => {
     const other = arg ? form.elements.namedItem(arg) : null;
     return other instanceof HTMLInputElement || other instanceof HTMLTextAreaElement ? value === other.value : false;
@@ -25,6 +32,8 @@ const ruleHandlers: Record<string, RuleHandler> = {
 };
 
 const asyncRuleHandlers = new Map<string, AsyncRuleHandler>();
+const initializedForms = new WeakSet<HTMLFormElement>();
+const initializedRepeatables = new WeakSet<HTMLElement>();
 
 export function registerAsyncRule(name: string, handler: AsyncRuleHandler): void {
   asyncRuleHandlers.set(name, handler);
@@ -32,6 +41,10 @@ export function registerAsyncRule(name: string, handler: AsyncRuleHandler): void
 
 function fieldName(fieldEl: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): string {
   return fieldEl.name || fieldEl.id || 'field';
+}
+
+function cssEscape(value: string): string {
+  return typeof CSS !== 'undefined' && typeof CSS.escape === 'function' ? CSS.escape(value) : value.replace(/["\\#.;,[\]=:]/g, '\\$&');
 }
 
 function resolveFormTarget(formEl: HTMLFormElement): HTMLElement | null {
@@ -45,10 +58,8 @@ function resolveFormTarget(formEl: HTMLFormElement): HTMLElement | null {
 
 function swap(target: HTMLElement | null, html: string, mode = 'inner'): void {
   if (!target) return;
-  if (mode === 'outer') target.outerHTML = html;
-  else if (mode === 'append') target.insertAdjacentHTML('beforeend', html);
-  else if (mode === 'prepend') target.insertAdjacentHTML('afterbegin', html);
-  else target.innerHTML = html;
+  const safeMode = ['inner', 'outer', 'append', 'prepend', 'before', 'after'].includes(mode) ? mode : 'inner';
+  swapTrustedHTML(target, html, safeMode as 'inner' | 'outer' | 'append' | 'prepend' | 'before' | 'after');
 }
 
 export function validateField(fieldEl: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): string[] {
@@ -83,11 +94,11 @@ export function clearErrors(formEl: HTMLFormElement): void {
 export function showErrors(formEl: HTMLFormElement, errors: FormErrors): void {
   Object.entries(errors).forEach(([name, messages]) => {
     const field = formEl.elements.namedItem(name);
-    const fieldEl = field instanceof HTMLElement ? field : formEl.querySelector<HTMLElement>(`#${CSS.escape(name)}`);
+    const fieldEl = field instanceof HTMLElement ? field : formEl.querySelector<HTMLElement>(`#${cssEscape(name)}`);
     if (!fieldEl) return;
     const msg = document.createElement('div');
     msg.className = 'uif-error';
-    msg.id = `${name}-error`;
+    msg.id = `${fieldEl.id || name}-error`;
     msg.textContent = messages[0] ?? 'Invalid value';
     msg.setAttribute('role', 'alert');
     fieldEl.setAttribute('aria-invalid', 'true');
@@ -102,9 +113,18 @@ export function showErrorSummary(formEl: HTMLFormElement, errors: FormErrors): H
   const summary = document.createElement('div');
   summary.className = 'uif-error-summary';
   summary.setAttribute('role', 'alert');
-  summary.innerHTML = `<strong>Please correct ${entries.length} field${entries.length === 1 ? '' : 's'}.</strong><ul>${entries
-    .map(([name, messages]) => `<li><a href="#${CSS.escape(name)}">${messages[0] ?? 'Invalid value'}</a></li>`)
-    .join('')}</ul>`;
+  const heading = document.createElement('strong');
+  heading.textContent = `Please correct ${entries.length} field${entries.length === 1 ? '' : 's'}.`;
+  const list = document.createElement('ul');
+  entries.forEach(([name, messages]) => {
+    const item = document.createElement('li');
+    const link = document.createElement('a');
+    link.href = `#${cssEscape(name)}`;
+    link.textContent = messages[0] ?? 'Invalid value';
+    item.append(link);
+    list.append(item);
+  });
+  summary.append(heading, list);
   formEl.prepend(summary);
   return summary;
 }
@@ -132,6 +152,8 @@ function setFormState(formEl: HTMLFormElement, state: 'idle' | 'submitting' | 's
 }
 
 export function initRepeatableGroup(root: HTMLElement): void {
+  if (initializedRepeatables.has(root)) return;
+  initializedRepeatables.add(root);
   root.addEventListener('click', (event) => {
     const action = event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('[data-uif-repeat-action]') : null;
     if (!action) return;
@@ -143,6 +165,8 @@ export function initRepeatableGroup(root: HTMLElement): void {
 }
 
 export function initForm(formEl: HTMLFormElement): void {
+  if (initializedForms.has(formEl)) return;
+  initializedForms.add(formEl);
   formEl.dataset.uifState ||= 'idle';
   formEl.querySelectorAll<HTMLElement>('[data-uif="repeatable"]').forEach(initRepeatableGroup);
   formEl.addEventListener('input', (event) => {

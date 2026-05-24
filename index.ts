@@ -32,21 +32,56 @@ export * from './packages/mobile/src/index.js';
 export * from './packages/ai/src/index.js';
 export * from './packages/mcp/src/index.js';
 
-export function start(root: Document | HTMLElement = document): void {
+export interface BatoiUIFApp {
+  root: Document | HTMLElement;
+  refresh(root?: Document | HTMLElement): void;
+  destroy(): void;
+}
+
+const apps = new WeakMap<Document | HTMLElement, BatoiUIFApp>();
+
+function hydrate(root: Document | HTMLElement, disposers: Set<() => void>): void {
   mountIcons(root);
-  initComponents(root);
-  bindRadActions(root);
+  disposers.add(initComponents(root));
+  disposers.add(bindRadActions(root));
   initDeclarativeFilters(root);
-  root.querySelectorAll<HTMLTableElement>('table[data-uif="table"]').forEach((el) => initTable(el));
-  root.querySelectorAll<HTMLFormElement>('form[data-uif="form"]').forEach((el) => initForm(el));
-  root.querySelectorAll<HTMLElement>('[data-uif="chart"]').forEach((el) => initChart(el));
-  bindChartExports(root);
-  root.querySelectorAll<HTMLElement>('[data-uif="realtime"]').forEach((el) => initRealtime(el));
-  root.querySelectorAll<HTMLElement>('[data-uif="push"]').forEach((el) => initPush(el));
-  root.querySelectorAll<HTMLElement>('[data-uif="mobile-shell"]').forEach((el) => initMobileShell(el));
-  root.querySelectorAll<HTMLElement>('[data-uif="ai-action"]').forEach((el) => renderAIAction(el));
-  root.querySelectorAll<HTMLElement>('[data-uif="tool-approval"]').forEach((el) => renderToolApproval(el));
-  root.querySelectorAll<HTMLElement>('[data-uif="install-prompt"]').forEach((el) => initInstallPrompt(el));
+  disposers.add(bindChartExports(root));
+  root.querySelectorAll<HTMLElement>('[data-uif]').forEach((el) => {
+    const type = el.dataset.uif;
+    if (type === 'table' && el.tagName === 'TABLE') initTable(el as HTMLTableElement);
+    if (type === 'form' && el.tagName === 'FORM') initForm(el as HTMLFormElement);
+    if (type === 'chart') initChart(el);
+    if (type === 'realtime') initRealtime(el);
+    if (type === 'push') initPush(el);
+    if (type === 'mobile-shell') initMobileShell(el);
+    if (type === 'ai-action') renderAIAction(el);
+    if (type === 'tool-approval') renderToolApproval(el);
+    if (type === 'install-prompt') initInstallPrompt(el);
+  });
+}
+
+export function start(root: Document | HTMLElement = document): BatoiUIFApp {
+  const existing = apps.get(root);
+  if (existing) {
+    existing.refresh(root);
+    return existing;
+  }
+
+  const disposers = new Set<() => void>();
+  const app: BatoiUIFApp = {
+    root,
+    refresh(target: Document | HTMLElement = root) {
+      hydrate(target, disposers);
+    },
+    destroy() {
+      disposers.forEach((dispose) => dispose());
+      disposers.clear();
+      apps.delete(root);
+    },
+  };
+  apps.set(root, app);
+  app.refresh(root);
+  return app;
 }
 
 export function autoStart(root: Document | HTMLElement = document): void {

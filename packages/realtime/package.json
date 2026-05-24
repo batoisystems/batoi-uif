@@ -14,5 +14,9 @@
   "files": ["dist"],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean"
+  },
+  "dependencies": {
+    "@batoi/uif-dom": "0.1.0",
+    "@batoi/uif-net": "0.1.0"
   }
 }

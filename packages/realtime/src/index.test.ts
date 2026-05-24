@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { connect, disconnect, publishLocal, subscribe } from './index.js';
+import { connect, disconnect, initRealtime, publishLocal, subscribe } from './index.js';
 
 describe('realtime', () => {
   it('publishes local events to subscribers', () => {
@@ -19,5 +19,15 @@ describe('realtime', () => {
     expect(fn).toHaveBeenCalledWith([{ id: 1 }]);
     disconnect('poll');
     vi.useRealTimers();
+  });
+
+  it('renders payload text safely in declarative feeds', () => {
+    document.body.innerHTML = '<div data-uif="realtime" data-uif-channel="safe"></div>';
+    const feed = document.querySelector('[data-uif="realtime"]') as HTMLElement;
+    initRealtime(feed);
+    publishLocal('safe', { message: '<img src=x onerror=alert(1)>' });
+    expect(feed.querySelector('img')).toBeNull();
+    expect(feed.textContent).toContain('<img src=x onerror=alert(1)>');
+    disconnect('safe');
   });
 });

@@ -21,6 +21,6 @@ interface RadResponse {
 declare function swapContent(targetEl: HTMLElement, html: string, mode?: string): HTMLElement;
 declare function rehydrate(targetEl: HTMLElement): void;
 declare function loadPartial(sourceEl: HTMLElement): Promise<RadResponse | null>;
-declare function bindRadActions(root?: Document | HTMLElement): void;
+declare function bindRadActions(root?: Document | HTMLElement): () => void;
 
 export { type RadResponse, type SwapMode, bindRadActions, loadPartial, rehydrate, swapContent };

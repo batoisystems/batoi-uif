@@ -21,4 +21,13 @@ describe('components', () => {
     expect(el.textContent).toBe('Saved');
     expect(el.getAttribute('role')).toBe('status');
   });
+
+  it('binds root actions only once', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    document.body.innerHTML = '<button data-uif-action="toast" data-uif-message="Saved">Notify</button>';
+    initAll(document);
+    initAll(document);
+    document.querySelector('button')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(document.querySelectorAll('.uif-toast')).toHaveLength(1);
+  });
 });

@@ -1,46 +1,97 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>RAD CRUD Example</title>
-    <link rel="stylesheet" href="../../packages/css/index.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF RAD CRUD</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/app-showcase.css">
   </head>
-  <body>
-    <main class="uif-container uif-stack uif-p-4">
-      <h1>Customer CRUD</h1>
-      <div class="uif-cluster">
-        <button class="uif-btn" data-uif-action="open" data-uif-target="#add-customer">Add customer</button>
-        <button data-uif="ajax" data-uif-action="reload" data-uif-src="/customers/list" data-uif-target="#customers">Reload list</button>
-      </div>
+  <body class="app-example-page" data-accent="blue" data-density="comfortable" data-surface="raised">
+    <main class="app-shell">
+      <div class="app-frame">
+        <header class="app-topbar">
+          <a class="app-brand" href="../">
+            <span class="app-brand-mark" data-uif-icon="batoi" data-uif-icon-title="Batoi"></span>
+            <span><strong>Batoi UIF</strong><span>Examples · CRUD</span></span>
+          </a>
+          <nav class="app-actions" aria-label="Example shortcuts">
+            <a class="app-pill" href="../"><span data-uif-icon="home"></span>All examples</a>
+            <a class="app-pill" href="../professional-showcase/"><span data-uif-icon="dashboard"></span>Showcase</a>
+            <a class="app-pill" href="../component-gallery/"><span data-uif-icon="grid"></span>Components</a>
+            <a class="app-pill" href="../chart-gallery/"><span data-uif-icon="chart"></span>Charts</a>
+            <a class="app-pill" href="../icon-gallery/"><span data-uif-icon="spark"></span>Icons</a>
+            <a class="app-pill is-primary" href="../../dist/uif.esm.js"><span data-uif-icon="download"></span>Distribution</a>
+          </nav>
+        </header>
 
-      <section id="customers" class="uif-card">
-        <h2>Customers</h2>
-        <article class="uif-cluster">
-          <span>Ada Lovelace</span>
-          <button data-uif-action="open" data-uif-target="#edit-customer">Edit</button>
-          <button data-uif="ajax" data-uif-action="delete" data-uif-confirm="Delete customer?" data-uif-src="/customers/1/delete" data-uif-target="#customers" data-uif-swap="inner">Delete</button>
-        </article>
-      </section>
+        <section class="app-hero">
+          <div>
+            <div class="app-eyebrow">RAD · CRUD</div>
+            <h1>CRUD screen with modals, forms, row actions, and partial update targets.</h1>
+            <p>A practical record management page for create, edit, delete, confirmation, validation, and target replacement workflows.</p>
+          </div>
+          <div class="app-hero-metrics" aria-label="Example highlights">
+            <div class="app-stat"><span class="app-icon" data-uif-icon="table"></span><div><strong>UIF</strong><span>Declarative behavior</span></div></div>
+            <div class="app-stat"><span class="app-icon" data-uif-icon="code"></span><div><strong>Copy</strong><span>Starter markup</span></div></div>
+            <div class="app-stat"><span class="app-icon" data-uif-icon="shield"></span><div><strong>0 deps</strong><span>Runtime footprint</span></div></div>
+          </div>
+        </section>
 
-      <div id="add-customer" data-uif="modal" data-uif-state="closed" hidden>
-        <form class="uif-card" data-uif="form" data-uif-src="/customers" data-uif-method="POST" data-uif-target="#customers">
-          <h2>Add customer</h2>
-          <label>Name <input name="name" data-uif-rule="required|minLength:2" /></label>
-          <label>Email <input name="email" data-uif-rule="required|email" /></label>
-          <button class="uif-btn">Save</button>
-          <button type="button" data-uif-action="close">Cancel</button>
-        </form>
-      </div>
+        <section class="app-layout">
+          <div class="app-workspace">
+            <section class="app-section-head">
+              <div>
+                <div class="app-eyebrow">Live example</div>
+                <h2>Customer records</h2>
+                <p>Use this pattern for server-mediated CRUD pages.</p>
+              </div>
+              <div class="app-actions"><button class="app-copy" type="button" data-uif-action="toast" data-uif-message="Example action triggered" data-uif-type="success"><span data-uif-icon="play"></span>Run action</button><button class="app-copy is-primary" type="button" data-example-copy><span data-uif-icon="copy"></span>Copy starter</button></div>
+            </section>
+            
+            <section class="app-card"><div class="app-card-head"><div><h2>Customers</h2><p>Modal-ready row actions and guarded deletes.</p></div><button class="app-copy is-primary" type="button" data-uif-action="open" data-uif-target="#add-customer">Add customer</button></div><div class="app-mini-list"><div class="app-mini-row"><span>Ada Lovelace</span><span><button class="app-copy" type="button">Edit</button> <button class="app-copy" type="button" data-uif-confirm="Delete customer?">Delete</button></span></div><div class="app-mini-row"><span>Grace Hopper</span><span><button class="app-copy" type="button">Edit</button></span></div></div></section>
+            <div id="add-customer" data-uif="modal" hidden><form class="app-card" data-uif="form" data-uif-validate="false"><h2>Add customer</h2><label class="uif-field">Name <input class="uif-input"></label><button class="uif-btn app-btn-primary" type="button">Save</button></form></div>
+          </div>
 
-      <div id="edit-customer" data-uif="modal" data-uif-state="closed" hidden>
-        <form class="uif-card" data-uif="form" data-uif-src="/customers/1" data-uif-method="POST" data-uif-target="#customers">
-          <h2>Edit customer</h2>
-          <label>Name <input name="name" value="Ada Lovelace" data-uif-rule="required|minLength:2" /></label>
-          <button class="uif-btn">Save</button>
-          <button type="button" data-uif-action="close">Cancel</button>
-        </form>
+          <aside class="app-builder" aria-label="Tweak and copy this example">
+            <div>
+              <div class="app-eyebrow">Builder</div>
+              <h2>Tweak and copy</h2>
+              <p>Adjust the presentation of this example, then copy the starter markup for your own page.</p>
+            </div>
+            <label>Accent
+              <select class="app-select" data-example-tweak="accent">
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="violet">Violet</option>
+                <option value="slate">Slate</option>
+              </select>
+            </label>
+            <label>Density
+              <select class="app-select" data-example-tweak="density">
+                <option value="comfortable">Comfortable</option>
+                <option value="compact">Compact</option>
+                <option value="spacious">Spacious</option>
+              </select>
+            </label>
+            <label>Surface
+              <select class="app-select" data-example-tweak="surface">
+                <option value="raised">Raised</option>
+                <option value="flat">Flat</option>
+                <option value="tinted">Tinted</option>
+              </select>
+            </label>
+            <label>Starter markup
+              <textarea readonly data-example-code>&lt;button data-uif-action=&quot;open&quot; data-uif-target=&quot;#add-customer&quot;&gt;Add customer&lt;/button&gt;</textarea>
+            </label>
+            <div class="app-builder-actions">
+              <button class="app-copy is-primary" type="button" data-example-copy><span data-uif-icon="copy"></span>Copy code</button>
+              <a class="app-pill" href="../../dist/uif.css"><span data-uif-icon="download"></span>CSS</a>
+            </div>
+          </aside>
+        </section>
       </div>
     </main>
+    <script type="module" src="../shared/app-showcase.js"></script>
   </body>
 </html>

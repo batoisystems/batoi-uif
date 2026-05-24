@@ -159,7 +159,12 @@ Planned application capability packages:
 
 Supported core chart types include `line`, `area`, `bar`, `horizontal-bar`, `grouped-bar`, `stacked-bar`, `pie`, `donut`, `doughnut`, `radar`, and `sparkline`. Compact app charts include `metric`, `progress`, `ring`, `gauge`, `timeline`, `heatmap`, and `bullet`. Statistical visualizations include `histogram`, `box-plot`, `scatter`, `regression`, `control-chart`, `distribution`, and `pareto`, backed by dependency-free helpers such as `summaryStats()`, `histogramBins()`, `movingAverage()`, `linearRegression()`, and `correlation()`.
 
-Open `examples/index.html` for a landing page that links to every bundled example. See `examples/chart-gallery/` for one declarative example of every supported chart type. See `examples/professional-showcase/` for a richer product-grade app surface with a fixed shell, KPI dashboard, CRM pipeline, governed AI approval desk, mobile field console, RAD admin table, and statistical analytics using the same lean JS/CSS library.
+Open `examples/index.html` for a landing page that links to every bundled example. See `examples/component-gallery/` for live component examples with copy-ready markup, including professional app patterns such as button matrices, toolbars, form sections, skeletons, metric rows, hero banners, summaries, inspectors, stat cards, empty states, filter builders, command palettes, notification panels, and native picker wrappers. See `examples/chart-gallery/` for one declarative example of every supported chart type. See `examples/professional-showcase/` for a richer product-grade app surface with a fixed shell, KPI dashboard, CRM pipeline, governed AI approval desk, mobile field console, RAD admin table, and statistical analytics using the same lean JS/CSS library.
+
+Reference docs:
+
+- `docs/data-uif-registry.md` lists the canonical declarative `data-uif-*` surface.
+- `docs/security.md` explains the trusted HTML boundary, safe text rendering, and AI/MCP server-side governance model.
 
 ### Micro App
 

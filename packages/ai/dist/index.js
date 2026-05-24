@@ -1,19 +1,46 @@
 // src/index.ts
+import { appendTextElement } from "@batoi/uif-dom";
 function renderAIAction(el) {
   const agent = el.dataset.uifAgent || "assistant";
   const tool = el.dataset.uifTool || "action";
-  el.innerHTML = `<div class="uif-ai-card"><strong>${agent}</strong><p>${tool}</p><button data-uif-action="open">Start</button></div>`;
+  const card = document.createElement("div");
+  card.className = "uif-ai-card";
+  appendTextElement(card, "strong", agent);
+  appendTextElement(card, "p", tool);
+  const button = document.createElement("button");
+  button.type = "button";
+  button.dataset.uifAction = "open";
+  button.textContent = "Start";
+  card.append(button);
+  el.replaceChildren(card);
 }
 function renderPromptPanel(el, history = []) {
-  el.innerHTML = `
-    <form class="uif-ai-prompt" data-uif-role="prompt">
-      <textarea name="prompt" data-uif-role="input"></textarea>
-      <div class="uif-ai-history">${history.map((item) => `<button type="button">${item}</button>`).join("")}</div>
-      <button type="submit">Send</button>
-    </form>`;
+  const form = document.createElement("form");
+  form.className = "uif-ai-prompt";
+  form.dataset.uifRole = "prompt";
+  const textarea = document.createElement("textarea");
+  textarea.name = "prompt";
+  textarea.dataset.uifRole = "input";
+  const historyEl = document.createElement("div");
+  historyEl.className = "uif-ai-history";
+  history.forEach((item) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = item;
+    historyEl.append(button);
+  });
+  const submit = document.createElement("button");
+  submit.type = "submit";
+  submit.textContent = "Send";
+  form.append(textarea, historyEl, submit);
+  el.replaceChildren(form);
 }
 function renderAssistantResponse(el, content) {
-  el.innerHTML = `<div class="uif-ai-response" role="status">${content}</div>`;
+  const response = document.createElement("div");
+  response.className = "uif-ai-response";
+  response.textContent = content;
+  response.setAttribute("role", "status");
+  el.replaceChildren(response);
 }
 function appendStreamingChunk(el, chunk) {
   el.textContent = `${el.textContent || ""}${chunk}`;
@@ -32,14 +59,19 @@ function createStreamSurface(el) {
   };
 }
 function renderAIResultCard(el, content) {
-  el.innerHTML = `
-    <div class="uif-ai-result" role="region">
-      <div data-uif-role="content">${content}</div>
-      <button data-uif-action="accept">Accept</button>
-      <button data-uif-action="reject">Reject</button>
-      <button data-uif-action="copy">Copy</button>
-      <button data-uif-action="insert">Insert</button>
-    </div>`;
+  const card = document.createElement("div");
+  card.className = "uif-ai-result";
+  card.setAttribute("role", "region");
+  const contentEl = appendTextElement(card, "div", content);
+  contentEl.dataset.uifRole = "content";
+  ["accept", "reject", "copy", "insert"].forEach((action) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.uifAction = action;
+    button.textContent = action.charAt(0).toUpperCase() + action.slice(1);
+    card.append(button);
+  });
+  el.replaceChildren(card);
 }
 var aiAction = { name: "ai-action", init: renderAIAction };
 export {

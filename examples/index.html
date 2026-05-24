@@ -8,201 +8,602 @@
     <style>
       body {
         margin: 0;
-        background: var(--uif-bg);
-        color: var(--uif-text);
+        background: #f4f6f8;
+        color: #111827;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
       }
 
-      .examples-shell {
+      .examples-page {
+        --accent: #0b72bd;
+        --success: #00a88f;
         min-height: 100dvh;
+        padding: 1.25rem;
         background:
-          linear-gradient(180deg, color-mix(in srgb, var(--uif-color-primary), transparent 94%), transparent 20rem),
-          var(--uif-bg);
+          radial-gradient(circle at 9% -8%, rgba(0, 168, 143, 0.16), transparent 23rem),
+          linear-gradient(180deg, rgba(11, 114, 189, 0.08), transparent 30rem),
+          #f4f6f8;
       }
 
-      .examples-head {
-        display: grid;
+      .examples-frame {
+        width: min(100%, 94rem);
+        margin-inline: auto;
+      }
+
+      .examples-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         gap: 1rem;
-        padding-block: 3rem 1.25rem;
+        min-height: 4.25rem;
+        padding: 0.75rem 0.9rem;
+        border: 1px solid #d8e0ea;
+        border-radius: 0.5rem;
+        background: #fff;
+        box-shadow: 0 12px 34px rgba(16, 24, 40, 0.08);
       }
 
-      .examples-head h1,
-      .examples-head p {
+      .examples-brand,
+      .examples-actions,
+      .examples-meta,
+      .examples-card-foot,
+      .examples-card-top,
+      .examples-card-list li,
+      .examples-stat {
+        display: flex;
+        align-items: center;
+      }
+
+      .examples-brand {
+        gap: 0.75rem;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .examples-brand-mark {
+        width: 2.15rem;
+        height: 2.15rem;
+        color: var(--success);
+      }
+
+      .examples-brand-mark .uif-icon,
+      .examples-brand-mark svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .examples-brand strong {
+        display: block;
+        color: #111827;
+        font-size: 1rem;
+        line-height: 1.1;
+      }
+
+      .examples-brand span span {
+        display: block;
+        color: #778293;
+        font-size: 0.78rem;
+      }
+
+      .examples-actions {
+        justify-content: flex-end;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+      }
+
+      .examples-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.42rem;
+        min-height: 2.25rem;
+        padding: 0.35rem 0.75rem;
+        border: 1px solid #dfe5ed;
+        border-radius: 0.5rem;
+        background: #fff;
+        color: #344054;
+        font-size: 0.84rem;
+        font-weight: 760;
+        text-decoration: none;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+      }
+
+      .examples-pill.is-primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .examples-pill .uif-icon {
+        width: 1rem;
+        height: 1rem;
+      }
+
+      .examples-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(21rem, 0.38fr);
+        gap: 1rem;
+        align-items: stretch;
+        margin: 1rem 0;
+        padding: 1.35rem;
+        border: 1px solid #d2dce8;
+        border-radius: 0.5rem;
+        background:
+          linear-gradient(135deg, rgba(11, 114, 189, 0.1), transparent 42%),
+          #fff;
+        box-shadow: 0 18px 45px rgba(16, 24, 40, 0.08);
+      }
+
+      .examples-eyebrow {
+        margin-bottom: 0.55rem;
+        color: #667085;
+        font-size: 0.72rem;
+        font-weight: 850;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .examples-hero h1 {
+        max-width: 58rem;
         margin: 0;
+        color: #111827;
+        font-size: clamp(2.2rem, 4vw, 4.25rem);
+        font-weight: 850;
+        line-height: 1.03;
       }
 
-      .examples-head h1 {
-        max-width: 54rem;
-        font-size: clamp(2rem, 4vw, 3.75rem);
+      .examples-hero p {
+        max-width: 55rem;
+        margin: 0.75rem 0 0;
+        color: #5d6675;
+        font-size: 1.05rem;
+        line-height: 1.58;
+      }
+
+      .examples-meta {
+        align-content: stretch;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+
+      .examples-stat {
+        gap: 0.75rem;
+        min-height: 5rem;
+        padding: 0.9rem 1rem;
+        border: 1px solid #dce5ef;
+        border-radius: 0.5rem;
+        background: #fff;
+        box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+      }
+
+      .examples-stat-icon,
+      .examples-card-icon {
+        display: grid;
+        place-items: center;
+        border-radius: 0.5rem;
+        background: #e7f1fb;
+        color: var(--accent);
+      }
+
+      .examples-stat-icon {
+        width: 2.25rem;
+        height: 2.25rem;
+        flex: 0 0 auto;
+      }
+
+      .examples-stat-icon .uif-icon,
+      .examples-stat-icon svg,
+      .examples-card-icon .uif-icon,
+      .examples-card-icon svg {
+        width: 1.15rem;
+        height: 1.15rem;
+      }
+
+      .examples-stat strong {
+        display: block;
+        color: #111827;
+        font-size: 1.35rem;
         line-height: 1;
       }
 
-      .examples-head p {
-        max-width: 48rem;
-        color: var(--uif-text-muted);
-        font-size: 1rem;
-        line-height: 1.55;
+      .examples-stat > div > span {
+        display: block;
+        margin-top: 0.25rem;
+        color: #667085;
+        font-size: 0.82rem;
+        font-weight: 700;
       }
 
-      .examples-feature {
+      .examples-section {
         display: grid;
-        grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.65fr);
         gap: 1rem;
-        align-items: stretch;
+        margin-top: 1rem;
       }
 
-      .examples-card-grid {
+      .examples-section-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1rem;
+        border: 1px solid #dde4ec;
+        border-radius: 0.5rem;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+      }
+
+      .examples-section-head h2,
+      .examples-section-head p {
+        margin: 0;
+      }
+
+      .examples-section-head h2 {
+        color: #111827;
+        font-size: 1.08rem;
+        font-weight: 840;
+      }
+
+      .examples-section-head p {
+        margin-top: 0.35rem;
+        color: #667085;
+        font-size: 0.9rem;
+      }
+
+      .examples-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 1rem;
       }
 
+      .examples-grid.is-featured {
+        grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 0.82fr));
+      }
+
       .examples-card {
+        position: relative;
         display: grid;
-        gap: 0.65rem;
-        min-height: 11rem;
-        text-decoration: none;
+        gap: 0.8rem;
+        min-width: 0;
+        min-height: 16rem;
+        padding: 1rem;
+        border: 1px solid #dce4ee;
+        border-radius: 0.5rem;
+        background: #fff;
         color: inherit;
+        text-decoration: none;
+        box-shadow: 0 10px 28px rgba(16, 24, 40, 0.055);
+        overflow: hidden;
         transition:
-          border-color var(--uif-motion-fast),
-          box-shadow var(--uif-motion-fast),
-          transform var(--uif-motion-fast);
+          border-color 160ms ease,
+          box-shadow 160ms ease,
+          transform 160ms ease;
+      }
+
+      .examples-card::after {
+        content: "";
+        position: absolute;
+        inset: auto 1rem 0;
+        height: 3px;
+        border-radius: 999px 999px 0 0;
+        background: linear-gradient(90deg, var(--accent), var(--success));
+        opacity: 0;
+        transition: opacity 160ms ease;
       }
 
       .examples-card:hover {
-        border-color: color-mix(in srgb, var(--uif-accent), transparent 65%);
-        box-shadow: var(--uif-shadow-md);
+        border-color: #c3d2e1;
+        box-shadow: 0 18px 42px rgba(16, 24, 40, 0.1);
         transform: translateY(-2px);
       }
 
-      .examples-card h2 {
+      .examples-card:hover::after {
+        opacity: 1;
+      }
+
+      .examples-card.is-large {
+        min-height: 24rem;
+      }
+
+      .examples-card-top {
+        justify-content: space-between;
+        gap: 0.75rem;
+      }
+
+      .examples-card-icon {
+        width: 2.35rem;
+        height: 2.35rem;
+        flex: 0 0 auto;
+      }
+
+      .examples-tag {
+        display: inline-flex;
+        align-items: center;
+        min-height: 1.6rem;
+        padding: 0.15rem 0.55rem;
+        border-radius: 999px;
+        background: #eef6fd;
+        color: var(--accent);
+        font-size: 0.73rem;
+        font-weight: 820;
+      }
+
+      .examples-tag.is-green {
+        background: #e7faf6;
+        color: #087e6d;
+      }
+
+      .examples-tag.is-warn {
+        background: #fff5d7;
+        color: #936a00;
+      }
+
+      .examples-card h3 {
         margin: 0;
-        font-size: 1rem;
+        color: #111827;
+        font-size: 1.1rem;
+        font-weight: 840;
+        line-height: 1.18;
+      }
+
+      .examples-card.is-large h3 {
+        font-size: 1.6rem;
       }
 
       .examples-card p {
         margin: 0;
-        color: var(--uif-text-muted);
-        font-size: 0.875rem;
-        line-height: 1.45;
+        color: #667085;
+        font-size: 0.9rem;
+        line-height: 1.5;
       }
 
-      .examples-card footer {
+      .examples-card-list {
+        display: grid;
+        gap: 0.45rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .examples-card-list li {
+        gap: 0.5rem;
+        color: #344054;
+        font-size: 0.84rem;
+        font-weight: 680;
+      }
+
+      .examples-card-list .uif-icon {
+        width: 0.95rem;
+        height: 0.95rem;
+        color: var(--success);
+      }
+
+      .examples-card-foot {
+        justify-content: space-between;
+        gap: 0.75rem;
         margin-top: auto;
+        padding-top: 0.3rem;
+        color: var(--accent);
+        font-size: 0.86rem;
+        font-weight: 820;
       }
 
-      .examples-feature .examples-card {
+      .examples-mini-chart {
+        display: grid;
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+        gap: 0.35rem;
+        align-items: end;
+        min-height: 6rem;
+        margin-top: 0.2rem;
+        padding: 1rem 0.8rem 0;
+        border: 1px solid #e5ebf2;
+        border-radius: 0.5rem;
+        background:
+          linear-gradient(180deg, rgba(11, 114, 189, 0.05), transparent),
+          #fbfcfe;
+      }
+
+      .examples-mini-chart span {
+        display: block;
+        border-radius: 999px 999px 0 0;
+        background: linear-gradient(180deg, #1685d4, #0b72bd);
+      }
+
+      .examples-card.is-library {
         min-height: 18rem;
       }
 
-      .examples-feature .examples-card h2 {
-        font-size: 1.55rem;
-      }
-
-      .examples-preview {
-        display: grid;
-        gap: 0.5rem;
-        align-content: start;
-      }
-
-      .examples-preview-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
-        padding: 0.65rem 0.75rem;
-        border: 1px solid var(--uif-border);
-        border-radius: var(--uif-radius-md);
-        background: var(--uif-surface-elevated);
-      }
-
-      .examples-preview-bars {
-        display: grid;
-        grid-template-columns: repeat(8, 1fr);
-        gap: 0.35rem;
-        align-items: end;
-        height: 5rem;
-        margin-top: auto;
-      }
-
-      .examples-preview-bars span {
-        display: block;
-        border-radius: 999px 999px 0 0;
-        background: var(--uif-color-primary);
-      }
-
-      @media (max-width: 56rem) {
-        .examples-feature,
-        .examples-card-grid {
+      @media (max-width: 72rem) {
+        .examples-hero,
+        .examples-grid,
+        .examples-grid.is-featured {
           grid-template-columns: 1fr;
         }
 
-        .examples-feature .examples-card {
-          min-height: auto;
+        .examples-meta {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 48rem) {
+        .examples-page {
+          padding: 0.875rem;
+        }
+
+        .examples-topbar,
+        .examples-section-head {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .examples-actions {
+          justify-content: flex-start;
+        }
+
+        .examples-hero {
+          padding: 1rem;
+        }
+
+        .examples-meta {
+          grid-template-columns: 1fr;
         }
       }
     </style>
   </head>
   <body>
-    <main class="examples-shell">
-      <div class="uif-container uif-stack uif-gap-5">
-        <header class="examples-head">
-          <span class="uif-badge uif-badge-info">Batoi UIF examples</span>
-          <h1>Practical examples for lean, dependency-free product interfaces.</h1>
-          <p>Use these examples to evaluate Batoi UIF across admin workspaces, RAD flows, charts, realtime interfaces, mobile shells, AI approval patterns, content pages, commerce flows, and full professional product surfaces.</p>
+    <main class="examples-page">
+      <div class="examples-frame">
+        <header class="examples-topbar">
+          <a class="examples-brand" href="./">
+            <span class="examples-brand-mark" data-uif-icon="batoi" data-uif-icon-title="Batoi"></span>
+            <span><strong>Batoi UIF</strong><span>Examples · v2.6</span></span>
+          </a>
+          <nav class="examples-actions" aria-label="Example shortcuts">
+            <a class="examples-pill" href="./"><span data-uif-icon="home"></span>All examples</a>
+            <a class="examples-pill" href="./professional-showcase/"><span data-uif-icon="dashboard"></span>Showcase</a>
+            <a class="examples-pill" href="./component-gallery/"><span data-uif-icon="grid"></span>Components</a>
+            <a class="examples-pill" href="./chart-gallery/"><span data-uif-icon="chart"></span>Charts</a>
+            <a class="examples-pill" href="./icon-gallery/"><span data-uif-icon="spark"></span>Icons</a>
+            <a class="examples-pill is-primary" href="../dist/uif.esm.js"><span data-uif-icon="download"></span>Distribution</a>
+          </nav>
         </header>
 
-        <section class="examples-feature" aria-label="Featured examples">
-          <a class="uif-card examples-card" href="./professional-showcase/">
-            <span class="uif-badge uif-badge-success">Featured</span>
-            <h2>Professional Showcase</h2>
-            <p>A full product-grade shell with KPI dashboard, CRM pipeline, AI approval desk, mobile field console, RAD admin table, and statistical analytics.</p>
-            <div class="examples-preview">
-              <div class="examples-preview-row"><strong>Net Revenue</strong><span class="uif-badge uif-badge-success">+14.2%</span></div>
-              <div class="examples-preview-row"><strong>Incident Queue</strong><span class="uif-badge uif-badge-warning">3 open</span></div>
-              <div class="examples-preview-bars" aria-hidden="true">
-                <span style="height:44%"></span><span style="height:58%"></span><span style="height:51%"></span><span style="height:68%"></span><span style="height:62%"></span><span style="height:74%"></span><span style="height:80%"></span><span style="height:92%"></span>
-              </div>
+        <section class="examples-hero">
+          <div>
+            <div class="examples-eyebrow">Batoi UIF · Example Workbench</div>
+            <h1>Lean JavaScript and CSS patterns for serious product interfaces.</h1>
+            <p>Explore production-oriented examples for RAD screens, dashboards, charts, mobile shells, AI approval surfaces, Micro Apps, and polished component catalogs. Every example is built with plain Batoi UIF distribution assets and no runtime framework dependency.</p>
+          </div>
+          <div class="examples-meta" aria-label="Examples summary">
+            <div class="examples-stat">
+              <span class="examples-stat-icon" data-uif-icon="package"></span>
+              <div><strong>17</strong><span>Example surfaces</span></div>
             </div>
-            <footer><span class="uif-text-primary">Open showcase →</span></footer>
-          </a>
-
-          <a class="uif-card examples-card" href="./chart-gallery/">
-            <span class="uif-badge uif-badge-info">Charts</span>
-            <h2>Chart Gallery</h2>
-            <p>Every supported SVG chart type, including statistical charts such as histogram, box plot, regression, control chart, and Pareto.</p>
-            <footer><span class="uif-text-primary">Open charts →</span></footer>
-          </a>
-
-          <a class="uif-card examples-card" href="./icon-gallery/">
-            <span class="uif-badge uif-badge-info">Icons</span>
-            <h2>Icon Gallery</h2>
-            <p>Browse every built-in SVG icon with copy-ready declarative markup, JavaScript usage, and raw SVG output.</p>
-            <footer><span class="uif-text-primary">Open icons →</span></footer>
-          </a>
-
-          <a class="uif-card examples-card" href="./micro-app-dashboard/">
-            <span class="uif-badge uif-badge-success">Client-only</span>
-            <h2>Micro App Dashboard</h2>
-            <p>A one-page Micro App using only Batoi UIF dist files, local persistence, charts, import/export, undo, and redo.</p>
-            <footer><span class="uif-text-primary">Open micro app →</span></footer>
-          </a>
+            <div class="examples-stat">
+              <span class="examples-stat-icon" data-uif-icon="code"></span>
+              <div><strong>JS/CSS</strong><span>Simple distribution</span></div>
+            </div>
+            <div class="examples-stat">
+              <span class="examples-stat-icon" data-uif-icon="shield"></span>
+              <div><strong>0</strong><span>Runtime dependencies</span></div>
+            </div>
+          </div>
         </section>
 
-        <section class="examples-card-grid" aria-label="Application examples">
-          <a class="uif-card examples-card" href="./admin-workspace/"><span class="uif-badge">Admin</span><h2>Admin Workspace</h2><p>Workspace shell, navigation, cards, tables, and repeated admin actions.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
-          <a class="uif-card examples-card" href="./rad-dashboard/"><span class="uif-badge">Dashboard</span><h2>RAD Dashboard</h2><p>Dashboard layout for server-rendered RAD applications with charts and workflow summaries.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
-          <a class="uif-card examples-card" href="./rad-crud/"><span class="uif-badge">CRUD</span><h2>RAD CRUD</h2><p>Forms, tables, confirmation actions, and server-friendly partial update patterns.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
-          <a class="uif-card examples-card" href="./ai-assisted-rad/"><span class="uif-badge uif-badge-info">AI</span><h2>AI-Assisted RAD</h2><p>AI action UI patterns for guided, auditable application workflows.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
-          <a class="uif-card examples-card" href="./ai-tool-approval/"><span class="uif-badge uif-badge-warning">Approval</span><h2>AI Tool Approval</h2><p>MCP-style approval cards, risk display, and tool execution review surfaces.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
-          <a class="uif-card examples-card" href="./realtime-ops/"><span class="uif-badge">Realtime</span><h2>Realtime Ops</h2><p>Operational monitoring pattern with live status, queue rows, and updates.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
-          <a class="uif-card examples-card" href="./realtime-feed/"><span class="uif-badge">Feed</span><h2>Realtime Feed</h2><p>SSE, WebSocket, and polling fallback patterns for server-friendly realtime views.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
-          <a class="uif-card examples-card" href="./mobile-shell/"><span class="uif-badge">Mobile</span><h2>Mobile Shell</h2><p>Mobile topbar, content region, bottom navigation, and safe-area conventions.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
-          <a class="uif-card examples-card" href="./mobile-pwa/"><span class="uif-badge">PWA</span><h2>Mobile PWA</h2><p>Install prompts, offline state, and mobile-first application structure.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
-          <a class="uif-card examples-card" href="./commerce-checkout/"><span class="uif-badge">Commerce</span><h2>Commerce Checkout</h2><p>Checkout forms, summaries, validation-ready fields, and action controls.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
-          <a class="uif-card examples-card" href="./saas-settings/"><span class="uif-badge">SaaS</span><h2>SaaS Settings</h2><p>Settings sections, form controls, plan details, and account configuration patterns.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
-          <a class="uif-card examples-card" href="./content-site/"><span class="uif-badge">Content</span><h2>Content Site</h2><p>Content-oriented layout using the same small CSS foundation.</p><footer><span class="uif-text-primary">Open example →</span></footer></a>
+        <section class="examples-section" aria-label="Featured examples">
+          <div class="examples-section-head">
+            <div>
+              <div class="examples-eyebrow">Featured</div>
+              <h2>Professional examples</h2>
+              <p>Start with the richest examples that show how Batoi UIF behaves in complete application scenarios.</p>
+            </div>
+            <a class="examples-pill" href="./professional-showcase/"><span data-uif-icon="external-link"></span>Open showcase</a>
+          </div>
+
+          <div class="examples-grid is-featured">
+            <a class="examples-card is-large" href="./professional-showcase/">
+              <div class="examples-card-top">
+                <span class="examples-card-icon" data-uif-icon="dashboard"></span>
+                <span class="examples-tag is-green">Featured</span>
+              </div>
+              <div>
+                <h3>Professional Showcase</h3>
+                <p>A product-grade shell with command center, CRM pipeline, AI approval desk, RAD admin table, mobile field console, and analytics views.</p>
+              </div>
+              <ul class="examples-card-list">
+                <li><span data-uif-icon="check"></span>Dedicated pages for each left navigation item</li>
+                <li><span data-uif-icon="check"></span>Executive dashboard, tables, forms, approvals, and mobile preview</li>
+                <li><span data-uif-icon="check"></span>Built to match practical enterprise product screens</li>
+              </ul>
+              <div class="examples-mini-chart" aria-hidden="true">
+                <span style="height: 42%"></span><span style="height: 58%"></span><span style="height: 51%"></span><span style="height: 67%"></span><span style="height: 63%"></span><span style="height: 76%"></span><span style="height: 72%"></span><span style="height: 85%"></span><span style="height: 80%"></span><span style="height: 92%"></span>
+              </div>
+              <div class="examples-card-foot"><span>Open professional showcase</span><span data-uif-icon="arrow-right"></span></div>
+            </a>
+
+            <a class="examples-card is-library" href="./component-gallery/">
+              <div class="examples-card-top">
+                <span class="examples-card-icon" data-uif-icon="grid"></span>
+                <span class="examples-tag">Library</span>
+              </div>
+              <div>
+                <h3>Component Gallery</h3>
+                <p>Professional component catalog with copy-ready markup for overlays, navigation, feedback, inputs, layouts, data, and workflow patterns.</p>
+              </div>
+              <ul class="examples-card-list">
+                <li><span data-uif-icon="check"></span>Live previews</li>
+                <li><span data-uif-icon="check"></span>Copy actions</li>
+                <li><span data-uif-icon="check"></span>Reusable UIF classes</li>
+              </ul>
+              <div class="examples-card-foot"><span>Browse components</span><span data-uif-icon="arrow-right"></span></div>
+            </a>
+
+            <a class="examples-card is-library" href="./micro-app-dashboard/">
+              <div class="examples-card-top">
+                <span class="examples-card-icon" data-uif-icon="spark"></span>
+                <span class="examples-tag is-green">Client-only</span>
+              </div>
+              <div>
+                <h3>Micro App Dashboard</h3>
+                <p>A one-page artifact-style application using local state, charts, import/export, undo, redo, and Batoi UIF distribution files.</p>
+              </div>
+              <ul class="examples-card-list">
+                <li><span data-uif-icon="check"></span>No backend required</li>
+                <li><span data-uif-icon="check"></span>Local persistence</li>
+                <li><span data-uif-icon="check"></span>Portable app surface</li>
+              </ul>
+              <div class="examples-card-foot"><span>Open micro app</span><span data-uif-icon="arrow-right"></span></div>
+            </a>
+          </div>
+        </section>
+
+        <section class="examples-section" aria-label="Library examples">
+          <div class="examples-section-head">
+            <div>
+              <div class="examples-eyebrow">Library</div>
+              <h2>Foundation galleries</h2>
+              <p>Use these pages to inspect and copy the reusable primitives that power the application examples.</p>
+            </div>
+          </div>
+
+          <div class="examples-grid">
+            <a class="examples-card" href="./chart-gallery/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="chart"></span><span class="examples-tag">Charts</span></div><h3>Chart Gallery</h3><p>SVG-first charts including line, bar, donut, pie, radar, sparkline, drill-down, exports, and statistical visuals.</p><div class="examples-card-foot"><span>Open charts</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./icon-gallery/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="spark"></span><span class="examples-tag">Icons</span></div><h3>Icon Gallery</h3><p>Every built-in SVG icon with declarative markup, JavaScript usage, raw SVG output, and copy actions.</p><div class="examples-card-foot"><span>Open icons</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./component-gallery/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="layers"></span><span class="examples-tag">Components</span></div><h3>Component Gallery</h3><p>Best-of-class component examples for professional server-rendered and client-only product interfaces.</p><div class="examples-card-foot"><span>Open components</span><span data-uif-icon="arrow-right"></span></div></a>
+          </div>
+        </section>
+
+        <section class="examples-section" aria-label="Application examples">
+          <div class="examples-section-head">
+            <div>
+              <div class="examples-eyebrow">Applications</div>
+              <h2>Scenario examples</h2>
+              <p>Reference implementations for the practical app categories Batoi UIF is expected to support.</p>
+            </div>
+          </div>
+
+          <div class="examples-grid">
+            <a class="examples-card" href="./admin-workspace/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="building"></span><span class="examples-tag">Admin</span></div><h3>Admin Workspace</h3><p>Workspace shell, navigation, cards, tables, and repeated admin actions.</p><div class="examples-card-foot"><span>Open example</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./rad-dashboard/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="dashboard"></span><span class="examples-tag">RAD</span></div><h3>RAD Dashboard</h3><p>Dashboard layout for server-rendered RAD applications with charts and workflow summaries.</p><div class="examples-card-foot"><span>Open example</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./rad-crud/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="table"></span><span class="examples-tag">CRUD</span></div><h3>RAD CRUD</h3><p>Forms, tables, confirmation actions, and server-friendly partial update patterns.</p><div class="examples-card-foot"><span>Open example</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./ai-assisted-rad/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="brain"></span><span class="examples-tag">AI</span></div><h3>AI-Assisted RAD</h3><p>AI action UI patterns for guided, auditable application workflows.</p><div class="examples-card-foot"><span>Open example</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./ai-tool-approval/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="approval"></span><span class="examples-tag is-warn">Approval</span></div><h3>AI Tool Approval</h3><p>MCP-style approval cards, risk display, and tool execution review surfaces.</p><div class="examples-card-foot"><span>Open example</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./realtime-ops/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="activity"></span><span class="examples-tag">Realtime</span></div><h3>Realtime Ops</h3><p>Operational monitoring pattern with live status, queue rows, and updates.</p><div class="examples-card-foot"><span>Open example</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./realtime-feed/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="sync"></span><span class="examples-tag">Feed</span></div><h3>Realtime Feed</h3><p>SSE, WebSocket, and polling fallback patterns for server-friendly realtime views.</p><div class="examples-card-foot"><span>Open example</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./mobile-shell/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="phone"></span><span class="examples-tag">Mobile</span></div><h3>Mobile Shell</h3><p>Mobile topbar, content region, bottom navigation, and safe-area conventions.</p><div class="examples-card-foot"><span>Open example</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./mobile-pwa/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="offline"></span><span class="examples-tag">PWA</span></div><h3>Mobile PWA</h3><p>Install prompts, offline state, and mobile-first application structure.</p><div class="examples-card-foot"><span>Open example</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./commerce-checkout/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="cart"></span><span class="examples-tag">Commerce</span></div><h3>Commerce Checkout</h3><p>Checkout forms, summaries, validation-ready fields, and action controls.</p><div class="examples-card-foot"><span>Open example</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./saas-settings/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="settings"></span><span class="examples-tag">SaaS</span></div><h3>SaaS Settings</h3><p>Settings sections, form controls, plan details, and account configuration patterns.</p><div class="examples-card-foot"><span>Open example</span><span data-uif-icon="arrow-right"></span></div></a>
+            <a class="examples-card" href="./content-site/"><div class="examples-card-top"><span class="examples-card-icon" data-uif-icon="document"></span><span class="examples-tag">Content</span></div><h3>Content Site</h3><p>Content-oriented layout using the same small CSS foundation.</p><div class="examples-card-foot"><span>Open example</span><span data-uif-icon="arrow-right"></span></div></a>
+          </div>
         </section>
       </div>
     </main>
+
+    <script type="module">
+      import { mountIcons } from '../dist/uif.esm.js';
+
+      mountIcons(document);
+    </script>
   </body>
 </html>

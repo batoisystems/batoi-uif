@@ -3,6 +3,7 @@ import { emit } from "@batoi/uif-core";
 import { collapse, expand, hide, show } from "@batoi/uif-effects";
 import { closeOverlay, openOverlay, positionOverlay, toggleOverlay } from "@batoi/uif-overlays";
 var instances = /* @__PURE__ */ new WeakMap();
+var actionBindings = /* @__PURE__ */ new WeakMap();
 var focusableSelector = [
   "a[href]",
   "button:not([disabled])",
@@ -450,7 +451,15 @@ function destroyComponent(el) {
 }
 function initAll(root = document) {
   root.querySelectorAll("[data-uif]").forEach(initComponent);
+  const existing = actionBindings.get(root);
+  if (existing) return existing;
   root.addEventListener("click", handleAction);
+  const dispose = () => {
+    root.removeEventListener("click", handleAction);
+    actionBindings.delete(root);
+  };
+  actionBindings.set(root, dispose);
+  return dispose;
 }
 function showToast(message, options = {}) {
   const toastEl = document.createElement("div");

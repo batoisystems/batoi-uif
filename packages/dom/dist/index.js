@@ -23,6 +23,41 @@ function resolveTarget(sourceEl, targetExpression = "self") {
   }
   return document.querySelector(targetExpression);
 }
+function setText(target, value) {
+  if (!target) return;
+  target.textContent = value == null ? "" : String(value);
+}
+function appendTextElement(parent, tagName, text, className) {
+  const el = document.createElement(tagName);
+  if (className) el.className = className;
+  setText(el, text);
+  parent.append(el);
+  return el;
+}
+function setTrustedHTML(target, html, options = {}) {
+  if (!target) return;
+  if (!options.trusted) {
+    throw new Error(`Batoi UIF refused untrusted HTML${options.context ? ` for ${options.context}` : ""}`);
+  }
+  target.innerHTML = html;
+}
+function swapTrustedHTML(targetEl, html, mode = "inner") {
+  if (mode === "inner") {
+    setTrustedHTML(targetEl, html, { trusted: true, context: "swap" });
+    return targetEl;
+  }
+  if (mode === "append") targetEl.insertAdjacentHTML("beforeend", html);
+  if (mode === "prepend") targetEl.insertAdjacentHTML("afterbegin", html);
+  if (mode === "before") targetEl.insertAdjacentHTML("beforebegin", html);
+  if (mode === "after") targetEl.insertAdjacentHTML("afterend", html);
+  if (mode === "outer") {
+    targetEl.insertAdjacentHTML("afterend", html);
+    const updated = targetEl.nextElementSibling;
+    targetEl.remove();
+    return updated instanceof HTMLElement ? updated : document.body;
+  }
+  return targetEl;
+}
 function candidates(root) {
   const own = root instanceof HTMLElement && root.matches("[data-uif]") ? [root] : [];
   return own.concat(qsa("[data-uif]", root));
@@ -66,6 +101,7 @@ function isInitialized(el) {
   return initialized.has(el);
 }
 export {
+  appendTextElement,
   autoInit,
   closest,
   isInitialized,
@@ -75,5 +111,8 @@ export {
   qsa,
   registerComponent,
   resolveTarget,
+  setText,
+  setTrustedHTML,
+  swapTrustedHTML,
   unmount
 };

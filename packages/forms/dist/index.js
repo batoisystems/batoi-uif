@@ -4,6 +4,7 @@ function emit(name, detail, target = document) {
 }
 
 // src/index.ts
+import { swapTrustedHTML } from "@batoi/uif-dom";
 import { request } from "@batoi/uif-net";
 var ruleHandlers = {
   required: (value) => value.trim().length > 0,
@@ -14,18 +15,29 @@ var ruleHandlers = {
   max: (value, arg) => value === "" || Number(value) <= Number(arg),
   minLength: (value, arg) => value.length >= Number(arg),
   maxLength: (value, arg) => value.length <= Number(arg),
-  pattern: (value, arg) => new RegExp(arg ?? "").test(value),
+  pattern: (value, arg) => {
+    try {
+      return new RegExp(arg ?? "").test(value);
+    } catch {
+      return false;
+    }
+  },
   sameAs: (value, arg, form2) => {
     const other = arg ? form2.elements.namedItem(arg) : null;
     return other instanceof HTMLInputElement || other instanceof HTMLTextAreaElement ? value === other.value : false;
   }
 };
 var asyncRuleHandlers = /* @__PURE__ */ new Map();
+var initializedForms = /* @__PURE__ */ new WeakSet();
+var initializedRepeatables = /* @__PURE__ */ new WeakSet();
 function registerAsyncRule(name, handler) {
   asyncRuleHandlers.set(name, handler);
 }
 function fieldName(fieldEl) {
   return fieldEl.name || fieldEl.id || "field";
+}
+function cssEscape(value) {
+  return typeof CSS !== "undefined" && typeof CSS.escape === "function" ? CSS.escape(value) : value.replace(/["\\#.;,[\]=:]/g, "\\$&");
 }
 function resolveFormTarget(formEl) {
   const expr = formEl.dataset.uifTarget;
@@ -37,10 +49,8 @@ function resolveFormTarget(formEl) {
 }
 function swap(target, html, mode = "inner") {
   if (!target) return;
-  if (mode === "outer") target.outerHTML = html;
-  else if (mode === "append") target.insertAdjacentHTML("beforeend", html);
-  else if (mode === "prepend") target.insertAdjacentHTML("afterbegin", html);
-  else target.innerHTML = html;
+  const safeMode = ["inner", "outer", "append", "prepend", "before", "after"].includes(mode) ? mode : "inner";
+  swapTrustedHTML(target, html, safeMode);
 }
 function validateField(fieldEl) {
   const form2 = fieldEl.form;
@@ -71,11 +81,11 @@ function clearErrors(formEl) {
 function showErrors(formEl, errors) {
   Object.entries(errors).forEach(([name, messages]) => {
     const field = formEl.elements.namedItem(name);
-    const fieldEl = field instanceof HTMLElement ? field : formEl.querySelector(`#${CSS.escape(name)}`);
+    const fieldEl = field instanceof HTMLElement ? field : formEl.querySelector(`#${cssEscape(name)}`);
     if (!fieldEl) return;
     const msg = document.createElement("div");
     msg.className = "uif-error";
-    msg.id = `${name}-error`;
+    msg.id = `${fieldEl.id || name}-error`;
     msg.textContent = messages[0] ?? "Invalid value";
     msg.setAttribute("role", "alert");
     fieldEl.setAttribute("aria-invalid", "true");
@@ -89,7 +99,18 @@ function showErrorSummary(formEl, errors) {
   const summary = document.createElement("div");
   summary.className = "uif-error-summary";
   summary.setAttribute("role", "alert");
-  summary.innerHTML = `<strong>Please correct ${entries.length} field${entries.length === 1 ? "" : "s"}.</strong><ul>${entries.map(([name, messages]) => `<li><a href="#${CSS.escape(name)}">${messages[0] ?? "Invalid value"}</a></li>`).join("")}</ul>`;
+  const heading = document.createElement("strong");
+  heading.textContent = `Please correct ${entries.length} field${entries.length === 1 ? "" : "s"}.`;
+  const list = document.createElement("ul");
+  entries.forEach(([name, messages]) => {
+    const item = document.createElement("li");
+    const link = document.createElement("a");
+    link.href = `#${cssEscape(name)}`;
+    link.textContent = messages[0] ?? "Invalid value";
+    item.append(link);
+    list.append(item);
+  });
+  summary.append(heading, list);
   formEl.prepend(summary);
   return summary;
 }
@@ -114,6 +135,8 @@ function setFormState(formEl, state) {
   emit(`uif:form-${state}`, { form: formEl }, formEl);
 }
 function initRepeatableGroup(root) {
+  if (initializedRepeatables.has(root)) return;
+  initializedRepeatables.add(root);
   root.addEventListener("click", (event) => {
     const action = event.target instanceof HTMLElement ? event.target.closest("[data-uif-repeat-action]") : null;
     if (!action) return;
@@ -124,6 +147,8 @@ function initRepeatableGroup(root) {
   });
 }
 function initForm(formEl) {
+  if (initializedForms.has(formEl)) return;
+  initializedForms.add(formEl);
   formEl.dataset.uifState ||= "idle";
   formEl.querySelectorAll('[data-uif="repeatable"]').forEach(initRepeatableGroup);
   formEl.addEventListener("input", (event) => {

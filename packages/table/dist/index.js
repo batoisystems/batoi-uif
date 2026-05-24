@@ -1,4 +1,7 @@
 // src/index.ts
+import { setTrustedHTML } from "@batoi/uif-dom";
+var initializedTables = /* @__PURE__ */ new WeakSet();
+var initializedFilters = /* @__PURE__ */ new WeakSet();
 function rows(table) {
   return Array.from(table.tBodies[0]?.rows ?? []);
 }
@@ -25,7 +28,14 @@ function setTableState(table, state) {
   const body = table.tBodies[0];
   if (!body || !["empty", "loading", "error"].includes(state)) return;
   const columns = Math.max(1, table.tHead?.rows[0]?.cells.length ?? 1);
-  body.innerHTML = `<tr data-uif-state="${state}"><td colspan="${columns}" class="uif-table-state">${state}</td></tr>`;
+  const row = document.createElement("tr");
+  row.dataset.uifState = state;
+  const cell = document.createElement("td");
+  cell.colSpan = columns;
+  cell.className = "uif-table-state";
+  cell.textContent = state;
+  row.append(cell);
+  body.replaceChildren(row);
 }
 function applyResponsiveColumns(table) {
   table.querySelectorAll("[data-uif-hide]").forEach((cell) => {
@@ -35,7 +45,7 @@ function applyResponsiveColumns(table) {
 function renderRemoteRows(table, data, columns) {
   const body = table.tBodies[0] || table.createTBody();
   if (data.html) {
-    body.innerHTML = data.html;
+    setTrustedHTML(body, data.html, { trusted: true, context: "remote table rows" });
     return;
   }
   const sourceRows = data.rows ?? [];
@@ -43,7 +53,17 @@ function renderRemoteRows(table, data, columns) {
     setTableState(table, "empty");
     return;
   }
-  body.innerHTML = sourceRows.map((row) => `<tr>${columns.map((column) => `<td>${String(row[column] ?? "")}</td>`).join("")}</tr>`).join("");
+  body.replaceChildren(
+    ...sourceRows.map((row) => {
+      const tr = document.createElement("tr");
+      columns.forEach((column) => {
+        const td = document.createElement("td");
+        td.textContent = String(row[column] ?? "");
+        tr.append(td);
+      });
+      return tr;
+    })
+  );
 }
 async function loadRemoteTable(table, options = {}) {
   const src = options.src || table.dataset.uifSrc;
@@ -82,6 +102,8 @@ function filterElements(targetSelector, query, mode = "contains") {
 }
 function initDeclarativeFilters(root = document) {
   root.querySelectorAll("[data-uif-filter-target]").forEach((filterInput) => {
+    if (initializedFilters.has(filterInput)) return;
+    initializedFilters.add(filterInput);
     const target = filterInput.dataset.uifFilterTarget;
     if (!target) return;
     const mode = filterInput.dataset.uifFilterMode || "contains";
@@ -90,6 +112,8 @@ function initDeclarativeFilters(root = document) {
   });
 }
 function initTable(table, options = {}) {
+  if (initializedTables.has(table)) return;
+  initializedTables.add(table);
   table.dataset.uifState = table.dataset.uifState || "idle";
   applyResponsiveColumns(table);
   table.querySelectorAll("th[data-uif-sort]").forEach((header, index) => {

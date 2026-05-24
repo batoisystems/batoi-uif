@@ -1,17 +1,29 @@
 import { emit } from '@batoi/uif-core';
+import { appendTextElement } from '@batoi/uif-dom';
 
 export function renderToolApproval(el: HTMLElement): void {
   const tool = el.dataset.uifTool || 'tool';
   const risk = el.dataset.uifRisk || 'medium';
   const irreversible = el.dataset.uifIrreversible === 'true';
-  el.innerHTML = `
-    <div class="uif-tool-approval" data-risk="${risk}">
-      <strong>${tool}</strong>
-      <span class="uif-risk-badge">${risk}${irreversible ? ' irreversible' : ''}</span>
-      ${irreversible ? '<input data-uif-role="confirm" placeholder="Type APPROVE">' : ''}
-      <button data-uif-action="approve">Approve</button>
-      <button data-uif-action="reject">Reject</button>
-    </div>`;
+  const card = document.createElement('div');
+  card.className = 'uif-tool-approval';
+  card.dataset.risk = risk;
+  appendTextElement(card, 'strong', tool);
+  appendTextElement(card, 'span', `${risk}${irreversible ? ' irreversible' : ''}`, 'uif-risk-badge');
+  if (irreversible) {
+    const input = document.createElement('input');
+    input.dataset.uifRole = 'confirm';
+    input.placeholder = 'Type APPROVE';
+    card.append(input);
+  }
+  ['approve', 'reject'].forEach((action) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.uifAction = action;
+    button.textContent = action.charAt(0).toUpperCase() + action.slice(1);
+    card.append(button);
+  });
+  el.replaceChildren(card);
   el.addEventListener('click', (event) => {
     const target = event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('[data-uif-action]') : null;
     const action = target?.dataset.uifAction;
@@ -25,27 +37,47 @@ export function renderToolApproval(el: HTMLElement): void {
 }
 
 export function renderToolProgress(el: HTMLElement, message: string): void {
-  el.innerHTML = `<div class="uif-tool-progress" role="status">${message}</div>`;
+  const progress = appendTextElement(document.createElement('div'), 'div', message, 'uif-tool-progress');
+  progress.setAttribute('role', 'status');
+  el.replaceChildren(progress);
 }
 
 export function renderToolTimeline(el: HTMLElement, steps: Array<{ label: string; state?: string }>): void {
-  el.innerHTML = `<ol class="uif-tool-timeline">${steps
-    .map((step) => `<li data-uif-state="${step.state ?? 'pending'}">${step.label}</li>`)
-    .join('')}</ol>`;
+  const list = document.createElement('ol');
+  list.className = 'uif-tool-timeline';
+  steps.forEach((step) => {
+    const item = appendTextElement(list, 'li', step.label);
+    item.dataset.uifState = step.state ?? 'pending';
+  });
+  el.replaceChildren(list);
 }
 
 export function renderToolAuditTrail(el: HTMLElement, entries: Array<{ actor?: string; action: string; at?: string }>): void {
-  el.innerHTML = `<ol class="uif-tool-audit">${entries
-    .map((entry) => `<li><strong>${entry.actor ?? 'system'}</strong> ${entry.action} <time>${entry.at ?? ''}</time></li>`)
-    .join('')}</ol>`;
+  const list = document.createElement('ol');
+  list.className = 'uif-tool-audit';
+  entries.forEach((entry) => {
+    const item = document.createElement('li');
+    appendTextElement(item, 'strong', entry.actor ?? 'system');
+    item.append(` ${entry.action} `);
+    appendTextElement(item, 'time', entry.at ?? '');
+    list.append(item);
+  });
+  el.replaceChildren(list);
 }
 
 export function renderDiff(el: HTMLElement, before: string, after: string): void {
-  el.innerHTML = `<div class="uif-diff"><pre data-uif-role="before">${before}</pre><pre data-uif-role="after">${after}</pre></div>`;
+  const diff = document.createElement('div');
+  diff.className = 'uif-diff';
+  const beforeEl = appendTextElement(diff, 'pre', before);
+  beforeEl.dataset.uifRole = 'before';
+  const afterEl = appendTextElement(diff, 'pre', after);
+  afterEl.dataset.uifRole = 'after';
+  el.replaceChildren(diff);
 }
 
 export function renderToolResult(el: HTMLElement, result: unknown): void {
-  el.innerHTML = `<pre class="uif-tool-result">${JSON.stringify(result, null, 2)}</pre>`;
+  const pre = appendTextElement(document.createElement('div'), 'pre', JSON.stringify(result, null, 2), 'uif-tool-result');
+  el.replaceChildren(pre);
 }
 
 export const toolApproval = { name: 'tool-approval', init: renderToolApproval };

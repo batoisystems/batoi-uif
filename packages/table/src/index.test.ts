@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { filterElements, filterTable, initDeclarativeFilters, selectedRows, sortTable } from './index.js';
+import { describe, expect, it, vi } from 'vitest';
+import { filterElements, filterTable, initDeclarativeFilters, loadRemoteTable, selectedRows, sortTable } from './index.js';
 
 describe('table', () => {
   it('sorts, filters, and returns selected rows', () => {
@@ -29,5 +29,15 @@ describe('table', () => {
     expect((document.querySelectorAll('[data-row]')[1] as HTMLElement).hidden).toBe(true);
     filterElements('[data-row]', '');
     expect((document.querySelectorAll('[data-row]')[1] as HTMLElement).hidden).toBe(false);
+  });
+
+  it('renders remote row values as text', async () => {
+    document.body.innerHTML = '<table><thead><tr><th>Name</th></tr></thead><tbody></tbody></table>';
+    const table = document.querySelector('table') as HTMLTableElement;
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ rows: [{ name: '<img src=x onerror=alert(1)>' }], page: 1 })));
+    await loadRemoteTable(table, { src: '/rows', columns: ['name'] });
+    expect(table.querySelector('img')).toBeNull();
+    expect(table.textContent).toContain('<img src=x onerror=alert(1)>');
+    vi.unstubAllGlobals();
   });
 });

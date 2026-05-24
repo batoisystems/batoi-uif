@@ -1,9 +1,10 @@
 // src/index.ts
 import { emit } from "@batoi/uif-core";
-import { autoInit, resolveTarget } from "@batoi/uif-dom";
+import { autoInit, resolveTarget, swapTrustedHTML } from "@batoi/uif-dom";
 import { request } from "@batoi/uif-net";
 var swapModes = /* @__PURE__ */ new Set(["inner", "outer", "append", "prepend", "before", "after"]);
 var bodylessMethods = /* @__PURE__ */ new Set(["GET", "HEAD"]);
+var boundRoots = /* @__PURE__ */ new WeakMap();
 function normalizeSwapMode(mode) {
   return swapModes.has(mode ?? "") ? mode : "inner";
 }
@@ -47,19 +48,7 @@ function requestPayload(sourceEl, method) {
   return void 0;
 }
 function swapContent(targetEl, html, mode = "inner") {
-  const safeMode = normalizeSwapMode(mode);
-  if (safeMode === "inner") targetEl.innerHTML = html;
-  if (safeMode === "append") targetEl.insertAdjacentHTML("beforeend", html);
-  if (safeMode === "prepend") targetEl.insertAdjacentHTML("afterbegin", html);
-  if (safeMode === "before") targetEl.insertAdjacentHTML("beforebegin", html);
-  if (safeMode === "after") targetEl.insertAdjacentHTML("afterend", html);
-  if (safeMode === "outer") {
-    targetEl.insertAdjacentHTML("afterend", html);
-    const updated = targetEl.nextElementSibling;
-    targetEl.remove();
-    return updated instanceof HTMLElement ? updated : document.body;
-  }
-  return targetEl;
+  return swapTrustedHTML(targetEl, html, normalizeSwapMode(mode));
 }
 function rehydrate(targetEl) {
   autoInit(targetEl);
@@ -102,7 +91,9 @@ async function loadPartial(sourceEl) {
   }
 }
 function bindRadActions(root = document) {
-  root.addEventListener("click", (event) => {
+  const existing = boundRoots.get(root);
+  if (existing) return existing;
+  const onClick = (event) => {
     const target = event.target instanceof HTMLElement ? event.target : null;
     const el = target?.closest(
       '[data-uif="ajax"],[data-uif-action="load"],[data-uif-action="reload"],[data-uif-action="delete"],[data-uif-action="save"],[data-uif-action="swap"]'
@@ -110,14 +101,23 @@ function bindRadActions(root = document) {
     if (!el) return;
     event.preventDefault();
     void loadPartial(el).catch(() => void 0);
-  });
-  root.addEventListener("submit", (event) => {
+  };
+  const onSubmit = (event) => {
     const target = event.target instanceof HTMLElement ? event.target : null;
     const form = target?.closest('form[data-uif="ajax"],form[data-uif-action="submit"],form[data-uif-action="save"]');
     if (!form) return;
     event.preventDefault();
     void loadPartial(form).catch(() => void 0);
-  });
+  };
+  root.addEventListener("click", onClick);
+  root.addEventListener("submit", onSubmit);
+  const dispose = () => {
+    root.removeEventListener("click", onClick);
+    root.removeEventListener("submit", onSubmit);
+    boundRoots.delete(root);
+  };
+  boundRoots.set(root, dispose);
+  return dispose;
 }
 export {
   bindRadActions,

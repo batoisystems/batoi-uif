@@ -1,19 +1,96 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Realtime Feed Example</title>
-    <link rel="stylesheet" href="../../packages/css/index.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Realtime Feed</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/app-showcase.css">
   </head>
-  <body>
-    <main class="uif-container uif-stack uif-p-4">
-      <h1>Realtime Feed</h1>
-      <section class="uif-card">
-        <div data-uif="realtime" data-uif-channel="workspace:123" data-uif-src="/mock/activity" data-uif-mode="poll" data-uif-target="#activity-feed"></div>
-        <p data-uif-state="connected">Connection mode: poll</p>
-        <div id="activity-feed" aria-live="polite">Waiting for activity...</div>
-      </section>
+  <body class="app-example-page" data-accent="green" data-density="comfortable" data-surface="raised">
+    <main class="app-shell">
+      <div class="app-frame">
+        <header class="app-topbar">
+          <a class="app-brand" href="../">
+            <span class="app-brand-mark" data-uif-icon="batoi" data-uif-icon-title="Batoi"></span>
+            <span><strong>Batoi UIF</strong><span>Examples · Feed</span></span>
+          </a>
+          <nav class="app-actions" aria-label="Example shortcuts">
+            <a class="app-pill" href="../"><span data-uif-icon="home"></span>All examples</a>
+            <a class="app-pill" href="../professional-showcase/"><span data-uif-icon="dashboard"></span>Showcase</a>
+            <a class="app-pill" href="../component-gallery/"><span data-uif-icon="grid"></span>Components</a>
+            <a class="app-pill" href="../chart-gallery/"><span data-uif-icon="chart"></span>Charts</a>
+            <a class="app-pill" href="../icon-gallery/"><span data-uif-icon="spark"></span>Icons</a>
+            <a class="app-pill is-primary" href="../../dist/uif.esm.js"><span data-uif-icon="download"></span>Distribution</a>
+          </nav>
+        </header>
+
+        <section class="app-hero">
+          <div>
+            <div class="app-eyebrow">Realtime · Feed</div>
+            <h1>Activity feed with declarative realtime binding and graceful fallback.</h1>
+            <p>A live feed region that can be backed by polling, SSE, or WebSocket depending on deployment constraints.</p>
+          </div>
+          <div class="app-hero-metrics" aria-label="Example highlights">
+            <div class="app-stat"><span class="app-icon" data-uif-icon="sync"></span><div><strong>UIF</strong><span>Declarative behavior</span></div></div>
+            <div class="app-stat"><span class="app-icon" data-uif-icon="code"></span><div><strong>Copy</strong><span>Starter markup</span></div></div>
+            <div class="app-stat"><span class="app-icon" data-uif-icon="shield"></span><div><strong>0 deps</strong><span>Runtime footprint</span></div></div>
+          </div>
+        </section>
+
+        <section class="app-layout">
+          <div class="app-workspace">
+            <section class="app-section-head">
+              <div>
+                <div class="app-eyebrow">Live example</div>
+                <h2>Activity feed</h2>
+                <p>A server-rendered feed region that can refresh progressively.</p>
+              </div>
+              <div class="app-actions"><button class="app-copy" type="button" data-uif-action="toast" data-uif-message="Example action triggered" data-uif-type="success"><span data-uif-icon="play"></span>Run action</button><button class="app-copy is-primary" type="button" data-example-copy><span data-uif-icon="copy"></span>Copy starter</button></div>
+            </section>
+            
+            <section class="app-card"><div class="app-card-head"><div><h2>Live Channel</h2><p>Polling mode shown for shared hosting compatibility.</p></div><span class="uif-badge uif-badge-success"><span class="app-status-dot"></span> Connected</span></div><div data-uif="realtime" data-uif-channel="workspace:123" data-uif-src="/mock/activity" data-uif-mode="poll" data-uif-target="#activity-feed"></div><div id="activity-feed" class="app-mini-list" aria-live="polite"><div class="app-mini-row"><span>Invoice sync completed</span><span>now</span></div><div class="app-mini-row"><span>Webhook retry queued</span><span>2m</span></div></div></section>
+          </div>
+
+          <aside class="app-builder" aria-label="Tweak and copy this example">
+            <div>
+              <div class="app-eyebrow">Builder</div>
+              <h2>Tweak and copy</h2>
+              <p>Adjust the presentation of this example, then copy the starter markup for your own page.</p>
+            </div>
+            <label>Accent
+              <select class="app-select" data-example-tweak="accent">
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="violet">Violet</option>
+                <option value="slate">Slate</option>
+              </select>
+            </label>
+            <label>Density
+              <select class="app-select" data-example-tweak="density">
+                <option value="comfortable">Comfortable</option>
+                <option value="compact">Compact</option>
+                <option value="spacious">Spacious</option>
+              </select>
+            </label>
+            <label>Surface
+              <select class="app-select" data-example-tweak="surface">
+                <option value="raised">Raised</option>
+                <option value="flat">Flat</option>
+                <option value="tinted">Tinted</option>
+              </select>
+            </label>
+            <label>Starter markup
+              <textarea readonly data-example-code>&lt;div data-uif=&quot;realtime&quot; data-uif-mode=&quot;poll&quot; data-uif-target=&quot;#activity-feed&quot;&gt;&lt;/div&gt;</textarea>
+            </label>
+            <div class="app-builder-actions">
+              <button class="app-copy is-primary" type="button" data-example-copy><span data-uif-icon="copy"></span>Copy code</button>
+              <a class="app-pill" href="../../dist/uif.css"><span data-uif-icon="download"></span>CSS</a>
+            </div>
+          </aside>
+        </section>
+      </div>
     </main>
+    <script type="module" src="../shared/app-showcase.js"></script>
   </body>
 </html>

@@ -1,7 +1,10 @@
 // src/index.ts
+import { appendTextElement } from "@batoi/uif-dom";
+import { request } from "@batoi/uif-net";
 var handlers = /* @__PURE__ */ new Map();
 var connections = /* @__PURE__ */ new Map();
 var states = /* @__PURE__ */ new Map();
+var elementSubscriptions = /* @__PURE__ */ new WeakMap();
 function setState(channel, state) {
   states.set(channel, state);
   window.dispatchEvent(new CustomEvent("uif:realtime-state", { detail: { channel, state } }));
@@ -58,15 +61,20 @@ function connect(options) {
     connections.set(options.channel, { close: () => socket.close() });
     return;
   }
+  let inFlight = false;
   const timer = window.setInterval(async () => {
     if (!options.src) return;
+    if (inFlight) return;
+    inFlight = true;
     try {
-      const response = await fetch(options.src);
+      const response = await request(options.src, { method: "GET", parseAs: "json", key: `realtime:${options.channel}`, timeout: options.interval ?? 5e3 });
       setState(options.channel, "connected");
-      publishLocal(options.channel, await response.json());
+      publishLocal(options.channel, response);
     } catch {
       setState(options.channel, "error");
       reconnect();
+    } finally {
+      inFlight = false;
     }
   }, options.interval ?? 5e3);
   if (options.heartbeat) {
@@ -84,11 +92,15 @@ function disconnect(channel) {
 function initRealtime(el) {
   const channel = el.dataset.uifChannel;
   if (!channel) return;
+  elementSubscriptions.get(el)?.();
   const target = el.dataset.uifTarget ? document.querySelector(el.dataset.uifTarget) : el;
-  subscribe(channel, (payload) => {
+  const unsubscribe = subscribe(channel, (payload) => {
     const items = Array.isArray(payload) ? payload : [payload];
-    if (target) target.innerHTML = items.map((item) => `<div class="uif-feed-item">${JSON.stringify(item)}</div>`).join("");
+    if (!target) return;
+    target.replaceChildren();
+    items.forEach((item) => appendTextElement(target, "div", typeof item === "string" ? item : JSON.stringify(item), "uif-feed-item"));
   });
+  elementSubscriptions.set(el, unsubscribe);
   connect({
     channel,
     src: el.dataset.uifSrc,

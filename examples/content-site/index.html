@@ -1,11 +1,96 @@
 <!doctype html>
 <html lang="en">
-  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Batoi UIF Content</title><link rel="stylesheet" href="../../dist/uif.css"></head>
-  <body>
-    <main class="uif-main">
-      <nav class="uif-toolbar" data-uif="nav"><a data-uif="route" href="/">Home</a><button class="uif-btn-secondary" data-uif="tooltip" data-uif-message="Copy article link">Share</button></nav>
-      <article class="uif-card"><h1>Progressive Interfaces</h1><p>Server-rendered pages enhanced with UIF components.</p></article>
-      <section data-uif="accordion"><button data-uif-role="trigger">More</button><div data-uif-role="panel">Disclosure content</div></section>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Content Site</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/app-showcase.css">
+  </head>
+  <body class="app-example-page" data-accent="slate" data-density="comfortable" data-surface="raised">
+    <main class="app-shell">
+      <div class="app-frame">
+        <header class="app-topbar">
+          <a class="app-brand" href="../">
+            <span class="app-brand-mark" data-uif-icon="batoi" data-uif-icon-title="Batoi"></span>
+            <span><strong>Batoi UIF</strong><span>Examples · Content</span></span>
+          </a>
+          <nav class="app-actions" aria-label="Example shortcuts">
+            <a class="app-pill" href="../"><span data-uif-icon="home"></span>All examples</a>
+            <a class="app-pill" href="../professional-showcase/"><span data-uif-icon="dashboard"></span>Showcase</a>
+            <a class="app-pill" href="../component-gallery/"><span data-uif-icon="grid"></span>Components</a>
+            <a class="app-pill" href="../chart-gallery/"><span data-uif-icon="chart"></span>Charts</a>
+            <a class="app-pill" href="../icon-gallery/"><span data-uif-icon="spark"></span>Icons</a>
+            <a class="app-pill is-primary" href="../../dist/uif.esm.js"><span data-uif-icon="download"></span>Distribution</a>
+          </nav>
+        </header>
+
+        <section class="app-hero">
+          <div>
+            <div class="app-eyebrow">Content · Site</div>
+            <h1>Content page with progressive navigation, share action, and disclosures.</h1>
+            <p>A content-oriented page that still uses Batoi UIF for route links, accordions, callouts, and copy-friendly patterns.</p>
+          </div>
+          <div class="app-hero-metrics" aria-label="Example highlights">
+            <div class="app-stat"><span class="app-icon" data-uif-icon="document"></span><div><strong>UIF</strong><span>Declarative behavior</span></div></div>
+            <div class="app-stat"><span class="app-icon" data-uif-icon="code"></span><div><strong>Copy</strong><span>Starter markup</span></div></div>
+            <div class="app-stat"><span class="app-icon" data-uif-icon="shield"></span><div><strong>0 deps</strong><span>Runtime footprint</span></div></div>
+          </div>
+        </section>
+
+        <section class="app-layout">
+          <div class="app-workspace">
+            <section class="app-section-head">
+              <div>
+                <div class="app-eyebrow">Live example</div>
+                <h2>Article layout</h2>
+                <p>Use the same lean framework for content surfaces and app screens.</p>
+              </div>
+              <div class="app-actions"><button class="app-copy" type="button" data-uif-action="toast" data-uif-message="Example action triggered" data-uif-type="success"><span data-uif-icon="play"></span>Run action</button><button class="app-copy is-primary" type="button" data-example-copy><span data-uif-icon="copy"></span>Copy starter</button></div>
+            </section>
+            
+            <article class="app-card"><div class="app-eyebrow">Article</div><h2>Progressive Interfaces</h2><p>Server-rendered pages enhanced with Batoi UIF components can stay simple, fast, accessible, and copy-friendly.</p><button class="app-copy" type="button" data-uif-action="toast" data-uif-message="Article link copied"><span data-uif-icon="share"></span>Share</button></article><section class="app-card" data-uif="accordion"><button class="app-copy" data-uif-role="trigger" type="button">Read implementation notes</button><div data-uif-role="panel">Disclosure content can be progressively enhanced without changing the server-rendered baseline.</div></section>
+          </div>
+
+          <aside class="app-builder" aria-label="Tweak and copy this example">
+            <div>
+              <div class="app-eyebrow">Builder</div>
+              <h2>Tweak and copy</h2>
+              <p>Adjust the presentation of this example, then copy the starter markup for your own page.</p>
+            </div>
+            <label>Accent
+              <select class="app-select" data-example-tweak="accent">
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="violet">Violet</option>
+                <option value="slate">Slate</option>
+              </select>
+            </label>
+            <label>Density
+              <select class="app-select" data-example-tweak="density">
+                <option value="comfortable">Comfortable</option>
+                <option value="compact">Compact</option>
+                <option value="spacious">Spacious</option>
+              </select>
+            </label>
+            <label>Surface
+              <select class="app-select" data-example-tweak="surface">
+                <option value="raised">Raised</option>
+                <option value="flat">Flat</option>
+                <option value="tinted">Tinted</option>
+              </select>
+            </label>
+            <label>Starter markup
+              <textarea readonly data-example-code>&lt;section data-uif=&quot;accordion&quot;&gt;&lt;button data-uif-role=&quot;trigger&quot;&gt;More&lt;/button&gt;&lt;/section&gt;</textarea>
+            </label>
+            <div class="app-builder-actions">
+              <button class="app-copy is-primary" type="button" data-example-copy><span data-uif-icon="copy"></span>Copy code</button>
+              <a class="app-pill" href="../../dist/uif.css"><span data-uif-icon="download"></span>CSS</a>
+            </div>
+          </aside>
+        </section>
+      </div>
     </main>
+    <script type="module" src="../shared/app-showcase.js"></script>
   </body>
 </html>

@@ -1,68 +1,105 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>RAD Dashboard Example</title>
-    <link rel="stylesheet" href="../../packages/css/index.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF RAD Dashboard</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/app-showcase.css">
   </head>
-  <body>
-    <main class="uif-container uif-stack uif-p-4">
-      <h1>Dashboard</h1>
-      <section class="uif-grid">
-        <article id="sales-card" class="uif-card">
-          <h2>Sales</h2>
-          <p>$24,800</p>
-          <button data-uif="ajax" data-uif-action="reload" data-uif-src="/dashboard/sales" data-uif-target="#sales-card">Refresh</button>
-        </article>
-        <article id="tickets-card" class="uif-card">
-          <h2>Tickets</h2>
-          <p>18 open</p>
-          <button data-uif="ajax" data-uif-action="reload" data-uif-src="/dashboard/tickets" data-uif-target="#tickets-card">Refresh</button>
-        </article>
-      </section>
+  <body class="app-example-page" data-accent="blue" data-density="comfortable" data-surface="raised">
+    <main class="app-shell">
+      <div class="app-frame">
+        <header class="app-topbar">
+          <a class="app-brand" href="../">
+            <span class="app-brand-mark" data-uif-icon="batoi" data-uif-icon-title="Batoi"></span>
+            <span><strong>Batoi UIF</strong><span>Examples · Dashboard</span></span>
+          </a>
+          <nav class="app-actions" aria-label="Example shortcuts">
+            <a class="app-pill" href="../"><span data-uif-icon="home"></span>All examples</a>
+            <a class="app-pill" href="../professional-showcase/"><span data-uif-icon="dashboard"></span>Showcase</a>
+            <a class="app-pill" href="../component-gallery/"><span data-uif-icon="grid"></span>Components</a>
+            <a class="app-pill" href="../chart-gallery/"><span data-uif-icon="chart"></span>Charts</a>
+            <a class="app-pill" href="../icon-gallery/"><span data-uif-icon="spark"></span>Icons</a>
+            <a class="app-pill is-primary" href="../../dist/uif.esm.js"><span data-uif-icon="download"></span>Distribution</a>
+          </nav>
+        </header>
 
-      <section class="uif-card">
-        <h2>Revenue Chart</h2>
-        <div
-          data-uif="chart"
-          data-uif-chart="grouped-bar"
-          data-uif-refresh="interval"
-          data-uif-interval="30000"
-          data-uif-options='{"legend":true,"grid":true}'
-          data-uif-data='[{"label":"Jan","values":{"New":120,"Renewal":80}},{"label":"Feb","values":{"New":180,"Renewal":92}},{"label":"Mar","values":{"New":150,"Renewal":110}}]'>
-        </div>
-      </section>
+        <section class="app-hero">
+          <div>
+            <div class="app-eyebrow">RAD · Dashboard</div>
+            <h1>Operational dashboard with charts, live status, and KPI cards.</h1>
+            <p>A dashboard pattern for server-rendered RAD applications with chart widgets, realtime feed regions, tabs, and refresh actions.</p>
+          </div>
+          <div class="app-hero-metrics" aria-label="Example highlights">
+            <div class="app-stat"><span class="app-icon" data-uif-icon="dashboard"></span><div><strong>UIF</strong><span>Declarative behavior</span></div></div>
+            <div class="app-stat"><span class="app-icon" data-uif-icon="code"></span><div><strong>Copy</strong><span>Starter markup</span></div></div>
+            <div class="app-stat"><span class="app-icon" data-uif-icon="shield"></span><div><strong>0 deps</strong><span>Runtime footprint</span></div></div>
+          </div>
+        </section>
 
-      <section class="uif-grid-3">
-        <article class="uif-card">
-          <h2>Pipeline Mix</h2>
-          <div data-uif="chart" data-uif-chart="donut" data-uif-options='{"legend":true}' data-uif-data='[{"label":"Won","value":45},{"label":"Open","value":35},{"label":"Risk","value":20}]'></div>
-        </article>
-        <article class="uif-card">
-          <h2>Readiness</h2>
-          <div data-uif="chart" data-uif-chart="radar" data-uif-data='[{"label":"Security","value":82},{"label":"Performance","value":74},{"label":"Reliability","value":91},{"label":"Cost","value":68}]'></div>
-        </article>
-        <article class="uif-card">
-          <h2>Target</h2>
-          <div data-uif="chart" data-uif-chart="bullet" data-uif-data='[{"label":"Revenue","value":72,"target":85,"max":100}]'></div>
-        </article>
-      </section>
+        <section class="app-layout">
+          <div class="app-workspace">
+            <section class="app-section-head">
+              <div>
+                <div class="app-eyebrow">Live example</div>
+                <h2>Dashboard workspace</h2>
+                <p>Compose charts and KPI summaries with small declarative UIF attributes.</p>
+              </div>
+              <div class="app-actions"><button class="app-copy" type="button" data-uif-action="toast" data-uif-message="Example action triggered" data-uif-type="success"><span data-uif-icon="play"></span>Run action</button><button class="app-copy is-primary" type="button" data-example-copy><span data-uif-icon="copy"></span>Copy starter</button></div>
+            </section>
+            
+            <section class="app-grid">
+              <article class="app-card app-kpi"><span class="app-icon" data-uif-icon="cash"></span><strong>$248K</strong><p>Quarter-to-date revenue.</p></article>
+              <article class="app-card app-kpi"><span class="app-icon" data-uif-icon="users"></span><strong>1,482</strong><p>Active workspaces.</p></article>
+              <article class="app-card app-kpi"><span class="app-icon" data-uif-icon="alert"></span><strong>3</strong><p>Open incidents.</p></article>
+            </section>
+            <section class="app-card">
+              <div class="app-card-head"><div><h2>Revenue Chart</h2><p>SVG chart rendered from data attributes.</p></div><span class="uif-badge uif-badge-success">Live</span></div>
+              <div data-uif="chart" data-uif-chart="grouped-bar" data-uif-options='{"legend":true,"grid":true}' data-uif-data='[{"label":"Jan","values":{"New":120,"Renewal":80}},{"label":"Feb","values":{"New":180,"Renewal":92}},{"label":"Mar","values":{"New":150,"Renewal":110}}]'></div>
+            </section>
+            <section class="app-card" data-uif="tabs"><button data-uif-role="tab">Revenue</button><button data-uif-role="tab">Operations</button><div data-uif-role="tabpanel">Revenue widget partial.</div><div data-uif-role="tabpanel">Operations widget partial.</div></section>
+          </div>
 
-      <section class="uif-card">
-        <h2>Activity Feed</h2>
-        <div data-uif="realtime" data-uif-channel="dashboard" data-uif-mode="poll" data-uif-src="/mock/activity" data-uif-target="#dashboard-feed"></div>
-        <div id="dashboard-feed" aria-live="polite">Waiting for updates...</div>
-      </section>
-
-      <section class="uif-card" data-uif="tabs">
-        <button data-uif-role="tab">Revenue</button>
-        <button data-uif-role="tab">Operations</button>
-        <div data-uif-role="tabpanel">Revenue widget partial.</div>
-        <div data-uif-role="tabpanel">Operations widget partial.</div>
-      </section>
-
-      <button class="uif-btn" data-uif-action="toast" data-uif-message="Dashboard refreshed" data-uif-type="success">Toast notification</button>
+          <aside class="app-builder" aria-label="Tweak and copy this example">
+            <div>
+              <div class="app-eyebrow">Builder</div>
+              <h2>Tweak and copy</h2>
+              <p>Adjust the presentation of this example, then copy the starter markup for your own page.</p>
+            </div>
+            <label>Accent
+              <select class="app-select" data-example-tweak="accent">
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="violet">Violet</option>
+                <option value="slate">Slate</option>
+              </select>
+            </label>
+            <label>Density
+              <select class="app-select" data-example-tweak="density">
+                <option value="comfortable">Comfortable</option>
+                <option value="compact">Compact</option>
+                <option value="spacious">Spacious</option>
+              </select>
+            </label>
+            <label>Surface
+              <select class="app-select" data-example-tweak="surface">
+                <option value="raised">Raised</option>
+                <option value="flat">Flat</option>
+                <option value="tinted">Tinted</option>
+              </select>
+            </label>
+            <label>Starter markup
+              <textarea readonly data-example-code>&lt;div data-uif=&quot;chart&quot; data-uif-chart=&quot;grouped-bar&quot; data-uif-options='{&quot;legend&quot;:true}'&gt;&lt;/div&gt;</textarea>
+            </label>
+            <div class="app-builder-actions">
+              <button class="app-copy is-primary" type="button" data-example-copy><span data-uif-icon="copy"></span>Copy code</button>
+              <a class="app-pill" href="../../dist/uif.css"><span data-uif-icon="download"></span>CSS</a>
+            </div>
+          </aside>
+        </section>
+      </div>
     </main>
+    <script type="module" src="../shared/app-showcase.js"></script>
   </body>
 </html>

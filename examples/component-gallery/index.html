@@ -1,0 +1,1026 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Component Gallery</title>
+    <link rel="stylesheet" href="../../packages/css/index.css">
+    <link rel="stylesheet" href="../shared/example.css">
+  </head>
+  <body class="example-page component-gallery-page">
+    <main class="example-shell">
+      <div class="example-frame">
+        <header class="example-topbar">
+          <a class="example-brand" href="../">
+            <span class="example-brand-mark" data-uif-icon="batoi" data-uif-icon-title="Batoi"></span>
+            <span><strong>Batoi UIF</strong><span>Examples</span></span>
+          </a>
+          <div class="example-actions">
+            <a class="example-pill" href="../"><span data-uif-icon="home"></span>All examples</a>
+            <a class="example-pill" href="../professional-showcase/"><span data-uif-icon="dashboard"></span>Showcase</a>
+            <a class="example-pill" href="./"><span data-uif-icon="grid"></span>Components</a>
+            <a class="example-pill" href="../chart-gallery/"><span data-uif-icon="chart"></span>Charts</a>
+            <a class="example-pill" href="../icon-gallery/"><span data-uif-icon="spark"></span>Icons</a>
+            <a class="example-pill is-primary" href="../../dist/uif.esm.js"><span data-uif-icon="download"></span>Distribution</a>
+          </div>
+        </header>
+
+        <section class="example-hero component-hero">
+          <div class="component-hero-copy">
+            <div class="example-eyebrow">Library · UI components</div>
+            <h1>Component Gallery</h1>
+            <p>Live dependency-free components with copy-ready markup for server-rendered applications, Micro Apps, dashboards, RAD screens, and mobile-ready product interfaces.</p>
+          </div>
+          <div class="component-hero-panel" aria-label="Gallery summary">
+            <div>
+              <strong>34</strong>
+              <span>Patterns</span>
+            </div>
+            <div>
+              <strong>0</strong>
+              <span>Runtime deps</span>
+            </div>
+            <div>
+              <strong>ARIA</strong>
+              <span>Ready states</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="component-catalog-shell">
+          <aside class="component-sidebar" aria-label="Component catalog navigation">
+            <div class="component-sidebar-card">
+              <div class="example-eyebrow">Catalog</div>
+              <h2>Production UI patterns</h2>
+              <p>Browse examples, inspect live behavior, and copy the canonical Batoi UIF markup directly.</p>
+              <nav class="example-tabs component-category-nav" aria-label="Component categories">
+                <a href="#overlays" aria-current="page"><span data-uif-icon="maximize"></span>Overlays</a>
+                <a href="#navigation"><span data-uif-icon="compass"></span>Navigation</a>
+                <a href="#feedback"><span data-uif-icon="bell"></span>Feedback</a>
+                <a href="#inputs"><span data-uif-icon="document"></span>Inputs</a>
+                <a href="#layout"><span data-uif-icon="grid"></span>Layout</a>
+                <a href="#data"><span data-uif-icon="table"></span>Data</a>
+                <a href="#workflow"><span data-uif-icon="workflow"></span>Workflow</a>
+              </nav>
+            </div>
+          </aside>
+
+          <section class="component-main" aria-label="Component examples">
+            <div class="component-main-head">
+              <div>
+                <div class="example-eyebrow">Examples</div>
+                <h2>Framework-native components</h2>
+                <p>Each card pairs a working preview with the lean HTML contract used by Batoi UIF.</p>
+              </div>
+              <div class="component-main-actions">
+                <span class="example-pill"><span data-uif-icon="code"></span>Copy-ready</span>
+                <span class="example-pill"><span data-uif-icon="shield"></span>Accessible defaults</span>
+              </div>
+            </div>
+
+            <div class="component-grid">
+          <article id="overlays" class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Overlay</div>
+                <h2>Modal</h2>
+                <p>Dialog role, modal state, Escape close, and focus handoff.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <button class="uif-btn" data-uif-action="open" data-uif-target="#gallery-modal"><span data-uif-icon="maximize"></span>Open modal</button>
+              <div id="gallery-modal" data-uif="modal" hidden>
+                <div class="component-dialog" data-uif-role="dialog">
+                  <h3>Review deployment</h3>
+                  <p>Approve this deployment after confirming the release window.</p>
+                  <div class="uif-cluster">
+                    <button class="uif-btn">Approve</button>
+                    <button class="uif-btn uif-btn-secondary" data-uif-action="close">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <pre><code>&lt;button class="uif-btn" data-uif-action="open" data-uif-target="#modal"&gt;Open modal&lt;/button&gt;
+&lt;div id="modal" data-uif="modal" hidden&gt;
+  &lt;div data-uif-role="dialog"&gt;
+    &lt;button data-uif-action="close"&gt;Close&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Overlay</div>
+                <h2>Drawer</h2>
+                <p>Side-panel pattern for filters, details, and edit forms.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <button class="uif-btn uif-btn-secondary" data-uif-action="open" data-uif-target="#gallery-drawer"><span data-uif-icon="sidebar"></span>Open drawer</button>
+              <aside id="gallery-drawer" class="uif-drawer uif-drawer-right" data-uif="drawer" hidden>
+                <div class="component-drawer-inner">
+                  <h3>Account filters</h3>
+                  <label class="uif-field">Stage <select class="uif-input"><option>All stages</option><option>Review</option></select></label>
+                  <button class="uif-btn" data-uif-action="close">Apply filters</button>
+                </div>
+              </aside>
+            </div>
+            <pre><code>&lt;button data-uif-action="open" data-uif-target="#drawer"&gt;Open drawer&lt;/button&gt;
+&lt;aside id="drawer" class="uif-drawer uif-drawer-right" data-uif="drawer" hidden&gt;
+  &lt;button data-uif-action="close"&gt;Close&lt;/button&gt;
+&lt;/aside&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Overlay</div>
+                <h2>Dropdown</h2>
+                <p>Toggleable menu with outside-click and Escape handling.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="component-menu" data-uif="dropdown">
+                <button class="uif-btn uif-btn-secondary" data-uif-role="trigger">Actions <span data-uif-icon="chevron-down"></span></button>
+                <div class="component-menu-panel" data-uif-role="panel" hidden>
+                  <button>Archive</button>
+                  <button>Duplicate</button>
+                  <button>Export</button>
+                </div>
+              </div>
+            </div>
+            <pre><code>&lt;div data-uif="dropdown"&gt;
+  &lt;button data-uif-role="trigger"&gt;Actions&lt;/button&gt;
+  &lt;div data-uif-role="panel" hidden&gt;...&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+          </article>
+
+          <article id="navigation" class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Navigation</div>
+                <h2>Tabs</h2>
+                <p>ARIA tab and panel states with arrow-key navigation.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="component-tabs" data-uif="tabs">
+                <button data-uif-role="tab">Overview</button>
+                <button data-uif-role="tab">Activity</button>
+                <button data-uif-role="tab">Access</button>
+                <div data-uif-role="tabpanel">Workspace health is within target.</div>
+                <div data-uif-role="tabpanel">12 changes this week.</div>
+                <div data-uif-role="tabpanel">4 roles configured.</div>
+              </div>
+            </div>
+            <pre><code>&lt;div data-uif="tabs"&gt;
+  &lt;button data-uif-role="tab"&gt;Overview&lt;/button&gt;
+  &lt;div data-uif-role="tabpanel"&gt;Panel&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Navigation</div>
+                <h2>Pagination</h2>
+                <p>Compact paging controls for server-rendered lists.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <nav class="component-pagination" data-uif="pagination" aria-label="Accounts pages">
+                <button class="uif-btn uif-btn-secondary">Prev</button>
+                <button class="uif-btn">1</button>
+                <button class="uif-btn uif-btn-secondary">2</button>
+                <button class="uif-btn uif-btn-secondary">Next</button>
+              </nav>
+            </div>
+            <pre><code>&lt;nav data-uif="pagination" aria-label="Pages"&gt;
+  &lt;button&gt;Prev&lt;/button&gt;&lt;button&gt;1&lt;/button&gt;&lt;button&gt;Next&lt;/button&gt;
+&lt;/nav&gt;</code></pre>
+          </article>
+
+          <article id="feedback" class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Feedback</div>
+                <h2>Toast</h2>
+                <p>Declarative notifications for saves, errors, and workflow events.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <button class="uif-btn" data-uif-action="toast" data-uif-message="Settings saved" data-uif-type="success"><span data-uif-icon="check"></span>Show toast</button>
+            </div>
+            <pre><code>&lt;button data-uif-action="toast" data-uif-message="Settings saved" data-uif-type="success"&gt;
+  Show toast
+&lt;/button&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Feedback</div>
+                <h2>Accordion</h2>
+                <p>Disclosure pattern for dense settings and help content.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <section class="component-accordion" data-uif="accordion">
+                <button data-uif-role="trigger">Deployment notes</button>
+                <div data-uif-role="panel">All changes are reversible and audited.</div>
+              </section>
+            </div>
+            <pre><code>&lt;section data-uif="accordion"&gt;
+  &lt;button data-uif-role="trigger"&gt;Details&lt;/button&gt;
+  &lt;div data-uif-role="panel"&gt;Content&lt;/div&gt;
+&lt;/section&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Feedback</div>
+                <h2>Progress</h2>
+                <p>Accessible progressbar state for upload and workflow steps.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="component-progress" data-uif="progress" data-uif-value="68"><span style="width:68%"></span></div>
+            </div>
+            <pre><code>&lt;div data-uif="progress" data-uif-value="68"&gt;&lt;span style="width:68%"&gt;&lt;/span&gt;&lt;/div&gt;</code></pre>
+          </article>
+
+          <article id="inputs" class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Input</div>
+                <h2>Combobox</h2>
+                <p>Filterable option list with `uif:select` events.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="component-combobox" data-uif="combobox">
+                <input class="uif-input" data-uif-role="input" placeholder="Search owner">
+                <div class="component-option-list">
+                  <button data-uif-role="option" data-uif-value="Ada Lovelace">Ada Lovelace</button>
+                  <button data-uif-role="option" data-uif-value="Grace Hopper">Grace Hopper</button>
+                  <button data-uif-role="option" data-uif-value="Katherine Johnson">Katherine Johnson</button>
+                </div>
+              </div>
+            </div>
+            <pre><code>&lt;div data-uif="combobox"&gt;
+  &lt;input data-uif-role="input"&gt;
+  &lt;button data-uif-role="option" data-uif-value="Ada"&gt;Ada&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Input</div>
+                <h2>File Upload</h2>
+                <p>Drop-ready shell for server-mediated uploads.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <label class="component-upload" data-uif="file-upload">
+                <span data-uif-icon="upload"></span>
+                <strong>Drop files or browse</strong>
+                <span>PDF, CSV, PNG up to 10 MB</span>
+                <input type="file">
+              </label>
+            </div>
+            <pre><code>&lt;label data-uif="file-upload"&gt;
+  &lt;input type="file"&gt;
+&lt;/label&gt;</code></pre>
+          </article>
+
+          <article id="layout" class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Layout</div>
+                <h2>Cards, Badges, Alerts</h2>
+                <p>Stable UI primitives for dashboards and app pages.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="component-stack">
+                <div class="uif-alert" data-uif="alert"><strong>Policy check passed.</strong> Workspace scope matches agent permissions.</div>
+                <div class="uif-cluster">
+                  <span class="uif-badge uif-badge-success">Active</span>
+                  <span class="uif-badge uif-badge-warning">Review</span>
+                  <span class="uif-badge uif-badge-danger">Blocked</span>
+                </div>
+              </div>
+            </div>
+            <pre><code>&lt;div class="uif-alert" data-uif="alert"&gt;Policy check passed.&lt;/div&gt;
+&lt;span class="uif-badge uif-badge-success"&gt;Active&lt;/span&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Actions</div>
+                <h2>Button Matrix</h2>
+                <p>Semantic button variants, outline styles, icon-only controls, and dense page actions.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="component-stack">
+                <div class="uif-cluster">
+                  <button class="uif-btn">Primary</button>
+                  <button class="uif-btn uif-btn-success">Success</button>
+                  <button class="uif-btn uif-btn-warning">Warning</button>
+                  <button class="uif-btn uif-btn-danger">Danger</button>
+                  <button class="uif-btn uif-btn-info">Info</button>
+                </div>
+                <div class="uif-cluster">
+                  <button class="uif-btn uif-btn-outline-primary">Primary</button>
+                  <button class="uif-btn uif-btn-outline-success">Success</button>
+                  <button class="uif-btn uif-btn-outline-warning">Warning</button>
+                  <button class="uif-btn uif-btn-outline-danger">Danger</button>
+                  <button class="uif-btn uif-btn-icon-only" aria-label="Refresh"><span data-uif-icon="refresh"></span></button>
+                </div>
+                <div class="uif-cluster">
+                  <a class="uif-page-btn uif-page-btn-primary" href="#"><span data-uif-icon="building"></span>Manage</a>
+                  <a class="uif-page-btn" href="#"><span data-uif-icon="shield"></span>Policy</a>
+                  <a class="uif-page-btn uif-page-btn-danger" href="#"><span data-uif-icon="trash"></span>Suspend</a>
+                </div>
+              </div>
+            </div>
+            <pre><code>&lt;button class="uif-btn uif-btn-success"&gt;Success&lt;/button&gt;
+&lt;button class="uif-btn uif-btn-outline-danger"&gt;Danger&lt;/button&gt;
+&lt;a class="uif-page-btn uif-page-btn-primary" href="#"&gt;Manage&lt;/a&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Toolbar</div>
+                <h2>Search, Filters, Actions</h2>
+                <p>Reusable action bars for table pages, reports, and admin workspaces.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <section class="uif-toolbar-shell">
+                <div class="uif-toolbar">
+                  <div class="uif-toolbar-start">
+                    <label class="uif-search"><span data-uif-icon="search"></span><input placeholder="Search records..."></label>
+                    <span class="uif-chip uif-chip-info"><span data-uif-icon="sliders"></span>3 filters</span>
+                  </div>
+                  <div class="uif-toolbar-end">
+                    <button class="uif-btn uif-btn-outline-neutral uif-btn-sm">Columns</button>
+                    <button class="uif-btn uif-btn-outline-info uif-btn-sm"><span data-uif-icon="download"></span>Export</button>
+                    <button class="uif-btn uif-btn-sm"><span data-uif-icon="plus"></span>New</button>
+                  </div>
+                </div>
+              </section>
+            </div>
+            <pre><code>&lt;section class="uif-toolbar-shell"&gt;
+  &lt;div class="uif-toolbar"&gt;
+    &lt;label class="uif-search"&gt;&lt;input placeholder="Search..."&gt;&lt;/label&gt;
+    &lt;button class="uif-btn uif-btn-sm"&gt;New&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Forms</div>
+                <h2>Form Section Grid</h2>
+                <p>Professional 12-column form sections for dense server-rendered entry pages.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <section class="uif-form-section">
+                <div class="uif-form-section-head">
+                  <h3 class="uif-form-section-title">Customer Details</h3>
+                  <p class="uif-form-section-copy">Aligned fields with responsive column spans.</p>
+                </div>
+                <div class="uif-form-grid-12">
+                  <label class="uif-field uif-col-6"><span class="uif-field-label">First name</span><input class="uif-input" value="Ada"></label>
+                  <label class="uif-field uif-col-6"><span class="uif-field-label">Last name</span><input class="uif-input" value="Lovelace"></label>
+                  <label class="uif-field uif-col-4"><span class="uif-field-label">Status</span><select class="uif-input"><option>Active</option></select></label>
+                  <label class="uif-field uif-col-8"><span class="uif-field-label">Email</span><input class="uif-input" value="ada@example.com"></label>
+                </div>
+              </section>
+            </div>
+            <pre><code>&lt;section class="uif-form-section"&gt;
+  &lt;div class="uif-form-grid-12"&gt;
+    &lt;label class="uif-field uif-col-6"&gt;...&lt;/label&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Loading</div>
+                <h2>Skeleton Loaders</h2>
+                <p>Shared loading blocks for profile cards, report rows, and dashboards.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-skeleton-card">
+                <div class="uif-flex">
+                  <span class="uif-skeleton uif-skeleton-avatar"></span>
+                  <div class="uif-skeleton-stack uif-w-full">
+                    <span class="uif-skeleton uif-skeleton-line-lg"></span>
+                    <span class="uif-skeleton uif-skeleton-line"></span>
+                    <span class="uif-skeleton uif-skeleton-line-sm"></span>
+                  </div>
+                </div>
+                <span class="uif-skeleton uif-skeleton-block"></span>
+              </div>
+            </div>
+            <pre><code>&lt;div class="uif-skeleton-card"&gt;
+  &lt;span class="uif-skeleton uif-skeleton-avatar"&gt;&lt;/span&gt;
+  &lt;span class="uif-skeleton uif-skeleton-line"&gt;&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+          </article>
+
+          <article id="data" class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Data</div>
+                <h2>Summary Block</h2>
+                <p>Key-value grids for profiles, report metadata, and right-rail detail summaries.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <section class="uif-summary-block">
+                <div>
+                  <h3 class="uif-section-title">Workspace Snapshot</h3>
+                  <p class="uif-section-copy">Compact metadata for operational pages.</p>
+                </div>
+                <div class="uif-kv-grid">
+                  <div class="uif-kv-item"><div class="uif-kv-term">Owner</div><div class="uif-kv-value">Ashwini Rath</div><div class="uif-kv-note">Platform Admin</div></div>
+                  <div class="uif-kv-item"><div class="uif-kv-term">Plan</div><div class="uif-kv-value">Enterprise</div><div class="uif-kv-note">Renews Jun 30</div></div>
+                  <div class="uif-kv-item"><div class="uif-kv-term">SLA</div><div class="uif-kv-value">99.94%</div><div class="uif-kv-note">30-day rolling</div></div>
+                </div>
+              </section>
+            </div>
+            <pre><code>&lt;section class="uif-summary-block"&gt;
+  &lt;div class="uif-kv-grid"&gt;&lt;div class="uif-kv-item"&gt;...&lt;/div&gt;&lt;/div&gt;
+&lt;/section&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Data</div>
+                <h2>Inspector Panel</h2>
+                <p>Right-rail review cards for selected records, approvals, and drilldowns.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <aside class="uif-inspector">
+                <div class="uif-inspector-head">
+                  <div><h3 class="uif-card-title">Risk Review</h3><p class="uif-card-copy">Checkout latency incident</p></div>
+                  <span class="uif-badge uif-badge-danger">High</span>
+                </div>
+                <section class="uif-inspector-section">
+                  <div class="uif-inspector-grid">
+                    <div class="uif-inspector-stat"><div class="uif-inspector-stat-value">18m</div><div class="uif-inspector-stat-label">MTTR</div></div>
+                    <div class="uif-inspector-stat"><div class="uif-inspector-stat-value">P1</div><div class="uif-inspector-stat-label">Priority</div></div>
+                    <div class="uif-inspector-stat"><div class="uif-inspector-stat-value">3</div><div class="uif-inspector-stat-label">Alerts</div></div>
+                  </div>
+                </section>
+              </aside>
+            </div>
+            <pre><code>&lt;aside class="uif-inspector"&gt;
+  &lt;div class="uif-inspector-head"&gt;...&lt;/div&gt;
+  &lt;section class="uif-inspector-section"&gt;...&lt;/section&gt;
+&lt;/aside&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Dashboard</div>
+                <h2>Stat Cards</h2>
+                <p>KPI tiles with semantic trend states and reusable icon slots.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-stat-grid">
+                <article class="uif-stat-card">
+                  <div class="uif-stat-card-head"><div><div class="uif-stat-card-label">Revenue</div><div class="uif-stat-card-value">$248K</div></div><div class="uif-stat-card-icon"><span data-uif-icon="cash"></span></div></div>
+                  <div class="uif-stat-card-meta">Quarter-to-date bookings</div>
+                  <div class="uif-stat-card-trend is-positive">+14.2% MoM</div>
+                </article>
+                <article class="uif-stat-card">
+                  <div class="uif-stat-card-head"><div><div class="uif-stat-card-label">Incidents</div><div class="uif-stat-card-value">3</div></div><div class="uif-stat-card-icon"><span data-uif-icon="alert"></span></div></div>
+                  <div class="uif-stat-card-meta">Open operational exceptions</div>
+                  <div class="uif-stat-card-trend is-negative">1 critical path</div>
+                </article>
+              </div>
+            </div>
+            <pre><code>&lt;article class="uif-stat-card"&gt;
+  &lt;div class="uif-stat-card-value"&gt;$248K&lt;/div&gt;
+  &lt;div class="uif-stat-card-trend is-positive"&gt;+14.2%&lt;/div&gt;
+&lt;/article&gt;</code></pre>
+          </article>
+
+          <article id="workflow" class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Workflow</div>
+                <h2>Stepper and Timeline</h2>
+                <p>Shared progress patterns for approvals, onboarding, and operational workflows.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-workflow-stepper">
+                <div class="uif-stepper-row">
+                  <div class="uif-stepper-item is-complete"><div class="uif-stepper-badge">1</div><div><div class="uif-stepper-title">Request</div><div class="uif-stepper-meta">Submitted by agent</div></div></div>
+                  <div class="uif-stepper-item is-current"><div class="uif-stepper-badge">2</div><div><div class="uif-stepper-title">Review</div><div class="uif-stepper-meta">Policy checks running</div></div></div>
+                  <div class="uif-stepper-item is-warning"><div class="uif-stepper-badge">3</div><div><div class="uif-stepper-title">Approve</div><div class="uif-stepper-meta">Needs owner sign-off</div></div></div>
+                </div>
+              </div>
+            </div>
+            <pre><code>&lt;div class="uif-stepper-item is-current"&gt;
+  &lt;div class="uif-stepper-badge"&gt;2&lt;/div&gt;
+  &lt;div class="uif-stepper-title"&gt;Review&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Fallback</div>
+                <h2>Empty State</h2>
+                <p>Reusable fallback for empty reports, no search matches, and unconfigured workflows.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <section class="uif-empty-state">
+                <div class="uif-empty-state-icon"><span data-uif-icon="archive"></span></div>
+                <h3 class="uif-empty-state-title">No matching records</h3>
+                <p class="uif-empty-state-copy">Adjust filters or create a new record to populate this view.</p>
+                <div class="uif-cluster"><button class="uif-btn uif-btn-outline-neutral">Clear filters</button><button class="uif-btn">Create record</button></div>
+              </section>
+            </div>
+            <pre><code>&lt;section class="uif-empty-state"&gt;
+  &lt;h3 class="uif-empty-state-title"&gt;No matching records&lt;/h3&gt;
+&lt;/section&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Filters</div>
+                <h2>Filter Builder</h2>
+                <p>Active filter chips, saved-view actions, and report filter summaries.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <section class="uif-filterbar">
+                <div class="uif-filterbar-head">
+                  <div><h3 class="uif-section-title">Active Filters</h3><p class="uif-section-copy">Current report constraints.</p></div>
+                  <div class="uif-cluster"><button class="uif-btn uif-btn-sm uif-btn-outline-neutral">Save view</button><button class="uif-btn uif-btn-sm">Apply</button></div>
+                </div>
+                <div class="uif-filterbar-chiprow">
+                  <span class="uif-filter-chip">Status: Submitted <button aria-label="Remove status">×</button></span>
+                  <span class="uif-filter-chip">Owner: Mira <button aria-label="Remove owner">×</button></span>
+                  <span class="uif-filter-chip">Date: This quarter <button aria-label="Remove date">×</button></span>
+                </div>
+              </section>
+            </div>
+            <pre><code>&lt;section class="uif-filterbar"&gt;
+  &lt;span class="uif-filter-chip"&gt;Status: Submitted &lt;button&gt;×&lt;/button&gt;&lt;/span&gt;
+&lt;/section&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Commands</div>
+                <h2>Command Palette</h2>
+                <p>Searchable actions using the existing `command-menu` component behavior.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-command-menu" data-uif="command-menu">
+                <input class="uif-input" data-uif-role="search" placeholder="Search commands...">
+                <button class="uif-menu-item" data-uif-role="item"><span>Open command center</span><kbd>⌘K</kbd></button>
+                <button class="uif-menu-item" data-uif-role="item"><span>Create new deal</span><kbd>N</kbd></button>
+                <button class="uif-menu-item uif-menu-item-danger" data-uif-role="item"><span>Archive selected</span></button>
+              </div>
+            </div>
+            <pre><code>&lt;div class="uif-command-menu" data-uif="command-menu"&gt;
+  &lt;input data-uif-role="search"&gt;
+  &lt;button data-uif-role="item"&gt;Open command center&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Native Inputs</div>
+                <h2>Date and Color Pickers</h2>
+                <p>Native browser controls with consistent UIF shells.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-picker-grid">
+                <label class="uif-field"><span class="uif-field-label">Service date</span><span class="uif-input-shell"><span class="uif-input-shell-icon" data-uif-icon="calendar"></span><input type="date" value="2026-05-24"></span></label>
+                <label class="uif-field"><span class="uif-field-label">Accent</span><span class="uif-color-picker"><input type="color" value="#0b72bd"><span><span class="uif-color-value">#0B72BD</span><span class="uif-field-hint">Theme color</span></span></span></label>
+              </div>
+            </div>
+            <pre><code>&lt;span class="uif-input-shell"&gt;&lt;input type="date"&gt;&lt;/span&gt;
+&lt;span class="uif-color-picker"&gt;&lt;input type="color"&gt;&lt;/span&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Notifications</div>
+                <h2>Notification Center</h2>
+                <p>Modal-based notification surface using UIF overlay behavior.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <button class="uif-btn uif-btn-outline-primary" data-uif-action="open" data-uif-target="#gallery-notifications"><span data-uif-icon="bell"></span>Open notifications</button>
+              <div id="gallery-notifications" data-uif="modal" hidden>
+                <div class="uif-notification-panel" data-uif-role="dialog">
+                  <div class="uif-notification-head"><h3 class="uif-card-title">Notifications</h3><button class="uif-btn uif-btn-sm uif-btn-outline-neutral" data-uif-action="close">Close</button></div>
+                  <div class="uif-notification-list">
+                    <article class="uif-notification-item is-unread"><div class="uif-notification-meta"><span>Critical workflow</span><span>2m ago</span></div><strong>Approval required</strong><span>Database index request needs owner review.</span></article>
+                    <article class="uif-notification-item"><div class="uif-notification-meta"><span>Billing</span><span>14m ago</span></div><strong>Invoice sync complete</strong><span>24 records updated.</span></article>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <pre><code>&lt;div data-uif="modal" hidden&gt;
+  &lt;div class="uif-notification-panel" data-uif-role="dialog"&gt;...&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Sizing</div>
+                <h2>Button Size Matrix</h2>
+                <p>Side-by-side button scales for forms, toolbars, and dense table pages.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="component-stack">
+                <div class="uif-cluster"><strong>UI buttons</strong><button class="uif-btn uif-btn-sm">Small</button><button class="uif-btn">Default</button><button class="uif-btn uif-btn-lg">Large</button></div>
+                <div class="uif-cluster"><strong>Page buttons</strong><a class="uif-page-btn uif-page-btn-sm" href="#">Small</a><a class="uif-page-btn uif-page-btn-primary" href="#">Default</a><a class="uif-page-btn uif-page-btn-lg uif-page-btn-info" href="#">Large</a></div>
+              </div>
+            </div>
+            <pre><code>&lt;button class="uif-btn uif-btn-sm"&gt;Small&lt;/button&gt;
+&lt;button class="uif-btn"&gt;Default&lt;/button&gt;
+&lt;a class="uif-page-btn uif-page-btn-lg"&gt;Large&lt;/a&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Tables</div>
+                <h2>Table Utilities</h2>
+                <p>Selectable rows, bulk action state, sortable headers, and status badges.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-table-toolbar">
+                <div class="uif-table-bulkbar"><span><strong>2</strong> selected</span><span class="uif-cluster"><button class="uif-btn uif-btn-sm uif-btn-outline-primary">Assign</button><button class="uif-btn uif-btn-sm uif-btn-outline-danger">Archive</button></span></div>
+              </div>
+              <table class="uif-table uif-data-grid" data-uif="table">
+                <thead><tr><th><input type="checkbox" checked aria-label="Select all"></th><th data-uif-sort>Account</th><th data-uif-sort>Value</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td><input type="checkbox" checked></td><td>Metro Finance</td><td>$42K</td><td><span class="uif-badge uif-badge-warning">Proposal</span></td></tr>
+                  <tr><td><input type="checkbox" checked></td><td>Kalinga Retail</td><td>$118K</td><td><span class="uif-badge uif-badge-danger">Risk</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code>&lt;div class="uif-table-bulkbar"&gt;&lt;strong&gt;2&lt;/strong&gt; selected&lt;/div&gt;
+&lt;table class="uif-table uif-data-grid" data-uif="table"&gt;...&lt;/table&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Headers</div>
+                <h2>Hero Banner</h2>
+                <p>Profile and report headers with avatar, actions, and metadata chips.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <section class="uif-hero-banner">
+                <div class="uif-hero-banner-head">
+                  <div class="uif-hero-main"><div class="uif-hero-avatar">MF</div><div><div class="uif-hero-kicker">Customer Record</div><h3 class="uif-hero-title">Metro Finance</h3><p class="uif-hero-copy">Enterprise account with active procurement review.</p></div></div>
+                  <div class="uif-cluster"><button class="uif-btn uif-btn-outline-neutral">Timeline</button><button class="uif-btn">Open record</button></div>
+                </div>
+                <div class="uif-hero-meta"><span class="uif-chip">Record #2048</span><span class="uif-chip uif-chip-info">Finance</span><span class="uif-chip uif-chip-warning">Review due</span></div>
+              </section>
+            </div>
+            <pre><code>&lt;section class="uif-hero-banner"&gt;
+  &lt;div class="uif-hero-main"&gt;...&lt;/div&gt;
+  &lt;div class="uif-hero-meta"&gt;...&lt;/div&gt;
+&lt;/section&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Layout</div>
+                <h2>Section Shells and Card Headers</h2>
+                <p>Titled page sections with actions and stacked inner cards.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <section class="uif-section-shell">
+                <div class="uif-section-head"><div><div class="uif-section-kicker">Review Queue</div><h3 class="uif-section-title">Open Items</h3><p class="uif-section-copy">Reusable shell for dashboard bands.</p></div><button class="uif-btn uif-btn-sm">New item</button></div>
+                <div class="uif-card-stack"><article class="uif-card-shell"><div class="uif-card-head"><div><h4 class="uif-card-title">Pending approval</h4><p class="uif-card-copy">3 items need review.</p></div><span class="uif-badge uif-badge-warning">3 pending</span></div></article></div>
+              </section>
+            </div>
+            <pre><code>&lt;section class="uif-section-shell"&gt;
+  &lt;div class="uif-section-head"&gt;...&lt;/div&gt;
+  &lt;article class="uif-card-shell"&gt;...&lt;/article&gt;
+&lt;/section&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Charts</div>
+                <h2>Chart Cards and Legends</h2>
+                <p>Standard wrapper for chart titles, chart surfaces, metadata, and legends.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <section class="uif-chart-card">
+                <div class="uif-chart-card-head"><div><h3 class="uif-chart-card-title">Weekly Revenue</h3><p class="uif-chart-card-copy">Reusable wrapper for SVG charts.</p></div><span class="uif-text-muted">W14-W20</span></div>
+                <div class="uif-chart-card-body"><div class="uif-chart-placeholder">Chart surface</div></div>
+                <div class="uif-chart-legend uif-p-4"><span class="uif-chart-legend-item"><i class="uif-chart-legend-swatch"></i>Revenue</span><span class="uif-chart-legend-item"><i class="uif-chart-legend-swatch" style="background:var(--uif-color-success)"></i>Target</span></div>
+              </section>
+            </div>
+            <pre><code>&lt;section class="uif-chart-card"&gt;
+  &lt;div class="uif-chart-card-head"&gt;...&lt;/div&gt;
+  &lt;div class="uif-chart-card-body"&gt;...&lt;/div&gt;
+&lt;/section&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Metrics</div>
+                <h2>Metrics and Progress Bars</h2>
+                <p>Ranked metric rows for productivity, utilization, and progress reports.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-metric-list">
+                <div class="uif-metric-row"><div class="uif-metric-head"><span class="uif-metric-label">Billable hours</span><span class="uif-metric-value">32.5 hrs</span></div><div class="uif-progress-bar uif-progress-bar-success"><span style="width:78%"></span></div><div class="uif-field-hint">78% of target</div></div>
+                <div class="uif-metric-row"><div class="uif-metric-head"><span class="uif-metric-label">Overdue tasks</span><span class="uif-metric-value">7</span></div><div class="uif-progress-bar uif-progress-bar-danger"><span style="width:35%"></span></div><div class="uif-field-hint">Needs review</div></div>
+              </div>
+            </div>
+            <pre><code>&lt;div class="uif-metric-row"&gt;
+  &lt;div class="uif-progress-bar uif-progress-bar-success"&gt;&lt;span style="width:78%"&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Menus</div>
+                <h2>Dropdown Menus</h2>
+                <p>Grouped action menus for rows, tables, and toolbar controls.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-dropdown-menu" data-uif="dropdown">
+                <button class="uif-btn uif-btn-outline-primary" data-uif-role="trigger">Quick actions <span data-uif-icon="chevron-down"></span></button>
+                <div class="uif-menu-surface" data-uif-role="panel" hidden>
+                  <div class="uif-menu-label">Workflow</div>
+                  <button class="uif-menu-item"><span>Assign review</span><span class="uif-text-muted">A</span></button>
+                  <button class="uif-menu-item"><span>Duplicate record</span></button>
+                  <button class="uif-menu-item uif-menu-item-danger"><span>Archive</span></button>
+                </div>
+              </div>
+            </div>
+            <pre><code>&lt;div class="uif-dropdown-menu" data-uif="dropdown"&gt;
+  &lt;button data-uif-role="trigger"&gt;Actions&lt;/button&gt;
+  &lt;div class="uif-menu-surface" data-uif-role="panel" hidden&gt;...&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Forms</div>
+                <h2>Form Utilities</h2>
+                <p>Dirty-state notes, validation-ready fields, serialization output, and action rows.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <form class="uif-form-section" data-uif="form">
+                <div class="uif-picker-grid">
+                  <label class="uif-field"><span class="uif-field-label">Member name</span><span class="uif-input-shell"><span data-uif-icon="user"></span><input name="member_name" value="Metro Finance" data-uif-rule="required"></span></label>
+                  <label class="uif-field"><span class="uif-field-label">Follow-up date</span><span class="uif-input-shell"><span data-uif-icon="calendar"></span><input type="date" value="2026-05-28"></span></label>
+                </div>
+                <div class="uif-note">Unsaved changes detected.</div>
+                <div class="uif-cluster"><button class="uif-btn" type="button">Validate</button><button class="uif-btn uif-btn-outline-neutral" type="button">Reset snapshot</button></div>
+              </form>
+            </div>
+            <pre><code>&lt;form class="uif-form-section" data-uif="form"&gt;
+  &lt;input name="member_name" data-uif-rule="required"&gt;
+  &lt;div class="uif-note"&gt;Unsaved changes detected.&lt;/div&gt;
+&lt;/form&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Framework</div>
+                <h2>AJAX, Loading, and Toasts</h2>
+                <p>Standard states for async buttons, panels, and feedback toasts.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-cluster">
+                <button class="uif-btn" aria-busy="true"><span class="uif-spinner uif-spinner-sm uif-spinner-inline uif-text-white"></span>Saving</button>
+                <button class="uif-btn uif-btn-info" data-uif-action="toast" data-uif-message="Queued for sync" data-uif-type="info">Show toast</button>
+                <div class="uif-loading-target" aria-busy="true"><strong>Panel loading target</strong><br><span class="uif-text-muted">Shared loading surface</span></div>
+              </div>
+            </div>
+            <pre><code>&lt;button class="uif-btn" aria-busy="true"&gt;&lt;span class="uif-spinner uif-spinner-inline"&gt;&lt;/span&gt;Saving&lt;/button&gt;
+&lt;button data-uif-action="toast" data-uif-message="Saved"&gt;Show toast&lt;/button&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Inputs</div>
+                <h2>Autosuggest Selects</h2>
+                <p>Searchable single-select and multi-select patterns backed by regular form fields.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="component-combobox" data-uif="combobox">
+                <input class="uif-input" data-uif-role="input" placeholder="Search teams...">
+                <div class="component-option-list">
+                  <button data-uif-role="option">Behavioral Health</button>
+                  <button data-uif-role="option">Care Management</button>
+                  <button data-uif-role="option">Finance</button>
+                  <button data-uif-role="option">Quality</button>
+                </div>
+              </div>
+            </div>
+            <pre><code>&lt;div data-uif="combobox"&gt;
+  &lt;input class="uif-input" data-uif-role="input" placeholder="Search..."&gt;
+  &lt;button data-uif-role="option"&gt;Finance&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Feedback</div>
+                <h2>Spinners</h2>
+                <p>Shared loading indicators for inline text, buttons, and panels.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-cluster">
+                <span class="uif-spinner uif-spinner-sm uif-text-primary"></span>
+                <span class="uif-spinner uif-text-info"></span>
+                <span class="uif-spinner uif-spinner-lg uif-text-success"></span>
+                <button class="uif-btn"><span class="uif-spinner uif-spinner-sm uif-spinner-inline uif-text-white"></span>Saving</button>
+              </div>
+            </div>
+            <pre><code>&lt;span class="uif-spinner uif-spinner-sm uif-text-primary"&gt;&lt;/span&gt;
+&lt;button class="uif-btn"&gt;&lt;span class="uif-spinner uif-spinner-inline"&gt;&lt;/span&gt;Saving&lt;/button&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Utilities</div>
+                <h2>Standardized Text Colors</h2>
+                <p>Semantic text utilities for emphasis without custom page CSS.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-grid-3">
+                <div class="uif-text-swatch"><strong class="uif-text-primary">Primary text</strong><code>.uif-text-primary</code></div>
+                <div class="uif-text-swatch"><strong class="uif-text-success">Success text</strong><code>.uif-text-success</code></div>
+                <div class="uif-text-swatch"><strong class="uif-text-danger">Danger text</strong><code>.uif-text-danger</code></div>
+              </div>
+            </div>
+            <pre><code>&lt;strong class="uif-text-success"&gt;Success text&lt;/strong&gt;
+&lt;span class="uif-text-muted"&gt;Muted text&lt;/span&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Utilities</div>
+                <h2>Spacing Utilities</h2>
+                <p>Margin, padding, grid, gap, and flex utilities for quick app composition.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-class-list">
+                <code>m-0 ... m-4</code><code>mt-*</code><code>mb-*</code><code>p-0 ... p-6</code><code>px-*</code><code>py-*</code><code>uif-gap-*</code><code>uif-grid-*</code>
+              </div>
+              <div class="uif-bg-surface uif-rounded uif-p-4 uif-mt-3"><div class="uif-bg-elevated uif-border uif-rounded uif-py-3 uif-px-4">`.uif-p-4` wrapper with inner spacing utilities</div></div>
+            </div>
+            <pre><code>&lt;section class="uif-p-4 uif-mt-3"&gt;
+  &lt;div class="uif-py-3 uif-px-4"&gt;Content&lt;/div&gt;
+&lt;/section&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Feedback</div>
+                <h2>Alert Matrix</h2>
+                <p>Semantic alert variants for success, warnings, errors, and neutral guidance.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="component-stack">
+                <section class="uif-alert uif-alert-success"><strong>Success alert</strong><br>Record saved and audit trail updated.</section>
+                <section class="uif-alert uif-alert-warning"><strong>Warning alert</strong><br>Authorization expires in 48 hours.</section>
+                <section class="uif-alert uif-alert-danger"><strong>Danger alert</strong><br>Policy blocked this action.</section>
+                <section class="uif-alert uif-alert-info"><strong>Info alert</strong><br>Sync will retry automatically.</section>
+              </div>
+            </div>
+            <pre><code>&lt;section class="uif-alert uif-alert-success"&gt;Saved&lt;/section&gt;
+&lt;section class="uif-alert uif-alert-danger"&gt;Blocked&lt;/section&gt;</code></pre>
+          </article>
+            </div>
+          </section>
+        </section>
+      </div>
+    </main>
+
+    <script type="module">
+      import { autoStart, mountIcons } from '../../dist/uif.esm.js';
+
+      function markCopied(button) {
+        const label = button.textContent;
+        button.textContent = 'Copied';
+        window.setTimeout(() => {
+          button.textContent = label;
+          mountIcons(button);
+        }, 1200);
+      }
+
+      autoStart();
+
+      document.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-copy-component]');
+        if (!button) return;
+        const code = button.closest('.component-card')?.querySelector('pre code');
+        if (!code) return;
+        await navigator.clipboard?.writeText(code.textContent.trim());
+        markCopied(button);
+      });
+    </script>
+  </body>
+</html>

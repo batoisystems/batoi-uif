@@ -1,87 +1,118 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin Workspace Example</title>
-    <link rel="stylesheet" href="../../packages/css/index.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Admin Workspace</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/app-showcase.css">
   </head>
-  <body>
-    <div class="uif-app-shell">
-      <aside class="uif-sidebar">
-        <h1 class="uif-text-lg">Workspace</h1>
-        <nav class="uif-stack" data-uif="nav" aria-label="Workspace">
-          <a href="#dashboard">Dashboard</a>
-          <a href="#customers">Customers</a>
-          <a href="#settings">Settings</a>
-        </nav>
-      </aside>
-      <div>
-        <header class="uif-topbar">
-          <div>
-            <strong>Customers</strong>
-            <span class="uif-badge">RAD</span>
-          </div>
-          <button class="uif-btn" data-uif-action="open" data-uif-target="#customer-drawer">Add Customer</button>
+  <body class="app-example-page" data-accent="blue" data-density="comfortable" data-surface="raised">
+    <main class="app-shell">
+      <div class="app-frame">
+        <header class="app-topbar">
+          <a class="app-brand" href="../">
+            <span class="app-brand-mark" data-uif-icon="batoi" data-uif-icon-title="Batoi"></span>
+            <span><strong>Batoi UIF</strong><span>Examples · Admin</span></span>
+          </a>
+          <nav class="app-actions" aria-label="Example shortcuts">
+            <a class="app-pill" href="../"><span data-uif-icon="home"></span>All examples</a>
+            <a class="app-pill" href="../professional-showcase/"><span data-uif-icon="dashboard"></span>Showcase</a>
+            <a class="app-pill" href="../component-gallery/"><span data-uif-icon="grid"></span>Components</a>
+            <a class="app-pill" href="../chart-gallery/"><span data-uif-icon="chart"></span>Charts</a>
+            <a class="app-pill" href="../icon-gallery/"><span data-uif-icon="spark"></span>Icons</a>
+            <a class="app-pill is-primary" href="../../dist/uif.esm.js"><span data-uif-icon="download"></span>Distribution</a>
+          </nav>
         </header>
-        <main class="uif-main uif-stack">
-          <section class="uif-toolbar">
-            <label class="uif-field">
-              <span class="uif-sr-only">Filter customers</span>
-              <input class="uif-input" type="search" placeholder="Filter customers" data-uif-table-filter="#customer-table" />
-            </label>
-            <div class="uif-cluster">
-              <button class="uif-btn uif-btn-secondary" data-uif="ajax" data-uif-action="reload" data-uif-src="/customers/list" data-uif-target="#customer-region">Reload</button>
-              <button class="uif-btn uif-btn-danger" data-uif="ajax" data-uif-action="delete" data-uif-confirm="Delete selected customers?" data-uif-src="/customers/bulk-delete">Bulk Delete</button>
+
+        <section class="app-hero">
+          <div>
+            <div class="app-eyebrow">Admin · Workspace</div>
+            <h1>Workspace administration with filters, tables, drawers, and bulk actions.</h1>
+            <p>A professional admin screen for repeated operational work: search, select rows, open guarded actions, edit records in a drawer, and keep the layout scannable.</p>
+          </div>
+          <div class="app-hero-metrics" aria-label="Example highlights">
+            <div class="app-stat"><span class="app-icon" data-uif-icon="users"></span><div><strong>248</strong><span>Customers</span></div></div>
+            <div class="app-stat"><span class="app-icon" data-uif-icon="approval"></span><div><strong>8</strong><span>Pending reviews</span></div></div>
+            <div class="app-stat"><span class="app-icon" data-uif-icon="shield"></span><div><strong>2FA</strong><span>Security ready</span></div></div>
+          </div>
+        </section>
+
+        <section class="app-layout">
+          <div class="app-workspace">
+            <section class="app-section-head">
+              <div>
+                <div class="app-eyebrow">Live example</div>
+                <h2>Customer administration</h2>
+                <p>Use this pattern for RAD administration pages that need dense but calm operational controls.</p>
+              </div>
+              <div class="app-actions"><button class="app-copy" type="button"><span data-uif-icon="filter"></span>Filter</button><button class="app-copy is-primary" type="button" data-uif-action="open" data-uif-target="#customer-drawer"><span data-uif-icon="plus"></span>Add customer</button></div>
+            </section>
+            
+            <section class="app-card">
+              <div class="app-card-head"><div><h2>Workspace Users</h2><p>Searchable table with selection and safe destructive actions.</p></div><span class="uif-badge">1 selected</span></div>
+              <div class="app-mini-row"><label class="uif-field"><span class="uif-sr-only">Search customers</span><input class="uif-input" type="search" placeholder="Search customers..." data-uif-table-filter="#customer-table"></label><button class="app-copy" type="button">Bulk action</button></div>
+              <div class="app-table-wrap">
+                <table id="customer-table" class="uif-table" data-uif="table">
+                  <thead><tr><th><input type="checkbox" aria-label="Select all"></th><th data-uif-sort>Name</th><th>Plan</th><th>Status</th><th>Action</th></tr></thead>
+                  <tbody><tr><td><input type="checkbox" checked></td><td>Ada Lovelace</td><td>Pro</td><td><span class="uif-badge uif-badge-success">Active</span></td><td><button class="app-copy" type="button" data-uif-action="open" data-uif-target="#customer-drawer">Edit</button></td></tr><tr><td><input type="checkbox"></td><td>Grace Hopper</td><td>Team</td><td><span class="uif-badge uif-badge-info">Trial</span></td><td><button class="app-copy" type="button">Review</button></td></tr></tbody>
+                </table>
+              </div>
+            </section>
+            <section class="app-grid">
+              <article class="app-card app-kpi"><span class="app-icon" data-uif-icon="inbox"></span><strong>24</strong><p>Open tasks for admins.</p></article>
+              <article class="app-card app-kpi"><span class="app-icon" data-uif-icon="clock"></span><strong>8</strong><p>Pending approval requests.</p></article>
+              <article class="app-card app-kpi"><span class="app-icon" data-uif-icon="activity"></span><strong>99.9%</strong><p>Workspace uptime.</p></article>
+            </section>
+            <aside id="customer-drawer" data-uif="drawer" data-uif-mode="right" hidden>
+              <form class="app-card" data-uif="form" data-uif-validate="false">
+                <h2>Customer</h2><label class="uif-field">Name <input class="uif-input" value="Ada Lovelace"></label><label class="uif-field">Email <input class="uif-input" value="ada@example.com"></label><button class="uif-btn app-btn-primary" type="button">Save</button>
+              </form>
+            </aside>
+          </div>
+
+          <aside class="app-builder" aria-label="Tweak and copy this example">
+            <div>
+              <div class="app-eyebrow">Builder</div>
+              <h2>Tweak and copy</h2>
+              <p>Adjust the presentation of this example, then copy the starter markup for your own page.</p>
             </div>
-          </section>
-          <section id="customer-region" class="uif-card">
-            <table id="customer-table" class="uif-table" data-uif="table">
-              <thead>
-                <tr>
-                  <th><input type="checkbox" aria-label="Select all" /></th>
-                  <th data-uif-sort="asc">Name</th>
-                  <th data-uif-sort="asc">Plan</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><input data-uif-role="row-select" type="checkbox" /></td>
-                  <td>Ada Lovelace</td>
-                  <td>Pro</td>
-                  <td><span class="uif-badge">Active</span></td>
-                  <td><button data-uif-action="open" data-uif-target="#customer-drawer">Edit</button></td>
-                </tr>
-                <tr>
-                  <td><input data-uif-role="row-select" type="checkbox" /></td>
-                  <td>Grace Hopper</td>
-                  <td>Team</td>
-                  <td><span class="uif-badge">Trial</span></td>
-                  <td><button data-uif-action="open" data-uif-target="#customer-drawer">Edit</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
-          <section class="uif-grid-3">
-            <article class="uif-card"><strong>24</strong><p class="uif-text-muted">Open tasks</p></article>
-            <article class="uif-card"><strong>8</strong><p class="uif-text-muted">Pending approvals</p></article>
-            <article class="uif-card"><strong>99.9%</strong><p class="uif-text-muted">Uptime</p></article>
-          </section>
-        </main>
+            <label>Accent
+              <select class="app-select" data-example-tweak="accent">
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="violet">Violet</option>
+                <option value="slate">Slate</option>
+              </select>
+            </label>
+            <label>Density
+              <select class="app-select" data-example-tweak="density">
+                <option value="comfortable">Comfortable</option>
+                <option value="compact">Compact</option>
+                <option value="spacious">Spacious</option>
+              </select>
+            </label>
+            <label>Surface
+              <select class="app-select" data-example-tweak="surface">
+                <option value="raised">Raised</option>
+                <option value="flat">Flat</option>
+                <option value="tinted">Tinted</option>
+              </select>
+            </label>
+            <label>Starter markup
+              <textarea readonly data-example-code>&lt;table class=&quot;uif-table&quot; data-uif=&quot;table&quot;&gt;
+  &lt;thead&gt;&lt;tr&gt;&lt;th data-uif-sort&gt;Name&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+  &lt;tbody&gt;&lt;tr&gt;&lt;td&gt;Ada Lovelace&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;uif-badge&quot;&gt;Active&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
+&lt;/table&gt;</textarea>
+            </label>
+            <div class="app-builder-actions">
+              <button class="app-copy is-primary" type="button" data-example-copy><span data-uif-icon="copy"></span>Copy code</button>
+              <a class="app-pill" href="../../dist/uif.css"><span data-uif-icon="download"></span>CSS</a>
+            </div>
+          </aside>
+        </section>
       </div>
-    </div>
-    <aside id="customer-drawer" data-uif="drawer" data-uif-mode="right" data-uif-state="closed" hidden>
-      <form class="uif-card" data-uif="form" data-uif-src="/customers/save" data-uif-method="POST" data-uif-target="#customer-region">
-        <h2>Customer</h2>
-        <label class="uif-field">Name <input class="uif-input" name="name" data-uif-rule="required|minLength:2" /></label>
-        <label class="uif-field">Email <input class="uif-input" name="email" data-uif-rule="required|email" /></label>
-        <div class="uif-cluster">
-          <button class="uif-btn">Save</button>
-          <button type="button" class="uif-btn uif-btn-secondary" data-uif-action="close">Cancel</button>
-        </div>
-      </form>
-    </aside>
+    </main>
+    <script type="module" src="../shared/app-showcase.js"></script>
   </body>
 </html>

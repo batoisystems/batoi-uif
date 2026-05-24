@@ -23,7 +23,7 @@ declare function initFileUpload(el: HTMLElement): ComponentInstance;
 declare function initCombobox(el: HTMLElement): ComponentInstance;
 declare function initComponent(el: HTMLElement): void;
 declare function destroyComponent(el: HTMLElement): void;
-declare function initAll(root?: Document | HTMLElement): void;
+declare function initAll(root?: Document | HTMLElement): () => void;
 declare function showToast(message: string, options?: {
     type?: string;
     duration?: number;
