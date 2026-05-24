@@ -33,6 +33,7 @@ var BatoiUIF = (() => {
     autoInit: () => autoInit2,
     autoStart: () => autoStart,
     badge: () => badge,
+    bindChartExports: () => bindChartExports,
     bindRadActions: () => bindRadActions,
     breadcrumb: () => breadcrumb,
     button: () => button,
@@ -50,7 +51,9 @@ var BatoiUIF = (() => {
     connect: () => connect,
     correlation: () => correlation,
     createAdvancedStore: () => createAdvancedStore,
+    createArtifactStore: () => createArtifactStore,
     createCacheStrategy: () => createCacheStrategy,
+    createMicroAppStore: () => createMicroAppStore,
     createStore: () => createStore,
     createStreamSurface: () => createStreamSurface,
     cumulativeSum: () => cumulativeSum,
@@ -59,11 +62,15 @@ var BatoiUIF = (() => {
     destroyChart: () => destroyChart,
     destroyComponent: () => destroyComponent,
     disconnect: () => disconnect,
+    downloadChartPng: () => downloadChartPng,
+    downloadChartSvg: () => downloadChartSvg,
     drawer: () => drawer,
     dropdown: () => dropdown,
     emit: () => emit2,
     expand: () => expand2,
     exportChartData: () => exportChartData,
+    exportChartPng: () => exportChartPng,
+    exportChartSvg: () => exportChartSvg,
     exportTable: () => exportTable,
     fileUpload: () => fileUpload,
     filterElements: () => filterElements,
@@ -342,6 +349,7 @@ var BatoiUIF = (() => {
 
   // packages/charts/src/index.ts
   var controllers2 = /* @__PURE__ */ new WeakMap();
+  var exportBindings = /* @__PURE__ */ new WeakMap();
   var defaultPalette = [
     "var(--uif-chart-1,var(--uif-color-primary))",
     "var(--uif-chart-2,var(--uif-color-success))",
@@ -352,6 +360,14 @@ var BatoiUIF = (() => {
     "var(--uif-chart-7,#0f766e)",
     "var(--uif-chart-8,#9333ea)"
   ];
+  var namedPalettes = {
+    default: defaultPalette,
+    professional: ["#0b72bd", "#00a88f", "#e4a700", "#df3158", "#7c3aed", "#0f766e"],
+    categorical: ["#0b72bd", "#00a88f", "#e4a700", "#df3158", "#7c3aed", "#d9468f", "#475467"],
+    status: ["#00a88f", "#0b72bd", "#e4a700", "#df3158"],
+    sequential: ["#d9ecff", "#9dccf4", "#5ba6df", "#1f7dc1", "#0b4f86"],
+    diverging: ["#df3158", "#f59e0b", "#e5e7eb", "#00a88f", "#0b72bd"]
+  };
   var chartIdCounter = 0;
   function esc(value) {
     return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
@@ -360,6 +376,10 @@ var BatoiUIF = (() => {
     const seed = `${options.id || options.label || type}-${options.width || 0}-${options.height || 0}`.toLowerCase();
     const clean = seed.replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
     return `uif-chart-${clean || type}`;
+  }
+  function paletteFor(options) {
+    if (Array.isArray(options.palette)) return options.palette;
+    return namedPalettes[options.palette ?? "default"] ?? defaultPalette;
   }
   function cleanValues(values) {
     return values.map(Number).filter(Number.isFinite);
@@ -464,16 +484,22 @@ var BatoiUIF = (() => {
   function margins(options) {
     return { top: 16, right: 18, bottom: options.axes === false ? 18 : 34, left: options.axes === false ? 18 : 42, ...options.margin };
   }
+  function coerceNumber(raw, options) {
+    const value = Number(raw);
+    if (Number.isFinite(value)) return value;
+    if (options.invalidValue === "error") throw new Error(`Invalid chart value: ${String(raw)}`);
+    return options.invalidValue === "skip" ? void 0 : 0;
+  }
   function valueOf(datum, options) {
     const raw = options.y && datum[options.y] != null ? datum[options.y] : datum.value;
-    return Number(raw) || 0;
+    return coerceNumber(raw, options);
   }
   function labelOf(datum, options) {
     const raw = options.x && datum[options.x] != null ? datum[options.x] : datum.label;
     return String(raw ?? "");
   }
   function normalizeData(data, options) {
-    return data.map((item) => ({ ...item, label: labelOf(item, options), value: valueOf(item, options) }));
+    return data.map((item) => ({ ...item, label: labelOf(item, options), value: valueOf(item, options) })).filter((item) => item.value != null || options.invalidValue !== "skip");
   }
   function coerceData(data) {
     return data.map((item, index) => typeof item === "number" ? { label: String(index + 1), value: item } : item);
@@ -519,10 +545,14 @@ var BatoiUIF = (() => {
   function fullDonutPath(cx, cy, outer, inner) {
     return `M ${cx - outer} ${cy} A ${outer} ${outer} 0 1 0 ${cx + outer} ${cy} A ${outer} ${outer} 0 1 0 ${cx - outer} ${cy} M ${cx - inner} ${cy} A ${inner} ${inner} 0 1 1 ${cx + inner} ${cy} A ${inner} ${inner} 0 1 1 ${cx - inner} ${cy} Z`;
   }
-  function markAttrs(label, options) {
-    const focus = options.focusable ? ' tabindex="0"' : "";
-    const aria = options.focusable ? ` aria-label="${esc(label)}"` : "";
-    return `class="uif-chart-mark"${focus}${aria} data-uif-chart-label="${esc(label)}"`;
+  function markAttrs(label, options, meta = {}) {
+    const interactive = options.focusable || Boolean(options.drilldown);
+    const focus = interactive ? ' tabindex="0" role="button"' : "";
+    const aria = interactive ? ` aria-label="${esc(label)}"` : "";
+    const index = meta.index == null ? "" : ` data-uif-chart-index="${meta.index}"`;
+    const value = meta.value == null ? "" : ` data-uif-chart-value="${esc(meta.value)}"`;
+    const series = meta.series == null ? "" : ` data-uif-series="${esc(meta.series)}"`;
+    return `class="uif-chart-mark"${focus}${aria} data-uif-chart-label="${esc(label)}"${index}${value}${series}`;
   }
   function axisAndGrid(width, height, plot, domain, options) {
     if (options.axes === false && options.grid === false) return "";
@@ -549,12 +579,23 @@ var BatoiUIF = (() => {
   function svgWrap(type, width, height, content, data, options) {
     const id = uid(options, type);
     const title = options.label || `${type} chart`;
-    const desc = options.description || data.map((d) => `${d.label ?? "item"} ${fmt(valueOf(d, options), options)}`).join(", ");
-    return `<svg class="uif-chart-svg uif-chart-${type}" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="${id}-title ${id}-desc"><title id="${id}-title">${esc(title)}</title><desc id="${id}-desc">${esc(desc)}</desc>${content}</svg>`;
+    const desc = options.description || data.map((d) => `${d.label ?? "item"} ${fmt(valueOf(d, options) ?? 0, options)}`).join(", ");
+    const table2 = options.table ? chartDataTable(data, options, id) : "";
+    return `<svg class="uif-chart-svg uif-chart-${type}" viewBox="0 0 ${width} ${height}" role="img" aria-roledescription="chart" aria-labelledby="${id}-title ${id}-desc"><title id="${id}-title">${esc(title)}</title><desc id="${id}-desc">${esc(desc)}</desc>${content}</svg>${table2}`;
+  }
+  function chartDataTable(data, options, id) {
+    const series = inferSeries(data, options);
+    const headers = ["Label", ...series.length ? series : ["Value"]];
+    const rows2 = data.map((datum) => {
+      const cells = series.length ? series.map((key) => fmt(Number(datum.values?.[key] ?? 0), options)) : [fmt(datum.value ?? 0, options)];
+      return `<tr><th scope="row">${esc(datum.label ?? "")}</th>${cells.map((cell) => `<td>${esc(cell)}</td>`).join("")}</tr>`;
+    }).join("");
+    const hidden = options.table === "sr-only" ? " uif-sr-only" : "";
+    return `<table id="${id}-table" class="uif-chart-data-table${hidden}"><caption>${esc(options.label || "Chart data")}</caption><thead><tr>${headers.map((header) => `<th scope="col">${esc(header)}</th>`).join("")}</tr></thead><tbody>${rows2}</tbody></table>`;
   }
   function legend(items, options) {
     if (!options.legend || !items.length) return "";
-    const palette = options.palette ?? defaultPalette;
+    const palette = paletteFor(options);
     return `<div class="uif-chart-legend" data-uif-placement="${options.legend === true ? "bottom" : options.legend}">${items.map((item, i) => `<span><i style="background:${palette[i % palette.length]}"></i>${esc(item)}</span>`).join("")}</div>`;
   }
   function renderLineLike(data, options, area = false, sparkline = false) {
@@ -563,7 +604,7 @@ var BatoiUIF = (() => {
     const plot = sparkline ? { top: 6, right: 6, bottom: 6, left: 6 } : margins(options);
     const normalized = normalizeData(data, options);
     const series = inferSeries(normalized, options);
-    const palette = options.palette ?? defaultPalette;
+    const palette = paletteFor(options);
     const values = series.length ? normalized.flatMap((d) => series.map((key) => Number(d.values?.[key] ?? 0))) : normalized.map((d) => d.value ?? 0);
     const y = scaleLinear(extent(values, options), [height - plot.bottom, plot.top]);
     const xStep = normalized.length > 1 ? (width - plot.left - plot.right) / (normalized.length - 1) : 0;
@@ -574,7 +615,7 @@ var BatoiUIF = (() => {
       const marks = sparkline || options.labels === false ? "" : points.map(([cx, cy], i) => {
         const value = name ? Number(normalized[i].values?.[name] ?? 0) : normalized[i].value ?? 0;
         const label = `${name ? `${name} ` : ""}${normalized[i].label ?? ""}: ${fmt(value, options)}`;
-        return `<circle ${markAttrs(label, options)} cx="${round(cx)}" cy="${round(cy)}" r="3"><title>${esc(label)}</title></circle>`;
+        return `<circle ${markAttrs(label, options, { index: i, value, series: name ?? void 0 })} cx="${round(cx)}" cy="${round(cy)}" r="3"><title>${esc(label)}</title></circle>`;
       }).join("");
       return `${fill}${line}${marks}`;
     };
@@ -587,7 +628,7 @@ var BatoiUIF = (() => {
     const plot = margins(options);
     const normalized = normalizeData(data, options);
     const series = inferSeries(normalized, options);
-    const palette = options.palette ?? defaultPalette;
+    const palette = paletteFor(options);
     const values = series.length && mode === "stacked-bar" ? normalized.flatMap((d) => {
       let positive = 0;
       let negative = 0;
@@ -622,7 +663,7 @@ var BatoiUIF = (() => {
           const w = band * 0.64;
           const h = Math.abs(y1 - y0);
           const label2 = `${d.label ?? ""} ${key}: ${fmt(value2, options)}`;
-          return `<rect ${markAttrs(label2, options)} data-uif-series="${esc(key)}" x="${round(x2)}" y="${round(Math.min(y0, y1))}" width="${round(w)}" height="${round(h)}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc(label2)}</title></rect>`;
+          return `<rect ${markAttrs(label2, options, { index: i, value: value2, series: key })} x="${round(x2)}" y="${round(Math.min(y0, y1))}" width="${round(w)}" height="${round(h)}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc(label2)}</title></rect>`;
         }).join("");
       }
       if (series.length && mode === "grouped-bar") {
@@ -632,7 +673,7 @@ var BatoiUIF = (() => {
           const y2 = yScale(value2);
           const x2 = plot.left + i * band + band * 0.14 + s * inner;
           const label2 = `${d.label ?? ""} ${key}: ${fmt(value2, options)}`;
-          return `<rect ${markAttrs(label2, options)} data-uif-series="${esc(key)}" x="${round(x2)}" y="${round(Math.min(y2, zeroY))}" width="${round(inner * 0.86)}" height="${round(Math.abs(zeroY - y2))}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc(label2)}</title></rect>`;
+          return `<rect ${markAttrs(label2, options, { index: i, value: value2, series: key })} x="${round(x2)}" y="${round(Math.min(y2, zeroY))}" width="${round(inner * 0.86)}" height="${round(Math.abs(zeroY - y2))}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc(label2)}</title></rect>`;
         }).join("");
       }
       const value = d.value ?? 0;
@@ -640,11 +681,11 @@ var BatoiUIF = (() => {
       if (!vertical) {
         const x2 = xScale(value);
         const y2 = plot.top + i * band + band * 0.18;
-        return `<rect ${markAttrs(label, options)} x="${round(Math.min(x2, zeroX))}" y="${round(y2)}" width="${round(Math.abs(x2 - zeroX))}" height="${round(band * 0.64)}" rx="3"><title>${esc(label)}</title></rect>`;
+        return `<rect ${markAttrs(label, options, { index: i, value })} x="${round(Math.min(x2, zeroX))}" y="${round(y2)}" width="${round(Math.abs(x2 - zeroX))}" height="${round(band * 0.64)}" rx="3"><title>${esc(label)}</title></rect>`;
       }
       const y = yScale(value);
       const x = plot.left + i * band + band * 0.18;
-      return `<rect ${markAttrs(label, options)} x="${round(x)}" y="${round(Math.min(y, zeroY))}" width="${round(band * 0.64)}" height="${round(Math.abs(zeroY - y))}" rx="3"><title>${esc(label)}</title></rect>`;
+      return `<rect ${markAttrs(label, options, { index: i, value })} x="${round(x)}" y="${round(Math.min(y, zeroY))}" width="${round(band * 0.64)}" height="${round(Math.abs(zeroY - y))}" rx="3"><title>${esc(label)}</title></rect>`;
     }).join("");
     const labels = options.axes === false ? "" : normalized.map(
       (d, i) => vertical ? `<text class="uif-chart-axis-label" x="${round(plot.left + i * band + band / 2)}" y="${height - 8}" text-anchor="middle">${esc(d.label)}</text>` : `<text class="uif-chart-axis-label" x="${plot.left - 8}" y="${round(plot.top + i * band + band / 2 + 4)}" text-anchor="end">${esc(d.label)}</text>`
@@ -656,7 +697,7 @@ var BatoiUIF = (() => {
     const width = options.width ?? 180;
     const height = options.height ?? 180;
     const normalized = normalizeData(data, options).filter((d) => (d.value ?? 0) > 0);
-    const palette = options.palette ?? defaultPalette;
+    const palette = paletteFor(options);
     const total = normalized.reduce((sum, d) => sum + (d.value ?? 0), 0);
     if (!total) return `<div class="uif-chart-state" data-uif-state="empty">${esc(options.description || "No positive values to chart")}</div>`;
     const radius = Math.min(width, height) / 2 - 10;
@@ -666,7 +707,7 @@ var BatoiUIF = (() => {
       const next = angle + (d.value ?? 0) / total * Math.PI * 2;
       const label = `${d.label ?? ""}: ${fmt(d.value ?? 0, options)}`;
       const fill = d.color || palette[i % palette.length];
-      const path = normalized.length === 1 && !donut ? `<circle ${markAttrs(label, options)} cx="${width / 2}" cy="${height / 2}" r="${radius}" style="fill:${fill}"><title>${esc(label)}</title></circle>` : `<path ${markAttrs(label, options)} d="${normalized.length === 1 && donut ? fullDonutPath(width / 2, height / 2, radius, inner) : arcPath(width / 2, height / 2, radius, angle, next, inner)}" ${normalized.length === 1 && donut ? 'fill-rule="evenodd" ' : ""}style="fill:${fill}"><title>${esc(label)}</title></path>`;
+      const path = normalized.length === 1 && !donut ? `<circle ${markAttrs(label, options, { index: i, value: d.value ?? 0 })} cx="${width / 2}" cy="${height / 2}" r="${radius}" style="fill:${fill}"><title>${esc(label)}</title></circle>` : `<path ${markAttrs(label, options, { index: i, value: d.value ?? 0 })} d="${normalized.length === 1 && donut ? fullDonutPath(width / 2, height / 2, radius, inner) : arcPath(width / 2, height / 2, radius, angle, next, inner)}" ${normalized.length === 1 && donut ? 'fill-rule="evenodd" ' : ""}style="fill:${fill}"><title>${esc(label)}</title></path>`;
       angle = next;
       return path;
     }).join("");
@@ -683,7 +724,7 @@ var BatoiUIF = (() => {
     const values = series.length ? normalized.flatMap((d) => series.map((key) => Number(d.values?.[key] ?? 0))) : normalized.map((d) => d.value ?? 0);
     const max = options.max ?? Math.max(1, ...values);
     const min = options.min ?? 0;
-    const palette = options.palette ?? defaultPalette;
+    const palette = paletteFor(options);
     const cx = width / 2;
     const cy = height / 2;
     const radius = Math.min(width, height) / 2 - 34;
@@ -738,7 +779,7 @@ var BatoiUIF = (() => {
     const datum = normalizeData(data, options)[0];
     const max = options.max ?? datum?.max ?? 100;
     const x = scaleLinear([0, max], [24, width - 18]);
-    const value = datum?.value ?? 0;
+    const value = Math.max(0, Math.min(max || 0, datum?.value ?? 0));
     const target = datum?.target ?? max;
     const content = `<rect class="uif-chart-range" x="24" y="24" width="${width - 42}" height="18"></rect><rect class="uif-chart-value-bar" x="24" y="24" width="${round(x(value) - 24)}" height="18"></rect><line class="uif-chart-target" x1="${round(x(target))}" y1="18" x2="${round(x(target))}" y2="48"></line><text class="uif-chart-axis-label" x="24" y="62">${esc(datum?.label ?? "")}</text>`;
     return svgWrap("bullet", width, height, content, [datum], options);
@@ -755,7 +796,7 @@ var BatoiUIF = (() => {
       const x = 10 + i % cols * cell;
       const y = 10 + Math.floor(i / cols) * cell;
       const label = `${d.label ?? ""}: ${fmt(d.value ?? 0, options)}`;
-      return `<rect ${markAttrs(label, options)} x="${round(x)}" y="${round(y)}" width="${round(cell - 3)}" height="${round(cell - 3)}" rx="3" style="opacity:${round(opacity)}"><title>${esc(label)}</title></rect>`;
+      return `<rect ${markAttrs(label, options, { index: i, value: d.value ?? 0 })} x="${round(x)}" y="${round(y)}" width="${round(cell - 3)}" height="${round(cell - 3)}" rx="3" style="opacity:${round(opacity)}"><title>${esc(label)}</title></rect>`;
     }).join("");
     return svgWrap("heatmap", width, height, cells, normalized, options);
   }
@@ -773,12 +814,12 @@ var BatoiUIF = (() => {
       const body = `${axisAndGrid(width, height, plot, [0, Math.max(1, ...bins.map((bin) => bin.count))], options)}<polyline class="uif-chart-series uif-chart-line" points="${pointString(points)}" fill="none"></polyline>`;
       return svgWrap("distribution", width, height, body, normalized, { ...options, description: options.description || "Binned distribution line" });
     }
-    const bars = bins.map((bin) => {
+    const bars = bins.map((bin, binIndex) => {
       const x0 = x(bin.x0);
       const x1 = x(bin.x1);
       const yy = y(bin.count);
       const label = `${fmt(bin.x0, options)}-${fmt(bin.x1, options)}: ${bin.count}`;
-      return `<rect ${markAttrs(label, options)} x="${round(x0 + 1)}" y="${round(yy)}" width="${round(Math.max(1, x1 - x0 - 2))}" height="${round(height - plot.bottom - yy)}" rx="2"><title>${esc(label)}</title></rect>`;
+      return `<rect ${markAttrs(label, options, { index: binIndex, value: bin.count })} x="${round(x0 + 1)}" y="${round(yy)}" width="${round(Math.max(1, x1 - x0 - 2))}" height="${round(height - plot.bottom - yy)}" rx="2"><title>${esc(label)}</title></rect>`;
     }).join("");
     return svgWrap("histogram", width, height, `${axisAndGrid(width, height, plot, [0, Math.max(1, ...bins.map((bin) => bin.count))], options)}${bars}`, normalized, options);
   }
@@ -794,7 +835,7 @@ var BatoiUIF = (() => {
     const cy = (height - plot.bottom + plot.top) / 2;
     const boxTop = cy - 22;
     const boxHeight = 44;
-    const content = `${verticalValueGrid(width, height, plot, domain, options)}<line class="uif-chart-grid" x1="${round(x(stats.min))}" y1="${cy}" x2="${round(x(stats.max))}" y2="${cy}"></line><rect ${markAttrs(`Q1 ${fmt(stats.q1, options)} to Q3 ${fmt(stats.q3, options)}`, options).replace('class="uif-chart-mark"', 'class="uif-chart-mark uif-chart-box"')} x="${round(x(stats.q1))}" y="${boxTop}" width="${round(Math.max(1, x(stats.q3) - x(stats.q1)))}" height="${boxHeight}" rx="3"><title>Q1 ${esc(fmt(stats.q1, options))}, median ${esc(fmt(stats.median, options))}, Q3 ${esc(fmt(stats.q3, options))}</title></rect><line class="uif-chart-target" x1="${round(x(stats.median))}" y1="${boxTop - 4}" x2="${round(x(stats.median))}" y2="${boxTop + boxHeight + 4}"></line><line class="uif-chart-target" x1="${round(x(stats.min))}" y1="${cy - 14}" x2="${round(x(stats.min))}" y2="${cy + 14}"></line><line class="uif-chart-target" x1="${round(x(stats.max))}" y1="${cy - 14}" x2="${round(x(stats.max))}" y2="${cy + 14}"></line>`;
+    const content = `${verticalValueGrid(width, height, plot, domain, options)}<line class="uif-chart-grid" x1="${round(x(stats.min))}" y1="${cy}" x2="${round(x(stats.max))}" y2="${cy}"></line><rect ${markAttrs(`Q1 ${fmt(stats.q1, options)} to Q3 ${fmt(stats.q3, options)}`, options, { value: stats.median }).replace('class="uif-chart-mark"', 'class="uif-chart-mark uif-chart-box"')} x="${round(x(stats.q1))}" y="${boxTop}" width="${round(Math.max(1, x(stats.q3) - x(stats.q1)))}" height="${boxHeight}" rx="3"><title>Q1 ${esc(fmt(stats.q1, options))}, median ${esc(fmt(stats.median, options))}, Q3 ${esc(fmt(stats.q3, options))}</title></rect><line class="uif-chart-target" x1="${round(x(stats.median))}" y1="${boxTop - 4}" x2="${round(x(stats.median))}" y2="${boxTop + boxHeight + 4}"></line><line class="uif-chart-target" x1="${round(x(stats.min))}" y1="${cy - 14}" x2="${round(x(stats.min))}" y2="${cy + 14}"></line><line class="uif-chart-target" x1="${round(x(stats.max))}" y1="${cy - 14}" x2="${round(x(stats.max))}" y2="${cy + 14}"></line>`;
     return svgWrap("box-plot", width, height, content, normalized, { ...options, description: options.description || `Median ${fmt(stats.median, options)}, IQR ${fmt(stats.iqr, options)}` });
   }
   function pointsFromData(data, options) {
@@ -816,7 +857,7 @@ var BatoiUIF = (() => {
     const y = scaleLinear(yDomain, [height - plot.bottom, plot.top]);
     const marks = points.map((point, index) => {
       const label = `${normalized[index]?.label || `Point ${index + 1}`}: ${fmt(point.x, options)}, ${fmt(point.y, options)}`;
-      return `<circle ${markAttrs(label, options)} cx="${round(x(point.x))}" cy="${round(y(point.y))}" r="4"><title>${esc(label)}</title></circle>`;
+      return `<circle ${markAttrs(label, options, { index, value: point.y })} cx="${round(x(point.x))}" cy="${round(y(point.y))}" r="4"><title>${esc(label)}</title></circle>`;
     }).join("");
     const reg = options.regression || forceRegression ? linearRegression(points) : null;
     const line = reg ? `<line class="uif-chart-regression" x1="${round(x(xDomain[0]))}" y1="${round(y(reg.predict(xDomain[0])))}" x2="${round(x(xDomain[1]))}" y2="${round(y(reg.predict(xDomain[1])))}"><title>y = ${esc(fmt(reg.slope, options))}x + ${esc(fmt(reg.intercept, options))}, R2 ${esc(fmt(reg.r2, options))}</title></line>` : "";
@@ -825,15 +866,30 @@ var BatoiUIF = (() => {
   function renderControlChart(data, options) {
     const normalized = normalizeData(data, options);
     const stats = summaryStats(normalized.map((d) => d.value ?? 0));
+    if (!stats.count) return `<div class="uif-chart-state" data-uif-state="empty">${esc(options.description || "No data")}</div>`;
+    const width = options.width ?? 360;
+    const height = options.height ?? 200;
+    const plot = margins(options);
     const sigma = stats.stddev || 1;
     const min = Math.min(stats.min, stats.mean - sigma * 3);
     const max = Math.max(stats.max, stats.mean + sigma * 3);
+    const domain = extent([min, max], options);
     const referenceLines = [stats.mean, stats.mean + sigma * 3, stats.mean - sigma * 3];
-    const html = renderLineLike(normalized, { ...options, min, max, description: options.description || "Control chart with mean and three sigma limits" });
-    return html.replace(
-      "</svg>",
-      `${referenceLines.map((value, index) => `<line class="uif-chart-reference ${index === 0 ? "uif-chart-mean" : ""}" x1="42" y1="${round(scaleLinear([min, max], [(options.height ?? 200) - margins(options).bottom, margins(options).top])(value))}" x2="${(options.width ?? 360) - margins(options).right}" y2="${round(scaleLinear([min, max], [(options.height ?? 200) - margins(options).bottom, margins(options).top])(value))}"><title>${index === 0 ? "Mean" : "Control limit"} ${esc(fmt(value, options))}</title></line>`).join("")}</svg>`
-    );
+    const y = scaleLinear(domain, [height - plot.bottom, plot.top]);
+    const xStep = normalized.length > 1 ? (width - plot.left - plot.right) / (normalized.length - 1) : 0;
+    const points = normalized.map((d, i) => [plot.left + i * xStep, y(d.value ?? 0)]);
+    const line = `<polyline class="uif-chart-series uif-chart-line" data-uif-series="value" points="${pointString(points)}" fill="none"></polyline>`;
+    const marks = points.map(([cx, cy], i) => {
+      const value = normalized[i].value ?? 0;
+      const label = `${normalized[i].label ?? ""}: ${fmt(value, options)}`;
+      return `<circle ${markAttrs(label, options, { index: i, value })} cx="${round(cx)}" cy="${round(cy)}" r="3"><title>${esc(label)}</title></circle>`;
+    }).join("");
+    const refs = referenceLines.map((value, index) => {
+      const yy = round(y(value));
+      return `<line class="uif-chart-reference ${index === 0 ? "uif-chart-mean" : ""}" x1="${plot.left}" y1="${yy}" x2="${width - plot.right}" y2="${yy}"><title>${index === 0 ? "Mean" : "Control limit"} ${esc(fmt(value, options))}</title></line>`;
+    }).join("");
+    const body = `${axisAndGrid(width, height, plot, domain, options)}${refs}${line}${marks}`;
+    return svgWrap("control-chart", width, height, body, normalized, { ...options, description: options.description || "Control chart with mean and three sigma limits" });
   }
   function renderPareto(data, options) {
     const sorted = normalizeData(data, options).sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
@@ -946,7 +1002,10 @@ var BatoiUIF = (() => {
       x: el.dataset.uifX || parsed.x,
       y: el.dataset.uifY || parsed.y,
       label: el.dataset.uifLabel || parsed.label,
-      id: el.dataset.uifId || parsed.id || `instance-${++chartIdCounter}`,
+      id: el.dataset.uifId || parsed.id || (el.dataset.uifChartInstanceId ||= `instance-${++chartIdCounter}`),
+      palette: el.dataset.uifPalette || parsed.palette,
+      table: el.dataset.uifChartTable === "sr-only" ? "sr-only" : el.dataset.uifChartTable != null ? el.dataset.uifChartTable !== "false" : parsed.table,
+      drilldown: parsed.drilldown || Boolean(el.dataset.uifDrilldown || el.dataset.uifDrilldownTarget || el.dataset.uifDrilldownUrl),
       series: el.dataset.uifSeries ? el.dataset.uifSeries.split(",").map((item) => item.trim()).filter(Boolean) : parsed.series
     };
   }
@@ -955,6 +1014,60 @@ var BatoiUIF = (() => {
     const width = Math.round(el.getBoundingClientRect().width || el.clientWidth || 0);
     if (!width) return options;
     return { ...options, width, height: options.height ?? Math.round(width / (options.aspectRatio || 1.8)) };
+  }
+  function chartDrilldownOptions(el, options) {
+    if (!options.drilldown && !el.dataset.uifDrilldown && !el.dataset.uifDrilldownTarget && !el.dataset.uifDrilldownUrl) return null;
+    const configured = typeof options.drilldown === "object" ? options.drilldown : {};
+    return {
+      ...configured,
+      action: el.dataset.uifDrilldown || configured.action || (el.dataset.uifDrilldownTarget ? "target" : el.dataset.uifDrilldownUrl ? "url" : "event"),
+      target: el.dataset.uifDrilldownTarget || configured.target,
+      url: el.dataset.uifDrilldownUrl || configured.url,
+      param: el.dataset.uifDrilldownParam || configured.param || "label"
+    };
+  }
+  function buildSelectionDetail(target, data, options) {
+    const indexRaw = target.getAttribute("data-uif-chart-index");
+    const index = indexRaw == null ? void 0 : Number(indexRaw);
+    const datum = index != null && Number.isInteger(index) ? data[index] : data.find((item) => String(item.label ?? "") && target.getAttribute("data-uif-chart-label")?.startsWith(String(item.label)));
+    const valueRaw = target.getAttribute("data-uif-chart-value");
+    const value = valueRaw == null ? datum ? valueOf(datum, options) : void 0 : Number(valueRaw);
+    const label = target.getAttribute("data-uif-chart-label") || target.getAttribute("aria-label") || String(datum?.label ?? "");
+    const series = target.getAttribute("data-uif-series") || void 0;
+    const params = {
+      label,
+      type: options.type ?? "bar"
+    };
+    if (index != null && Number.isFinite(index)) params.index = String(index);
+    if (value != null && Number.isFinite(value)) params.value = String(value);
+    if (series) params.series = series;
+    if (datum?.label != null) params.datumLabel = String(datum.label);
+    return { label, value: Number.isFinite(value) ? value : void 0, index, series, type: options.type ?? "bar", datum, params };
+  }
+  function resolveDrilldownUrl(url, detail, param) {
+    const resolved = url.replace(/\{([a-zA-Z0-9_.-]+)\}/g, (_, key) => encodeURIComponent(detail.params[key] ?? String(detail.datum?.[key] ?? "")));
+    const parsed = new URL(resolved, window.location.href);
+    if (!url.includes("{")) parsed.searchParams.set(param, detail.params[param] ?? detail.label);
+    return parsed.toString();
+  }
+  async function runDrilldown(el, detail, options) {
+    el.dispatchEvent(new CustomEvent("uif:chart-drilldown", { detail: { ...detail, drilldown: options }, bubbles: true }));
+    if (options.action === "event") return;
+    if (options.action === "route" || options.action === "url" && !options.target) {
+      if (options.url) window.location.assign(resolveDrilldownUrl(options.url, detail, options.param || "label"));
+      return;
+    }
+    if (!options.target || !options.url) return;
+    const target = document.querySelector(options.target);
+    if (!target) return;
+    target.dataset.uifState = "loading";
+    try {
+      target.innerHTML = await request(resolveDrilldownUrl(options.url, detail, options.param || "label"), { method: "GET", parseAs: "text" });
+      target.dataset.uifState = "loaded";
+    } catch (error) {
+      target.dataset.uifState = "error";
+      el.dispatchEvent(new CustomEvent("uif:chart-drilldown-error", { detail: { error, selection: detail, drilldown: options }, bubbles: true }));
+    }
   }
   function initChart(el) {
     controllers2.get(el)?.destroy();
@@ -989,19 +1102,27 @@ var BatoiUIF = (() => {
       const target = event.target instanceof Element ? event.target.closest(".uif-chart-mark") : null;
       if (!target) return;
       if (event instanceof KeyboardEvent && !["Enter", " "].includes(event.key)) return;
+      if (event instanceof KeyboardEvent) event.preventDefault();
+      const detail = buildSelectionDetail(target, data, options);
       el.dispatchEvent(
         new CustomEvent("uif:chart-select", {
-          detail: {
-            label: target.getAttribute("data-uif-chart-label") || target.getAttribute("aria-label") || "",
-            series: target.getAttribute("data-uif-series") || void 0,
-            type: options.type ?? "bar"
-          },
+          detail,
           bubbles: true
         })
       );
+      const drilldown = chartDrilldownOptions(el, options);
+      if (drilldown) void runDrilldown(el, detail, drilldown);
+    };
+    const announceMark = (event) => {
+      const target = event.target instanceof Element ? event.target.closest(".uif-chart-mark") : null;
+      if (!target) return;
+      const name = event.type === "focusin" ? "uif:chart-focus" : "uif:chart-hover";
+      el.dispatchEvent(new CustomEvent(name, { detail: buildSelectionDetail(target, data, options), bubbles: true }));
     };
     el.addEventListener("click", select);
     el.addEventListener("keydown", select);
+    el.addEventListener("focusin", announceMark);
+    el.addEventListener("mouseover", announceMark);
     const controller = {
       refresh,
       destroy() {
@@ -1010,6 +1131,8 @@ var BatoiUIF = (() => {
         if (resizeTimer) window.clearTimeout(resizeTimer);
         el.removeEventListener("click", select);
         el.removeEventListener("keydown", select);
+        el.removeEventListener("focusin", announceMark);
+        el.removeEventListener("mouseover", announceMark);
         controllers2.delete(el);
       }
     };
@@ -1023,9 +1146,140 @@ var BatoiUIF = (() => {
   function destroyChart(el) {
     controllers2.get(el)?.destroy();
   }
+  function csvCell(value) {
+    return JSON.stringify(value ?? "");
+  }
+  function chartSvgFrom(target) {
+    return target instanceof SVGSVGElement ? target : target.querySelector("svg");
+  }
+  function svgSize(svg) {
+    const viewBox = svg.getAttribute("viewBox")?.split(/\s+/).map(Number) ?? [];
+    const rect = svg.getBoundingClientRect();
+    return {
+      width: Number(svg.getAttribute("width")) || viewBox[2] || rect.width || 360,
+      height: Number(svg.getAttribute("height")) || viewBox[3] || rect.height || 220
+    };
+  }
+  function inlineSvgStyles(svg) {
+    const clone = svg.cloneNode(true);
+    const sourceElements = [svg, ...Array.from(svg.querySelectorAll("*"))];
+    const cloneElements = [clone, ...Array.from(clone.querySelectorAll("*"))];
+    sourceElements.forEach((source, index) => {
+      const target = cloneElements[index];
+      if (!target || typeof window === "undefined" || !window.getComputedStyle) return;
+      const style = window.getComputedStyle(source);
+      const properties = ["fill", "stroke", "stroke-width", "stroke-dasharray", "opacity", "font-family", "font-size", "font-weight", "text-anchor"];
+      const inline = properties.map((property) => `${property}:${style.getPropertyValue(property)}`).join(";");
+      target.setAttribute("style", `${target.getAttribute("style") || ""};${inline}`);
+    });
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    if (!clone.getAttribute("width")) {
+      const { width } = svgSize(svg);
+      clone.setAttribute("width", String(Math.round(width)));
+    }
+    if (!clone.getAttribute("height")) {
+      const { height } = svgSize(svg);
+      clone.setAttribute("height", String(Math.round(height)));
+    }
+    return clone;
+  }
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+  function exportChartSvg(target) {
+    const svg = chartSvgFrom(target);
+    if (!svg) return "";
+    const serialized = new XMLSerializer().serializeToString(inlineSvgStyles(svg));
+    return serialized.startsWith("<?xml") ? serialized : `<?xml version="1.0" encoding="UTF-8"?>
+${serialized}`;
+  }
+  function downloadChartSvg(target, filename = "chart.svg") {
+    const svg = exportChartSvg(target);
+    if (!svg) return;
+    downloadBlob(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }), filename);
+  }
+  async function exportChartPng(target, options = {}) {
+    const svg = chartSvgFrom(target);
+    if (!svg) throw new Error("No chart SVG found");
+    const source = exportChartSvg(svg);
+    const size = svgSize(svg);
+    const width = options.width ?? size.width;
+    const height = options.height ?? size.height;
+    const scale = options.scale ?? 2;
+    const image = new Image();
+    const svgUrl = URL.createObjectURL(new Blob([source], { type: "image/svg+xml;charset=utf-8" }));
+    try {
+      await new Promise((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error("Unable to render chart SVG"));
+        image.src = svgUrl;
+      });
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(width * scale));
+      canvas.height = Math.max(1, Math.round(height * scale));
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Canvas is not available");
+      if (options.background) {
+        context.fillStyle = options.background;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      return await new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Unable to export chart PNG")), "image/png");
+      });
+    } finally {
+      URL.revokeObjectURL(svgUrl);
+    }
+  }
+  async function downloadChartPng(target, filename = "chart.png", options = {}) {
+    downloadBlob(await exportChartPng(target, options), filename);
+  }
+  function bindChartExports(root = document) {
+    exportBindings.get(root)?.();
+    const onClick = (event) => {
+      const button2 = event.target instanceof Element ? event.target.closest("[data-uif-chart-export]") : null;
+      if (!button2) return;
+      const format = button2.dataset.uifChartExport || "svg";
+      const targetSelector = button2.dataset.uifChartTarget || button2.getAttribute("aria-controls");
+      const target = targetSelector ? root.querySelector(targetSelector) : button2.closest("[data-uif-chart-host], .uif-card, article")?.querySelector('[data-uif="chart"]');
+      if (!target) return;
+      const filename = button2.dataset.uifFilename || `chart.${format}`;
+      if (format === "svg") downloadChartSvg(target, filename.endsWith(".svg") ? filename : `${filename}.svg`);
+      if (format === "png") void downloadChartPng(target, filename.endsWith(".png") ? filename : `${filename}.png`, { background: button2.dataset.uifBackground || void 0 });
+      if (format === "csv") {
+        const data = parseChartData(target);
+        downloadBlob(new Blob([exportChartData(data, "csv")], { type: "text/csv;charset=utf-8" }), filename.endsWith(".csv") ? filename : `${filename}.csv`);
+      }
+      button2.dispatchEvent(new CustomEvent("uif:chart-export", { detail: { format, target }, bubbles: true }));
+    };
+    root.addEventListener("click", onClick);
+    const dispose = () => {
+      root.removeEventListener("click", onClick);
+      exportBindings.delete(root);
+    };
+    exportBindings.set(root, dispose);
+    return dispose;
+  }
   function exportChartData(data, format = "json") {
-    if (format === "csv") {
-      return ["label,value", ...data.map((d) => `${JSON.stringify(d.label ?? "")},${d.value ?? ""}`)].join("\n");
+    if (format === "csv" || format === "tsv") {
+      const delimiter = format === "tsv" ? "	" : ",";
+      const series = [...new Set(data.flatMap((d) => Object.keys(d.values ?? {})))];
+      const extra = [...new Set(data.flatMap((d) => Object.keys(d).filter((key) => !["label", "value", "values"].includes(key) && typeof d[key] !== "object")))];
+      const headers = ["label", "value", ...series, ...extra];
+      const rows2 = data.map(
+        (d) => headers.map((key) => {
+          const value = key in (d.values ?? {}) ? d.values?.[key] : d[key];
+          return format === "tsv" ? String(value ?? "").replace(/\t/g, " ") : csvCell(value);
+        }).join(delimiter)
+      );
+      return [headers.join(delimiter), ...rows2].join("\n");
     }
     return JSON.stringify(data);
   }
@@ -3343,13 +3597,17 @@ var BatoiUIF = (() => {
     const notify2 = (path) => {
       if (storage && options.key) storage.setItem(options.key, JSON.stringify(state));
       subscribers.get(path)?.forEach((fn) => fn(getByPath(state, path)));
-      subscribers.get("*")?.forEach((fn) => fn(state));
+      if (path !== "*") subscribers.get("*")?.forEach((fn) => fn(state));
     };
     const nextState = () => options.immutable ? structuredClone(state) : state;
-    return {
+    const api = {
       get(path) {
         if (path && options.computed?.[path]) return options.computed[path](state);
         return path ? getByPath(state, path) : state;
+      },
+      replace(next) {
+        state = structuredClone(next);
+        notify2("*");
       },
       set(path, value) {
         state = nextState();
@@ -3398,6 +3656,74 @@ var BatoiUIF = (() => {
         subscribers.clear();
       }
     };
+    return api;
+  }
+  function createMicroAppStore(initialState, options = {}) {
+    const base = createAdvancedStore(initialState, { ...options, immutable: true });
+    const historyLimit = Math.max(1, options.historyLimit ?? 50);
+    const past = [];
+    const future = [];
+    const snapshot = () => structuredClone(base.get());
+    const remember = () => {
+      past.push(snapshot());
+      if (past.length > historyLimit) past.shift();
+      future.length = 0;
+    };
+    return {
+      ...base,
+      set(path, value) {
+        remember();
+        base.set(path, value);
+      },
+      update(path, updater) {
+        remember();
+        base.set(path, updater(base.get(path)));
+      },
+      push(path, value) {
+        remember();
+        base.push(path, value);
+      },
+      removeAt(path, index) {
+        remember();
+        base.removeAt(path, index);
+      },
+      reset() {
+        remember();
+        base.replace(structuredClone(initialState));
+      },
+      exportJSON(space = 2) {
+        return JSON.stringify(base.get(), null, space);
+      },
+      importJSON(json) {
+        const parsed = JSON.parse(json);
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Micro App state must be a JSON object");
+        remember();
+        base.replace(parsed);
+      },
+      canUndo() {
+        return past.length > 0;
+      },
+      canRedo() {
+        return future.length > 0;
+      },
+      undo() {
+        const previous = past.pop();
+        if (!previous) return false;
+        future.push(snapshot());
+        base.replace(previous);
+        return true;
+      },
+      redo() {
+        const next = future.pop();
+        if (!next) return false;
+        past.push(snapshot());
+        base.replace(next);
+        return true;
+      }
+    };
+  }
+  function createArtifactStore(initialState, options = {}) {
+    return createMicroAppStore(initialState, options);
   }
 
   // index.ts
@@ -3409,6 +3735,7 @@ var BatoiUIF = (() => {
     root.querySelectorAll('table[data-uif="table"]').forEach((el) => initTable(el));
     root.querySelectorAll('form[data-uif="form"]').forEach((el) => initForm(el));
     root.querySelectorAll('[data-uif="chart"]').forEach((el) => initChart(el));
+    bindChartExports(root);
     root.querySelectorAll('[data-uif="realtime"]').forEach((el) => initRealtime(el));
     root.querySelectorAll('[data-uif="push"]').forEach((el) => initPush(el));
     root.querySelectorAll('[data-uif="mobile-shell"]').forEach((el) => initMobileShell(el));

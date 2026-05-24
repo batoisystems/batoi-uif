@@ -35,6 +35,8 @@ Classic script usage:
 
 For PHP, RAD, and other server-rendered pages, `BatoiUIF.autoStart()` initializes common `data-uif` components, forms, tables, charts, icons, RAD AJAX actions, realtime regions, push controls, mobile shells, AI actions, and MCP approval widgets without a bundler.
 
+The same distribution files can also power **Micro Apps**: self-contained, client-only applications built with static HTML, Batoi UIF CSS/JS, browser APIs, and optional local persistence. Import the ES module from `dist/uif.esm.js`, use `createMicroAppStore()` for local persistence, undo/redo, reset, and JSON import/export, and render charts/icons/components directly in static HTML.
+
 ## Positioning
 
 Batoi UIF is not a Bootstrap clone, a jQuery replacement, a React/Vue/Angular competitor, a Chart.js replacement, or a native mobile framework.
@@ -158,6 +160,25 @@ Planned application capability packages:
 Supported core chart types include `line`, `area`, `bar`, `horizontal-bar`, `grouped-bar`, `stacked-bar`, `pie`, `donut`, `doughnut`, `radar`, and `sparkline`. Compact app charts include `metric`, `progress`, `ring`, `gauge`, `timeline`, `heatmap`, and `bullet`. Statistical visualizations include `histogram`, `box-plot`, `scatter`, `regression`, `control-chart`, `distribution`, and `pareto`, backed by dependency-free helpers such as `summaryStats()`, `histogramBins()`, `movingAverage()`, `linearRegression()`, and `correlation()`.
 
 Open `examples/index.html` for a landing page that links to every bundled example. See `examples/chart-gallery/` for one declarative example of every supported chart type. See `examples/professional-showcase/` for a richer product-grade app surface with a fixed shell, KPI dashboard, CRM pipeline, governed AI approval desk, mobile field console, RAD admin table, and statistical analytics using the same lean JS/CSS library.
+
+### Micro App
+
+```html
+<link rel="stylesheet" href="./dist/uif.css">
+<script type="module">
+  import { createMicroAppStore, initChart, mountIcons } from './dist/uif.esm.js';
+
+  const store = createMicroAppStore(
+    { tasks: [{ label: 'Ship demo', done: false }] },
+    { persist: 'local', key: 'demo-micro-app' }
+  );
+
+  store.push('tasks', { label: 'Export JSON', done: false });
+  console.log(store.exportJSON());
+</script>
+```
+
+See `examples/micro-app-dashboard/` for a copy-ready static Micro App with local persistence, undo/redo, reset, JSON import/export, icons, and charts.
 
 ### Dependency-free SVG icon
 

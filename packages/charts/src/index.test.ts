@@ -13,6 +13,7 @@ import {
   summaryStats,
   zScores,
   exportChartData,
+  exportChartSvg,
 } from './index.js';
 
 describe('charts', () => {
@@ -99,13 +100,47 @@ describe('charts', () => {
     expect(stacked).toContain('Loss: -4');
     expect(renderChart([{ label: 'Zero', value: 0 }], { type: 'pie' })).toContain('No positive values');
     expect(renderChart([{ label: 'Only', value: 10 }], { type: 'donut' })).toContain('fill-rule="evenodd"');
+    expect(renderChart([{ label: 'Zero', value: 0, max: 0 }], { type: 'bullet' })).toContain('width="0"');
+  });
+
+  it('handles invalid values explicitly', () => {
+    const skipped = renderChart(
+      [
+        { label: 'Good', value: 12 },
+        { label: 'Bad', value: 'n/a' as unknown as number },
+      ],
+      { type: 'bar', invalidValue: 'skip' },
+    );
+    expect(skipped).toContain('Good');
+    expect(skipped).not.toContain('Bad');
+    expect(() => renderChart([{ label: 'Bad', value: 'n/a' as unknown as number }], { type: 'bar', invalidValue: 'error' })).toThrow('Invalid chart value');
+  });
+
+  it('renders control chart reference lines in the actual plot geometry', () => {
+    const html = renderChart(
+      [
+        { label: 'A', value: 10 },
+        { label: 'B', value: 12 },
+      ],
+      { type: 'control-chart', width: 520, height: 260, margin: { left: 60, right: 30 } },
+    );
+    expect(html).toContain('x1="60"');
+    expect(html).toContain('x2="490"');
+    expect(html).toContain('uif-chart-reference');
   });
 
   it('adds accessible title and description ids', () => {
-    const html = renderChart([{ label: 'Jan', value: 10 }], { type: 'bar', label: 'Bookings', description: 'Monthly bookings' });
+    const html = renderChart([{ label: 'Jan', value: 10 }], { type: 'bar', label: 'Bookings', description: 'Monthly bookings', table: 'sr-only' });
     expect(html).toContain('role="img"');
+    expect(html).toContain('aria-roledescription="chart"');
     expect(html).toContain('Bookings');
     expect(html).toContain('Monthly bookings');
+    expect(html).toContain('uif-chart-data-table uif-sr-only');
+  });
+
+  it('supports named palettes', () => {
+    const html = renderChart([{ label: 'Jan', value: 10 }], { type: 'line', palette: 'professional' });
+    expect(html).toContain('stroke:#0b72bd');
   });
 
   it('adapts table data and exports csv', () => {
@@ -120,9 +155,20 @@ describe('charts', () => {
     expect(adaptTable(table, { seriesColumns: [1, 2] })[0].values).toEqual({ Value: 12, Target: 15 });
     expect(adaptRecords([{ month: 'Jan', revenue: '12' }], { label: 'month', value: 'revenue' })).toEqual([{ month: 'Jan', revenue: '12', label: 'Jan', value: 12, values: undefined }]);
     expect(exportChartData([{ label: 'Jan', value: 12 }], 'csv')).toContain('label,value');
+    expect(exportChartData([{ label: 'Jan', values: { Actual: 12, Target: 15 } }], 'csv')).toContain('Actual,Target');
+    expect(exportChartData([{ label: 'Jan', value: 12 }], 'tsv')).toContain('label\tvalue');
   });
 
-  it('parses data safely and emits chart select events', async () => {
+  it('exports visible chart svg markup', () => {
+    const host = document.createElement('div');
+    host.innerHTML = renderChart([{ label: 'Jan', value: 12 }], { type: 'bar', label: 'Revenue' });
+    const svg = exportChartSvg(host);
+    expect(svg).toContain('<svg');
+    expect(svg).toContain('Revenue');
+    expect(svg).toContain('xmlns="http://www.w3.org/2000/svg"');
+  });
+
+  it('parses data safely and emits chart select and drilldown events', async () => {
     const el = document.createElement('div');
     el.dataset.uifData = '{bad json';
     expect(parseChartData(el)).toEqual([]);
@@ -130,12 +176,25 @@ describe('charts', () => {
     el.dataset.uifData = '[{"label":"Jan","value":12}]';
     el.dataset.uifChart = 'bar';
     el.dataset.uifOptions = '{"focusable":true}';
+    el.dataset.uifPalette = 'professional';
+    el.dataset.uifChartTable = 'sr-only';
+    el.dataset.uifDrilldown = 'event';
     document.body.append(el);
     const event = new Promise<CustomEvent>((resolve) => el.addEventListener('uif:chart-select', (item) => resolve(item as CustomEvent), { once: true }));
+    const drilldown = new Promise<CustomEvent>((resolve) => el.addEventListener('uif:chart-drilldown', (item) => resolve(item as CustomEvent), { once: true }));
+    const focus = new Promise<CustomEvent>((resolve) => el.addEventListener('uif:chart-focus', (item) => resolve(item as CustomEvent), { once: true }));
     const controller = initChart(el);
     await controller.refresh();
-    el.querySelector('.uif-chart-mark')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const firstTitleId = el.querySelector('title')?.id;
+    await controller.refresh();
+    expect(el.querySelector('title')?.id).toBe(firstTitleId);
+    const mark = el.querySelector('.uif-chart-mark');
+    mark?.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    expect((await focus).detail.label).toContain('Jan');
+    mark?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect((await event).detail.label).toContain('Jan');
+    expect((await drilldown).detail.params.value).toBe('12');
+    expect(el.querySelector('.uif-chart-data-table')).toBeTruthy();
     controller.destroy();
     el.remove();
   });

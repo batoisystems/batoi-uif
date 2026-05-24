@@ -1,5 +1,5 @@
 import { renderAIAction } from './packages/ai/src/index.js';
-import { initChart } from './packages/charts/src/index.js';
+import { bindChartExports, initChart } from './packages/charts/src/index.js';
 import { initAll as initComponents } from './packages/components/src/index.js';
 import { initForm } from './packages/forms/src/index.js';
 import { mountIcons } from './packages/icons/src/index.js';
@@ -40,6 +40,7 @@ export function start(root: Document | HTMLElement = document): void {
   root.querySelectorAll<HTMLTableElement>('table[data-uif="table"]').forEach((el) => initTable(el));
   root.querySelectorAll<HTMLFormElement>('form[data-uif="form"]').forEach((el) => initForm(el));
   root.querySelectorAll<HTMLElement>('[data-uif="chart"]').forEach((el) => initChart(el));
+  bindChartExports(root);
   root.querySelectorAll<HTMLElement>('[data-uif="realtime"]').forEach((el) => initRealtime(el));
   root.querySelectorAll<HTMLElement>('[data-uif="push"]').forEach((el) => initPush(el));
   root.querySelectorAll<HTMLElement>('[data-uif="mobile-shell"]').forEach((el) => initMobileShell(el));

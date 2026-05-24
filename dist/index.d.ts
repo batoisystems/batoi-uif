@@ -877,8 +877,13 @@ interface StoreOptions {
     key?: string;
     computed?: Record<string, Computed>;
 }
+interface MicroAppStoreOptions extends StoreOptions {
+    historyLimit?: number;
+}
+type ArtifactStoreOptions = MicroAppStoreOptions;
 declare function createStore<T extends State>(initialState: T): {
     get(path?: string): unknown;
+    replace(next: State): void;
     set(path: string, value: unknown): void;
     update(path: string, updater: (value: unknown) => unknown): void;
     push(path: string, value: unknown): void;
@@ -889,10 +894,47 @@ declare function createStore<T extends State>(initialState: T): {
 };
 declare function createAdvancedStore<T extends State>(initialState: T, options?: StoreOptions): {
     get(path?: string): unknown;
+    replace(next: State): void;
     set(path: string, value: unknown): void;
     update(path: string, updater: (value: unknown) => unknown): void;
     push(path: string, value: unknown): void;
     removeAt(path: string, index: number): void;
+    subscribe(pathOrHandler: string | Subscriber, handler?: Subscriber): () => void;
+    bind(root?: ParentNode): void;
+    destroy(): void;
+};
+declare function createMicroAppStore<T extends State>(initialState: T, options?: MicroAppStoreOptions): {
+    set(path: string, value: unknown): void;
+    update(path: string, updater: (value: unknown) => unknown): void;
+    push(path: string, value: unknown): void;
+    removeAt(path: string, index: number): void;
+    reset(): void;
+    exportJSON(space?: number): string;
+    importJSON(json: string): void;
+    canUndo(): boolean;
+    canRedo(): boolean;
+    undo(): boolean;
+    redo(): boolean;
+    get(path?: string): unknown;
+    replace(next: State): void;
+    subscribe(pathOrHandler: string | Subscriber, handler?: Subscriber): () => void;
+    bind(root?: ParentNode): void;
+    destroy(): void;
+};
+declare function createArtifactStore<T extends State>(initialState: T, options?: ArtifactStoreOptions): {
+    set(path: string, value: unknown): void;
+    update(path: string, updater: (value: unknown) => unknown): void;
+    push(path: string, value: unknown): void;
+    removeAt(path: string, index: number): void;
+    reset(): void;
+    exportJSON(space?: number): string;
+    importJSON(json: string): void;
+    canUndo(): boolean;
+    canRedo(): boolean;
+    undo(): boolean;
+    redo(): boolean;
+    get(path?: string): unknown;
+    replace(next: State): void;
     subscribe(pathOrHandler: string | Subscriber, handler?: Subscriber): () => void;
     bind(root?: ParentNode): void;
     destroy(): void;
@@ -931,14 +973,17 @@ interface ChartOptions {
     axes?: boolean;
     grid?: boolean;
     tooltip?: boolean;
+    table?: boolean | 'sr-only';
     focusable?: boolean;
-    palette?: string[];
+    palette?: string[] | ChartPaletteName;
     formatValue?: (value: number) => string;
+    invalidValue?: 'zero' | 'skip' | 'error';
     min?: number;
     max?: number;
     stacked?: boolean;
     responsive?: boolean;
     exportable?: boolean;
+    drilldown?: boolean | DrilldownOptions;
     sparklineType?: 'line' | 'bar';
     id?: string;
     aspectRatio?: number;
@@ -957,9 +1002,32 @@ interface ChartOptions {
     }>;
     target?: number;
 }
+type ChartPaletteName = 'default' | 'professional' | 'categorical' | 'status' | 'sequential' | 'diverging';
+interface DrilldownOptions {
+    action?: 'event' | 'target' | 'url' | 'route';
+    target?: string;
+    url?: string;
+    param?: string;
+}
 interface ChartController {
     refresh(): Promise<void>;
     destroy(): void;
+}
+interface ChartSelectionDetail {
+    label: string;
+    value?: number;
+    index?: number;
+    series?: string;
+    type: ChartType;
+    datum?: ChartDatum;
+    params: Record<string, string>;
+}
+interface ChartExportOptions {
+    filename?: string;
+    background?: string;
+    scale?: number;
+    width?: number;
+    height?: number;
 }
 interface TableAdapterOptions {
     labelColumn?: number | string;
@@ -1023,7 +1091,12 @@ declare function adaptRecords(records: Array<Record<string, unknown>>, mapping?:
 declare function initChart(el: HTMLElement): ChartController;
 declare function refreshChart(el: HTMLElement): Promise<void>;
 declare function destroyChart(el: HTMLElement): void;
-declare function exportChartData(data: ChartDatum[], format?: 'json' | 'csv'): string;
+declare function exportChartSvg(target: SVGSVGElement | HTMLElement): string;
+declare function downloadChartSvg(target: SVGSVGElement | HTMLElement, filename?: string): void;
+declare function exportChartPng(target: SVGSVGElement | HTMLElement, options?: ChartExportOptions): Promise<Blob>;
+declare function downloadChartPng(target: SVGSVGElement | HTMLElement, filename?: string, options?: ChartExportOptions): Promise<void>;
+declare function bindChartExports(root?: Document | HTMLElement): () => void;
+declare function exportChartData(data: ChartDatum[], format?: 'json' | 'csv' | 'tsv'): string;
 declare const chart: {
     name: string;
     init: (el: HTMLElement) => void;
@@ -1127,4 +1200,4 @@ declare const toolApproval: {
 declare function start(root?: Document | HTMLElement): void;
 declare function autoStart(root?: Document | HTMLElement): void;
 
-export { type ChartController, type ChartDatum, type ChartMargin, type ChartOptions, type ChartType, type ComponentInstance, type EffectOptions, type FormErrors, type HistogramBin, type HistogramOptions, type IconDefinition, type IconName, type IconOptions, type IconRegistry, type MountIconsOptions, type NotificationItem, type OverlayOptions, type QueryHandler, type QueryInput, type RadResponse, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RequestOptions, type RouterOptions, type StoreOptions, type SummaryStats, type SwapMode, type TableAdapterOptions, type TableOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFValue, accordion, adaptRecords, adaptTable, addNotification, aiAction, alert, appendStreamingChunk, applyResponsiveColumns, autoInit, autoStart, badge, bindRadActions, breadcrumb, button, cacheStrategies, cancelRequest, card, chart, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, connect, correlation, createAdvancedStore, createCacheStrategy, createStore, createStreamSurface, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, disconnect, drawer, dropdown, emit, expand, exportChartData, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, fragment, get, getConnectionState, getNotifications, getOverlayStack, getPushSubscription, hasIcon, hide, histogramBins, icon, iconElement, icons, init, initAll, initChart, initComponent, initDeclarativeFilters, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, isInitialized, linearRegression, loadPartial, loadRemoteTable, markNotificationsRead, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseChartData, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queueOfflineTask, ready, realtime, refreshChart, registerAsyncRule, registerComponent, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, rehydrate, renderAIAction, renderAIResultCard, renderAssistantResponse, renderChart, renderDiff, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolTimeline, request, requestNotificationPermission, resolveTarget, selectedRows, serialize, setAccent, setDensity, setTableState, setupInstallPrompt, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, start, stepper, submitForm, subscribe, subscribeToPush, summaryStats, swapContent, table, tabs, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterServiceWorker, unsubscribeFromPush, upload, useRequestInterceptor, useResponseInterceptor, validateField, validateForm, validateFormAsync, wizard, zScores };
+export { type ArtifactStoreOptions, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type DrilldownOptions, type EffectOptions, type FormErrors, type HistogramBin, type HistogramOptions, type IconDefinition, type IconName, type IconOptions, type IconRegistry, type MicroAppStoreOptions, type MountIconsOptions, type NotificationItem, type OverlayOptions, type QueryHandler, type QueryInput, type RadResponse, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RequestOptions, type RouterOptions, type StoreOptions, type SummaryStats, type SwapMode, type TableAdapterOptions, type TableOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFValue, accordion, adaptRecords, adaptTable, addNotification, aiAction, alert, appendStreamingChunk, applyResponsiveColumns, autoInit, autoStart, badge, bindChartExports, bindRadActions, breadcrumb, button, cacheStrategies, cancelRequest, card, chart, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, connect, correlation, createAdvancedStore, createArtifactStore, createCacheStrategy, createMicroAppStore, createStore, createStreamSurface, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, disconnect, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, fragment, get, getConnectionState, getNotifications, getOverlayStack, getPushSubscription, hasIcon, hide, histogramBins, icon, iconElement, icons, init, initAll, initChart, initComponent, initDeclarativeFilters, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, isInitialized, linearRegression, loadPartial, loadRemoteTable, markNotificationsRead, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseChartData, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queueOfflineTask, ready, realtime, refreshChart, registerAsyncRule, registerComponent, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, rehydrate, renderAIAction, renderAIResultCard, renderAssistantResponse, renderChart, renderDiff, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolTimeline, request, requestNotificationPermission, resolveTarget, selectedRows, serialize, setAccent, setDensity, setTableState, setupInstallPrompt, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, start, stepper, submitForm, subscribe, subscribeToPush, summaryStats, swapContent, table, tabs, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterServiceWorker, unsubscribeFromPush, upload, useRequestInterceptor, useResponseInterceptor, validateField, validateForm, validateFormAsync, wizard, zScores };

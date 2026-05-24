@@ -9,6 +9,12 @@ export interface StoreOptions {
   computed?: Record<string, Computed>;
 }
 
+export interface MicroAppStoreOptions extends StoreOptions {
+  historyLimit?: number;
+}
+
+export type ArtifactStoreOptions = MicroAppStoreOptions;
+
 function getByPath(obj: State, path: string): unknown {
   return path.split('.').reduce<unknown>((acc, part) => {
     if (acc && typeof acc === 'object') return (acc as State)[part];
@@ -41,14 +47,18 @@ export function createAdvancedStore<T extends State>(initialState: T, options: S
   const notify = (path: string) => {
     if (storage && options.key) storage.setItem(options.key, JSON.stringify(state));
     subscribers.get(path)?.forEach((fn) => fn(getByPath(state, path)));
-    subscribers.get('*')?.forEach((fn) => fn(state));
+    if (path !== '*') subscribers.get('*')?.forEach((fn) => fn(state));
   };
   const nextState = (): State => (options.immutable ? structuredClone(state) : state);
 
-  return {
+  const api = {
     get(path?: string): unknown {
       if (path && options.computed?.[path]) return options.computed[path](state);
       return path ? getByPath(state, path) : state;
+    },
+    replace(next: State): void {
+      state = structuredClone(next);
+      notify('*');
     },
     set(path: string, value: unknown): void {
       state = nextState();
@@ -97,4 +107,75 @@ export function createAdvancedStore<T extends State>(initialState: T, options: S
       subscribers.clear();
     },
   };
+  return api;
+}
+
+export function createMicroAppStore<T extends State>(initialState: T, options: MicroAppStoreOptions = {}) {
+  const base = createAdvancedStore(initialState, { ...options, immutable: true });
+  const historyLimit = Math.max(1, options.historyLimit ?? 50);
+  const past: State[] = [];
+  const future: State[] = [];
+  const snapshot = () => structuredClone(base.get() as State);
+  const remember = () => {
+    past.push(snapshot());
+    if (past.length > historyLimit) past.shift();
+    future.length = 0;
+  };
+
+  return {
+    ...base,
+    set(path: string, value: unknown): void {
+      remember();
+      base.set(path, value);
+    },
+    update(path: string, updater: (value: unknown) => unknown): void {
+      remember();
+      base.set(path, updater(base.get(path)));
+    },
+    push(path: string, value: unknown): void {
+      remember();
+      base.push(path, value);
+    },
+    removeAt(path: string, index: number): void {
+      remember();
+      base.removeAt(path, index);
+    },
+    reset(): void {
+      remember();
+      base.replace(structuredClone(initialState));
+    },
+    exportJSON(space = 2): string {
+      return JSON.stringify(base.get(), null, space);
+    },
+    importJSON(json: string): void {
+      const parsed = JSON.parse(json) as State;
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Micro App state must be a JSON object');
+      remember();
+      base.replace(parsed);
+    },
+    canUndo(): boolean {
+      return past.length > 0;
+    },
+    canRedo(): boolean {
+      return future.length > 0;
+    },
+    undo(): boolean {
+      const previous = past.pop();
+      if (!previous) return false;
+      future.push(snapshot());
+      base.replace(previous);
+      return true;
+    },
+    redo(): boolean {
+      const next = future.pop();
+      if (!next) return false;
+      past.push(snapshot());
+      base.replace(next);
+      return true;
+    },
+  };
+}
+
+export function createArtifactStore<T extends State>(initialState: T, options: ArtifactStoreOptions = {}) {
+  return createMicroAppStore(initialState, options);
 }

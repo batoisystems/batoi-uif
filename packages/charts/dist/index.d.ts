@@ -31,14 +31,17 @@ interface ChartOptions {
     axes?: boolean;
     grid?: boolean;
     tooltip?: boolean;
+    table?: boolean | 'sr-only';
     focusable?: boolean;
-    palette?: string[];
+    palette?: string[] | ChartPaletteName;
     formatValue?: (value: number) => string;
+    invalidValue?: 'zero' | 'skip' | 'error';
     min?: number;
     max?: number;
     stacked?: boolean;
     responsive?: boolean;
     exportable?: boolean;
+    drilldown?: boolean | DrilldownOptions;
     sparklineType?: 'line' | 'bar';
     id?: string;
     aspectRatio?: number;
@@ -57,9 +60,32 @@ interface ChartOptions {
     }>;
     target?: number;
 }
+type ChartPaletteName = 'default' | 'professional' | 'categorical' | 'status' | 'sequential' | 'diverging';
+interface DrilldownOptions {
+    action?: 'event' | 'target' | 'url' | 'route';
+    target?: string;
+    url?: string;
+    param?: string;
+}
 interface ChartController {
     refresh(): Promise<void>;
     destroy(): void;
+}
+interface ChartSelectionDetail {
+    label: string;
+    value?: number;
+    index?: number;
+    series?: string;
+    type: ChartType;
+    datum?: ChartDatum;
+    params: Record<string, string>;
+}
+interface ChartExportOptions {
+    filename?: string;
+    background?: string;
+    scale?: number;
+    width?: number;
+    height?: number;
 }
 interface TableAdapterOptions {
     labelColumn?: number | string;
@@ -123,11 +149,16 @@ declare function adaptRecords(records: Array<Record<string, unknown>>, mapping?:
 declare function initChart(el: HTMLElement): ChartController;
 declare function refreshChart(el: HTMLElement): Promise<void>;
 declare function destroyChart(el: HTMLElement): void;
-declare function exportChartData(data: ChartDatum[], format?: 'json' | 'csv'): string;
+declare function exportChartSvg(target: SVGSVGElement | HTMLElement): string;
+declare function downloadChartSvg(target: SVGSVGElement | HTMLElement, filename?: string): void;
+declare function exportChartPng(target: SVGSVGElement | HTMLElement, options?: ChartExportOptions): Promise<Blob>;
+declare function downloadChartPng(target: SVGSVGElement | HTMLElement, filename?: string, options?: ChartExportOptions): Promise<void>;
+declare function bindChartExports(root?: Document | HTMLElement): () => void;
+declare function exportChartData(data: ChartDatum[], format?: 'json' | 'csv' | 'tsv'): string;
 declare const chart: {
     name: string;
     init: (el: HTMLElement) => void;
     destroy: typeof destroyChart;
 };
 
-export { type ChartController, type ChartDatum, type ChartMargin, type ChartOptions, type ChartType, type HistogramBin, type HistogramOptions, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type SummaryStats, type TableAdapterOptions, adaptRecords, adaptTable, chart, correlation, cumulativeSum, destroyChart, exportChartData, histogramBins, initChart, linearRegression, movingAverage, parseChartData, percentChange, quantile, refreshChart, renderChart, summaryStats, zScores };
+export { type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type DrilldownOptions, type HistogramBin, type HistogramOptions, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type SummaryStats, type TableAdapterOptions, adaptRecords, adaptTable, bindChartExports, chart, correlation, cumulativeSum, destroyChart, downloadChartPng, downloadChartSvg, exportChartData, exportChartPng, exportChartSvg, histogramBins, initChart, linearRegression, movingAverage, parseChartData, percentChange, quantile, refreshChart, renderChart, summaryStats, zScores };

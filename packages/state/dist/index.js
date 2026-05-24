@@ -27,13 +27,17 @@ function createAdvancedStore(initialState, options = {}) {
   const notify = (path) => {
     if (storage && options.key) storage.setItem(options.key, JSON.stringify(state));
     subscribers.get(path)?.forEach((fn) => fn(getByPath(state, path)));
-    subscribers.get("*")?.forEach((fn) => fn(state));
+    if (path !== "*") subscribers.get("*")?.forEach((fn) => fn(state));
   };
   const nextState = () => options.immutable ? structuredClone(state) : state;
-  return {
+  const api = {
     get(path) {
       if (path && options.computed?.[path]) return options.computed[path](state);
       return path ? getByPath(state, path) : state;
+    },
+    replace(next) {
+      state = structuredClone(next);
+      notify("*");
     },
     set(path, value) {
       state = nextState();
@@ -82,8 +86,78 @@ function createAdvancedStore(initialState, options = {}) {
       subscribers.clear();
     }
   };
+  return api;
+}
+function createMicroAppStore(initialState, options = {}) {
+  const base = createAdvancedStore(initialState, { ...options, immutable: true });
+  const historyLimit = Math.max(1, options.historyLimit ?? 50);
+  const past = [];
+  const future = [];
+  const snapshot = () => structuredClone(base.get());
+  const remember = () => {
+    past.push(snapshot());
+    if (past.length > historyLimit) past.shift();
+    future.length = 0;
+  };
+  return {
+    ...base,
+    set(path, value) {
+      remember();
+      base.set(path, value);
+    },
+    update(path, updater) {
+      remember();
+      base.set(path, updater(base.get(path)));
+    },
+    push(path, value) {
+      remember();
+      base.push(path, value);
+    },
+    removeAt(path, index) {
+      remember();
+      base.removeAt(path, index);
+    },
+    reset() {
+      remember();
+      base.replace(structuredClone(initialState));
+    },
+    exportJSON(space = 2) {
+      return JSON.stringify(base.get(), null, space);
+    },
+    importJSON(json) {
+      const parsed = JSON.parse(json);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Micro App state must be a JSON object");
+      remember();
+      base.replace(parsed);
+    },
+    canUndo() {
+      return past.length > 0;
+    },
+    canRedo() {
+      return future.length > 0;
+    },
+    undo() {
+      const previous = past.pop();
+      if (!previous) return false;
+      future.push(snapshot());
+      base.replace(previous);
+      return true;
+    },
+    redo() {
+      const next = future.pop();
+      if (!next) return false;
+      past.push(snapshot());
+      base.replace(next);
+      return true;
+    }
+  };
+}
+function createArtifactStore(initialState, options = {}) {
+  return createMicroAppStore(initialState, options);
 }
 export {
   createAdvancedStore,
+  createArtifactStore,
+  createMicroAppStore,
   createStore
 };

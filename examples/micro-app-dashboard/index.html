@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Micro App Dashboard</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <style>
+      body {
+        margin: 0;
+        background: #f4f6f8;
+        color: #20252d;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .artifact-shell {
+        min-height: 100dvh;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      .artifact-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.85rem 1.25rem;
+        border-bottom: 1px solid #dfe3e8;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(12px);
+      }
+
+      .artifact-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .artifact-brand [data-uif-icon] {
+        width: 1.9rem;
+        height: 1.9rem;
+        color: #00a88f;
+      }
+
+      .artifact-brand span span {
+        display: block;
+        color: #8a9099;
+        font-size: 0.78rem;
+      }
+
+      .artifact-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 0.5rem;
+      }
+
+      .artifact-main {
+        width: min(100% - 2rem, 76rem);
+        margin-inline: auto;
+        padding: 1.25rem 0 2rem;
+      }
+
+      .artifact-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .artifact-head h1,
+      .artifact-head p {
+        margin: 0;
+      }
+
+      .artifact-head h1 {
+        font-size: 1.65rem;
+        line-height: 1.15;
+      }
+
+      .artifact-head p {
+        margin-top: 0.35rem;
+        color: #667085;
+      }
+
+      .artifact-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(20rem, 0.8fr);
+        gap: 1rem;
+      }
+
+      .artifact-card {
+        border: 1px solid #dfe3e8;
+        border-radius: 0.75rem;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+        overflow: hidden;
+      }
+
+      .artifact-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1rem;
+        border-bottom: 1px solid #eef1f4;
+      }
+
+      .artifact-card-head h2 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .artifact-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .artifact-stat {
+        min-height: 7.5rem;
+        padding: 1rem;
+      }
+
+      .artifact-stat strong {
+        display: block;
+        margin-top: 0.8rem;
+        font-size: 2rem;
+        line-height: 1;
+      }
+
+      .artifact-form {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 9rem auto;
+        gap: 0.5rem;
+        padding: 1rem;
+        border-bottom: 1px solid #eef1f4;
+      }
+
+      .artifact-form input,
+      .artifact-form select,
+      .artifact-import textarea {
+        width: 100%;
+        border: 1px solid #d0d5dd;
+        border-radius: 0.5rem;
+        background: #fff;
+        color: #20252d;
+        font: inherit;
+      }
+
+      .artifact-form input,
+      .artifact-form select {
+        min-height: 2.4rem;
+        padding: 0 0.65rem;
+      }
+
+      .artifact-list {
+        display: grid;
+        gap: 0.65rem;
+        padding: 1rem;
+      }
+
+      .artifact-task {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        border: 1px solid #e7eaee;
+        border-radius: 0.65rem;
+        background: #fbfcfd;
+      }
+
+      .artifact-task strong {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .artifact-task span {
+        color: #667085;
+        font-size: 0.82rem;
+      }
+
+      .artifact-task[data-done="true"] strong {
+        color: #8a9099;
+        text-decoration: line-through;
+      }
+
+      .artifact-side {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .artifact-chart {
+        padding: 1rem;
+      }
+
+      .artifact-import {
+        display: grid;
+        gap: 0.75rem;
+        padding: 1rem;
+      }
+
+      .artifact-import textarea {
+        min-height: 11rem;
+        padding: 0.75rem;
+        font: 0.78rem/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      .artifact-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        min-height: 2.4rem;
+        padding: 0 0.75rem;
+        border: 1px solid #d0d5dd;
+        border-radius: 0.5rem;
+        background: #fff;
+        color: #344054;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .artifact-btn.is-primary {
+        border-color: #0b72bd;
+        background: #0b72bd;
+        color: #fff;
+      }
+
+      .artifact-btn.is-danger {
+        border-color: #ffd3db;
+        background: #fff1f3;
+        color: #c01048;
+      }
+
+      .artifact-btn .uif-icon {
+        width: 1rem;
+        height: 1rem;
+      }
+
+      .artifact-muted {
+        color: #667085;
+        font-size: 0.84rem;
+      }
+
+      @media (max-width: 58rem) {
+        .artifact-head,
+        .artifact-topbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .artifact-grid,
+        .artifact-stat-grid,
+        .artifact-form {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="artifact-shell">
+      <header class="artifact-topbar">
+        <a class="artifact-brand" href="../">
+          <span data-uif-icon="batoi" data-uif-icon-title="Batoi UIF"></span>
+          <span><strong>Batoi UIF</strong><span>Client-only Micro App</span></span>
+        </a>
+        <div class="artifact-actions">
+          <button class="artifact-btn" type="button" data-action="undo"><span data-uif-icon="undo"></span>Undo</button>
+          <button class="artifact-btn" type="button" data-action="redo"><span data-uif-icon="redo"></span>Redo</button>
+          <button class="artifact-btn" type="button" data-action="export"><span data-uif-icon="download"></span>Export JSON</button>
+          <button class="artifact-btn is-danger" type="button" data-action="reset"><span data-uif-icon="refresh"></span>Reset</button>
+        </div>
+      </header>
+
+      <main class="artifact-main">
+        <section class="artifact-head">
+          <div>
+            <span class="uif-badge uif-badge-success">Static HTML · Local persistence · No backend</span>
+            <h1>Micro App Operations Board</h1>
+            <p>One-page app built from Batoi UIF distribution files, browser APIs, and local state.</p>
+          </div>
+          <span class="artifact-muted" id="save-state">Saved locally</span>
+        </section>
+
+        <section class="artifact-stat-grid" aria-label="Summary">
+          <article class="artifact-card artifact-stat"><span class="artifact-muted">Open tasks</span><strong id="open-count">0</strong></article>
+          <article class="artifact-card artifact-stat"><span class="artifact-muted">Completed</span><strong id="done-count">0</strong></article>
+          <article class="artifact-card artifact-stat"><span class="artifact-muted">High priority</span><strong id="high-count">0</strong></article>
+        </section>
+
+        <section class="artifact-grid">
+          <article class="artifact-card">
+            <div class="artifact-card-head">
+              <h2>Tasks</h2>
+              <span class="artifact-muted">Persisted in localStorage</span>
+            </div>
+            <form class="artifact-form" id="task-form">
+              <input name="label" aria-label="Task label" placeholder="Add a task..." required>
+              <select name="priority" aria-label="Priority">
+                <option value="High">High</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="Low">Low</option>
+              </select>
+              <button class="artifact-btn is-primary" type="submit"><span data-uif-icon="plus"></span>Add</button>
+            </form>
+            <div class="artifact-list" id="task-list"></div>
+          </article>
+
+          <aside class="artifact-side">
+            <article class="artifact-card">
+              <div class="artifact-card-head">
+                <h2>Priority Mix</h2>
+                <button class="artifact-btn" type="button" data-uif-chart-export="svg" data-uif-chart-target="#priority-chart"><span data-uif-icon="download"></span>SVG</button>
+              </div>
+              <div class="artifact-chart" id="priority-chart" data-uif="chart" data-uif-chart="donut" data-uif-palette="status" data-uif-chart-table="sr-only"></div>
+            </article>
+
+            <article class="artifact-card">
+              <div class="artifact-card-head">
+                <h2>Import / Export</h2>
+                <span class="artifact-muted">Portable app state</span>
+              </div>
+              <div class="artifact-import">
+                <textarea id="json-state" spellcheck="false" aria-label="Micro App JSON state"></textarea>
+                <div class="artifact-actions">
+                  <button class="artifact-btn" type="button" data-action="copy"><span data-uif-icon="copy"></span>Copy</button>
+                  <button class="artifact-btn is-primary" type="button" data-action="import"><span data-uif-icon="upload"></span>Import</button>
+                </div>
+              </div>
+            </article>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <script type="module">
+      import { bindChartExports, createMicroAppStore, initChart, mountIcons } from '../../dist/uif.esm.js';
+
+      const initialState = {
+        tasks: [
+          { label: 'Draft client-only Micro App pattern', priority: 'High', done: true },
+          { label: 'Validate chart export flow', priority: 'Medium', done: false },
+          { label: 'Prepare demo data import', priority: 'Low', done: false },
+        ],
+      };
+
+      const store = createMicroAppStore(initialState, {
+        persist: 'local',
+        key: 'batoi-uif-micro-app-dashboard',
+        historyLimit: 30,
+      });
+
+      const taskList = document.querySelector('#task-list');
+      const form = document.querySelector('#task-form');
+      const jsonState = document.querySelector('#json-state');
+      const saveState = document.querySelector('#save-state');
+
+      function tasks() {
+        return store.get('tasks') || [];
+      }
+
+      function priorityData() {
+        return ['High', 'Medium', 'Low'].map((priority) => ({
+          label: priority,
+          value: tasks().filter((task) => task.priority === priority).length,
+        }));
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;');
+      }
+
+      function render() {
+        const currentTasks = tasks();
+        const open = currentTasks.filter((task) => !task.done).length;
+        const done = currentTasks.filter((task) => task.done).length;
+        document.querySelector('#open-count').textContent = String(open);
+        document.querySelector('#done-count').textContent = String(done);
+        document.querySelector('#high-count').textContent = String(currentTasks.filter((task) => task.priority === 'High' && !task.done).length);
+        taskList.innerHTML = currentTasks.map((task, index) => `
+          <div class="artifact-task" data-done="${task.done}">
+            <input type="checkbox" ${task.done ? 'checked' : ''} aria-label="Toggle ${escapeHtml(task.label)}" data-toggle="${index}">
+            <div><strong>${escapeHtml(task.label)}</strong><span>${escapeHtml(task.priority)} priority</span></div>
+            <span class="uif-badge">${task.done ? 'Done' : 'Open'}</span>
+            <button class="artifact-btn is-danger" type="button" data-remove="${index}"><span data-uif-icon="trash"></span></button>
+          </div>
+        `).join('');
+        const chart = document.querySelector('#priority-chart');
+        chart.dataset.uifData = JSON.stringify(priorityData());
+        chart.dataset.uifOptions = JSON.stringify({ legend: true, table: 'sr-only', focusable: true });
+        initChart(chart);
+        jsonState.value = store.exportJSON();
+        saveState.textContent = `Saved locally · ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        mountIcons(document);
+      }
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = new FormData(form);
+        const label = String(data.get('label') || '').trim();
+        if (!label) return;
+        store.push('tasks', { label, priority: String(data.get('priority') || 'Medium'), done: false });
+        form.reset();
+        render();
+      });
+
+      taskList.addEventListener('change', (event) => {
+        const input = event.target instanceof Element ? event.target.closest('[data-toggle]') : null;
+        if (!input) return;
+        const index = Number(input.dataset.toggle);
+        const next = tasks().map((task, taskIndex) => taskIndex === index ? { ...task, done: input.checked } : task);
+        store.set('tasks', next);
+        render();
+      });
+
+      taskList.addEventListener('click', (event) => {
+        const button = event.target instanceof Element ? event.target.closest('[data-remove]') : null;
+        if (!button) return;
+        store.removeAt('tasks', Number(button.dataset.remove));
+        render();
+      });
+
+      document.addEventListener('click', async (event) => {
+        const action = event.target instanceof Element ? event.target.closest('[data-action]')?.dataset.action : null;
+        if (!action) return;
+        if (action === 'undo' && store.undo()) render();
+        if (action === 'redo' && store.redo()) render();
+        if (action === 'reset') {
+          store.reset();
+          render();
+        }
+        if (action === 'export') {
+          const blob = new Blob([store.exportJSON()], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'batoi-uif-micro-app-state.json';
+          link.click();
+          URL.revokeObjectURL(url);
+        }
+        if (action === 'copy') await navigator.clipboard?.writeText(store.exportJSON());
+        if (action === 'import') {
+          store.importJSON(jsonState.value);
+          render();
+        }
+      });
+
+      mountIcons(document);
+      bindChartExports(document);
+      render();
+    </script>
+  </body>
+</html>

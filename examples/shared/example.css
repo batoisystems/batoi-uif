@@ -210,6 +210,13 @@
   border-bottom: 1px solid #eef1f4;
 }
 
+.chart-workbench-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
 .chart-workbench-head h2,
 .chart-workbench-head p {
   margin: 0;
@@ -275,11 +282,28 @@
 .chart-preview-panel {
   display: grid;
   align-items: center;
+  gap: 0.75rem;
   min-height: 16rem;
   padding: 0.75rem;
   border: 1px solid #e7eaee;
   border-radius: 0.65rem;
   background: #f8fbfe;
+}
+
+.chart-drilldown-panel {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #d8e9f7;
+  border-radius: 0.55rem;
+  background: #fff;
+  color: #667085;
+  font-size: 0.8rem;
+}
+
+.chart-drilldown-panel strong {
+  color: #20252d;
+  font-size: 0.86rem;
 }
 
 .chart-preview-panel [data-uif="chart"] {

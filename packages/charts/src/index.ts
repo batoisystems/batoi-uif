@@ -62,14 +62,17 @@ export interface ChartOptions {
   axes?: boolean;
   grid?: boolean;
   tooltip?: boolean;
+  table?: boolean | 'sr-only';
   focusable?: boolean;
-  palette?: string[];
+  palette?: string[] | ChartPaletteName;
   formatValue?: (value: number) => string;
+  invalidValue?: 'zero' | 'skip' | 'error';
   min?: number;
   max?: number;
   stacked?: boolean;
   responsive?: boolean;
   exportable?: boolean;
+  drilldown?: boolean | DrilldownOptions;
   sparklineType?: 'line' | 'bar';
   id?: string;
   aspectRatio?: number;
@@ -80,9 +83,36 @@ export interface ChartOptions {
   target?: number;
 }
 
+export type ChartPaletteName = 'default' | 'professional' | 'categorical' | 'status' | 'sequential' | 'diverging';
+
+export interface DrilldownOptions {
+  action?: 'event' | 'target' | 'url' | 'route';
+  target?: string;
+  url?: string;
+  param?: string;
+}
+
 export interface ChartController {
   refresh(): Promise<void>;
   destroy(): void;
+}
+
+export interface ChartSelectionDetail {
+  label: string;
+  value?: number;
+  index?: number;
+  series?: string;
+  type: ChartType;
+  datum?: ChartDatum;
+  params: Record<string, string>;
+}
+
+export interface ChartExportOptions {
+  filename?: string;
+  background?: string;
+  scale?: number;
+  width?: number;
+  height?: number;
 }
 
 export interface TableAdapterOptions {
@@ -139,6 +169,7 @@ export interface RegressionResult {
 }
 
 const controllers = new WeakMap<HTMLElement, ChartController>();
+const exportBindings = new WeakMap<Document | HTMLElement, () => void>();
 const defaultPalette = [
   'var(--uif-chart-1,var(--uif-color-primary))',
   'var(--uif-chart-2,var(--uif-color-success))',
@@ -149,6 +180,15 @@ const defaultPalette = [
   'var(--uif-chart-7,#0f766e)',
   'var(--uif-chart-8,#9333ea)',
 ];
+
+const namedPalettes: Record<ChartPaletteName, string[]> = {
+  default: defaultPalette,
+  professional: ['#0b72bd', '#00a88f', '#e4a700', '#df3158', '#7c3aed', '#0f766e'],
+  categorical: ['#0b72bd', '#00a88f', '#e4a700', '#df3158', '#7c3aed', '#d9468f', '#475467'],
+  status: ['#00a88f', '#0b72bd', '#e4a700', '#df3158'],
+  sequential: ['#d9ecff', '#9dccf4', '#5ba6df', '#1f7dc1', '#0b4f86'],
+  diverging: ['#df3158', '#f59e0b', '#e5e7eb', '#00a88f', '#0b72bd'],
+};
 
 let chartIdCounter = 0;
 
@@ -164,6 +204,11 @@ function uid(options: ChartOptions, type: ChartType): string {
   const seed = `${options.id || options.label || type}-${options.width || 0}-${options.height || 0}`.toLowerCase();
   const clean = seed.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   return `uif-chart-${clean || type}`;
+}
+
+function paletteFor(options: ChartOptions): string[] {
+  if (Array.isArray(options.palette)) return options.palette;
+  return namedPalettes[options.palette ?? 'default'] ?? defaultPalette;
 }
 
 function cleanValues(values: number[]): number[] {
@@ -282,9 +327,16 @@ function margins(options: ChartOptions): ChartMargin {
   return { top: 16, right: 18, bottom: options.axes === false ? 18 : 34, left: options.axes === false ? 18 : 42, ...options.margin };
 }
 
-function valueOf(datum: ChartDatum, options: ChartOptions): number {
+function coerceNumber(raw: unknown, options: ChartOptions): number | undefined {
+  const value = Number(raw);
+  if (Number.isFinite(value)) return value;
+  if (options.invalidValue === 'error') throw new Error(`Invalid chart value: ${String(raw)}`);
+  return options.invalidValue === 'skip' ? undefined : 0;
+}
+
+function valueOf(datum: ChartDatum, options: ChartOptions): number | undefined {
   const raw = options.y && datum[options.y] != null ? datum[options.y] : datum.value;
-  return Number(raw) || 0;
+  return coerceNumber(raw, options);
 }
 
 function labelOf(datum: ChartDatum, options: ChartOptions): string {
@@ -293,7 +345,9 @@ function labelOf(datum: ChartDatum, options: ChartOptions): string {
 }
 
 function normalizeData(data: ChartDatum[], options: ChartOptions): ChartDatum[] {
-  return data.map((item) => ({ ...item, label: labelOf(item, options), value: valueOf(item, options) }));
+  return data
+    .map((item) => ({ ...item, label: labelOf(item, options), value: valueOf(item, options) }))
+    .filter((item) => item.value != null || options.invalidValue !== 'skip');
 }
 
 function coerceData(data: Array<ChartDatum | number>): ChartDatum[] {
@@ -350,10 +404,14 @@ function fullDonutPath(cx: number, cy: number, outer: number, inner: number): st
   return `M ${cx - outer} ${cy} A ${outer} ${outer} 0 1 0 ${cx + outer} ${cy} A ${outer} ${outer} 0 1 0 ${cx - outer} ${cy} M ${cx - inner} ${cy} A ${inner} ${inner} 0 1 1 ${cx + inner} ${cy} A ${inner} ${inner} 0 1 1 ${cx - inner} ${cy} Z`;
 }
 
-function markAttrs(label: string, options: ChartOptions): string {
-  const focus = options.focusable ? ' tabindex="0"' : '';
-  const aria = options.focusable ? ` aria-label="${esc(label)}"` : '';
-  return `class="uif-chart-mark"${focus}${aria} data-uif-chart-label="${esc(label)}"`;
+function markAttrs(label: string, options: ChartOptions, meta: { index?: number; value?: number; series?: string } = {}): string {
+  const interactive = options.focusable || Boolean(options.drilldown);
+  const focus = interactive ? ' tabindex="0" role="button"' : '';
+  const aria = interactive ? ` aria-label="${esc(label)}"` : '';
+  const index = meta.index == null ? '' : ` data-uif-chart-index="${meta.index}"`;
+  const value = meta.value == null ? '' : ` data-uif-chart-value="${esc(meta.value)}"`;
+  const series = meta.series == null ? '' : ` data-uif-series="${esc(meta.series)}"`;
+  return `class="uif-chart-mark"${focus}${aria} data-uif-chart-label="${esc(label)}"${index}${value}${series}`;
 }
 
 function axisAndGrid(width: number, height: number, plot: ChartMargin, domain: [number, number], options: ChartOptions): string {
@@ -387,13 +445,27 @@ function verticalValueGrid(width: number, height: number, plot: ChartMargin, dom
 function svgWrap(type: ChartType, width: number, height: number, content: string, data: ChartDatum[], options: ChartOptions): string {
   const id = uid(options, type);
   const title = options.label || `${type} chart`;
-  const desc = options.description || data.map((d) => `${d.label ?? 'item'} ${fmt(valueOf(d, options), options)}`).join(', ');
-  return `<svg class="uif-chart-svg uif-chart-${type}" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="${id}-title ${id}-desc"><title id="${id}-title">${esc(title)}</title><desc id="${id}-desc">${esc(desc)}</desc>${content}</svg>`;
+  const desc = options.description || data.map((d) => `${d.label ?? 'item'} ${fmt(valueOf(d, options) ?? 0, options)}`).join(', ');
+  const table = options.table ? chartDataTable(data, options, id) : '';
+  return `<svg class="uif-chart-svg uif-chart-${type}" viewBox="0 0 ${width} ${height}" role="img" aria-roledescription="chart" aria-labelledby="${id}-title ${id}-desc"><title id="${id}-title">${esc(title)}</title><desc id="${id}-desc">${esc(desc)}</desc>${content}</svg>${table}`;
+}
+
+function chartDataTable(data: ChartDatum[], options: ChartOptions, id: string): string {
+  const series = inferSeries(data, options);
+  const headers = ['Label', ...(series.length ? series : ['Value'])];
+  const rows = data
+    .map((datum) => {
+      const cells = series.length ? series.map((key) => fmt(Number(datum.values?.[key] ?? 0), options)) : [fmt(datum.value ?? 0, options)];
+      return `<tr><th scope="row">${esc(datum.label ?? '')}</th>${cells.map((cell) => `<td>${esc(cell)}</td>`).join('')}</tr>`;
+    })
+    .join('');
+  const hidden = options.table === 'sr-only' ? ' uif-sr-only' : '';
+  return `<table id="${id}-table" class="uif-chart-data-table${hidden}"><caption>${esc(options.label || 'Chart data')}</caption><thead><tr>${headers.map((header) => `<th scope="col">${esc(header)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function legend(items: string[], options: ChartOptions): string {
   if (!options.legend || !items.length) return '';
-  const palette = options.palette ?? defaultPalette;
+  const palette = paletteFor(options);
   return `<div class="uif-chart-legend" data-uif-placement="${options.legend === true ? 'bottom' : options.legend}">${items
     .map((item, i) => `<span><i style="background:${palette[i % palette.length]}"></i>${esc(item)}</span>`)
     .join('')}</div>`;
@@ -405,7 +477,7 @@ function renderLineLike(data: ChartDatum[], options: ChartOptions, area = false,
   const plot = sparkline ? { top: 6, right: 6, bottom: 6, left: 6 } : margins(options);
   const normalized = normalizeData(data, options);
   const series = inferSeries(normalized, options);
-  const palette = options.palette ?? defaultPalette;
+  const palette = paletteFor(options);
   const values = series.length ? normalized.flatMap((d) => series.map((key) => Number(d.values?.[key] ?? 0))) : normalized.map((d) => d.value ?? 0);
   const y = scaleLinear(extent(values, options), [height - plot.bottom, plot.top]);
   const xStep = normalized.length > 1 ? (width - plot.left - plot.right) / (normalized.length - 1) : 0;
@@ -420,7 +492,7 @@ function renderLineLike(data: ChartDatum[], options: ChartOptions, area = false,
             .map(([cx, cy], i) => {
               const value = name ? Number(normalized[i].values?.[name] ?? 0) : normalized[i].value ?? 0;
               const label = `${name ? `${name} ` : ''}${normalized[i].label ?? ''}: ${fmt(value, options)}`;
-              return `<circle ${markAttrs(label, options)} cx="${round(cx)}" cy="${round(cy)}" r="3"><title>${esc(label)}</title></circle>`;
+              return `<circle ${markAttrs(label, options, { index: i, value, series: name ?? undefined })} cx="${round(cx)}" cy="${round(cy)}" r="3"><title>${esc(label)}</title></circle>`;
             })
             .join('');
     return `${fill}${line}${marks}`;
@@ -437,7 +509,7 @@ function renderBars(data: ChartDatum[], options: ChartOptions, mode: 'bar' | 'ho
   const plot = margins(options);
   const normalized = normalizeData(data, options);
   const series = inferSeries(normalized, options);
-  const palette = options.palette ?? defaultPalette;
+  const palette = paletteFor(options);
   const values =
     series.length && mode === 'stacked-bar'
       ? normalized.flatMap((d) => {
@@ -479,7 +551,7 @@ function renderBars(data: ChartDatum[], options: ChartOptions, mode: 'bar' | 'ho
             const w = band * 0.64;
             const h = Math.abs(y1 - y0);
             const label = `${d.label ?? ''} ${key}: ${fmt(value, options)}`;
-            return `<rect ${markAttrs(label, options)} data-uif-series="${esc(key)}" x="${round(x)}" y="${round(Math.min(y0, y1))}" width="${round(w)}" height="${round(h)}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc(label)}</title></rect>`;
+            return `<rect ${markAttrs(label, options, { index: i, value, series: key })} x="${round(x)}" y="${round(Math.min(y0, y1))}" width="${round(w)}" height="${round(h)}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc(label)}</title></rect>`;
           })
           .join('');
       }
@@ -491,7 +563,7 @@ function renderBars(data: ChartDatum[], options: ChartOptions, mode: 'bar' | 'ho
             const y = yScale(value);
             const x = plot.left + i * band + band * 0.14 + s * inner;
             const label = `${d.label ?? ''} ${key}: ${fmt(value, options)}`;
-            return `<rect ${markAttrs(label, options)} data-uif-series="${esc(key)}" x="${round(x)}" y="${round(Math.min(y, zeroY))}" width="${round(inner * 0.86)}" height="${round(Math.abs(zeroY - y))}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc(label)}</title></rect>`;
+            return `<rect ${markAttrs(label, options, { index: i, value, series: key })} x="${round(x)}" y="${round(Math.min(y, zeroY))}" width="${round(inner * 0.86)}" height="${round(Math.abs(zeroY - y))}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc(label)}</title></rect>`;
           })
           .join('');
       }
@@ -500,11 +572,11 @@ function renderBars(data: ChartDatum[], options: ChartOptions, mode: 'bar' | 'ho
       if (!vertical) {
         const x = xScale(value);
         const y = plot.top + i * band + band * 0.18;
-        return `<rect ${markAttrs(label, options)} x="${round(Math.min(x, zeroX))}" y="${round(y)}" width="${round(Math.abs(x - zeroX))}" height="${round(band * 0.64)}" rx="3"><title>${esc(label)}</title></rect>`;
+        return `<rect ${markAttrs(label, options, { index: i, value })} x="${round(Math.min(x, zeroX))}" y="${round(y)}" width="${round(Math.abs(x - zeroX))}" height="${round(band * 0.64)}" rx="3"><title>${esc(label)}</title></rect>`;
       }
       const y = yScale(value);
       const x = plot.left + i * band + band * 0.18;
-      return `<rect ${markAttrs(label, options)} x="${round(x)}" y="${round(Math.min(y, zeroY))}" width="${round(band * 0.64)}" height="${round(Math.abs(zeroY - y))}" rx="3"><title>${esc(label)}</title></rect>`;
+      return `<rect ${markAttrs(label, options, { index: i, value })} x="${round(x)}" y="${round(Math.min(y, zeroY))}" width="${round(band * 0.64)}" height="${round(Math.abs(zeroY - y))}" rx="3"><title>${esc(label)}</title></rect>`;
     })
     .join('');
   const labels =
@@ -525,7 +597,7 @@ function renderPie(data: ChartDatum[], options: ChartOptions, donut = false): st
   const width = options.width ?? 180;
   const height = options.height ?? 180;
   const normalized = normalizeData(data, options).filter((d) => (d.value ?? 0) > 0);
-  const palette = options.palette ?? defaultPalette;
+  const palette = paletteFor(options);
   const total = normalized.reduce((sum, d) => sum + (d.value ?? 0), 0);
   if (!total) return `<div class="uif-chart-state" data-uif-state="empty">${esc(options.description || 'No positive values to chart')}</div>`;
   const radius = Math.min(width, height) / 2 - 10;
@@ -538,8 +610,8 @@ function renderPie(data: ChartDatum[], options: ChartOptions, donut = false): st
       const fill = d.color || palette[i % palette.length];
       const path =
         normalized.length === 1 && !donut
-          ? `<circle ${markAttrs(label, options)} cx="${width / 2}" cy="${height / 2}" r="${radius}" style="fill:${fill}"><title>${esc(label)}</title></circle>`
-          : `<path ${markAttrs(label, options)} d="${normalized.length === 1 && donut ? fullDonutPath(width / 2, height / 2, radius, inner) : arcPath(width / 2, height / 2, radius, angle, next, inner)}" ${normalized.length === 1 && donut ? 'fill-rule="evenodd" ' : ''}style="fill:${fill}"><title>${esc(label)}</title></path>`;
+          ? `<circle ${markAttrs(label, options, { index: i, value: d.value ?? 0 })} cx="${width / 2}" cy="${height / 2}" r="${radius}" style="fill:${fill}"><title>${esc(label)}</title></circle>`
+          : `<path ${markAttrs(label, options, { index: i, value: d.value ?? 0 })} d="${normalized.length === 1 && donut ? fullDonutPath(width / 2, height / 2, radius, inner) : arcPath(width / 2, height / 2, radius, angle, next, inner)}" ${normalized.length === 1 && donut ? 'fill-rule="evenodd" ' : ''}style="fill:${fill}"><title>${esc(label)}</title></path>`;
       angle = next;
       return path;
     })
@@ -558,7 +630,7 @@ function renderRadar(data: ChartDatum[], options: ChartOptions): string {
   const values = series.length ? normalized.flatMap((d) => series.map((key) => Number(d.values?.[key] ?? 0))) : normalized.map((d) => d.value ?? 0);
   const max = options.max ?? Math.max(1, ...values);
   const min = options.min ?? 0;
-  const palette = options.palette ?? defaultPalette;
+  const palette = paletteFor(options);
   const cx = width / 2;
   const cy = height / 2;
   const radius = Math.min(width, height) / 2 - 34;
@@ -621,7 +693,7 @@ function renderBullet(data: ChartDatum[], options: ChartOptions): string {
   const datum = normalizeData(data, options)[0];
   const max = options.max ?? datum?.max ?? 100;
   const x = scaleLinear([0, max], [24, width - 18]);
-  const value = datum?.value ?? 0;
+  const value = Math.max(0, Math.min(max || 0, datum?.value ?? 0));
   const target = datum?.target ?? max;
   const content = `<rect class="uif-chart-range" x="24" y="24" width="${width - 42}" height="18"></rect><rect class="uif-chart-value-bar" x="24" y="24" width="${round(x(value) - 24)}" height="18"></rect><line class="uif-chart-target" x1="${round(x(target))}" y1="18" x2="${round(x(target))}" y2="48"></line><text class="uif-chart-axis-label" x="24" y="62">${esc(datum?.label ?? '')}</text>`;
   return svgWrap('bullet', width, height, content, [datum], options);
@@ -640,7 +712,7 @@ function renderHeatmap(data: ChartDatum[], options: ChartOptions): string {
       const x = 10 + (i % cols) * cell;
       const y = 10 + Math.floor(i / cols) * cell;
       const label = `${d.label ?? ''}: ${fmt(d.value ?? 0, options)}`;
-      return `<rect ${markAttrs(label, options)} x="${round(x)}" y="${round(y)}" width="${round(cell - 3)}" height="${round(cell - 3)}" rx="3" style="opacity:${round(opacity)}"><title>${esc(label)}</title></rect>`;
+      return `<rect ${markAttrs(label, options, { index: i, value: d.value ?? 0 })} x="${round(x)}" y="${round(y)}" width="${round(cell - 3)}" height="${round(cell - 3)}" rx="3" style="opacity:${round(opacity)}"><title>${esc(label)}</title></rect>`;
     })
     .join('');
   return svgWrap('heatmap', width, height, cells, normalized, options);
@@ -661,12 +733,12 @@ function renderHistogram(data: ChartDatum[], options: ChartOptions, distribution
     return svgWrap('distribution', width, height, body, normalized, { ...options, description: options.description || 'Binned distribution line' });
   }
   const bars = bins
-    .map((bin) => {
+    .map((bin, binIndex) => {
       const x0 = x(bin.x0);
       const x1 = x(bin.x1);
       const yy = y(bin.count);
       const label = `${fmt(bin.x0, options)}-${fmt(bin.x1, options)}: ${bin.count}`;
-      return `<rect ${markAttrs(label, options)} x="${round(x0 + 1)}" y="${round(yy)}" width="${round(Math.max(1, x1 - x0 - 2))}" height="${round(height - plot.bottom - yy)}" rx="2"><title>${esc(label)}</title></rect>`;
+      return `<rect ${markAttrs(label, options, { index: binIndex, value: bin.count })} x="${round(x0 + 1)}" y="${round(yy)}" width="${round(Math.max(1, x1 - x0 - 2))}" height="${round(height - plot.bottom - yy)}" rx="2"><title>${esc(label)}</title></rect>`;
     })
     .join('');
   return svgWrap('histogram', width, height, `${axisAndGrid(width, height, plot, [0, Math.max(1, ...bins.map((bin) => bin.count))], options)}${bars}`, normalized, options);
@@ -684,7 +756,7 @@ function renderBoxPlot(data: ChartDatum[], options: ChartOptions): string {
   const cy = (height - plot.bottom + plot.top) / 2;
   const boxTop = cy - 22;
   const boxHeight = 44;
-  const content = `${verticalValueGrid(width, height, plot, domain, options)}<line class="uif-chart-grid" x1="${round(x(stats.min))}" y1="${cy}" x2="${round(x(stats.max))}" y2="${cy}"></line><rect ${markAttrs(`Q1 ${fmt(stats.q1, options)} to Q3 ${fmt(stats.q3, options)}`, options).replace('class="uif-chart-mark"', 'class="uif-chart-mark uif-chart-box"')} x="${round(x(stats.q1))}" y="${boxTop}" width="${round(Math.max(1, x(stats.q3) - x(stats.q1)))}" height="${boxHeight}" rx="3"><title>Q1 ${esc(fmt(stats.q1, options))}, median ${esc(fmt(stats.median, options))}, Q3 ${esc(fmt(stats.q3, options))}</title></rect><line class="uif-chart-target" x1="${round(x(stats.median))}" y1="${boxTop - 4}" x2="${round(x(stats.median))}" y2="${boxTop + boxHeight + 4}"></line><line class="uif-chart-target" x1="${round(x(stats.min))}" y1="${cy - 14}" x2="${round(x(stats.min))}" y2="${cy + 14}"></line><line class="uif-chart-target" x1="${round(x(stats.max))}" y1="${cy - 14}" x2="${round(x(stats.max))}" y2="${cy + 14}"></line>`;
+  const content = `${verticalValueGrid(width, height, plot, domain, options)}<line class="uif-chart-grid" x1="${round(x(stats.min))}" y1="${cy}" x2="${round(x(stats.max))}" y2="${cy}"></line><rect ${markAttrs(`Q1 ${fmt(stats.q1, options)} to Q3 ${fmt(stats.q3, options)}`, options, { value: stats.median }).replace('class="uif-chart-mark"', 'class="uif-chart-mark uif-chart-box"')} x="${round(x(stats.q1))}" y="${boxTop}" width="${round(Math.max(1, x(stats.q3) - x(stats.q1)))}" height="${boxHeight}" rx="3"><title>Q1 ${esc(fmt(stats.q1, options))}, median ${esc(fmt(stats.median, options))}, Q3 ${esc(fmt(stats.q3, options))}</title></rect><line class="uif-chart-target" x1="${round(x(stats.median))}" y1="${boxTop - 4}" x2="${round(x(stats.median))}" y2="${boxTop + boxHeight + 4}"></line><line class="uif-chart-target" x1="${round(x(stats.min))}" y1="${cy - 14}" x2="${round(x(stats.min))}" y2="${cy + 14}"></line><line class="uif-chart-target" x1="${round(x(stats.max))}" y1="${cy - 14}" x2="${round(x(stats.max))}" y2="${cy + 14}"></line>`;
   return svgWrap('box-plot', width, height, content, normalized, { ...options, description: options.description || `Median ${fmt(stats.median, options)}, IQR ${fmt(stats.iqr, options)}` });
 }
 
@@ -709,7 +781,7 @@ function renderScatter(data: ChartDatum[], options: ChartOptions, forceRegressio
   const marks = points
     .map((point, index) => {
       const label = `${normalized[index]?.label || `Point ${index + 1}`}: ${fmt(point.x, options)}, ${fmt(point.y, options)}`;
-      return `<circle ${markAttrs(label, options)} cx="${round(x(point.x))}" cy="${round(y(point.y))}" r="4"><title>${esc(label)}</title></circle>`;
+      return `<circle ${markAttrs(label, options, { index, value: point.y })} cx="${round(x(point.x))}" cy="${round(y(point.y))}" r="4"><title>${esc(label)}</title></circle>`;
     })
     .join('');
   const reg = options.regression || forceRegression ? linearRegression(points) : null;
@@ -722,15 +794,34 @@ function renderScatter(data: ChartDatum[], options: ChartOptions, forceRegressio
 function renderControlChart(data: ChartDatum[], options: ChartOptions): string {
   const normalized = normalizeData(data, options);
   const stats = summaryStats(normalized.map((d) => d.value ?? 0));
+  if (!stats.count) return `<div class="uif-chart-state" data-uif-state="empty">${esc(options.description || 'No data')}</div>`;
+  const width = options.width ?? 360;
+  const height = options.height ?? 200;
+  const plot = margins(options);
   const sigma = stats.stddev || 1;
   const min = Math.min(stats.min, stats.mean - sigma * 3);
   const max = Math.max(stats.max, stats.mean + sigma * 3);
+  const domain = extent([min, max], options);
   const referenceLines = [stats.mean, stats.mean + sigma * 3, stats.mean - sigma * 3];
-  const html = renderLineLike(normalized, { ...options, min, max, description: options.description || 'Control chart with mean and three sigma limits' });
-  return html.replace(
-    '</svg>',
-    `${referenceLines.map((value, index) => `<line class="uif-chart-reference ${index === 0 ? 'uif-chart-mean' : ''}" x1="42" y1="${round(scaleLinear([min, max], [(options.height ?? 200) - margins(options).bottom, margins(options).top])(value))}" x2="${(options.width ?? 360) - margins(options).right}" y2="${round(scaleLinear([min, max], [(options.height ?? 200) - margins(options).bottom, margins(options).top])(value))}"><title>${index === 0 ? 'Mean' : 'Control limit'} ${esc(fmt(value, options))}</title></line>`).join('')}</svg>`,
-  );
+  const y = scaleLinear(domain, [height - plot.bottom, plot.top]);
+  const xStep = normalized.length > 1 ? (width - plot.left - plot.right) / (normalized.length - 1) : 0;
+  const points = normalized.map((d, i) => [plot.left + i * xStep, y(d.value ?? 0)] as [number, number]);
+  const line = `<polyline class="uif-chart-series uif-chart-line" data-uif-series="value" points="${pointString(points)}" fill="none"></polyline>`;
+  const marks = points
+    .map(([cx, cy], i) => {
+      const value = normalized[i].value ?? 0;
+      const label = `${normalized[i].label ?? ''}: ${fmt(value, options)}`;
+      return `<circle ${markAttrs(label, options, { index: i, value })} cx="${round(cx)}" cy="${round(cy)}" r="3"><title>${esc(label)}</title></circle>`;
+    })
+    .join('');
+  const refs = referenceLines
+    .map((value, index) => {
+      const yy = round(y(value));
+      return `<line class="uif-chart-reference ${index === 0 ? 'uif-chart-mean' : ''}" x1="${plot.left}" y1="${yy}" x2="${width - plot.right}" y2="${yy}"><title>${index === 0 ? 'Mean' : 'Control limit'} ${esc(fmt(value, options))}</title></line>`;
+    })
+    .join('');
+  const body = `${axisAndGrid(width, height, plot, domain, options)}${refs}${line}${marks}`;
+  return svgWrap('control-chart', width, height, body, normalized, { ...options, description: options.description || 'Control chart with mean and three sigma limits' });
 }
 
 function renderPareto(data: ChartDatum[], options: ChartOptions): string {
@@ -851,7 +942,10 @@ function optionsFromElement(el: HTMLElement): ChartOptions {
     x: el.dataset.uifX || parsed.x,
     y: el.dataset.uifY || parsed.y,
     label: el.dataset.uifLabel || parsed.label,
-    id: el.dataset.uifId || parsed.id || `instance-${++chartIdCounter}`,
+    id: el.dataset.uifId || parsed.id || (el.dataset.uifChartInstanceId ||= `instance-${++chartIdCounter}`),
+    palette: (el.dataset.uifPalette as ChartPaletteName | undefined) || parsed.palette,
+    table: el.dataset.uifChartTable === 'sr-only' ? 'sr-only' : el.dataset.uifChartTable != null ? el.dataset.uifChartTable !== 'false' : parsed.table,
+    drilldown: parsed.drilldown || Boolean(el.dataset.uifDrilldown || el.dataset.uifDrilldownTarget || el.dataset.uifDrilldownUrl),
     series: el.dataset.uifSeries ? el.dataset.uifSeries.split(',').map((item) => item.trim()).filter(Boolean) : parsed.series,
   };
 }
@@ -861,6 +955,64 @@ function responsiveOptions(el: HTMLElement, options: ChartOptions): ChartOptions
   const width = Math.round(el.getBoundingClientRect().width || el.clientWidth || 0);
   if (!width) return options;
   return { ...options, width, height: options.height ?? Math.round(width / (options.aspectRatio || 1.8)) };
+}
+
+function chartDrilldownOptions(el: HTMLElement, options: ChartOptions): DrilldownOptions | null {
+  if (!options.drilldown && !el.dataset.uifDrilldown && !el.dataset.uifDrilldownTarget && !el.dataset.uifDrilldownUrl) return null;
+  const configured = typeof options.drilldown === 'object' ? options.drilldown : {};
+  return {
+    ...configured,
+    action: (el.dataset.uifDrilldown as DrilldownOptions['action']) || configured.action || (el.dataset.uifDrilldownTarget ? 'target' : el.dataset.uifDrilldownUrl ? 'url' : 'event'),
+    target: el.dataset.uifDrilldownTarget || configured.target,
+    url: el.dataset.uifDrilldownUrl || configured.url,
+    param: el.dataset.uifDrilldownParam || configured.param || 'label',
+  };
+}
+
+function buildSelectionDetail(target: SVGElement, data: ChartDatum[], options: ChartOptions): ChartSelectionDetail {
+  const indexRaw = target.getAttribute('data-uif-chart-index');
+  const index = indexRaw == null ? undefined : Number(indexRaw);
+  const datum = index != null && Number.isInteger(index) ? data[index] : data.find((item) => String(item.label ?? '') && target.getAttribute('data-uif-chart-label')?.startsWith(String(item.label)));
+  const valueRaw = target.getAttribute('data-uif-chart-value');
+  const value = valueRaw == null ? (datum ? valueOf(datum, options) : undefined) : Number(valueRaw);
+  const label = target.getAttribute('data-uif-chart-label') || target.getAttribute('aria-label') || String(datum?.label ?? '');
+  const series = target.getAttribute('data-uif-series') || undefined;
+  const params: Record<string, string> = {
+    label,
+    type: options.type ?? 'bar',
+  };
+  if (index != null && Number.isFinite(index)) params.index = String(index);
+  if (value != null && Number.isFinite(value)) params.value = String(value);
+  if (series) params.series = series;
+  if (datum?.label != null) params.datumLabel = String(datum.label);
+  return { label, value: Number.isFinite(value) ? value : undefined, index, series, type: options.type ?? 'bar', datum, params };
+}
+
+function resolveDrilldownUrl(url: string, detail: ChartSelectionDetail, param: string): string {
+  const resolved = url.replace(/\{([a-zA-Z0-9_.-]+)\}/g, (_, key: string) => encodeURIComponent(detail.params[key] ?? String(detail.datum?.[key] ?? '')));
+  const parsed = new URL(resolved, window.location.href);
+  if (!url.includes('{')) parsed.searchParams.set(param, detail.params[param] ?? detail.label);
+  return parsed.toString();
+}
+
+async function runDrilldown(el: HTMLElement, detail: ChartSelectionDetail, options: DrilldownOptions): Promise<void> {
+  el.dispatchEvent(new CustomEvent('uif:chart-drilldown', { detail: { ...detail, drilldown: options }, bubbles: true }));
+  if (options.action === 'event') return;
+  if (options.action === 'route' || (options.action === 'url' && !options.target)) {
+    if (options.url) window.location.assign(resolveDrilldownUrl(options.url, detail, options.param || 'label'));
+    return;
+  }
+  if (!options.target || !options.url) return;
+  const target = document.querySelector<HTMLElement>(options.target);
+  if (!target) return;
+  target.dataset.uifState = 'loading';
+  try {
+    target.innerHTML = await request<string>(resolveDrilldownUrl(options.url, detail, options.param || 'label'), { method: 'GET', parseAs: 'text' });
+    target.dataset.uifState = 'loaded';
+  } catch (error) {
+    target.dataset.uifState = 'error';
+    el.dispatchEvent(new CustomEvent('uif:chart-drilldown-error', { detail: { error, selection: detail, drilldown: options }, bubbles: true }));
+  }
 }
 
 export function initChart(el: HTMLElement): ChartController {
@@ -899,19 +1051,29 @@ export function initChart(el: HTMLElement): ChartController {
     const target = event.target instanceof Element ? event.target.closest<SVGElement>('.uif-chart-mark') : null;
     if (!target) return;
     if (event instanceof KeyboardEvent && !['Enter', ' '].includes(event.key)) return;
+    if (event instanceof KeyboardEvent) event.preventDefault();
+    const detail = buildSelectionDetail(target, data, options);
     el.dispatchEvent(
       new CustomEvent('uif:chart-select', {
-        detail: {
-          label: target.getAttribute('data-uif-chart-label') || target.getAttribute('aria-label') || '',
-          series: target.getAttribute('data-uif-series') || undefined,
-          type: options.type ?? 'bar',
-        },
+        detail,
         bubbles: true,
       }),
     );
+    const drilldown = chartDrilldownOptions(el, options);
+    if (drilldown) void runDrilldown(el, detail, drilldown);
   };
+
+  const announceMark = (event: Event) => {
+    const target = event.target instanceof Element ? event.target.closest<SVGElement>('.uif-chart-mark') : null;
+    if (!target) return;
+    const name = event.type === 'focusin' ? 'uif:chart-focus' : 'uif:chart-hover';
+    el.dispatchEvent(new CustomEvent(name, { detail: buildSelectionDetail(target, data, options), bubbles: true }));
+  };
+
   el.addEventListener('click', select);
   el.addEventListener('keydown', select);
+  el.addEventListener('focusin', announceMark);
+  el.addEventListener('mouseover', announceMark);
 
   const controller = {
     refresh,
@@ -921,6 +1083,8 @@ export function initChart(el: HTMLElement): ChartController {
       if (resizeTimer) window.clearTimeout(resizeTimer);
       el.removeEventListener('click', select);
       el.removeEventListener('keydown', select);
+      el.removeEventListener('focusin', announceMark);
+      el.removeEventListener('mouseover', announceMark);
       controllers.delete(el);
     },
   };
@@ -937,9 +1101,151 @@ export function destroyChart(el: HTMLElement): void {
   controllers.get(el)?.destroy();
 }
 
-export function exportChartData(data: ChartDatum[], format: 'json' | 'csv' = 'json'): string {
-  if (format === 'csv') {
-    return ['label,value', ...data.map((d) => `${JSON.stringify(d.label ?? '')},${d.value ?? ''}`)].join('\n');
+function csvCell(value: unknown): string {
+  return JSON.stringify(value ?? '');
+}
+
+function chartSvgFrom(target: SVGSVGElement | HTMLElement): SVGSVGElement | null {
+  return target instanceof SVGSVGElement ? target : target.querySelector<SVGSVGElement>('svg');
+}
+
+function svgSize(svg: SVGSVGElement): { width: number; height: number } {
+  const viewBox = svg.getAttribute('viewBox')?.split(/\s+/).map(Number) ?? [];
+  const rect = svg.getBoundingClientRect();
+  return {
+    width: Number(svg.getAttribute('width')) || viewBox[2] || rect.width || 360,
+    height: Number(svg.getAttribute('height')) || viewBox[3] || rect.height || 220,
+  };
+}
+
+function inlineSvgStyles(svg: SVGSVGElement): SVGSVGElement {
+  const clone = svg.cloneNode(true) as SVGSVGElement;
+  const sourceElements = [svg, ...Array.from(svg.querySelectorAll<SVGElement>('*'))];
+  const cloneElements = [clone, ...Array.from(clone.querySelectorAll<SVGElement>('*'))];
+  sourceElements.forEach((source, index) => {
+    const target = cloneElements[index];
+    if (!target || typeof window === 'undefined' || !window.getComputedStyle) return;
+    const style = window.getComputedStyle(source);
+    const properties = ['fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'opacity', 'font-family', 'font-size', 'font-weight', 'text-anchor'];
+    const inline = properties.map((property) => `${property}:${style.getPropertyValue(property)}`).join(';');
+    target.setAttribute('style', `${target.getAttribute('style') || ''};${inline}`);
+  });
+  clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  if (!clone.getAttribute('width')) {
+    const { width } = svgSize(svg);
+    clone.setAttribute('width', String(Math.round(width)));
+  }
+  if (!clone.getAttribute('height')) {
+    const { height } = svgSize(svg);
+    clone.setAttribute('height', String(Math.round(height)));
+  }
+  return clone;
+}
+
+function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+export function exportChartSvg(target: SVGSVGElement | HTMLElement): string {
+  const svg = chartSvgFrom(target);
+  if (!svg) return '';
+  const serialized = new XMLSerializer().serializeToString(inlineSvgStyles(svg));
+  return serialized.startsWith('<?xml') ? serialized : `<?xml version="1.0" encoding="UTF-8"?>\n${serialized}`;
+}
+
+export function downloadChartSvg(target: SVGSVGElement | HTMLElement, filename = 'chart.svg'): void {
+  const svg = exportChartSvg(target);
+  if (!svg) return;
+  downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), filename);
+}
+
+export async function exportChartPng(target: SVGSVGElement | HTMLElement, options: ChartExportOptions = {}): Promise<Blob> {
+  const svg = chartSvgFrom(target);
+  if (!svg) throw new Error('No chart SVG found');
+  const source = exportChartSvg(svg);
+  const size = svgSize(svg);
+  const width = options.width ?? size.width;
+  const height = options.height ?? size.height;
+  const scale = options.scale ?? 2;
+  const image = new Image();
+  const svgUrl = URL.createObjectURL(new Blob([source], { type: 'image/svg+xml;charset=utf-8' }));
+  try {
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error('Unable to render chart SVG'));
+      image.src = svgUrl;
+    });
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(width * scale));
+    canvas.height = Math.max(1, Math.round(height * scale));
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Canvas is not available');
+    if (options.background) {
+      context.fillStyle = options.background;
+      context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('Unable to export chart PNG'))), 'image/png');
+    });
+  } finally {
+    URL.revokeObjectURL(svgUrl);
+  }
+}
+
+export async function downloadChartPng(target: SVGSVGElement | HTMLElement, filename = 'chart.png', options: ChartExportOptions = {}): Promise<void> {
+  downloadBlob(await exportChartPng(target, options), filename);
+}
+
+export function bindChartExports(root: Document | HTMLElement = document): () => void {
+  exportBindings.get(root)?.();
+  const onClick = (event: Event) => {
+    const button = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-uif-chart-export]') : null;
+    if (!button) return;
+    const format = button.dataset.uifChartExport || 'svg';
+    const targetSelector = button.dataset.uifChartTarget || button.getAttribute('aria-controls');
+    const target = targetSelector ? root.querySelector<HTMLElement>(targetSelector) : button.closest<HTMLElement>('[data-uif-chart-host], .uif-card, article')?.querySelector<HTMLElement>('[data-uif="chart"]');
+    if (!target) return;
+    const filename = button.dataset.uifFilename || `chart.${format}`;
+    if (format === 'svg') downloadChartSvg(target, filename.endsWith('.svg') ? filename : `${filename}.svg`);
+    if (format === 'png') void downloadChartPng(target, filename.endsWith('.png') ? filename : `${filename}.png`, { background: button.dataset.uifBackground || undefined });
+    if (format === 'csv') {
+      const data = parseChartData(target);
+      downloadBlob(new Blob([exportChartData(data, 'csv')], { type: 'text/csv;charset=utf-8' }), filename.endsWith('.csv') ? filename : `${filename}.csv`);
+    }
+    button.dispatchEvent(new CustomEvent('uif:chart-export', { detail: { format, target }, bubbles: true }));
+  };
+  root.addEventListener('click', onClick);
+  const dispose = () => {
+    root.removeEventListener('click', onClick);
+    exportBindings.delete(root);
+  };
+  exportBindings.set(root, dispose);
+  return dispose;
+}
+
+export function exportChartData(data: ChartDatum[], format: 'json' | 'csv' | 'tsv' = 'json'): string {
+  if (format === 'csv' || format === 'tsv') {
+    const delimiter = format === 'tsv' ? '\t' : ',';
+    const series = [...new Set(data.flatMap((d) => Object.keys(d.values ?? {})))];
+    const extra = [...new Set(data.flatMap((d) => Object.keys(d).filter((key) => !['label', 'value', 'values'].includes(key) && typeof d[key] !== 'object')))];
+    const headers = ['label', 'value', ...series, ...extra];
+    const rows = data.map((d) =>
+      headers
+        .map((key) => {
+          const value = key in (d.values ?? {}) ? d.values?.[key] : d[key];
+          return format === 'tsv' ? String(value ?? '').replace(/\t/g, ' ') : csvCell(value);
+        })
+        .join(delimiter),
+    );
+    return [headers.join(delimiter), ...rows].join('\n');
   }
   return JSON.stringify(data);
 }

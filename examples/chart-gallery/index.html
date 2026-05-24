@@ -48,7 +48,11 @@
               <h2>Chart Builder</h2>
               <p>Choose a chart type, toggle common options, preview the result, and copy declarative HTML for direct use.</p>
             </div>
-            <button class="chart-copy is-primary" type="button" data-copy-workbench><span data-uif-icon="copy"></span>Copy markup</button>
+            <div class="chart-workbench-actions">
+              <button class="chart-copy" type="button" data-export-preview="svg"><span data-uif-icon="download"></span>SVG</button>
+              <button class="chart-copy" type="button" data-export-preview="png"><span data-uif-icon="download"></span>PNG</button>
+              <button class="chart-copy is-primary" type="button" data-copy-workbench><span data-uif-icon="copy"></span>Copy markup</button>
+            </div>
           </div>
           <div class="chart-workbench-grid">
             <form class="chart-options" id="chart-options">
@@ -79,10 +83,16 @@
                 <label><input name="legend" type="checkbox"> Legend</label>
                 <label><input name="labels" type="checkbox" checked> Labels</label>
                 <label><input name="focusable" type="checkbox"> Focusable marks</label>
+                <label><input name="drilldown" type="checkbox"> Drill-down</label>
+                <label><input name="table" type="checkbox"> Data table fallback</label>
               </div>
             </form>
             <div class="chart-preview-panel">
               <div id="chart-preview" data-uif="chart" data-uif-chart="line" data-uif-options='{"grid":true,"axes":true,"labels":true}' data-uif-data='[{"label":"Jan","value":120},{"label":"Feb","value":180},{"label":"Mar","value":150},{"label":"Apr","value":220}]'></div>
+              <div class="chart-drilldown-panel" id="chart-drilldown-panel" aria-live="polite">
+                <strong>Drill-down preview</strong>
+                <span>Select a chart mark after enabling drill-down.</span>
+              </div>
             </div>
             <div class="chart-code-panel">
               <div class="chart-code-head">
@@ -207,13 +217,7 @@
       </div>
     </main>
     <script type="module">
-      import { initChart, mountIcons } from '../../dist/uif.esm.js?v=20260524-batoi-icon-v2';
-
-      const palettes = {
-        professional: ['#0b72bd', '#00a88f', '#e4a700', '#df3158', '#7c3aed'],
-        categorical: ['#0b72bd', '#00a88f', '#e4a700', '#df3158', '#7c3aed', '#0f766e'],
-        status: ['#00a88f', '#0b72bd', '#e4a700', '#df3158'],
-      };
+      import { downloadChartPng, downloadChartSvg, initChart, mountIcons } from '../../dist/uif.esm.js?v=20260524-chart-drilldown';
 
       function titleForType(type) {
         return type.split('-').map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
@@ -237,6 +241,11 @@
           `data-uif-chart="${el.dataset.uifChart}"`,
           el.dataset.uifX ? `data-uif-x="${el.dataset.uifX}"` : '',
           el.dataset.uifY ? `data-uif-y="${el.dataset.uifY}"` : '',
+          el.dataset.uifDrilldown ? `data-uif-drilldown="${el.dataset.uifDrilldown}"` : '',
+          el.dataset.uifDrilldownTarget ? `data-uif-drilldown-target="${el.dataset.uifDrilldownTarget}"` : '',
+          el.dataset.uifDrilldownUrl ? `data-uif-drilldown-url="${el.dataset.uifDrilldownUrl}"` : '',
+          el.dataset.uifPalette ? `data-uif-palette="${el.dataset.uifPalette}"` : '',
+          el.dataset.uifChartTable ? `data-uif-chart-table="${el.dataset.uifChartTable}"` : '',
           Object.keys(options).length ? `data-uif-options='${escapeAttribute(JSON.stringify(options))}'` : '',
           `data-uif-data='${escapeAttribute(el.dataset.uifData || '[]')}'`,
         ].filter(Boolean);
@@ -280,6 +289,8 @@
             <button class="chart-copy" type="button" data-copy-card="markup"><span data-uif-icon="copy"></span>Markup</button>
             <button class="chart-copy" type="button" data-copy-card="data"><span data-uif-icon="copy"></span>Data</button>
             <button class="chart-copy" type="button" data-copy-card="options"><span data-uif-icon="copy"></span>Options</button>
+            <button class="chart-copy" type="button" data-export-card="svg"><span data-uif-icon="download"></span>SVG</button>
+            <button class="chart-copy" type="button" data-export-card="png"><span data-uif-icon="download"></span>PNG</button>
           `;
           card.append(actions);
         });
@@ -305,12 +316,15 @@
             labels: data.has('labels'),
             focusable: data.has('focusable'),
           };
+          if (data.has('drilldown')) {
+            options.drilldown = true;
+            options.focusable = true;
+          }
+          if (data.has('table')) options.table = 'sr-only';
           if (data.has('legend')) options.legend = true;
           const size = data.get('size');
           if (size === 'compact') Object.assign(options, { width: 260, height: 150 });
           if (size === 'wide') Object.assign(options, { width: 520, height: 260 });
-          const palette = data.get('palette');
-          if (palette && palette !== 'default') options.palette = palettes[palette];
           return options;
         }
 
@@ -320,6 +334,13 @@
           preview.dataset.uifChart = source.dataset.uifChart;
           preview.dataset.uifData = source.dataset.uifData || '[]';
           preview.dataset.uifOptions = JSON.stringify(options);
+          const palette = new FormData(form).get('palette');
+          if (palette && palette !== 'default') preview.dataset.uifPalette = palette;
+          else delete preview.dataset.uifPalette;
+          if (options.table) preview.dataset.uifChartTable = 'sr-only';
+          else delete preview.dataset.uifChartTable;
+          if (options.drilldown) preview.dataset.uifDrilldown = 'event';
+          else delete preview.dataset.uifDrilldown;
           if (source.dataset.uifX) preview.dataset.uifX = source.dataset.uifX;
           else delete preview.dataset.uifX;
           if (source.dataset.uifY) preview.dataset.uifY = source.dataset.uifY;
@@ -329,6 +350,11 @@
         }
 
         form.addEventListener('input', renderWorkbench);
+        preview.addEventListener('uif:chart-drilldown', (event) => {
+          const detail = event.detail;
+          const panel = document.querySelector('#chart-drilldown-panel');
+          panel.innerHTML = `<strong>${escapeHtml(detail.label)}</strong><span>Type: ${escapeHtml(detail.type)} · Value: ${escapeHtml(detail.value ?? 'n/a')} · Series: ${escapeHtml(detail.series ?? 'value')}</span>`;
+        });
         renderWorkbench();
       }
 
@@ -339,6 +365,19 @@
       document.querySelectorAll('.example-chart-card [data-uif="chart"]').forEach((el) => initChart(el));
 
       document.addEventListener('click', async (event) => {
+        const exportButton = event.target.closest('[data-export-card], [data-export-preview]');
+        if (exportButton) {
+          const format = exportButton.dataset.exportCard || exportButton.dataset.exportPreview;
+          const chart = exportButton.dataset.exportPreview
+            ? document.querySelector('#chart-preview')
+            : exportButton.closest('.example-chart-card')?.querySelector('[data-uif="chart"]');
+          if (!chart) return;
+          if (format === 'svg') downloadChartSvg(chart, `${chart.dataset.uifChart || 'chart'}.svg`);
+          if (format === 'png') await downloadChartPng(chart, `${chart.dataset.uifChart || 'chart'}.png`, { background: '#ffffff' });
+          markCopied(exportButton);
+          return;
+        }
+
         const button = event.target.closest('[data-copy-card], [data-copy-code], [data-copy-workbench]');
         if (!button) return;
         if (button.dataset.copyCard) {
