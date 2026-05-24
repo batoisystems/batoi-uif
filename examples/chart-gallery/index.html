@@ -5,58 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Batoi UIF Chart Gallery</title>
     <link rel="stylesheet" href="../../packages/css/index.css">
+    <link rel="stylesheet" href="../shared/example.css">
   </head>
-  <body>
-    <main class="uif-container uif-stack uif-p-4">
-      <header class="uif-page-head uif-p-0">
-        <div class="uif-page-title">
-          <h1>Chart Gallery</h1>
-          <p>Every supported dependency-free SVG chart type rendered with declarative UIF markup.</p>
-        </div>
-      </header>
+  <body class="example-page">
+    <main class="example-shell">
+      <div class="example-frame">
+        <header class="example-topbar">
+          <a class="example-brand" href="../">
+            <span class="example-brand-mark" data-uif-icon="batoi" data-uif-icon-title="Batoi"></span>
+            <span><strong>Batoi UIF</strong><span>Examples</span></span>
+          </a>
+          <div class="example-actions">
+            <a class="example-pill" href="../professional-showcase/">Professional showcase</a>
+            <a class="example-pill is-primary" href="../../dist/uif.esm.js">Distribution module</a>
+          </div>
+        </header>
 
-      <section class="uif-grid-3">
-        <article class="uif-card">
+        <section class="example-hero">
+          <div>
+            <div class="example-eyebrow">Library · SVG charts</div>
+            <h1>Chart Gallery</h1>
+            <p>Every supported dependency-free SVG chart type rendered with declarative UIF markup, including statistical charts for practical dashboards and operational reports.</p>
+          </div>
+          <div class="example-meta" aria-label="Gallery summary">
+            <span class="example-pill">26 chart types</span>
+            <span class="example-pill">0 runtime dependencies</span>
+            <span class="example-pill">SVG-first</span>
+          </div>
+        </section>
+
+        <nav class="example-tabs" aria-label="Chart categories">
+          <a href="#standard" aria-current="page">Standard</a>
+          <a href="#compact">Compact</a>
+          <a href="#operational">Operational</a>
+          <a href="#statistical">Statistical</a>
+        </nav>
+
+        <div class="example-chart-grid">
+        <article id="standard" class="uif-card example-chart-card">
           <h2>Line</h2>
           <div data-uif="chart" data-uif-chart="line" data-uif-options='{"grid":true,"focusable":true}' data-uif-data='[{"label":"Jan","value":120},{"label":"Feb","value":180},{"label":"Mar","value":150},{"label":"Apr","value":220}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Area</h2>
           <div data-uif="chart" data-uif-chart="area" data-uif-options='{"grid":true}' data-uif-data='[{"label":"Jan","value":80},{"label":"Feb","value":130},{"label":"Mar","value":110},{"label":"Apr","value":170}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Bar</h2>
           <div data-uif="chart" data-uif-chart="bar" data-uif-options='{"grid":true}' data-uif-data='[{"label":"Jan","value":42},{"label":"Feb","value":64},{"label":"Mar","value":58},{"label":"Apr","value":79}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Horizontal Bar</h2>
           <div data-uif="chart" data-uif-chart="horizontal-bar" data-uif-data='[{"label":"Sales","value":72},{"label":"Ops","value":55},{"label":"Support","value":38}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Grouped Bar</h2>
           <div data-uif="chart" data-uif-chart="grouped-bar" data-uif-options='{"legend":true,"grid":true}' data-uif-data='[{"label":"Jan","values":{"New":120,"Renewal":80}},{"label":"Feb","values":{"New":140,"Renewal":90}},{"label":"Mar","values":{"New":150,"Renewal":110}}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Stacked Bar</h2>
           <div data-uif="chart" data-uif-chart="stacked-bar" data-uif-options='{"legend":true,"grid":true}' data-uif-data='[{"label":"Jan","values":{"Product":70,"Services":30}},{"label":"Feb","values":{"Product":82,"Services":42}},{"label":"Mar","values":{"Product":88,"Services":50}}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Pie</h2>
           <div data-uif="chart" data-uif-chart="pie" data-uif-options='{"legend":true}' data-uif-data='[{"label":"Direct","value":35},{"label":"Partner","value":25},{"label":"Self Serve","value":40}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Donut</h2>
           <div data-uif="chart" data-uif-chart="donut" data-uif-options='{"legend":true}' data-uif-data='[{"label":"Won","value":45},{"label":"Open","value":35},{"label":"Risk","value":20}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Doughnut Alias</h2>
           <div data-uif="chart" data-uif-chart="doughnut" data-uif-options='{"legend":true}' data-uif-data='[{"label":"Used","value":68},{"label":"Available","value":32}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Radar</h2>
           <div data-uif="chart" data-uif-chart="radar" data-uif-data='[{"label":"Security","value":82},{"label":"Performance","value":74},{"label":"Reliability","value":91},{"label":"Cost","value":68},{"label":"UX","value":79}]'></div>
         </article>
-        <article class="uif-card">
+        <article id="compact" class="uif-card example-chart-card is-compact">
           <h2>Sparkline</h2>
           <div class="uif-stat">
             <div class="uif-stat-head"><span class="uif-stat-meta">Revenue</span><span class="uif-badge uif-badge-success">+12%</span></div>
@@ -64,70 +90,72 @@
             <div data-uif="chart" data-uif-chart="sparkline" data-uif-data='[{"label":"1","value":12},{"label":"2","value":18},{"label":"3","value":16},{"label":"4","value":24},{"label":"5","value":30}]'></div>
           </div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card is-compact">
           <h2>Metric</h2>
           <div data-uif="chart" data-uif-chart="metric" data-uif-data='[{"label":"Open Tickets","value":18}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card is-compact">
           <h2>Progress</h2>
           <div data-uif="chart" data-uif-chart="progress" data-uif-data='[{"label":"Completion","value":72,"max":100}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card is-compact">
           <h2>Ring</h2>
           <div data-uif="chart" data-uif-chart="ring" data-uif-data='[{"label":"SLA","value":94,"max":100}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card is-compact">
           <h2>Gauge</h2>
           <div data-uif="chart" data-uif-chart="gauge" data-uif-data='[{"label":"Health","value":81,"max":100}]'></div>
         </article>
-        <article class="uif-card">
+        <article id="operational" class="uif-card example-chart-card">
           <h2>Timeline</h2>
           <div data-uif="chart" data-uif-chart="timeline" data-uif-data='[{"label":"Queued","value":15},{"label":"Running","value":28},{"label":"Done","value":44},{"label":"Failed","value":4}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Heatmap</h2>
           <div data-uif="chart" data-uif-chart="heatmap" data-uif-data='[{"label":"Mon","value":4},{"label":"Tue","value":7},{"label":"Wed","value":3},{"label":"Thu","value":9},{"label":"Fri","value":6},{"label":"Sat","value":2},{"label":"Sun","value":5}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Status Heatmap</h2>
           <div data-uif="chart" data-uif-chart="status-heatmap" data-uif-data='[{"label":"API","value":9},{"label":"Jobs","value":6},{"label":"Billing","value":3},{"label":"Search","value":8},{"label":"Push","value":5},{"label":"AI","value":7}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Bullet</h2>
           <div data-uif="chart" data-uif-chart="bullet" data-uif-data='[{"label":"Revenue","value":72,"target":85,"max":100}]'></div>
         </article>
-        <article class="uif-card">
+        <article id="statistical" class="uif-card example-chart-card is-statistical">
           <h2>Histogram</h2>
           <div data-uif="chart" data-uif-chart="histogram" data-uif-options='{"bins":5,"grid":true,"focusable":true}' data-uif-data='[12,18,19,22,22,25,31,33,35,38,42,45]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card is-statistical">
           <h2>Box Plot</h2>
           <div data-uif="chart" data-uif-chart="box-plot" data-uif-data='[12,18,19,22,22,25,31,33,35,38,42,45]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card is-statistical">
           <h2>Scatter</h2>
           <div data-uif="chart" data-uif-chart="scatter" data-uif-x="load" data-uif-y="latency" data-uif-data='[{"label":"A","load":12,"latency":80},{"label":"B","load":20,"latency":110},{"label":"C","load":28,"latency":130},{"label":"D","load":36,"latency":175}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card is-statistical">
           <h2>Regression</h2>
           <div data-uif="chart" data-uif-chart="regression" data-uif-x="users" data-uif-y="tickets" data-uif-data='[{"label":"Mon","users":120,"tickets":8},{"label":"Tue","users":180,"tickets":13},{"label":"Wed","users":220,"tickets":19},{"label":"Thu","users":280,"tickets":24}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card is-statistical">
           <h2>Control Chart</h2>
           <div data-uif="chart" data-uif-chart="control-chart" data-uif-data='[{"label":"1","value":22},{"label":"2","value":24},{"label":"3","value":21},{"label":"4","value":25},{"label":"5","value":23},{"label":"6","value":31},{"label":"7","value":24}]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card is-statistical">
           <h2>Distribution</h2>
           <div data-uif="chart" data-uif-chart="distribution" data-uif-options='{"bins":6}' data-uif-data='[4,7,7,8,9,12,14,14,15,18,21,22,24]'></div>
         </article>
-        <article class="uif-card">
+        <article class="uif-card example-chart-card">
           <h2>Pareto</h2>
           <div data-uif="chart" data-uif-chart="pareto" data-uif-data='[{"label":"Login","value":42},{"label":"Billing","value":26},{"label":"Search","value":17},{"label":"Export","value":8}]'></div>
         </article>
-      </section>
+        </div>
+      </div>
     </main>
     <script type="module">
-      import { initChart } from '../../packages/charts/src/index.js';
+      import { initChart, mountIcons } from '../../dist/uif.esm.js?v=20260524-batoi-icon-v2';
+      mountIcons(document);
       document.querySelectorAll('[data-uif="chart"]').forEach((el) => initChart(el));
     </script>
   </body>

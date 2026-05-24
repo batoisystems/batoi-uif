@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Icon Gallery</title>
+    <link rel="stylesheet" href="../../packages/css/index.css">
+    <link rel="stylesheet" href="../shared/example.css">
+    <style>
+      .icon-toolbar {
+        display: grid;
+        grid-template-columns: minmax(14rem, 1fr) auto;
+        gap: 0.75rem;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .icon-search {
+        min-height: 2.75rem;
+        padding: 0.5rem 0.85rem;
+        border: 1px solid #dfe3e8;
+        border-radius: 0.65rem;
+        background: #fff;
+        color: #20252d;
+        font: inherit;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+      }
+
+      .icon-search:focus {
+        border-color: #0b72bd;
+        outline: 3px solid rgba(11, 114, 189, 0.14);
+      }
+
+      .icon-count {
+        color: #667085;
+        font-size: 0.86rem;
+        font-weight: 700;
+      }
+
+      .icon-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+      }
+
+      .icon-card {
+        display: grid;
+        grid-template-rows: auto auto 1fr auto;
+        gap: 0.75rem;
+        min-width: 0;
+        padding: 1rem;
+        border: 1px solid #dfe3e8;
+        border-radius: 0.75rem;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+      }
+
+      .icon-preview {
+        display: grid;
+        place-items: center;
+        width: 3.25rem;
+        height: 3.25rem;
+        border: 1px solid #d8e9f7;
+        border-radius: 0.75rem;
+        background: #f4f9fd;
+        color: #0b72bd;
+      }
+
+      .icon-preview.is-brand {
+        color: #00b696;
+      }
+
+      .icon-preview .uif-icon {
+        width: 1.75rem;
+        height: 1.75rem;
+      }
+
+      .icon-card h2 {
+        margin: 0;
+        color: #20252d;
+        font-size: 0.98rem;
+        font-weight: 750;
+        line-height: 1.2;
+      }
+
+      .icon-code {
+        min-width: 0;
+        margin: 0;
+        padding: 0.65rem;
+        border: 1px solid #e7eaee;
+        border-radius: 0.55rem;
+        background: #f8fafc;
+        color: #344054;
+        font-size: 0.74rem;
+        line-height: 1.45;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .icon-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+      }
+
+      .icon-copy {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        min-height: 2rem;
+        padding: 0.35rem 0.55rem;
+        border: 1px solid #dfe3e8;
+        border-radius: 0.5rem;
+        background: #fff;
+        color: #4b5563;
+        font: inherit;
+        font-size: 0.76rem;
+        font-weight: 750;
+        cursor: pointer;
+      }
+
+      .icon-copy:hover,
+      .icon-copy:focus {
+        border-color: #0b72bd;
+        color: #0b72bd;
+      }
+
+      .icon-copy.is-copied {
+        border-color: #bfeee5;
+        background: #e7faf6;
+        color: #087e6d;
+      }
+
+      .icon-copy .uif-icon {
+        width: 1rem;
+        height: 1rem;
+      }
+
+      @media (max-width: 72rem) {
+        .icon-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 56rem) {
+        .icon-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 40rem) {
+        .icon-toolbar,
+        .icon-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body class="example-page">
+    <main class="example-shell">
+      <div class="example-frame">
+        <header class="example-topbar">
+          <a class="example-brand" href="../">
+            <span class="example-brand-mark" data-uif-icon="batoi" data-uif-icon-title="Batoi"></span>
+            <span><strong>Batoi UIF</strong><span>Examples</span></span>
+          </a>
+          <div class="example-actions">
+            <a class="example-pill" href="../chart-gallery/">Chart gallery</a>
+            <a class="example-pill is-primary" href="../../dist/uif.esm.js">Distribution module</a>
+          </div>
+        </header>
+
+        <section class="example-hero">
+          <div>
+            <div class="example-eyebrow">Library · SVG icons</div>
+            <h1>Icon Gallery</h1>
+            <p>Every built-in Batoi UIF icon from the dependency-free SVG registry, with copy-ready declarative markup and JavaScript usage.</p>
+          </div>
+          <div class="example-meta" aria-label="Icon gallery summary">
+            <span class="example-pill" id="icon-total">0 icons</span>
+            <span class="example-pill">currentColor</span>
+            <span class="example-pill">SVG-first</span>
+          </div>
+        </section>
+
+        <div class="icon-toolbar">
+          <input class="icon-search" id="icon-search" type="search" placeholder="Search icons..." autocomplete="off">
+          <span class="icon-count" id="icon-count">Loading icons...</span>
+        </div>
+
+        <section class="icon-grid" id="icon-grid" aria-label="Available icons"></section>
+      </div>
+    </main>
+
+    <script type="module">
+      import { icon, icons, mountIcons } from '../../dist/uif.esm.js?v=20260524-batoi-icon-v2';
+
+      const grid = document.querySelector('#icon-grid');
+      const search = document.querySelector('#icon-search');
+      const total = document.querySelector('#icon-total');
+      const count = document.querySelector('#icon-count');
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;');
+      }
+
+      function titleFor(name) {
+        return name.split('-').map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+      }
+
+      function markupFor(name) {
+        return `<span data-uif-icon="${name}" data-uif-icon-title="${titleFor(name)}"></span>`;
+      }
+
+      function scriptFor(name) {
+        return `import { icon } from 'batoi-uif';\nconst svg = icon('${name}', { title: '${titleFor(name)}' });`;
+      }
+
+      const iconNames = Object.keys(icons).sort((a, b) => a.localeCompare(b));
+      total.textContent = `${iconNames.length} icons`;
+
+      function renderIcons(filter = '') {
+        const query = filter.trim().toLowerCase();
+        const visible = iconNames.filter((name) => name.includes(query));
+        count.textContent = `${visible.length} of ${iconNames.length} icons`;
+        grid.innerHTML = visible.map((name) => {
+          const declarative = markupFor(name);
+          const js = scriptFor(name);
+          const svg = icon(name, { title: titleFor(name) });
+          return `
+            <article class="icon-card" data-icon-name="${escapeHtml(name)}">
+              <div class="icon-preview ${name === 'batoi' ? 'is-brand' : ''}" aria-hidden="true">${svg}</div>
+              <h2>${escapeHtml(name)}</h2>
+              <pre class="icon-code"><code>${escapeHtml(declarative)}</code></pre>
+              <div class="icon-actions">
+                <button class="icon-copy" type="button" data-copy="${escapeHtml(name)}"><span data-uif-icon="copy"></span>Name</button>
+                <button class="icon-copy" type="button" data-copy="${escapeHtml(declarative)}"><span data-uif-icon="copy"></span>Markup</button>
+                <button class="icon-copy" type="button" data-copy="${escapeHtml(js)}"><span data-uif-icon="copy"></span>JS</button>
+                <button class="icon-copy" type="button" data-copy="${escapeHtml(svg)}"><span data-uif-icon="copy"></span>SVG</button>
+              </div>
+            </article>
+          `;
+        }).join('');
+        mountIcons(grid);
+      }
+
+      async function copyText(value) {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(value);
+          return;
+        }
+        const input = document.createElement('textarea');
+        input.value = value;
+        input.setAttribute('readonly', '');
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.append(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+      }
+
+      document.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-copy]');
+        if (!button) return;
+        await copyText(button.dataset.copy);
+        const label = button.textContent;
+        button.classList.add('is-copied');
+        button.textContent = 'Copied';
+        window.setTimeout(() => {
+          button.classList.remove('is-copied');
+          button.innerHTML = '<span data-uif-icon="copy"></span>' + label;
+          mountIcons(button);
+        }, 1200);
+      });
+
+      search.addEventListener('input', () => renderIcons(search.value));
+      mountIcons(document);
+      renderIcons();
+    </script>
+  </body>
+</html>

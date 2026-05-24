@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hasIcon, icon, iconElement, mountIcons, registerIcon } from './index.js';
+import { hasIcon, icon, iconElement, icons, mountIcons, registerIcon } from './index.js';
 
 describe('icons', () => {
   it('renders decorative SVG markup', () => {
@@ -27,6 +27,34 @@ describe('icons', () => {
     registerIcon('custom-mark', '<path d="M1 1h22v22H1z"></path>');
     expect(hasIcon('custom-mark')).toBe(true);
     expect(icon('custom-mark')).toContain('M1 1h22v22H1z');
+  });
+
+  it('includes the Batoi brand mark', () => {
+    const markup = icon('batoi', { title: 'Batoi' });
+    expect(hasIcon('batoi')).toBe(true);
+    expect(markup).toContain('<title>Batoi</title>');
+    expect(markup).toContain('fill="currentColor"');
+  });
+
+  it('includes a broad first-party icon set for application interfaces', () => {
+    expect(Object.keys(icons).length).toBeGreaterThanOrEqual(120);
+    [
+      'archive',
+      'bank',
+      'cart',
+      'dashboard',
+      'donut-chart',
+      'eye-off',
+      'folder',
+      'gauge-chart',
+      'mail',
+      'server',
+      'wallet',
+      'workflow',
+    ].forEach((name) => {
+      expect(hasIcon(name)).toBe(true);
+      expect(icon(name)).toContain('<svg');
+    });
   });
 
   it('mounts declarative icons idempotently', () => {
