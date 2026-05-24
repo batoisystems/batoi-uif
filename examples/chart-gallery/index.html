@@ -41,6 +41,59 @@
           <a href="#statistical">Statistical</a>
         </nav>
 
+        <section class="chart-workbench" aria-label="Chart builder">
+          <div class="chart-workbench-head">
+            <div>
+              <div class="example-eyebrow">Configure · Preview · Copy</div>
+              <h2>Chart Builder</h2>
+              <p>Choose a chart type, toggle common options, preview the result, and copy declarative HTML for direct use.</p>
+            </div>
+            <button class="chart-copy is-primary" type="button" data-copy-workbench><span data-uif-icon="copy"></span>Copy markup</button>
+          </div>
+          <div class="chart-workbench-grid">
+            <form class="chart-options" id="chart-options">
+              <label>
+                <span>Chart type</span>
+                <select name="type" id="chart-type"></select>
+              </label>
+              <label>
+                <span>Palette</span>
+                <select name="palette">
+                  <option value="default">Default theme</option>
+                  <option value="professional">Professional</option>
+                  <option value="categorical">Categorical</option>
+                  <option value="status">Status</option>
+                </select>
+              </label>
+              <label>
+                <span>Size</span>
+                <select name="size">
+                  <option value="responsive">Responsive</option>
+                  <option value="compact">Compact</option>
+                  <option value="wide">Wide</option>
+                </select>
+              </label>
+              <div class="chart-option-checks">
+                <label><input name="grid" type="checkbox" checked> Grid</label>
+                <label><input name="axes" type="checkbox" checked> Axes</label>
+                <label><input name="legend" type="checkbox"> Legend</label>
+                <label><input name="labels" type="checkbox" checked> Labels</label>
+                <label><input name="focusable" type="checkbox"> Focusable marks</label>
+              </div>
+            </form>
+            <div class="chart-preview-panel">
+              <div id="chart-preview" data-uif="chart" data-uif-chart="line" data-uif-options='{"grid":true,"axes":true,"labels":true}' data-uif-data='[{"label":"Jan","value":120},{"label":"Feb","value":180},{"label":"Mar","value":150},{"label":"Apr","value":220}]'></div>
+            </div>
+            <div class="chart-code-panel">
+              <div class="chart-code-head">
+                <strong>HTML</strong>
+                <button class="chart-copy" type="button" data-copy-code><span data-uif-icon="copy"></span>Copy</button>
+              </div>
+              <textarea id="chart-code" readonly spellcheck="false"></textarea>
+            </div>
+          </div>
+        </section>
+
         <div class="example-chart-grid">
         <article id="standard" class="uif-card example-chart-card">
           <h2>Line</h2>
@@ -58,27 +111,27 @@
           <h2>Horizontal Bar</h2>
           <div data-uif="chart" data-uif-chart="horizontal-bar" data-uif-data='[{"label":"Sales","value":72},{"label":"Ops","value":55},{"label":"Support","value":38}]'></div>
         </article>
-        <article class="uif-card example-chart-card">
+        <article class="uif-card example-chart-card is-categorical">
           <h2>Grouped Bar</h2>
           <div data-uif="chart" data-uif-chart="grouped-bar" data-uif-options='{"legend":true,"grid":true}' data-uif-data='[{"label":"Jan","values":{"New":120,"Renewal":80}},{"label":"Feb","values":{"New":140,"Renewal":90}},{"label":"Mar","values":{"New":150,"Renewal":110}}]'></div>
         </article>
-        <article class="uif-card example-chart-card">
+        <article class="uif-card example-chart-card is-categorical">
           <h2>Stacked Bar</h2>
           <div data-uif="chart" data-uif-chart="stacked-bar" data-uif-options='{"legend":true,"grid":true}' data-uif-data='[{"label":"Jan","values":{"Product":70,"Services":30}},{"label":"Feb","values":{"Product":82,"Services":42}},{"label":"Mar","values":{"Product":88,"Services":50}}]'></div>
         </article>
-        <article class="uif-card example-chart-card">
+        <article class="uif-card example-chart-card is-categorical">
           <h2>Pie</h2>
           <div data-uif="chart" data-uif-chart="pie" data-uif-options='{"legend":true}' data-uif-data='[{"label":"Direct","value":35},{"label":"Partner","value":25},{"label":"Self Serve","value":40}]'></div>
         </article>
-        <article class="uif-card example-chart-card">
+        <article class="uif-card example-chart-card is-categorical">
           <h2>Donut</h2>
           <div data-uif="chart" data-uif-chart="donut" data-uif-options='{"legend":true}' data-uif-data='[{"label":"Won","value":45},{"label":"Open","value":35},{"label":"Risk","value":20}]'></div>
         </article>
-        <article class="uif-card example-chart-card">
+        <article class="uif-card example-chart-card is-categorical">
           <h2>Doughnut Alias</h2>
           <div data-uif="chart" data-uif-chart="doughnut" data-uif-options='{"legend":true}' data-uif-data='[{"label":"Used","value":68},{"label":"Available","value":32}]'></div>
         </article>
-        <article class="uif-card example-chart-card">
+        <article class="uif-card example-chart-card is-categorical">
           <h2>Radar</h2>
           <div data-uif="chart" data-uif-chart="radar" data-uif-data='[{"label":"Security","value":82},{"label":"Performance","value":74},{"label":"Reliability","value":91},{"label":"Cost","value":68},{"label":"UX","value":79}]'></div>
         </article>
@@ -106,19 +159,19 @@
           <h2>Gauge</h2>
           <div data-uif="chart" data-uif-chart="gauge" data-uif-data='[{"label":"Health","value":81,"max":100}]'></div>
         </article>
-        <article id="operational" class="uif-card example-chart-card">
+        <article id="operational" class="uif-card example-chart-card is-operational">
           <h2>Timeline</h2>
           <div data-uif="chart" data-uif-chart="timeline" data-uif-data='[{"label":"Queued","value":15},{"label":"Running","value":28},{"label":"Done","value":44},{"label":"Failed","value":4}]'></div>
         </article>
-        <article class="uif-card example-chart-card">
+        <article class="uif-card example-chart-card is-operational">
           <h2>Heatmap</h2>
           <div data-uif="chart" data-uif-chart="heatmap" data-uif-data='[{"label":"Mon","value":4},{"label":"Tue","value":7},{"label":"Wed","value":3},{"label":"Thu","value":9},{"label":"Fri","value":6},{"label":"Sat","value":2},{"label":"Sun","value":5}]'></div>
         </article>
-        <article class="uif-card example-chart-card">
+        <article class="uif-card example-chart-card is-operational">
           <h2>Status Heatmap</h2>
           <div data-uif="chart" data-uif-chart="status-heatmap" data-uif-data='[{"label":"API","value":9},{"label":"Jobs","value":6},{"label":"Billing","value":3},{"label":"Search","value":8},{"label":"Push","value":5},{"label":"AI","value":7}]'></div>
         </article>
-        <article class="uif-card example-chart-card">
+        <article class="uif-card example-chart-card is-operational">
           <h2>Bullet</h2>
           <div data-uif="chart" data-uif-chart="bullet" data-uif-data='[{"label":"Revenue","value":72,"target":85,"max":100}]'></div>
         </article>
@@ -155,8 +208,156 @@
     </main>
     <script type="module">
       import { initChart, mountIcons } from '../../dist/uif.esm.js?v=20260524-batoi-icon-v2';
+
+      const palettes = {
+        professional: ['#0b72bd', '#00a88f', '#e4a700', '#df3158', '#7c3aed'],
+        categorical: ['#0b72bd', '#00a88f', '#e4a700', '#df3158', '#7c3aed', '#0f766e'],
+        status: ['#00a88f', '#0b72bd', '#e4a700', '#df3158'],
+      };
+
+      function titleForType(type) {
+        return type.split('-').map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;');
+      }
+
+      function escapeAttribute(value) {
+        return String(value).replaceAll('&', '&amp;').replaceAll("'", '&#39;');
+      }
+
+      function chartMarkup(el, optionsOverride) {
+        const options = optionsOverride ?? JSON.parse(el.dataset.uifOptions || '{}');
+        const attrs = [
+          'data-uif="chart"',
+          `data-uif-chart="${el.dataset.uifChart}"`,
+          el.dataset.uifX ? `data-uif-x="${el.dataset.uifX}"` : '',
+          el.dataset.uifY ? `data-uif-y="${el.dataset.uifY}"` : '',
+          Object.keys(options).length ? `data-uif-options='${escapeAttribute(JSON.stringify(options))}'` : '',
+          `data-uif-data='${escapeAttribute(el.dataset.uifData || '[]')}'`,
+        ].filter(Boolean);
+        return `<div ${attrs.join(' ')}></div>`;
+      }
+
+      async function copyText(value) {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(value);
+          return;
+        }
+        const input = document.createElement('textarea');
+        input.value = value;
+        input.setAttribute('readonly', '');
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.append(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+      }
+
+      function markCopied(button) {
+        const html = button.innerHTML;
+        button.classList.add('is-copied');
+        button.textContent = 'Copied';
+        window.setTimeout(() => {
+          button.classList.remove('is-copied');
+          button.innerHTML = html;
+          mountIcons(button);
+        }, 1200);
+      }
+
+      function enhanceChartCards() {
+        document.querySelectorAll('.example-chart-card').forEach((card) => {
+          const chart = card.querySelector('[data-uif="chart"]');
+          if (!chart) return;
+          const actions = document.createElement('div');
+          actions.className = 'chart-card-actions';
+          actions.innerHTML = `
+            <button class="chart-copy" type="button" data-copy-card="markup"><span data-uif-icon="copy"></span>Markup</button>
+            <button class="chart-copy" type="button" data-copy-card="data"><span data-uif-icon="copy"></span>Data</button>
+            <button class="chart-copy" type="button" data-copy-card="options"><span data-uif-icon="copy"></span>Options</button>
+          `;
+          card.append(actions);
+        });
+      }
+
+      function setupWorkbench() {
+        const sourceCharts = [...document.querySelectorAll('.example-chart-card [data-uif="chart"]')];
+        const byType = new Map(sourceCharts.map((el) => [el.dataset.uifChart, el]));
+        const typeSelect = document.querySelector('#chart-type');
+        const form = document.querySelector('#chart-options');
+        const preview = document.querySelector('#chart-preview');
+        const code = document.querySelector('#chart-code');
+
+        typeSelect.innerHTML = [...byType.keys()]
+          .map((type) => `<option value="${type}">${titleForType(type)}</option>`)
+          .join('');
+
+        function selectedOptions() {
+          const data = new FormData(form);
+          const options = {
+            grid: data.has('grid'),
+            axes: data.has('axes'),
+            labels: data.has('labels'),
+            focusable: data.has('focusable'),
+          };
+          if (data.has('legend')) options.legend = true;
+          const size = data.get('size');
+          if (size === 'compact') Object.assign(options, { width: 260, height: 150 });
+          if (size === 'wide') Object.assign(options, { width: 520, height: 260 });
+          const palette = data.get('palette');
+          if (palette && palette !== 'default') options.palette = palettes[palette];
+          return options;
+        }
+
+        function renderWorkbench() {
+          const source = byType.get(typeSelect.value) ?? sourceCharts[0];
+          const options = selectedOptions();
+          preview.dataset.uifChart = source.dataset.uifChart;
+          preview.dataset.uifData = source.dataset.uifData || '[]';
+          preview.dataset.uifOptions = JSON.stringify(options);
+          if (source.dataset.uifX) preview.dataset.uifX = source.dataset.uifX;
+          else delete preview.dataset.uifX;
+          if (source.dataset.uifY) preview.dataset.uifY = source.dataset.uifY;
+          else delete preview.dataset.uifY;
+          code.value = chartMarkup(preview, options);
+          initChart(preview);
+        }
+
+        form.addEventListener('input', renderWorkbench);
+        renderWorkbench();
+      }
+
       mountIcons(document);
-      document.querySelectorAll('[data-uif="chart"]').forEach((el) => initChart(el));
+      enhanceChartCards();
+      mountIcons(document);
+      setupWorkbench();
+      document.querySelectorAll('.example-chart-card [data-uif="chart"]').forEach((el) => initChart(el));
+
+      document.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-copy-card], [data-copy-code], [data-copy-workbench]');
+        if (!button) return;
+        if (button.dataset.copyCard) {
+          const card = button.closest('.example-chart-card');
+          const chart = card?.querySelector('[data-uif="chart"]');
+          if (!chart) return;
+          const value = button.dataset.copyCard === 'data'
+            ? chart.dataset.uifData || '[]'
+            : button.dataset.copyCard === 'options'
+              ? chart.dataset.uifOptions || '{}'
+              : chartMarkup(chart);
+          await copyText(value);
+          markCopied(button);
+          return;
+        }
+        const code = document.querySelector('#chart-code');
+        await copyText(code.value);
+        markCopied(button);
+      });
     </script>
   </body>
 </html>
