@@ -18,6 +18,22 @@ export interface UIFRequestError extends Error {
   data?: unknown;
 }
 
+export type ConnectorType = 'api' | 'json' | 'csv' | 'static' | 'spreadsheet' | 'google-sheet';
+export type ConnectorMode = 'readonly' | 'readwrite';
+
+export interface DataConnector<T = unknown> {
+  type: ConnectorType;
+  name?: string;
+  mode?: ConnectorMode;
+  src?: string;
+  method?: string;
+  headers?: HeadersInit;
+  data?: T;
+  timeout?: number;
+  refreshInterval?: number;
+  transform?: (value: unknown) => T | Promise<T>;
+}
+
 type RequestInterceptor = (url: string, options: RequestOptions) => void | RequestOptions | Promise<void | RequestOptions>;
 type ResponseInterceptor = (response: Response) => void | Response | Promise<void | Response>;
 
@@ -162,4 +178,82 @@ export function upload<T = unknown>(url: string, formData: FormData, options: Re
     });
   }
   return request<T>(url, { ...options, method: options.method ?? 'POST', body: formData });
+}
+
+export function parseCSV(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let quoted = false;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    const next = text[index + 1];
+    if (char === '"' && quoted && next === '"') {
+      cell += '"';
+      index += 1;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === ',' && !quoted) {
+      row.push(cell);
+      cell = '';
+    } else if ((char === '\n' || char === '\r') && !quoted) {
+      if (char === '\r' && next === '\n') index += 1;
+      row.push(cell);
+      if (row.some((value) => value !== '')) rows.push(row);
+      row = [];
+      cell = '';
+    } else {
+      cell += char;
+    }
+  }
+
+  row.push(cell);
+  if (row.some((value) => value !== '')) rows.push(row);
+  return rows;
+}
+
+export function csvToObjects(text: string): Array<Record<string, string>> {
+  const [head, ...rows] = parseCSV(text);
+  if (!head) return [];
+  return rows.map((row) =>
+    head.reduce<Record<string, string>>((acc, key, index) => {
+      acc[key] = row[index] ?? '';
+      return acc;
+    }, {}),
+  );
+}
+
+export async function loadConnector<T = unknown>(connector: DataConnector<T>, options: RequestOptions = {}): Promise<T> {
+  let value: unknown;
+  if (connector.type === 'static') {
+    value = connector.data;
+  } else {
+    if (!connector.src) throw new Error(`Connector source is required for ${connector.type}`);
+    const parseAs = connector.type === 'csv' ? 'text' : 'auto';
+    value = await request(connector.src, {
+      ...options,
+      method: connector.method ?? 'GET',
+      headers: connector.headers ?? options.headers,
+      timeout: connector.timeout ?? options.timeout,
+      parseAs,
+    });
+    if (connector.type === 'csv') value = csvToObjects(String(value));
+  }
+  return connector.transform ? connector.transform(value) : (value as T);
+}
+
+export function bindConnector<T = unknown>(connector: DataConnector<T>, handler: (value: T) => void | Promise<void>, options: RequestOptions = {}): () => void {
+  let stopped = false;
+  let timer: number | undefined;
+  const load = async () => {
+    const value = await loadConnector(connector, options);
+    if (!stopped) await handler(value);
+  };
+  void load();
+  if (connector.refreshInterval) timer = window.setInterval(() => void load(), connector.refreshInterval);
+  return () => {
+    stopped = true;
+    if (timer) window.clearInterval(timer);
+  };
 }

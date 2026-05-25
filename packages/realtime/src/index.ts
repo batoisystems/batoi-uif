@@ -2,7 +2,7 @@ import { appendTextElement } from '@batoi/uif-dom';
 import { request } from '@batoi/uif-net';
 
 export type RealtimeMode = 'sse' | 'websocket' | 'poll';
-export type RealtimeState = 'connecting' | 'connected' | 'reconnecting' | 'disconnected' | 'stale' | 'error';
+export type RealtimeState = 'idle' | 'connecting' | 'connected' | 'open' | 'reconnecting' | 'disconnected' | 'closed' | 'stale' | 'degraded' | 'error' | 'failed';
 export type RealtimeHandler = (payload: unknown) => void;
 
 export interface RealtimeOptions {
@@ -15,9 +15,26 @@ export interface RealtimeOptions {
   heartbeat?: number;
 }
 
+export interface RealtimeBindingOptions extends Omit<RealtimeOptions, 'mode'> {
+  transport?: RealtimeMode | 'polling';
+  fallback?: 'polling' | 'none';
+  onMessage?: RealtimeHandler;
+  onState?: (state: RealtimeState) => void;
+}
+
+export interface PresenceUser {
+  id: string;
+  name?: string;
+  color?: string;
+  cursor?: { x: number; y: number };
+  lastSeen: string;
+  metadata?: Record<string, unknown>;
+}
+
 const handlers = new Map<string, Set<RealtimeHandler>>();
 const connections = new Map<string, { close(): void }>();
 const states = new Map<string, RealtimeState>();
+const presence = new Map<string, Map<string, PresenceUser>>();
 const elementSubscriptions = new WeakMap<HTMLElement, () => void>();
 
 function setState(channel: string, state: RealtimeState): void {
@@ -26,7 +43,7 @@ function setState(channel: string, state: RealtimeState): void {
 }
 
 export function getConnectionState(channel: string): RealtimeState {
-  return states.get(channel) ?? 'disconnected';
+  return states.get(channel) ?? 'idle';
 }
 
 function parsePayload(data: string): unknown {
@@ -104,6 +121,40 @@ export function connect(options: RealtimeOptions): void {
     }, options.heartbeat);
   }
   connections.set(options.channel, { close: () => window.clearInterval(timer) });
+}
+
+export function bindRealtime(options: RealtimeBindingOptions): () => void {
+  const mode = options.transport === 'polling' ? 'poll' : options.transport;
+  const disposers: Array<() => void> = [];
+  if (options.onMessage) disposers.push(subscribe(options.channel, options.onMessage));
+  if (options.onState) {
+    const listener = (event: Event) => {
+      const detail = (event as CustomEvent<{ channel: string; state: RealtimeState }>).detail;
+      if (detail?.channel === options.channel) options.onState?.(detail.state);
+    };
+    window.addEventListener('uif:realtime-state', listener);
+    disposers.push(() => window.removeEventListener('uif:realtime-state', listener));
+  }
+  connect({ ...options, mode: mode ?? (options.fallback === 'polling' ? 'poll' : undefined) });
+  disposers.push(() => disconnect(options.channel));
+  return () => disposers.splice(0).forEach((dispose) => dispose());
+}
+
+export function updatePresence(channel: string, user: Omit<PresenceUser, 'lastSeen'> & { lastSeen?: string }): PresenceUser {
+  if (!presence.has(channel)) presence.set(channel, new Map());
+  const next: PresenceUser = { ...user, lastSeen: user.lastSeen ?? new Date().toISOString() };
+  presence.get(channel)?.set(next.id, next);
+  window.dispatchEvent(new CustomEvent('uif:presence', { detail: { channel, users: getPresence(channel) } }));
+  return next;
+}
+
+export function removePresence(channel: string, userId: string): void {
+  presence.get(channel)?.delete(userId);
+  window.dispatchEvent(new CustomEvent('uif:presence', { detail: { channel, users: getPresence(channel) } }));
+}
+
+export function getPresence(channel: string): PresenceUser[] {
+  return Array.from(presence.get(channel)?.values() ?? []);
 }
 
 export function disconnect(channel: string): void {

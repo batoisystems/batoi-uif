@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Browser Extension Kit</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/example.css">
+    <style>
+      .extension-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+        gap: 1rem;
+      }
+
+      .extension-code {
+        overflow: auto;
+        max-height: 32rem;
+        margin: 0;
+        padding: 1rem;
+        border-radius: 0.65rem;
+        background: #111827;
+        color: #d1e7ff;
+        font: 0.8rem/1.55 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      @media (max-width: 56rem) {
+        .extension-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="example-page">
+      <header class="example-topbar">
+        <a class="example-brand" href="../"><span data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Extension Kit</span></span></a>
+        <nav class="example-actions" aria-label="Examples">
+          <a class="example-pill" href="../">All examples</a>
+          <a class="example-pill" href="../micro-app-dashboard/">Micro App</a>
+          <a class="example-pill" href="../component-gallery/">Components</a>
+          <a class="example-pill" href="../chart-gallery/">Charts</a>
+        </nav>
+      </header>
+
+      <section class="example-hero">
+        <div>
+          <span class="example-eyebrow">Manifest V3 · popup · side panel · content script</span>
+          <h1>Browser Extension Shell</h1>
+          <p>Generate a dependency-free extension manifest and reuse UIF components in extension popups, side panels, options pages, and content-script mounts.</p>
+        </div>
+        <div class="example-hero-actions">
+          <button class="uif-btn" type="button" data-copy="#manifest-output"><span data-uif-icon="copy"></span>Copy manifest</button>
+        </div>
+      </section>
+
+      <section class="extension-grid">
+        <article class="example-card">
+          <div class="example-card-head">
+            <h2>Extension Surfaces</h2>
+            <p>UIF stays browser-native, so the same CSS and JS distribution can power each extension surface.</p>
+          </div>
+          <div class="example-card-body">
+            <div class="uif-stack">
+              <div class="uif-summary-block"><span data-uif-icon="desktop"></span><div><strong>Popup</strong><p>Fast task launcher and status panel.</p></div></div>
+              <div class="uif-summary-block"><span data-uif-icon="sidebar"></span><div><strong>Side panel</strong><p>Workspace-aware assistant, checklist, or dashboard.</p></div></div>
+              <div class="uif-summary-block"><span data-uif-icon="code"></span><div><strong>Content script</strong><p>Mount governed UI onto approved host pages.</p></div></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="example-card">
+          <div class="example-card-head">
+            <h2>Generated Manifest</h2>
+            <p>Copy this into an extension project and point the HTML pages at the UIF distribution.</p>
+          </div>
+          <div class="example-card-body">
+            <pre class="extension-code"><code id="manifest-output"></code></pre>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script type="module">
+      import { createExtensionManifest, mountIcons } from '../../dist/uif.esm.js';
+
+      const manifest = createExtensionManifest({
+        name: 'Batoi UIF Workspace Helper',
+        description: 'Dependency-free Batoi UIF extension shell.',
+        permissions: ['storage', 'sidePanel'],
+        hostPermissions: ['https://*.batoi.com/*'],
+        surfaces: {
+          popup: 'popup.html',
+          options: 'options.html',
+          sidePanel: 'side-panel.html',
+          contentScript: 'content-script.js',
+          serviceWorker: 'service-worker.js',
+        },
+      });
+
+      document.querySelector('#manifest-output').textContent = JSON.stringify(manifest, null, 2);
+      document.addEventListener('click', async (event) => {
+        const button = event.target instanceof Element ? event.target.closest('[data-copy]') : null;
+        if (!button) return;
+        const target = document.querySelector(button.dataset.copy);
+        await navigator.clipboard?.writeText(target?.textContent || '');
+      });
+      mountIcons(document);
+    </script>
+  </body>
+</html>

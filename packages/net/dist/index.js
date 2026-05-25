@@ -124,9 +124,85 @@ function upload(url, formData, options = {}) {
   }
   return request(url, { ...options, method: options.method ?? "POST", body: formData });
 }
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let quoted = false;
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    const next = text[index + 1];
+    if (char === '"' && quoted && next === '"') {
+      cell += '"';
+      index += 1;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === "," && !quoted) {
+      row.push(cell);
+      cell = "";
+    } else if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && next === "\n") index += 1;
+      row.push(cell);
+      if (row.some((value) => value !== "")) rows.push(row);
+      row = [];
+      cell = "";
+    } else {
+      cell += char;
+    }
+  }
+  row.push(cell);
+  if (row.some((value) => value !== "")) rows.push(row);
+  return rows;
+}
+function csvToObjects(text) {
+  const [head, ...rows] = parseCSV(text);
+  if (!head) return [];
+  return rows.map(
+    (row) => head.reduce((acc, key, index) => {
+      acc[key] = row[index] ?? "";
+      return acc;
+    }, {})
+  );
+}
+async function loadConnector(connector, options = {}) {
+  let value;
+  if (connector.type === "static") {
+    value = connector.data;
+  } else {
+    if (!connector.src) throw new Error(`Connector source is required for ${connector.type}`);
+    const parseAs = connector.type === "csv" ? "text" : "auto";
+    value = await request(connector.src, {
+      ...options,
+      method: connector.method ?? "GET",
+      headers: connector.headers ?? options.headers,
+      timeout: connector.timeout ?? options.timeout,
+      parseAs
+    });
+    if (connector.type === "csv") value = csvToObjects(String(value));
+  }
+  return connector.transform ? connector.transform(value) : value;
+}
+function bindConnector(connector, handler, options = {}) {
+  let stopped = false;
+  let timer;
+  const load = async () => {
+    const value = await loadConnector(connector, options);
+    if (!stopped) await handler(value);
+  };
+  void load();
+  if (connector.refreshInterval) timer = window.setInterval(() => void load(), connector.refreshInterval);
+  return () => {
+    stopped = true;
+    if (timer) window.clearInterval(timer);
+  };
+}
 export {
+  bindConnector,
   cancelRequest,
+  csvToObjects,
   get,
+  loadConnector,
+  parseCSV,
   post,
   request,
   submitForm,

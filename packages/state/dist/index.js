@@ -155,9 +155,132 @@ function createMicroAppStore(initialState, options = {}) {
 function createArtifactStore(initialState, options = {}) {
   return createMicroAppStore(initialState, options);
 }
+function makeScopedKey(namespace, key) {
+  return `${namespace}:${key}`;
+}
+function stripScope(namespace, key) {
+  return key.startsWith(`${namespace}:`) ? key.slice(namespace.length + 1) : key;
+}
+function makeMemoryStorage() {
+  const map = /* @__PURE__ */ new Map();
+  return {
+    get length() {
+      return map.size;
+    },
+    clear() {
+      map.clear();
+    },
+    getItem(key) {
+      return map.get(key) ?? null;
+    },
+    key(index) {
+      return Array.from(map.keys())[index] ?? null;
+    },
+    removeItem(key) {
+      map.delete(key);
+    },
+    setItem(key, value) {
+      map.set(key, value);
+    }
+  };
+}
+function createLocalStore(options = {}) {
+  const namespace = options.namespace || "uif";
+  const storage = options.driver === "memory" ? makeMemoryStorage() : window.localStorage;
+  const api = {
+    namespace,
+    async get(key) {
+      const raw = storage.getItem(makeScopedKey(namespace, key));
+      return raw === null ? void 0 : JSON.parse(raw);
+    },
+    async set(key, value) {
+      storage.setItem(makeScopedKey(namespace, key), JSON.stringify(value));
+    },
+    async delete(key) {
+      storage.removeItem(makeScopedKey(namespace, key));
+    },
+    async list() {
+      const items = [];
+      for (let index = 0; index < storage.length; index += 1) {
+        const scopedKey = storage.key(index);
+        if (!scopedKey?.startsWith(`${namespace}:`)) continue;
+        const raw = storage.getItem(scopedKey);
+        if (raw === null) continue;
+        items.push({ key: stripScope(namespace, scopedKey), value: JSON.parse(raw) });
+      }
+      return items;
+    },
+    async clear() {
+      const keys = await api.list();
+      keys.forEach((item) => storage.removeItem(makeScopedKey(namespace, item.key)));
+    },
+    async exportJSON(space = 2) {
+      const entries = await api.list();
+      return JSON.stringify(
+        entries.reduce((acc, item) => {
+          acc[item.key] = item.value;
+          return acc;
+        }, {}),
+        null,
+        space
+      );
+    },
+    async importJSON(json) {
+      const parsed = JSON.parse(json);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Local store import must be a JSON object");
+      await api.clear();
+      await Promise.all(Object.entries(parsed).map(([key, value]) => api.set(key, value)));
+    }
+  };
+  return api;
+}
+function id(prefix = "sync") {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+function createSyncQueue(store, key = "sync-queue") {
+  const read = async () => await store.get(key) ?? [];
+  const write = (items) => store.set(key, items);
+  return {
+    async enqueue(action, payload, itemId = id()) {
+      const now = (/* @__PURE__ */ new Date()).toISOString();
+      const item = { id: itemId, action, payload, status: "queued", attempts: 0, createdAt: now, updatedAt: now };
+      await write([...await read(), item]);
+      return item;
+    },
+    async list(status) {
+      const items = await read();
+      return status ? items.filter((item) => item.status === status) : items;
+    },
+    async update(itemId, patch) {
+      const items = await read();
+      const index = items.findIndex((item) => item.id === itemId);
+      if (index < 0) throw new Error(`Sync queue item not found: ${itemId}`);
+      const next = { ...items[index], ...patch, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+      items[index] = next;
+      await write(items);
+      return next;
+    },
+    async remove(itemId) {
+      await write((await read()).filter((item) => item.id !== itemId));
+    },
+    async clear(status) {
+      await write(status ? (await read()).filter((item) => item.status !== status) : []);
+    },
+    async exportJSON(space = 2) {
+      return JSON.stringify(await read(), null, space);
+    },
+    async importJSON(json) {
+      const parsed = JSON.parse(json);
+      if (!Array.isArray(parsed)) throw new Error("Sync queue import must be a JSON array");
+      await write(parsed);
+    }
+  };
+}
 export {
   createAdvancedStore,
   createArtifactStore,
+  createLocalStore,
   createMicroAppStore,
-  createStore
+  createStore,
+  createSyncQueue
 };

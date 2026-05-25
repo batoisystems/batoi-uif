@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Dashboard Connectors</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/example.css">
+    <style>
+      .dashboard-shell {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .dashboard-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        padding: 1rem;
+        border: 1px solid #d8e0ea;
+        border-radius: 0.5rem;
+        background: #fff;
+      }
+
+      .dashboard-code {
+        overflow: auto;
+        max-height: 24rem;
+        margin: 0;
+        padding: 1rem;
+        border-radius: 0.65rem;
+        background: #111827;
+        color: #d1e7ff;
+        font: 0.78rem/1.55 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="example-page">
+      <header class="example-topbar">
+        <a class="example-brand" href="../"><span data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Dashboard connectors</span></span></a>
+        <nav class="example-actions" aria-label="Examples">
+          <a class="example-pill" href="../">All examples</a>
+          <a class="example-pill" href="../micro-app-dashboard/">Micro App</a>
+          <a class="example-pill" href="../chart-gallery/">Charts</a>
+          <a class="example-pill" href="../component-gallery/">Components</a>
+        </nav>
+      </header>
+
+      <section class="example-hero">
+        <div>
+          <span class="example-eyebrow">JSON connector · filters · dashboard config</span>
+          <h1>Connector-backed operational dashboard</h1>
+          <p>Load data from a local JSON connector, filter it in the browser, render metrics/charts/tables, and copy the dashboard configuration.</p>
+        </div>
+        <button class="uif-btn" type="button" data-copy="#dashboard-config"><span data-uif-icon="copy"></span>Copy config</button>
+      </section>
+
+      <section class="dashboard-shell">
+        <div class="dashboard-toolbar">
+          <label class="uif-field">
+            <span class="uif-field-label">Region filter</span>
+            <select class="uif-input" id="region-filter">
+              <option value="">All regions</option>
+              <option>North</option>
+              <option>East</option>
+              <option>South</option>
+              <option>West</option>
+            </select>
+          </label>
+          <span class="uif-badge uif-badge-success" id="connector-state">Loading connector</span>
+        </div>
+
+        <section id="dashboard-output"></section>
+
+        <article class="uif-card uif-card-flush">
+          <div class="uif-card-head">
+            <div><h2>Copyable Dashboard Config</h2><p>Use this config with <code>renderDashboard()</code> or declarative <code>data-uif="dashboard"</code>.</p></div>
+          </div>
+          <div class="uif-card-body">
+            <pre class="dashboard-code"><code id="dashboard-config"></code></pre>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script type="module">
+      import { applyDashboardFilters, createDashboardConfig, loadConnector, mountIcons, renderDashboard, summarizeDashboard } from '../../dist/uif.esm.js';
+
+      const connector = { type: 'json', src: './data.json', refreshInterval: 0 };
+      const output = document.querySelector('#dashboard-output');
+      const code = document.querySelector('#dashboard-config');
+      const state = document.querySelector('#connector-state');
+      const filter = document.querySelector('#region-filter');
+      let rows = [];
+
+      function configFor(data) {
+        const revenue = summarizeDashboard(data, 'revenue');
+        const pipeline = summarizeDashboard(data, 'pipeline');
+        return createDashboardConfig({
+          title: 'Regional Revenue Dashboard',
+          description: 'Rendered from a JSON connector with client-side filters.',
+          columns: 4,
+          widgets: [
+            { id: 'revenue', title: 'Revenue', type: 'metric', value: `$${revenue.sum}K`, change: `${data.length} regions` },
+            { id: 'pipeline', title: 'Pipeline', type: 'metric', value: `$${pipeline.sum}K`, change: 'weighted' },
+            { id: 'risk', title: 'Risk items', type: 'metric', value: data.reduce((sum, row) => sum + row.risk, 0) },
+            { id: 'avg', title: 'Average revenue', type: 'metric', value: `$${Math.round(revenue.average)}K` },
+            { id: 'chart', title: 'Revenue by region', type: 'chart', span: 2, data: data.map((row) => ({ label: row.region, value: row.revenue })), chart: { type: 'bar', height: 260, palette: 'professional', exportable: true } },
+            { id: 'pipeline-chart', title: 'Pipeline mix', type: 'chart', span: 2, data: data.map((row) => ({ label: row.region, value: row.pipeline })), chart: { type: 'donut', height: 260, palette: 'categorical', legend: true } },
+            { id: 'records', title: 'Connector records', type: 'table', span: 'full', data, columns: ['region', 'revenue', 'pipeline', 'risk'] },
+          ],
+        });
+      }
+
+      function render() {
+        const filters = filter.value ? [{ field: 'region', value: filter.value }] : [];
+        const filtered = applyDashboardFilters(rows, filters);
+        const config = configFor(filtered);
+        output.innerHTML = renderDashboard(config);
+        code.textContent = JSON.stringify(config, null, 2);
+        mountIcons(document);
+      }
+
+      rows = await loadConnector(connector);
+      state.textContent = `Connector loaded · ${rows.length} records`;
+      filter.addEventListener('change', render);
+      document.addEventListener('click', async (event) => {
+        const button = event.target instanceof Element ? event.target.closest('[data-copy]') : null;
+        if (!button) return;
+        const target = document.querySelector(button.dataset.copy);
+        await navigator.clipboard?.writeText(target?.textContent || '');
+      });
+      render();
+    </script>
+  </body>
+</html>

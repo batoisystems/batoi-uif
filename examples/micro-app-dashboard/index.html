@@ -210,6 +210,17 @@
         padding: 1rem;
       }
 
+      .artifact-code {
+        overflow: auto;
+        max-height: 13rem;
+        margin: 0;
+        padding: 1rem;
+        border-radius: 0.65rem;
+        background: #111827;
+        color: #d1e7ff;
+        font: 0.76rem/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
       .artifact-import textarea {
         min-height: 11rem;
         padding: 0.75rem;
@@ -298,7 +309,7 @@
             <h1>Micro App Operations Board</h1>
             <p>One-page app built from Batoi UIF distribution files, browser APIs, and local state.</p>
           </div>
-          <span class="artifact-muted" id="save-state">Saved locally</span>
+          <span class="artifact-muted" id="save-state">Manifest validated · Saved locally</span>
         </section>
 
         <section class="artifact-stat-grid" aria-label="Summary">
@@ -347,13 +358,35 @@
                 </div>
               </div>
             </article>
+
+            <article class="artifact-card">
+              <div class="artifact-card-head">
+                <h2>Micro App Manifest</h2>
+                <button class="artifact-btn" type="button" data-action="copy-manifest"><span data-uif-icon="copy"></span>Copy</button>
+              </div>
+              <div class="artifact-import">
+                <pre class="artifact-code" id="manifest-code"></pre>
+              </div>
+            </article>
           </aside>
         </section>
       </main>
     </div>
 
     <script type="module">
-      import { bindChartExports, createMicroAppStore, initChart, mountIcons } from '../../dist/uif.esm.js';
+      import { bindChartExports, createLocalStore, createMicroAppStore, createSyncQueue, initChart, mountIcons, parseMicroAppManifest } from '../../dist/uif.esm.js';
+
+      const manifest = parseMicroAppManifest({
+        name: 'Micro App Operations Board',
+        type: 'micro-app',
+        storage: { mode: 'local-first', localStore: 'localstorage', namespace: 'batoi-uif-micro-app-dashboard' },
+        realtime: { enabled: false },
+        connectors: [{ type: 'static', name: 'Seed tasks', mode: 'readonly' }],
+        permissions: { storage: true },
+      });
+
+      const localStore = createLocalStore({ namespace: manifest.storage.namespace || 'batoi-uif-micro-app-dashboard' });
+      const syncQueue = createSyncQueue(localStore);
 
       const initialState = {
         tasks: [
@@ -373,6 +406,7 @@
       const form = document.querySelector('#task-form');
       const jsonState = document.querySelector('#json-state');
       const saveState = document.querySelector('#save-state');
+      const manifestCode = document.querySelector('#manifest-code');
 
       function tasks() {
         return store.get('tasks') || [];
@@ -413,7 +447,8 @@
         chart.dataset.uifOptions = JSON.stringify({ legend: true, table: 'sr-only', focusable: true });
         initChart(chart);
         jsonState.value = store.exportJSON();
-        saveState.textContent = `Saved locally · ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        manifestCode.textContent = JSON.stringify(manifest, null, 2);
+        saveState.textContent = `Manifest valid · Saved locally · ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
         mountIcons(document);
       }
 
@@ -462,8 +497,10 @@
           URL.revokeObjectURL(url);
         }
         if (action === 'copy') await navigator.clipboard?.writeText(store.exportJSON());
+        if (action === 'copy-manifest') await navigator.clipboard?.writeText(JSON.stringify(manifest, null, 2));
         if (action === 'import') {
           store.importJSON(jsonState.value);
+          await syncQueue.enqueue('import-state', { source: 'textarea', count: tasks().length });
           render();
         }
       });

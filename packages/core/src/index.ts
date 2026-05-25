@@ -1,5 +1,6 @@
 export type UIFOptions = Record<string, unknown>;
 export * from './attributes.js';
+export * from './micro-app.js';
 
 export interface UIFApp {
   root: Document | HTMLElement;

@@ -14,6 +14,20 @@ interface UIFRequestError extends Error {
     response?: Response;
     data?: unknown;
 }
+type ConnectorType = 'api' | 'json' | 'csv' | 'static' | 'spreadsheet' | 'google-sheet';
+type ConnectorMode = 'readonly' | 'readwrite';
+interface DataConnector<T = unknown> {
+    type: ConnectorType;
+    name?: string;
+    mode?: ConnectorMode;
+    src?: string;
+    method?: string;
+    headers?: HeadersInit;
+    data?: T;
+    timeout?: number;
+    refreshInterval?: number;
+    transform?: (value: unknown) => T | Promise<T>;
+}
 type RequestInterceptor = (url: string, options: RequestOptions) => void | RequestOptions | Promise<void | RequestOptions>;
 type ResponseInterceptor = (response: Response) => void | Response | Promise<void | Response>;
 declare function useRequestInterceptor(fn: RequestInterceptor): () => void;
@@ -24,5 +38,9 @@ declare function get<T = unknown>(url: string, options?: RequestOptions): Promis
 declare function post<T = unknown>(url: string, data?: unknown, options?: RequestOptions): Promise<T>;
 declare function submitForm<T = unknown>(formEl: HTMLFormElement, options?: RequestOptions): Promise<T>;
 declare function upload<T = unknown>(url: string, formData: FormData, options?: RequestOptions): Promise<T>;
+declare function parseCSV(text: string): string[][];
+declare function csvToObjects(text: string): Array<Record<string, string>>;
+declare function loadConnector<T = unknown>(connector: DataConnector<T>, options?: RequestOptions): Promise<T>;
+declare function bindConnector<T = unknown>(connector: DataConnector<T>, handler: (value: T) => void | Promise<void>, options?: RequestOptions): () => void;
 
-export { type RequestOptions, type UIFRequestError, cancelRequest, get, post, request, submitForm, upload, useRequestInterceptor, useResponseInterceptor };
+export { type ConnectorMode, type ConnectorType, type DataConnector, type RequestOptions, type UIFRequestError, bindConnector, cancelRequest, csvToObjects, get, loadConnector, parseCSV, post, request, submitForm, upload, useRequestInterceptor, useResponseInterceptor };

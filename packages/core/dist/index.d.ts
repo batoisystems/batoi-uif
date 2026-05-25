@@ -7,6 +7,72 @@ type UIFValue = (typeof uifValues)[number];
 type UIFAction = (typeof uifActions)[number];
 type UIFState = (typeof uifStates)[number];
 
+type MicroAppStorageMode = 'local-only' | 'local-first' | 'sync-optional' | 'connected' | 'shared';
+type MicroAppLocalStore = 'indexeddb' | 'localstorage' | 'memory' | 'none';
+type MicroAppRealtimeTransport = 'websocket' | 'sse' | 'polling';
+type MicroAppConnectorType = 'api' | 'csv' | 'json' | 'spreadsheet' | 'google-sheet' | 'static';
+type MicroAppConnectorMode = 'readonly' | 'readwrite';
+interface MicroAppStorageManifest {
+    mode?: MicroAppStorageMode;
+    localStore?: MicroAppLocalStore;
+    sharedStore?: boolean;
+    namespace?: string;
+    encrypted?: boolean;
+}
+interface MicroAppRealtimeManifest {
+    enabled?: boolean;
+    channel?: string;
+    transport?: MicroAppRealtimeTransport;
+    fallback?: 'polling' | 'none';
+}
+interface MicroAppConnectorManifest {
+    type: MicroAppConnectorType;
+    name?: string;
+    mode?: MicroAppConnectorMode;
+    src?: string;
+    refreshInterval?: number;
+    schema?: Record<string, unknown>;
+}
+interface MicroAppPermissionsManifest {
+    network?: string[];
+    storage?: boolean;
+    realtime?: boolean;
+    ai?: boolean;
+    mcp?: boolean;
+}
+interface MicroAppManifest {
+    name: string;
+    type: 'micro-app';
+    version?: string;
+    description?: string;
+    entry?: string;
+    storage: Required<Pick<MicroAppStorageManifest, 'mode' | 'localStore' | 'sharedStore'>> & MicroAppStorageManifest;
+    realtime: Required<Pick<MicroAppRealtimeManifest, 'enabled'>> & MicroAppRealtimeManifest;
+    connectors: MicroAppConnectorManifest[];
+    permissions: MicroAppPermissionsManifest;
+    build?: {
+        upgradeable?: boolean;
+        appType?: string;
+    };
+    ui?: {
+        mount?: string;
+        title?: string;
+        icon?: string;
+    };
+    [key: string]: unknown;
+}
+interface MicroAppManifestIssue {
+    path: string;
+    message: string;
+}
+interface MicroAppManifestResult {
+    manifest: MicroAppManifest;
+    issues: MicroAppManifestIssue[];
+    valid: boolean;
+}
+declare function validateMicroAppManifest(input: unknown): MicroAppManifestResult;
+declare function parseMicroAppManifest(input: unknown): MicroAppManifest;
+
 type UIFOptions = Record<string, unknown>;
 
 interface UIFApp {
@@ -34,4 +100,4 @@ declare function setDensity(density: 'compact' | 'default' | 'roomy', target?: H
 declare function setAccent(color: string, target?: HTMLElement): void;
 declare function init(root?: Document | HTMLElement, options?: UIFOptions): UIFApp;
 
-export { type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, type UIFState, type UIFValue, emit, init, on, parseOptions, registerPlugin, setAccent, setDensity, uifActions, uifAttributes, uifStates, uifValues };
+export { type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, type UIFState, type UIFValue, emit, init, on, parseMicroAppManifest, parseOptions, registerPlugin, setAccent, setDensity, uifActions, uifAttributes, uifStates, uifValues, validateMicroAppManifest };

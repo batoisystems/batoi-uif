@@ -4,13 +4,14 @@ import { request } from "@batoi/uif-net";
 var handlers = /* @__PURE__ */ new Map();
 var connections = /* @__PURE__ */ new Map();
 var states = /* @__PURE__ */ new Map();
+var presence = /* @__PURE__ */ new Map();
 var elementSubscriptions = /* @__PURE__ */ new WeakMap();
 function setState(channel, state) {
   states.set(channel, state);
   window.dispatchEvent(new CustomEvent("uif:realtime-state", { detail: { channel, state } }));
 }
 function getConnectionState(channel) {
-  return states.get(channel) ?? "disconnected";
+  return states.get(channel) ?? "idle";
 }
 function parsePayload(data) {
   try {
@@ -84,6 +85,36 @@ function connect(options) {
   }
   connections.set(options.channel, { close: () => window.clearInterval(timer) });
 }
+function bindRealtime(options) {
+  const mode = options.transport === "polling" ? "poll" : options.transport;
+  const disposers = [];
+  if (options.onMessage) disposers.push(subscribe(options.channel, options.onMessage));
+  if (options.onState) {
+    const listener = (event) => {
+      const detail = event.detail;
+      if (detail?.channel === options.channel) options.onState?.(detail.state);
+    };
+    window.addEventListener("uif:realtime-state", listener);
+    disposers.push(() => window.removeEventListener("uif:realtime-state", listener));
+  }
+  connect({ ...options, mode: mode ?? (options.fallback === "polling" ? "poll" : void 0) });
+  disposers.push(() => disconnect(options.channel));
+  return () => disposers.splice(0).forEach((dispose) => dispose());
+}
+function updatePresence(channel, user) {
+  if (!presence.has(channel)) presence.set(channel, /* @__PURE__ */ new Map());
+  const next = { ...user, lastSeen: user.lastSeen ?? (/* @__PURE__ */ new Date()).toISOString() };
+  presence.get(channel)?.set(next.id, next);
+  window.dispatchEvent(new CustomEvent("uif:presence", { detail: { channel, users: getPresence(channel) } }));
+  return next;
+}
+function removePresence(channel, userId) {
+  presence.get(channel)?.delete(userId);
+  window.dispatchEvent(new CustomEvent("uif:presence", { detail: { channel, users: getPresence(channel) } }));
+}
+function getPresence(channel) {
+  return Array.from(presence.get(channel)?.values() ?? []);
+}
 function disconnect(channel) {
   connections.get(channel)?.close();
   connections.delete(channel);
@@ -111,12 +142,16 @@ function initRealtime(el) {
 }
 var realtime = { name: "realtime", init: initRealtime };
 export {
+  bindRealtime,
   connect,
   disconnect,
   getConnectionState,
+  getPresence,
   initRealtime,
   publishBatched,
   publishLocal,
   realtime,
-  subscribe
+  removePresence,
+  subscribe,
+  updatePresence
 };

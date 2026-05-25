@@ -30,12 +30,15 @@ var BatoiUIF = (() => {
     alert: () => alert,
     appendStreamingChunk: () => appendStreamingChunk,
     appendTextElement: () => appendTextElement2,
+    applyDashboardFilters: () => applyDashboardFilters,
     applyResponsiveColumns: () => applyResponsiveColumns,
     autoInit: () => autoInit2,
     autoStart: () => autoStart,
     badge: () => badge,
     bindChartExports: () => bindChartExports,
+    bindConnector: () => bindConnector,
     bindRadActions: () => bindRadActions,
+    bindRealtime: () => bindRealtime,
     breadcrumb: () => breadcrumb,
     button: () => button,
     cacheStrategies: () => cacheStrategies,
@@ -54,9 +57,15 @@ var BatoiUIF = (() => {
     createAdvancedStore: () => createAdvancedStore,
     createArtifactStore: () => createArtifactStore,
     createCacheStrategy: () => createCacheStrategy,
+    createDashboardConfig: () => createDashboardConfig,
+    createExtensionManifest: () => createExtensionManifest,
+    createExtensionMessage: () => createExtensionMessage,
+    createLocalStore: () => createLocalStore,
     createMicroAppStore: () => createMicroAppStore,
     createStore: () => createStore,
     createStreamSurface: () => createStreamSurface,
+    createSyncQueue: () => createSyncQueue,
+    csvToObjects: () => csvToObjects,
     cumulativeSum: () => cumulativeSum,
     dataTable: () => dataTable,
     delegate: () => delegate,
@@ -83,6 +92,7 @@ var BatoiUIF = (() => {
     getConnectionState: () => getConnectionState,
     getNotifications: () => getNotifications,
     getOverlayStack: () => getOverlayStack,
+    getPresence: () => getPresence,
     getPushSubscription: () => getPushSubscription,
     hasIcon: () => hasIcon,
     hide: () => hide2,
@@ -94,6 +104,7 @@ var BatoiUIF = (() => {
     initAll: () => initAll,
     initChart: () => initChart,
     initComponent: () => initComponent,
+    initDashboard: () => initDashboard,
     initDeclarativeFilters: () => initDeclarativeFilters,
     initForm: () => initForm,
     initInstallPrompt: () => initInstallPrompt,
@@ -108,8 +119,10 @@ var BatoiUIF = (() => {
     initSheetModal: () => initSheetModal,
     initSwipeAction: () => initSwipeAction,
     initTable: () => initTable,
+    isExtensionRuntime: () => isExtensionRuntime,
     isInitialized: () => isInitialized,
     linearRegression: () => linearRegression,
+    loadConnector: () => loadConnector,
     loadPartial: () => loadPartial,
     loadRemoteTable: () => loadRemoteTable,
     markNotificationsRead: () => markNotificationsRead,
@@ -128,7 +141,9 @@ var BatoiUIF = (() => {
     onOnline: () => onOnline,
     openOverlay: () => openOverlay2,
     pagination: () => pagination,
+    parseCSV: () => parseCSV,
     parseChartData: () => parseChartData,
+    parseMicroAppManifest: () => parseMicroAppManifest,
     parseOptions: () => parseOptions,
     percentChange: () => percentChange,
     popover: () => popover,
@@ -152,10 +167,13 @@ var BatoiUIF = (() => {
     registerPushServiceWorker: () => registerPushServiceWorker,
     registerServiceWorker: () => registerServiceWorker,
     rehydrate: () => rehydrate,
+    removePresence: () => removePresence,
     renderAIAction: () => renderAIAction,
     renderAIResultCard: () => renderAIResultCard,
     renderAssistantResponse: () => renderAssistantResponse,
     renderChart: () => renderChart,
+    renderDashboard: () => renderDashboard,
+    renderDashboardWidget: () => renderDashboardWidget,
     renderDiff: () => renderDiff,
     renderPromptPanel: () => renderPromptPanel,
     renderToolApproval: () => renderToolApproval,
@@ -189,6 +207,7 @@ var BatoiUIF = (() => {
     submitForm: () => submitForm,
     subscribe: () => subscribe,
     subscribeToPush: () => subscribeToPush,
+    summarizeDashboard: () => summarizeDashboard,
     summaryStats: () => summaryStats,
     swapContent: () => swapContent,
     swapTrustedHTML: () => swapTrustedHTML2,
@@ -210,12 +229,14 @@ var BatoiUIF = (() => {
     unreadCount: () => unreadCount,
     unregisterServiceWorker: () => unregisterServiceWorker,
     unsubscribeFromPush: () => unsubscribeFromPush,
+    updatePresence: () => updatePresence,
     upload: () => upload,
     useRequestInterceptor: () => useRequestInterceptor,
     useResponseInterceptor: () => useResponseInterceptor,
     validateField: () => validateField,
     validateForm: () => validateForm,
     validateFormAsync: () => validateFormAsync,
+    validateMicroAppManifest: () => validateMicroAppManifest,
     wizard: () => wizard,
     zScores: () => zScores
   });
@@ -681,13 +702,13 @@ var BatoiUIF = (() => {
     }).join("");
   }
   function svgWrap(type, width, height, content, data, options) {
-    const id = uid(options, type);
+    const id2 = uid(options, type);
     const title = options.label || `${type} chart`;
     const desc = options.description || data.map((d) => `${d.label ?? "item"} ${fmt(valueOf(d, options) ?? 0, options)}`).join(", ");
-    const table2 = options.table ? chartDataTable(data, options, id) : "";
-    return `<svg class="uif-chart-svg uif-chart-${type}" viewBox="0 0 ${width} ${height}" role="img" aria-roledescription="chart" aria-labelledby="${id}-title ${id}-desc"><title id="${id}-title">${esc(title)}</title><desc id="${id}-desc">${esc(desc)}</desc>${content}</svg>${table2}`;
+    const table2 = options.table ? chartDataTable(data, options, id2) : "";
+    return `<svg class="uif-chart-svg uif-chart-${type}" viewBox="0 0 ${width} ${height}" role="img" aria-roledescription="chart" aria-labelledby="${id2}-title ${id2}-desc"><title id="${id2}-title">${esc(title)}</title><desc id="${id2}-desc">${esc(desc)}</desc>${content}</svg>${table2}`;
   }
-  function chartDataTable(data, options, id) {
+  function chartDataTable(data, options, id2) {
     const series = inferSeries(data, options);
     const headers = ["Label", ...series.length ? series : ["Value"]];
     const rows2 = data.map((datum) => {
@@ -695,7 +716,7 @@ var BatoiUIF = (() => {
       return `<tr><th scope="row">${esc(datum.label ?? "")}</th>${cells.map((cell) => `<td>${esc(cell)}</td>`).join("")}</tr>`;
     }).join("");
     const hidden = options.table === "sr-only" ? " uif-sr-only" : "";
-    return `<table id="${id}-table" class="uif-chart-data-table${hidden}"><caption>${esc(options.label || "Chart data")}</caption><thead><tr>${headers.map((header) => `<th scope="col">${esc(header)}</th>`).join("")}</tr></thead><tbody>${rows2}</tbody></table>`;
+    return `<table id="${id2}-table" class="uif-chart-data-table${hidden}"><caption>${esc(options.label || "Chart data")}</caption><thead><tr>${headers.map((header) => `<th scope="col">${esc(header)}</th>`).join("")}</tr></thead><tbody>${rows2}</tbody></table>`;
   }
   function legend(items, options) {
     if (!options.legend || !items.length) return "";
@@ -1980,6 +2001,644 @@ ${serialized}`;
   var nav = { name: "nav", init: initPassive, destroy: destroyComponent };
   var table = { name: "table", init: initPassive, destroy: destroyComponent };
 
+  // packages/charts/dist/index.js
+  var defaultPalette2 = [
+    "var(--uif-chart-1,var(--uif-color-primary))",
+    "var(--uif-chart-2,var(--uif-color-success))",
+    "var(--uif-chart-3,var(--uif-color-warning))",
+    "var(--uif-chart-4,var(--uif-color-danger))",
+    "var(--uif-chart-5,var(--uif-color-info))",
+    "var(--uif-chart-6,#7c3aed)",
+    "var(--uif-chart-7,#0f766e)",
+    "var(--uif-chart-8,#9333ea)"
+  ];
+  var namedPalettes2 = {
+    default: defaultPalette2,
+    professional: ["#0b72bd", "#00a88f", "#e4a700", "#df3158", "#7c3aed", "#0f766e"],
+    categorical: ["#0b72bd", "#00a88f", "#e4a700", "#df3158", "#7c3aed", "#d9468f", "#475467"],
+    status: ["#00a88f", "#0b72bd", "#e4a700", "#df3158"],
+    sequential: ["#d9ecff", "#9dccf4", "#5ba6df", "#1f7dc1", "#0b4f86"],
+    diverging: ["#df3158", "#f59e0b", "#e5e7eb", "#00a88f", "#0b72bd"]
+  };
+  function esc2(value) {
+    return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+  }
+  function uid2(options, type) {
+    const seed = `${options.id || options.label || type}-${options.width || 0}-${options.height || 0}`.toLowerCase();
+    const clean = seed.replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    return `uif-chart-${clean || type}`;
+  }
+  function paletteFor2(options) {
+    if (Array.isArray(options.palette)) return options.palette;
+    return namedPalettes2[options.palette ?? "default"] ?? defaultPalette2;
+  }
+  function cleanValues2(values) {
+    return values.map(Number).filter(Number.isFinite);
+  }
+  function quantile2(values, q) {
+    const sorted = cleanValues2(values).sort((a, b) => a - b);
+    if (!sorted.length) return 0;
+    const pos = (sorted.length - 1) * Math.max(0, Math.min(1, q));
+    const base = Math.floor(pos);
+    const rest = pos - base;
+    return sorted[base] + ((sorted[base + 1] ?? sorted[base]) - sorted[base]) * rest;
+  }
+  function summaryStats2(values) {
+    const nums = cleanValues2(values);
+    const count = nums.length;
+    const sum = nums.reduce((total, value) => total + value, 0);
+    const mean = count ? sum / count : 0;
+    const variance = count ? nums.reduce((total, value) => total + (value - mean) ** 2, 0) / count : 0;
+    const q1 = quantile2(nums, 0.25);
+    const q3 = quantile2(nums, 0.75);
+    return {
+      count,
+      min: count ? Math.min(...nums) : 0,
+      max: count ? Math.max(...nums) : 0,
+      sum,
+      mean,
+      median: quantile2(nums, 0.5),
+      variance,
+      stddev: Math.sqrt(variance),
+      q1,
+      q3,
+      iqr: q3 - q1
+    };
+  }
+  function histogramBins2(values, options = {}) {
+    const nums = cleanValues2(values);
+    if (!nums.length) return [];
+    const min = options.min ?? Math.min(...nums);
+    const max = options.max ?? Math.max(...nums);
+    const binCount = Math.max(1, Math.floor(options.bins ?? Math.ceil(Math.sqrt(nums.length))));
+    const span = max - min || 1;
+    const bins = Array.from({ length: binCount }, (_, index) => ({
+      x0: min + span / binCount * index,
+      x1: min + span / binCount * (index + 1),
+      count: 0
+    }));
+    nums.forEach((value) => {
+      const index = value === max ? binCount - 1 : Math.floor((value - min) / span * binCount);
+      bins[Math.max(0, Math.min(binCount - 1, index))].count += 1;
+    });
+    return bins;
+  }
+  function correlation2(pointsOrX, yValues) {
+    const points = Array.isArray(yValues) ? pointsOrX.map((x, index) => ({ x, y: yValues[index] })) : pointsOrX;
+    const clean = points.filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+    if (clean.length < 2) return 0;
+    const xMean = clean.reduce((sum, point) => sum + point.x, 0) / clean.length;
+    const yMean = clean.reduce((sum, point) => sum + point.y, 0) / clean.length;
+    const numerator = clean.reduce((sum, point) => sum + (point.x - xMean) * (point.y - yMean), 0);
+    const xDen = Math.sqrt(clean.reduce((sum, point) => sum + (point.x - xMean) ** 2, 0));
+    const yDen = Math.sqrt(clean.reduce((sum, point) => sum + (point.y - yMean) ** 2, 0));
+    return xDen && yDen ? numerator / (xDen * yDen) : 0;
+  }
+  function linearRegression2(points) {
+    const clean = points.filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+    if (clean.length < 2) return { slope: 0, intercept: clean[0]?.y ?? 0, r: 0, r2: 0, predict: (x) => clean[0]?.y ?? x * 0 };
+    const xMean = clean.reduce((sum, point) => sum + point.x, 0) / clean.length;
+    const yMean = clean.reduce((sum, point) => sum + point.y, 0) / clean.length;
+    const numerator = clean.reduce((sum, point) => sum + (point.x - xMean) * (point.y - yMean), 0);
+    const denominator = clean.reduce((sum, point) => sum + (point.x - xMean) ** 2, 0);
+    const slope = denominator ? numerator / denominator : 0;
+    const intercept = yMean - slope * xMean;
+    const r = correlation2(clean);
+    return { slope, intercept, r, r2: r * r, predict: (x) => slope * x + intercept };
+  }
+  function margins2(options) {
+    return { top: 16, right: 18, bottom: options.axes === false ? 18 : 34, left: options.axes === false ? 18 : 42, ...options.margin };
+  }
+  function coerceNumber2(raw, options) {
+    const value = Number(raw);
+    if (Number.isFinite(value)) return value;
+    if (options.invalidValue === "error") throw new Error(`Invalid chart value: ${String(raw)}`);
+    return options.invalidValue === "skip" ? void 0 : 0;
+  }
+  function valueOf2(datum, options) {
+    const raw = options.y && datum[options.y] != null ? datum[options.y] : datum.value;
+    return coerceNumber2(raw, options);
+  }
+  function labelOf2(datum, options) {
+    const raw = options.x && datum[options.x] != null ? datum[options.x] : datum.label;
+    return String(raw ?? "");
+  }
+  function normalizeData2(data, options) {
+    return data.map((item) => ({ ...item, label: labelOf2(item, options), value: valueOf2(item, options) })).filter((item) => item.value != null || options.invalidValue !== "skip");
+  }
+  function coerceData2(data) {
+    return data.map((item, index) => typeof item === "number" ? { label: String(index + 1), value: item } : item);
+  }
+  function inferSeries2(data, options) {
+    if (options.series?.length) return options.series;
+    const keys = /* @__PURE__ */ new Set();
+    data.forEach((datum) => Object.keys(datum.values ?? {}).forEach((key) => keys.add(key)));
+    return [...keys];
+  }
+  function fmt2(value, options) {
+    return options.formatValue ? options.formatValue(value) : String(Number.isInteger(value) ? value : Number(value.toFixed(2)));
+  }
+  function extent2(values, options) {
+    const min = options.min ?? Math.min(0, ...values);
+    const max = options.max ?? Math.max(1, ...values);
+    return min === max ? [Math.min(0, min), max + 1] : [min, max];
+  }
+  function scaleLinear2(domain, range) {
+    const [d0, d1] = domain;
+    const [r0, r1] = range;
+    const span = d1 - d0 || 1;
+    return (value) => r0 + (value - d0) / span * (r1 - r0);
+  }
+  function pointString2(points) {
+    return points.map(([x, y]) => `${round2(x)},${round2(y)}`).join(" ");
+  }
+  function round2(value) {
+    return Math.round(value * 100) / 100;
+  }
+  function polar2(cx, cy, radius, angle) {
+    return [cx + radius * Math.cos(angle), cy + radius * Math.sin(angle)];
+  }
+  function arcPath2(cx, cy, outer, start2, end, inner = 0) {
+    const large = end - start2 > Math.PI ? 1 : 0;
+    const [sx, sy] = polar2(cx, cy, outer, start2);
+    const [ex, ey] = polar2(cx, cy, outer, end);
+    if (inner <= 0) return `M ${cx} ${cy} L ${sx} ${sy} A ${outer} ${outer} 0 ${large} 1 ${ex} ${ey} Z`;
+    const [isx, isy] = polar2(cx, cy, inner, end);
+    const [iex, iey] = polar2(cx, cy, inner, start2);
+    return `M ${sx} ${sy} A ${outer} ${outer} 0 ${large} 1 ${ex} ${ey} L ${isx} ${isy} A ${inner} ${inner} 0 ${large} 0 ${iex} ${iey} Z`;
+  }
+  function fullDonutPath2(cx, cy, outer, inner) {
+    return `M ${cx - outer} ${cy} A ${outer} ${outer} 0 1 0 ${cx + outer} ${cy} A ${outer} ${outer} 0 1 0 ${cx - outer} ${cy} M ${cx - inner} ${cy} A ${inner} ${inner} 0 1 1 ${cx + inner} ${cy} A ${inner} ${inner} 0 1 1 ${cx - inner} ${cy} Z`;
+  }
+  function markAttrs2(label, options, meta = {}) {
+    const interactive = options.focusable || Boolean(options.drilldown);
+    const focus = interactive ? ' tabindex="0" role="button"' : "";
+    const aria = interactive ? ` aria-label="${esc2(label)}"` : "";
+    const index = meta.index == null ? "" : ` data-uif-chart-index="${meta.index}"`;
+    const value = meta.value == null ? "" : ` data-uif-chart-value="${esc2(meta.value)}"`;
+    const series = meta.series == null ? "" : ` data-uif-series="${esc2(meta.series)}"`;
+    return `class="uif-chart-mark"${focus}${aria} data-uif-chart-label="${esc2(label)}"${index}${value}${series}`;
+  }
+  function axisAndGrid2(width, height, plot, domain, options) {
+    if (options.axes === false && options.grid === false) return "";
+    const y = scaleLinear2(domain, [height - plot.bottom, plot.top]);
+    const ticks = Array.from({ length: 5 }, (_, i) => domain[0] + (domain[1] - domain[0]) / 4 * i);
+    return ticks.map((tick) => {
+      const yy = y(tick);
+      const grid = options.grid === false ? "" : `<line class="uif-chart-grid" x1="${plot.left}" y1="${yy}" x2="${width - plot.right}" y2="${yy}"></line>`;
+      const label = options.axes === false ? "" : `<text class="uif-chart-axis-label" x="${plot.left - 8}" y="${yy + 4}" text-anchor="end">${esc2(fmt2(tick, options))}</text>`;
+      return `${grid}${label}`;
+    }).join("");
+  }
+  function verticalValueGrid2(width, height, plot, domain, options) {
+    if (options.axes === false && options.grid === false) return "";
+    const x = scaleLinear2(domain, [plot.left, width - plot.right]);
+    const ticks = Array.from({ length: 5 }, (_, i) => domain[0] + (domain[1] - domain[0]) / 4 * i);
+    return ticks.map((tick) => {
+      const xx = x(tick);
+      const grid = options.grid === false ? "" : `<line class="uif-chart-grid" x1="${xx}" y1="${plot.top}" x2="${xx}" y2="${height - plot.bottom}"></line>`;
+      const label = options.axes === false ? "" : `<text class="uif-chart-axis-label" x="${xx}" y="${height - 8}" text-anchor="middle">${esc2(fmt2(tick, options))}</text>`;
+      return `${grid}${label}`;
+    }).join("");
+  }
+  function svgWrap2(type, width, height, content, data, options) {
+    const id2 = uid2(options, type);
+    const title = options.label || `${type} chart`;
+    const desc = options.description || data.map((d) => `${d.label ?? "item"} ${fmt2(valueOf2(d, options) ?? 0, options)}`).join(", ");
+    const table2 = options.table ? chartDataTable2(data, options, id2) : "";
+    return `<svg class="uif-chart-svg uif-chart-${type}" viewBox="0 0 ${width} ${height}" role="img" aria-roledescription="chart" aria-labelledby="${id2}-title ${id2}-desc"><title id="${id2}-title">${esc2(title)}</title><desc id="${id2}-desc">${esc2(desc)}</desc>${content}</svg>${table2}`;
+  }
+  function chartDataTable2(data, options, id2) {
+    const series = inferSeries2(data, options);
+    const headers = ["Label", ...series.length ? series : ["Value"]];
+    const rows2 = data.map((datum) => {
+      const cells = series.length ? series.map((key) => fmt2(Number(datum.values?.[key] ?? 0), options)) : [fmt2(datum.value ?? 0, options)];
+      return `<tr><th scope="row">${esc2(datum.label ?? "")}</th>${cells.map((cell) => `<td>${esc2(cell)}</td>`).join("")}</tr>`;
+    }).join("");
+    const hidden = options.table === "sr-only" ? " uif-sr-only" : "";
+    return `<table id="${id2}-table" class="uif-chart-data-table${hidden}"><caption>${esc2(options.label || "Chart data")}</caption><thead><tr>${headers.map((header) => `<th scope="col">${esc2(header)}</th>`).join("")}</tr></thead><tbody>${rows2}</tbody></table>`;
+  }
+  function legend2(items, options) {
+    if (!options.legend || !items.length) return "";
+    const palette = paletteFor2(options);
+    return `<div class="uif-chart-legend" data-uif-placement="${options.legend === true ? "bottom" : options.legend}">${items.map((item, i) => `<span><i style="background:${palette[i % palette.length]}"></i>${esc2(item)}</span>`).join("")}</div>`;
+  }
+  function renderLineLike2(data, options, area = false, sparkline = false) {
+    const width = options.width ?? (sparkline ? 160 : 360);
+    const height = options.height ?? (sparkline ? 64 : 200);
+    const plot = sparkline ? { top: 6, right: 6, bottom: 6, left: 6 } : margins2(options);
+    const normalized = normalizeData2(data, options);
+    const series = inferSeries2(normalized, options);
+    const palette = paletteFor2(options);
+    const values = series.length ? normalized.flatMap((d) => series.map((key) => Number(d.values?.[key] ?? 0))) : normalized.map((d) => d.value ?? 0);
+    const y = scaleLinear2(extent2(values, options), [height - plot.bottom, plot.top]);
+    const xStep = normalized.length > 1 ? (width - plot.left - plot.right) / (normalized.length - 1) : 0;
+    const renderSeries = (name, index) => {
+      const points = normalized.map((d, i) => [plot.left + i * xStep, y(name ? Number(d.values?.[name] ?? 0) : d.value ?? 0)]);
+      const line = `<polyline class="uif-chart-series uif-chart-line" data-uif-series="${esc2(name ?? "value")}" points="${pointString2(points)}" fill="none" style="stroke:${palette[index % palette.length]}"></polyline>`;
+      const fill = area ? `<polygon class="uif-chart-area" points="${plot.left},${height - plot.bottom} ${pointString2(points)} ${width - plot.right},${height - plot.bottom}" style="fill:${palette[index % palette.length]}"></polygon>` : "";
+      const marks = sparkline || options.labels === false ? "" : points.map(([cx, cy], i) => {
+        const value = name ? Number(normalized[i].values?.[name] ?? 0) : normalized[i].value ?? 0;
+        const label = `${name ? `${name} ` : ""}${normalized[i].label ?? ""}: ${fmt2(value, options)}`;
+        return `<circle ${markAttrs2(label, options, { index: i, value, series: name ?? void 0 })} cx="${round2(cx)}" cy="${round2(cy)}" r="3"><title>${esc2(label)}</title></circle>`;
+      }).join("");
+      return `${fill}${line}${marks}`;
+    };
+    const body = `${sparkline ? "" : axisAndGrid2(width, height, plot, extent2(values, options), options)}${series.length ? series.map(renderSeries).join("") : renderSeries(null, 0)}`;
+    return `${svgWrap2(sparkline ? "sparkline" : area ? "area" : "line", width, height, body, normalized, options)}${legend2(series, options)}`;
+  }
+  function renderBars2(data, options, mode) {
+    const width = options.width ?? 360;
+    const height = options.height ?? 220;
+    const plot = margins2(options);
+    const normalized = normalizeData2(data, options);
+    const series = inferSeries2(normalized, options);
+    const palette = paletteFor2(options);
+    const values = series.length && mode === "stacked-bar" ? normalized.flatMap((d) => {
+      let positive = 0;
+      let negative = 0;
+      series.forEach((key) => {
+        const value = Number(d.values?.[key] ?? 0);
+        if (value >= 0) positive += value;
+        else negative += value;
+      });
+      return [negative, positive];
+    }) : series.length ? normalized.flatMap((d) => series.map((key) => Number(d.values?.[key] ?? 0))) : normalized.map((d) => d.value ?? 0);
+    const domain = extent2(values, options);
+    const vertical = mode !== "horizontal-bar";
+    const major = vertical ? width - plot.left - plot.right : height - plot.top - plot.bottom;
+    const band = major / Math.max(1, normalized.length);
+    const zeroY = scaleLinear2(domain, [height - plot.bottom, plot.top])(0);
+    const zeroX = scaleLinear2(domain, [plot.left, width - plot.right])(0);
+    const yScale = scaleLinear2(domain, [height - plot.bottom, plot.top]);
+    const xScale = scaleLinear2(domain, [plot.left, width - plot.right]);
+    const bars = normalized.map((d, i) => {
+      if (series.length && mode === "stacked-bar") {
+        let positiveOffset = 0;
+        let negativeOffset = 0;
+        return series.map((key, s) => {
+          const value2 = Number(d.values?.[key] ?? 0);
+          const start2 = value2 >= 0 ? positiveOffset : negativeOffset;
+          const end = start2 + value2;
+          if (value2 >= 0) positiveOffset = end;
+          else negativeOffset = end;
+          const y0 = yScale(start2);
+          const y1 = yScale(end);
+          const x2 = plot.left + i * band + band * 0.18;
+          const w = band * 0.64;
+          const h = Math.abs(y1 - y0);
+          const label2 = `${d.label ?? ""} ${key}: ${fmt2(value2, options)}`;
+          return `<rect ${markAttrs2(label2, options, { index: i, value: value2, series: key })} x="${round2(x2)}" y="${round2(Math.min(y0, y1))}" width="${round2(w)}" height="${round2(h)}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc2(label2)}</title></rect>`;
+        }).join("");
+      }
+      if (series.length && mode === "grouped-bar") {
+        const inner = band * 0.72 / series.length;
+        return series.map((key, s) => {
+          const value2 = Number(d.values?.[key] ?? 0);
+          const y2 = yScale(value2);
+          const x2 = plot.left + i * band + band * 0.14 + s * inner;
+          const label2 = `${d.label ?? ""} ${key}: ${fmt2(value2, options)}`;
+          return `<rect ${markAttrs2(label2, options, { index: i, value: value2, series: key })} x="${round2(x2)}" y="${round2(Math.min(y2, zeroY))}" width="${round2(inner * 0.86)}" height="${round2(Math.abs(zeroY - y2))}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc2(label2)}</title></rect>`;
+        }).join("");
+      }
+      const value = d.value ?? 0;
+      const label = `${d.label ?? ""}: ${fmt2(value, options)}`;
+      if (!vertical) {
+        const x2 = xScale(value);
+        const y2 = plot.top + i * band + band * 0.18;
+        return `<rect ${markAttrs2(label, options, { index: i, value })} x="${round2(Math.min(x2, zeroX))}" y="${round2(y2)}" width="${round2(Math.abs(x2 - zeroX))}" height="${round2(band * 0.64)}" rx="3"><title>${esc2(label)}</title></rect>`;
+      }
+      const y = yScale(value);
+      const x = plot.left + i * band + band * 0.18;
+      return `<rect ${markAttrs2(label, options, { index: i, value })} x="${round2(x)}" y="${round2(Math.min(y, zeroY))}" width="${round2(band * 0.64)}" height="${round2(Math.abs(zeroY - y))}" rx="3"><title>${esc2(label)}</title></rect>`;
+    }).join("");
+    const labels = options.axes === false ? "" : normalized.map(
+      (d, i) => vertical ? `<text class="uif-chart-axis-label" x="${round2(plot.left + i * band + band / 2)}" y="${height - 8}" text-anchor="middle">${esc2(d.label)}</text>` : `<text class="uif-chart-axis-label" x="${plot.left - 8}" y="${round2(plot.top + i * band + band / 2 + 4)}" text-anchor="end">${esc2(d.label)}</text>`
+    ).join("");
+    const grid = vertical ? axisAndGrid2(width, height, plot, domain, options) : verticalValueGrid2(width, height, plot, domain, options);
+    return `${svgWrap2(mode, width, height, `${grid}${bars}${labels}`, normalized, options)}${legend2(series, options)}`;
+  }
+  function renderPie2(data, options, donut = false) {
+    const width = options.width ?? 180;
+    const height = options.height ?? 180;
+    const normalized = normalizeData2(data, options).filter((d) => (d.value ?? 0) > 0);
+    const palette = paletteFor2(options);
+    const total = normalized.reduce((sum, d) => sum + (d.value ?? 0), 0);
+    if (!total) return `<div class="uif-chart-state" data-uif-state="empty">${esc2(options.description || "No positive values to chart")}</div>`;
+    const radius = Math.min(width, height) / 2 - 10;
+    const inner = donut ? radius * 0.55 : 0;
+    let angle = -Math.PI / 2;
+    const paths = normalized.map((d, i) => {
+      const next = angle + (d.value ?? 0) / total * Math.PI * 2;
+      const label = `${d.label ?? ""}: ${fmt2(d.value ?? 0, options)}`;
+      const fill = d.color || palette[i % palette.length];
+      const path = normalized.length === 1 && !donut ? `<circle ${markAttrs2(label, options, { index: i, value: d.value ?? 0 })} cx="${width / 2}" cy="${height / 2}" r="${radius}" style="fill:${fill}"><title>${esc2(label)}</title></circle>` : `<path ${markAttrs2(label, options, { index: i, value: d.value ?? 0 })} d="${normalized.length === 1 && donut ? fullDonutPath2(width / 2, height / 2, radius, inner) : arcPath2(width / 2, height / 2, radius, angle, next, inner)}" ${normalized.length === 1 && donut ? 'fill-rule="evenodd" ' : ""}style="fill:${fill}"><title>${esc2(label)}</title></path>`;
+      angle = next;
+      return path;
+    }).join("");
+    return `${svgWrap2(donut ? "donut" : "pie", width, height, paths, normalized, options)}${legend2(
+      normalized.map((d) => d.label ?? ""),
+      options
+    )}`;
+  }
+  function renderRadar2(data, options) {
+    const width = options.width ?? 260;
+    const height = options.height ?? 260;
+    const normalized = normalizeData2(data, options);
+    const series = inferSeries2(normalized, options);
+    const values = series.length ? normalized.flatMap((d) => series.map((key) => Number(d.values?.[key] ?? 0))) : normalized.map((d) => d.value ?? 0);
+    const max = options.max ?? Math.max(1, ...values);
+    const min = options.min ?? 0;
+    const palette = paletteFor2(options);
+    const cx = width / 2;
+    const cy = height / 2;
+    const radius = Math.min(width, height) / 2 - 34;
+    const axes = normalized.map((d, i) => {
+      const angle = -Math.PI / 2 + i / normalized.length * Math.PI * 2;
+      const [x, y] = polar2(cx, cy, radius, angle);
+      const [lx, ly] = polar2(cx, cy, radius + 16, angle);
+      return `<line class="uif-chart-grid" x1="${cx}" y1="${cy}" x2="${round2(x)}" y2="${round2(y)}"></line><text class="uif-chart-axis-label" x="${round2(lx)}" y="${round2(ly)}" text-anchor="middle">${esc2(d.label)}</text>`;
+    }).join("");
+    const rings = [0.25, 0.5, 0.75, 1].map((factor) => {
+      const pts = normalized.map((_, i) => polar2(cx, cy, radius * factor, -Math.PI / 2 + i / normalized.length * Math.PI * 2));
+      return `<polygon class="uif-chart-grid-polygon" points="${pointString2(pts)}"></polygon>`;
+    }).join("");
+    const renderSeries = (name, index) => {
+      const pts = normalized.map((d, i) => {
+        const value = name ? Number(d.values?.[name] ?? 0) : d.value ?? 0;
+        const r = (value - min) / (max - min || 1) * radius;
+        return polar2(cx, cy, r, -Math.PI / 2 + i / normalized.length * Math.PI * 2);
+      });
+      return `<polygon class="uif-chart-radar-area" data-uif-series="${esc2(name ?? "value")}" points="${pointString2(pts)}" style="stroke:${palette[index % palette.length]};fill:${palette[index % palette.length]}"></polygon>`;
+    };
+    return `${svgWrap2("radar", width, height, `${rings}${axes}${series.length ? series.map(renderSeries).join("") : renderSeries(null, 0)}`, normalized, options)}${legend2(series, options)}`;
+  }
+  function renderSparkline2(data, options) {
+    if (options.sparklineType === "bar") return renderBars2(data, { ...options, width: options.width ?? 160, height: options.height ?? 56, axes: false, grid: false }, "bar");
+    return renderLineLike2(data, { ...options, axes: false, grid: false, labels: false }, false, true);
+  }
+  function renderMetric2(data, options) {
+    const first = normalizeData2(data, options)[0];
+    return `<div class="uif-chart-metric" role="img" aria-label="${esc2(options.label || first?.label || "Metric")}: ${esc2(fmt2(first?.value ?? 0, options))}"><strong>${esc2(fmt2(first?.value ?? 0, options))}</strong><span>${esc2(first?.label ?? options.label ?? "Metric")}</span></div>`;
+  }
+  function renderRing2(data, options, type) {
+    const width = options.width ?? 140;
+    const height = options.height ?? (type === "gauge" ? 90 : 140);
+    const datum = normalizeData2(data, options)[0];
+    const value = datum?.value ?? 0;
+    const max = options.max ?? datum?.max ?? 100;
+    const pct = Math.max(0, Math.min(1, value / (max || 1)));
+    if (type === "gauge") {
+      const start2 = Math.PI;
+      const end = Math.PI + pct * Math.PI;
+      const bg = arcPath2(width / 2, height - 8, 58, Math.PI, Math.PI * 2, 46);
+      const fg = arcPath2(width / 2, height - 8, 58, start2, end, 46);
+      return svgWrap2("gauge", width, height, `<path class="uif-chart-ring-bg" d="${bg}"></path><path class="uif-chart-value" d="${fg}"></path><text x="${width / 2}" y="${height - 18}" text-anchor="middle">${esc2(fmt2(value, options))}</text>`, [datum], options);
+    }
+    const dash = round2(pct * 283);
+    return svgWrap2(type, width, height, `<circle class="uif-chart-ring-bg" cx="${width / 2}" cy="${height / 2}" r="45"></circle><circle class="uif-chart-value" cx="${width / 2}" cy="${height / 2}" r="45" stroke-dasharray="${dash} 283"></circle><text x="${width / 2}" y="${height / 2 + 4}" text-anchor="middle">${esc2(fmt2(value, options))}</text>`, [datum], options);
+  }
+  function renderBullet2(data, options) {
+    const width = options.width ?? 320;
+    const height = options.height ?? 72;
+    const datum = normalizeData2(data, options)[0];
+    const max = options.max ?? datum?.max ?? 100;
+    const x = scaleLinear2([0, max], [24, width - 18]);
+    const value = Math.max(0, Math.min(max || 0, datum?.value ?? 0));
+    const target = datum?.target ?? max;
+    const content = `<rect class="uif-chart-range" x="24" y="24" width="${width - 42}" height="18"></rect><rect class="uif-chart-value-bar" x="24" y="24" width="${round2(x(value) - 24)}" height="18"></rect><line class="uif-chart-target" x1="${round2(x(target))}" y1="18" x2="${round2(x(target))}" y2="48"></line><text class="uif-chart-axis-label" x="24" y="62">${esc2(datum?.label ?? "")}</text>`;
+    return svgWrap2("bullet", width, height, content, [datum], options);
+  }
+  function renderHeatmap2(data, options) {
+    const width = options.width ?? 320;
+    const height = options.height ?? 160;
+    const normalized = normalizeData2(data, options);
+    const cols = Math.ceil(Math.sqrt(normalized.length || 1));
+    const cell = Math.min((width - 20) / cols, (height - 20) / Math.ceil(normalized.length / cols));
+    const max = Math.max(1, ...normalized.map((d) => d.value ?? 0));
+    const cells = normalized.map((d, i) => {
+      const opacity = 0.2 + (d.value ?? 0) / max * 0.8;
+      const x = 10 + i % cols * cell;
+      const y = 10 + Math.floor(i / cols) * cell;
+      const label = `${d.label ?? ""}: ${fmt2(d.value ?? 0, options)}`;
+      return `<rect ${markAttrs2(label, options, { index: i, value: d.value ?? 0 })} x="${round2(x)}" y="${round2(y)}" width="${round2(cell - 3)}" height="${round2(cell - 3)}" rx="3" style="opacity:${round2(opacity)}"><title>${esc2(label)}</title></rect>`;
+    }).join("");
+    return svgWrap2("heatmap", width, height, cells, normalized, options);
+  }
+  function renderHistogram2(data, options, distribution = false) {
+    const width = options.width ?? 360;
+    const height = options.height ?? 220;
+    const plot = margins2(options);
+    const normalized = normalizeData2(data, options);
+    const bins = histogramBins2(normalized.map((d) => d.value ?? 0), { bins: options.bins, min: options.min, max: options.max });
+    if (!bins.length) return `<div class="uif-chart-state" data-uif-state="empty">${esc2(options.description || "No data")}</div>`;
+    const x = scaleLinear2([bins[0].x0, bins[bins.length - 1].x1], [plot.left, width - plot.right]);
+    const y = scaleLinear2([0, Math.max(1, ...bins.map((bin) => bin.count))], [height - plot.bottom, plot.top]);
+    if (distribution) {
+      const points = bins.map((bin) => [x((bin.x0 + bin.x1) / 2), y(bin.count)]);
+      const body = `${axisAndGrid2(width, height, plot, [0, Math.max(1, ...bins.map((bin) => bin.count))], options)}<polyline class="uif-chart-series uif-chart-line" points="${pointString2(points)}" fill="none"></polyline>`;
+      return svgWrap2("distribution", width, height, body, normalized, { ...options, description: options.description || "Binned distribution line" });
+    }
+    const bars = bins.map((bin, binIndex) => {
+      const x0 = x(bin.x0);
+      const x1 = x(bin.x1);
+      const yy = y(bin.count);
+      const label = `${fmt2(bin.x0, options)}-${fmt2(bin.x1, options)}: ${bin.count}`;
+      return `<rect ${markAttrs2(label, options, { index: binIndex, value: bin.count })} x="${round2(x0 + 1)}" y="${round2(yy)}" width="${round2(Math.max(1, x1 - x0 - 2))}" height="${round2(height - plot.bottom - yy)}" rx="2"><title>${esc2(label)}</title></rect>`;
+    }).join("");
+    return svgWrap2("histogram", width, height, `${axisAndGrid2(width, height, plot, [0, Math.max(1, ...bins.map((bin) => bin.count))], options)}${bars}`, normalized, options);
+  }
+  function renderBoxPlot2(data, options) {
+    const width = options.width ?? 320;
+    const height = options.height ?? 160;
+    const plot = margins2({ ...options, margin: { top: 18, right: 20, bottom: 28, left: 34, ...options.margin } });
+    const normalized = normalizeData2(data, options);
+    const stats = summaryStats2(normalized.map((d) => d.value ?? 0));
+    if (!stats.count) return `<div class="uif-chart-state" data-uif-state="empty">${esc2(options.description || "No data")}</div>`;
+    const domain = extent2([stats.min, stats.max], options);
+    const x = scaleLinear2(domain, [plot.left, width - plot.right]);
+    const cy = (height - plot.bottom + plot.top) / 2;
+    const boxTop = cy - 22;
+    const boxHeight = 44;
+    const content = `${verticalValueGrid2(width, height, plot, domain, options)}<line class="uif-chart-grid" x1="${round2(x(stats.min))}" y1="${cy}" x2="${round2(x(stats.max))}" y2="${cy}"></line><rect ${markAttrs2(`Q1 ${fmt2(stats.q1, options)} to Q3 ${fmt2(stats.q3, options)}`, options, { value: stats.median }).replace('class="uif-chart-mark"', 'class="uif-chart-mark uif-chart-box"')} x="${round2(x(stats.q1))}" y="${boxTop}" width="${round2(Math.max(1, x(stats.q3) - x(stats.q1)))}" height="${boxHeight}" rx="3"><title>Q1 ${esc2(fmt2(stats.q1, options))}, median ${esc2(fmt2(stats.median, options))}, Q3 ${esc2(fmt2(stats.q3, options))}</title></rect><line class="uif-chart-target" x1="${round2(x(stats.median))}" y1="${boxTop - 4}" x2="${round2(x(stats.median))}" y2="${boxTop + boxHeight + 4}"></line><line class="uif-chart-target" x1="${round2(x(stats.min))}" y1="${cy - 14}" x2="${round2(x(stats.min))}" y2="${cy + 14}"></line><line class="uif-chart-target" x1="${round2(x(stats.max))}" y1="${cy - 14}" x2="${round2(x(stats.max))}" y2="${cy + 14}"></line>`;
+    return svgWrap2("box-plot", width, height, content, normalized, { ...options, description: options.description || `Median ${fmt2(stats.median, options)}, IQR ${fmt2(stats.iqr, options)}` });
+  }
+  function pointsFromData2(data, options) {
+    return normalizeData2(data, options).map((d, index) => ({
+      x: Number(options.x && d[options.x] != null ? d[options.x] : d.x ?? index + 1),
+      y: Number(options.y && d[options.y] != null ? d[options.y] : d.y ?? d.value ?? 0)
+    }));
+  }
+  function renderScatter2(data, options, forceRegression = false) {
+    const width = options.width ?? 360;
+    const height = options.height ?? 220;
+    const plot = margins2(options);
+    const normalized = normalizeData2(data, options);
+    const points = pointsFromData2(data, options).filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+    if (!points.length) return `<div class="uif-chart-state" data-uif-state="empty">${esc2(options.description || "No plottable points")}</div>`;
+    const xDomain = extent2(points.map((point) => point.x), { min: options.min });
+    const yDomain = extent2(points.map((point) => point.y), { max: options.max });
+    const x = scaleLinear2(xDomain, [plot.left, width - plot.right]);
+    const y = scaleLinear2(yDomain, [height - plot.bottom, plot.top]);
+    const marks = points.map((point, index) => {
+      const label = `${normalized[index]?.label || `Point ${index + 1}`}: ${fmt2(point.x, options)}, ${fmt2(point.y, options)}`;
+      return `<circle ${markAttrs2(label, options, { index, value: point.y })} cx="${round2(x(point.x))}" cy="${round2(y(point.y))}" r="4"><title>${esc2(label)}</title></circle>`;
+    }).join("");
+    const reg = options.regression || forceRegression ? linearRegression2(points) : null;
+    const line = reg ? `<line class="uif-chart-regression" x1="${round2(x(xDomain[0]))}" y1="${round2(y(reg.predict(xDomain[0])))}" x2="${round2(x(xDomain[1]))}" y2="${round2(y(reg.predict(xDomain[1])))}"><title>y = ${esc2(fmt2(reg.slope, options))}x + ${esc2(fmt2(reg.intercept, options))}, R2 ${esc2(fmt2(reg.r2, options))}</title></line>` : "";
+    return svgWrap2(forceRegression ? "regression" : "scatter", width, height, `${axisAndGrid2(width, height, plot, yDomain, options)}${verticalValueGrid2(width, height, plot, xDomain, options)}${marks}${line}`, normalized, options);
+  }
+  function renderControlChart2(data, options) {
+    const normalized = normalizeData2(data, options);
+    const stats = summaryStats2(normalized.map((d) => d.value ?? 0));
+    if (!stats.count) return `<div class="uif-chart-state" data-uif-state="empty">${esc2(options.description || "No data")}</div>`;
+    const width = options.width ?? 360;
+    const height = options.height ?? 200;
+    const plot = margins2(options);
+    const sigma = stats.stddev || 1;
+    const min = Math.min(stats.min, stats.mean - sigma * 3);
+    const max = Math.max(stats.max, stats.mean + sigma * 3);
+    const domain = extent2([min, max], options);
+    const referenceLines = [stats.mean, stats.mean + sigma * 3, stats.mean - sigma * 3];
+    const y = scaleLinear2(domain, [height - plot.bottom, plot.top]);
+    const xStep = normalized.length > 1 ? (width - plot.left - plot.right) / (normalized.length - 1) : 0;
+    const points = normalized.map((d, i) => [plot.left + i * xStep, y(d.value ?? 0)]);
+    const line = `<polyline class="uif-chart-series uif-chart-line" data-uif-series="value" points="${pointString2(points)}" fill="none"></polyline>`;
+    const marks = points.map(([cx, cy], i) => {
+      const value = normalized[i].value ?? 0;
+      const label = `${normalized[i].label ?? ""}: ${fmt2(value, options)}`;
+      return `<circle ${markAttrs2(label, options, { index: i, value })} cx="${round2(cx)}" cy="${round2(cy)}" r="3"><title>${esc2(label)}</title></circle>`;
+    }).join("");
+    const refs = referenceLines.map((value, index) => {
+      const yy = round2(y(value));
+      return `<line class="uif-chart-reference ${index === 0 ? "uif-chart-mean" : ""}" x1="${plot.left}" y1="${yy}" x2="${width - plot.right}" y2="${yy}"><title>${index === 0 ? "Mean" : "Control limit"} ${esc2(fmt2(value, options))}</title></line>`;
+    }).join("");
+    const body = `${axisAndGrid2(width, height, plot, domain, options)}${refs}${line}${marks}`;
+    return svgWrap2("control-chart", width, height, body, normalized, { ...options, description: options.description || "Control chart with mean and three sigma limits" });
+  }
+  function renderPareto2(data, options) {
+    const sorted = normalizeData2(data, options).sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
+    const total = sorted.reduce((sum, item) => sum + Math.max(0, item.value ?? 0), 0) || 1;
+    let running = 0;
+    const cumulative = sorted.map((item) => {
+      running += Math.max(0, item.value ?? 0);
+      return { ...item, values: { Count: item.value ?? 0, Cumulative: running / total * 100 } };
+    });
+    return `${renderBars2(cumulative, { ...options, type: "bar", series: [], y: void 0 }, "bar")}${renderLineLike2(
+      cumulative.map((item) => ({ label: item.label, value: Number(item.values?.Cumulative ?? 0) })),
+      { ...options, label: options.label || "Cumulative percent", min: 0, max: 100 }
+    )}`;
+  }
+  function renderChart2(data, options = {}) {
+    const type = options.type ?? "bar";
+    const normalized = normalizeData2(coerceData2(data), options);
+    if (!normalized.length) return `<div class="uif-chart-state" data-uif-state="empty">${esc2(options.description || "No data")}</div>`;
+    if (type === "metric") return renderMetric2(normalized, options);
+    if (type === "line") return renderLineLike2(normalized, options);
+    if (type === "area") return renderLineLike2(normalized, options, true);
+    if (type === "horizontal-bar") return renderBars2(normalized, options, "horizontal-bar");
+    if (type === "grouped-bar") return renderBars2(normalized, options, "grouped-bar");
+    if (type === "stacked-bar") return renderBars2(normalized, options, "stacked-bar");
+    if (type === "pie") return renderPie2(normalized, options);
+    if (type === "donut" || type === "doughnut") return renderPie2(normalized, options, true);
+    if (type === "radar") return renderRadar2(normalized, options);
+    if (type === "sparkline") return renderSparkline2(normalized, options);
+    if (type === "progress" || type === "ring" || type === "gauge") return renderRing2(normalized, options, type);
+    if (type === "bullet") return renderBullet2(normalized, options);
+    if (type === "heatmap" || type === "status-heatmap") return renderHeatmap2(normalized, options);
+    if (type === "timeline") return renderBars2(normalized, { ...options, axes: false }, "bar");
+    if (type === "histogram") return renderHistogram2(normalized, options);
+    if (type === "box-plot") return renderBoxPlot2(normalized, options);
+    if (type === "scatter") return renderScatter2(normalized, options);
+    if (type === "regression") return renderScatter2(normalized, options, true);
+    if (type === "control-chart") return renderControlChart2(normalized, options);
+    if (type === "distribution") return renderHistogram2(normalized, options, true);
+    if (type === "pareto") return renderPareto2(normalized, options);
+    return renderBars2(normalized, options, "bar");
+  }
+
+  // packages/dashboard/src/index.ts
+  function esc3(value) {
+    return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+  }
+  function asRecord(value) {
+    return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  }
+  function normalizeWidget(widget, index) {
+    return {
+      ...widget,
+      id: widget.id || `widget-${index + 1}`,
+      title: widget.title || `Widget ${index + 1}`,
+      type: widget.type || "metric",
+      span: widget.span ?? 1
+    };
+  }
+  function createDashboardConfig(config) {
+    return {
+      ...config,
+      title: config.title || "Dashboard",
+      density: config.density ?? "default",
+      columns: config.columns ?? 3,
+      filters: config.filters ?? [],
+      widgets: (config.widgets ?? []).map(normalizeWidget)
+    };
+  }
+  function applyDashboardFilters(rows2, filters = []) {
+    return rows2.filter(
+      (row) => filters.every((filter) => {
+        const value = row[filter.field];
+        const operator = filter.operator ?? "equals";
+        if (operator === "contains") return String(value ?? "").toLowerCase().includes(String(filter.value ?? "").toLowerCase());
+        if (operator === "gte") return Number(value) >= Number(filter.value);
+        if (operator === "lte") return Number(value) <= Number(filter.value);
+        if (operator === "between" && Array.isArray(filter.value)) return Number(value) >= Number(filter.value[0]) && Number(value) <= Number(filter.value[1]);
+        return value === filter.value;
+      })
+    );
+  }
+  function summarizeDashboard(rows2, field) {
+    const values = rows2.map((row) => Number(row[field])).filter(Number.isFinite);
+    const sum = values.reduce((total, value) => total + value, 0);
+    return {
+      count: values.length,
+      sum,
+      average: values.length ? sum / values.length : 0,
+      min: values.length ? Math.min(...values) : 0,
+      max: values.length ? Math.max(...values) : 0
+    };
+  }
+  function renderRows(rows2, columns) {
+    const visibleColumns = columns?.length ? columns : Object.keys(rows2[0] ?? {});
+    if (!rows2.length) return '<p class="uif-text-muted">No records</p>';
+    return `<div class="uif-table-wrap"><table class="uif-table"><thead><tr>${visibleColumns.map((column) => `<th>${esc3(column)}</th>`).join("")}</tr></thead><tbody>${rows2.map((row) => `<tr>${visibleColumns.map((column) => `<td>${esc3(row[column])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  }
+  function chartData(data) {
+    return (data ?? []).map((item) => {
+      const row = asRecord(item);
+      return {
+        ...row,
+        label: String(row.label ?? row.name ?? ""),
+        value: Number(row.value ?? 0)
+      };
+    });
+  }
+  function renderDashboardWidget(widget, options = {}) {
+    const span = widget.span === "full" ? "full" : String(widget.span ?? 1);
+    const body = widget.type === "chart" ? renderChart2(chartData(widget.data), { type: "bar", palette: "professional", table: "sr-only", ...widget.chart ?? {} }) : widget.type === "table" ? renderRows((widget.data ?? []).map(asRecord), widget.columns) : widget.type === "list" ? `<ul class="uif-list">${(widget.data ?? []).map((item) => `<li>${esc3(asRecord(item).label ?? item)}</li>`).join("")}</ul>` : widget.type === "custom" ? widget.html ?? "" : `<strong class="uif-dashboard-metric">${esc3(widget.value ?? 0)}</strong>${widget.change ? `<span class="uif-badge uif-badge-success">${esc3(widget.change)}</span>` : ""}`;
+    return `<article class="uif-card uif-dashboard-widget" data-uif-dashboard-span="${esc3(span)}"><div class="uif-card-head"><div><h3>${esc3(widget.title)}</h3>${widget.description ? `<p>${esc3(widget.description)}</p>` : ""}</div></div><div class="uif-card-body">${body || `<p class="uif-text-muted">${esc3(options.emptyText ?? "No data")}</p>`}</div></article>`;
+  }
+  function renderDashboard(input, options = {}) {
+    const config = createDashboardConfig(input);
+    const className = ["uif-dashboard", options.className].filter(Boolean).join(" ");
+    return `<section class="${esc3(className)}" data-uif-dashboard-columns="${config.columns}" data-uif-dashboard-density="${esc3(config.density)}"><header class="uif-dashboard-head"><div><h2>${esc3(config.title)}</h2>${config.description ? `<p>${esc3(config.description)}</p>` : ""}</div></header><div class="uif-dashboard-grid">${config.widgets.map((widget) => renderDashboardWidget(widget, options)).join("")}</div></section>`;
+  }
+  function initDashboard(el) {
+    const raw = el.dataset.uifDashboard || el.dataset.uifOptions;
+    if (!raw) return;
+    const config = createDashboardConfig(JSON.parse(raw));
+    el.innerHTML = renderDashboard(config);
+  }
+
   // packages/forms/src/index.ts
   var ruleHandlers = {
     required: (value) => value.trim().length > 0,
@@ -2820,13 +3479,14 @@ ${serialized}`;
   var handlers = /* @__PURE__ */ new Map();
   var connections = /* @__PURE__ */ new Map();
   var states = /* @__PURE__ */ new Map();
+  var presence = /* @__PURE__ */ new Map();
   var elementSubscriptions = /* @__PURE__ */ new WeakMap();
   function setState2(channel, state) {
     states.set(channel, state);
     window.dispatchEvent(new CustomEvent("uif:realtime-state", { detail: { channel, state } }));
   }
   function getConnectionState(channel) {
-    return states.get(channel) ?? "disconnected";
+    return states.get(channel) ?? "idle";
   }
   function parsePayload(data) {
     try {
@@ -2899,6 +3559,36 @@ ${serialized}`;
       }, options.heartbeat);
     }
     connections.set(options.channel, { close: () => window.clearInterval(timer) });
+  }
+  function bindRealtime(options) {
+    const mode = options.transport === "polling" ? "poll" : options.transport;
+    const disposers = [];
+    if (options.onMessage) disposers.push(subscribe(options.channel, options.onMessage));
+    if (options.onState) {
+      const listener = (event) => {
+        const detail = event.detail;
+        if (detail?.channel === options.channel) options.onState?.(detail.state);
+      };
+      window.addEventListener("uif:realtime-state", listener);
+      disposers.push(() => window.removeEventListener("uif:realtime-state", listener));
+    }
+    connect({ ...options, mode: mode ?? (options.fallback === "polling" ? "poll" : void 0) });
+    disposers.push(() => disconnect(options.channel));
+    return () => disposers.splice(0).forEach((dispose) => dispose());
+  }
+  function updatePresence(channel, user) {
+    if (!presence.has(channel)) presence.set(channel, /* @__PURE__ */ new Map());
+    const next = { ...user, lastSeen: user.lastSeen ?? (/* @__PURE__ */ new Date()).toISOString() };
+    presence.get(channel)?.set(next.id, next);
+    window.dispatchEvent(new CustomEvent("uif:presence", { detail: { channel, users: getPresence(channel) } }));
+    return next;
+  }
+  function removePresence(channel, userId) {
+    presence.get(channel)?.delete(userId);
+    window.dispatchEvent(new CustomEvent("uif:presence", { detail: { channel, users: getPresence(channel) } }));
+  }
+  function getPresence(channel) {
+    return Array.from(presence.get(channel)?.values() ?? []);
   }
   function disconnect(channel) {
     connections.get(channel)?.close();
@@ -3191,6 +3881,110 @@ ${serialized}`;
     "approved",
     "rejected"
   ];
+
+  // packages/core/src/micro-app.ts
+  var storageModes = /* @__PURE__ */ new Set(["local-only", "local-first", "sync-optional", "connected", "shared"]);
+  var localStores = /* @__PURE__ */ new Set(["indexeddb", "localstorage", "memory", "none"]);
+  var transports = /* @__PURE__ */ new Set(["websocket", "sse", "polling"]);
+  var connectorTypes = /* @__PURE__ */ new Set(["api", "csv", "json", "spreadsheet", "google-sheet", "static"]);
+  var connectorModes = /* @__PURE__ */ new Set(["readonly", "readwrite"]);
+  function isRecord(value) {
+    return Boolean(value && typeof value === "object" && !Array.isArray(value));
+  }
+  function stringValue(value) {
+    return typeof value === "string" && value.trim() ? value.trim() : void 0;
+  }
+  function booleanValue(value, fallback) {
+    return typeof value === "boolean" ? value : fallback;
+  }
+  function normalizeStorage(raw, issues) {
+    const source = isRecord(raw) ? raw : {};
+    const mode = stringValue(source.mode);
+    const localStore = stringValue(source.localStore);
+    if (mode && !storageModes.has(mode)) issues.push({ path: "storage.mode", message: `Unsupported storage mode: ${mode}` });
+    if (localStore && !localStores.has(localStore)) issues.push({ path: "storage.localStore", message: `Unsupported local store: ${localStore}` });
+    return {
+      mode: storageModes.has(mode) ? mode : "local-first",
+      localStore: localStores.has(localStore) ? localStore : "indexeddb",
+      sharedStore: booleanValue(source.sharedStore, false),
+      namespace: stringValue(source.namespace),
+      encrypted: booleanValue(source.encrypted, false)
+    };
+  }
+  function normalizeRealtime(raw, issues) {
+    const source = isRecord(raw) ? raw : {};
+    const transport = stringValue(source.transport);
+    if (transport && !transports.has(transport)) issues.push({ path: "realtime.transport", message: `Unsupported transport: ${transport}` });
+    return {
+      enabled: booleanValue(source.enabled, false),
+      channel: stringValue(source.channel),
+      transport: transports.has(transport) ? transport : "polling",
+      fallback: source.fallback === "none" ? "none" : "polling"
+    };
+  }
+  function normalizeConnector(raw, index, issues) {
+    if (!isRecord(raw)) {
+      issues.push({ path: `connectors.${index}`, message: "Connector must be an object" });
+      return void 0;
+    }
+    const type = stringValue(raw.type);
+    const mode = stringValue(raw.mode);
+    if (!type || !connectorTypes.has(type)) {
+      issues.push({ path: `connectors.${index}.type`, message: type ? `Unsupported connector type: ${type}` : "Connector type is required" });
+      return void 0;
+    }
+    if (mode && !connectorModes.has(mode)) issues.push({ path: `connectors.${index}.mode`, message: `Unsupported connector mode: ${mode}` });
+    return {
+      type,
+      name: stringValue(raw.name),
+      mode: connectorModes.has(mode) ? mode : "readonly",
+      src: stringValue(raw.src),
+      refreshInterval: typeof raw.refreshInterval === "number" ? raw.refreshInterval : void 0,
+      schema: isRecord(raw.schema) ? raw.schema : void 0
+    };
+  }
+  function normalizePermissions(raw) {
+    const source = isRecord(raw) ? raw : {};
+    return {
+      network: Array.isArray(source.network) ? source.network.filter((item) => typeof item === "string") : [],
+      storage: booleanValue(source.storage, true),
+      realtime: booleanValue(source.realtime, false),
+      ai: booleanValue(source.ai, false),
+      mcp: booleanValue(source.mcp, false)
+    };
+  }
+  function validateMicroAppManifest(input) {
+    const issues = [];
+    const source = isRecord(input) ? input : {};
+    if (!isRecord(input)) issues.push({ path: "$", message: "Manifest must be an object" });
+    const name = stringValue(source.name);
+    if (!name) issues.push({ path: "name", message: "Micro App name is required" });
+    if (source.type !== "micro-app") issues.push({ path: "type", message: 'Manifest type must be "micro-app"' });
+    const connectors = Array.isArray(source.connectors) ? source.connectors.map((item, index) => normalizeConnector(item, index, issues)).filter((item) => Boolean(item)) : [];
+    const manifest = {
+      ...source,
+      name: name ?? "Untitled Micro App",
+      type: "micro-app",
+      version: stringValue(source.version),
+      description: stringValue(source.description),
+      entry: stringValue(source.entry),
+      storage: normalizeStorage(source.storage, issues),
+      realtime: normalizeRealtime(source.realtime, issues),
+      connectors,
+      permissions: normalizePermissions(source.permissions),
+      build: isRecord(source.build) ? { upgradeable: booleanValue(source.build.upgradeable, false), appType: stringValue(source.build.appType) } : void 0,
+      ui: isRecord(source.ui) ? { mount: stringValue(source.ui.mount), title: stringValue(source.ui.title), icon: stringValue(source.ui.icon) } : void 0
+    };
+    return { manifest, issues, valid: issues.length === 0 };
+  }
+  function parseMicroAppManifest(input) {
+    const result = validateMicroAppManifest(input);
+    if (!result.valid) {
+      const message = result.issues.map((issue) => `${issue.path}: ${issue.message}`).join("; ");
+      throw new Error(`Invalid Micro App manifest: ${message}`);
+    }
+    return result.manifest;
+  }
 
   // packages/core/src/index.ts
   var plugins = /* @__PURE__ */ new Map();
@@ -3557,6 +4351,39 @@ ${serialized}`;
     el.style.height = "";
   }
 
+  // packages/extension-kit/src/index.ts
+  function createExtensionManifest(options) {
+    const surfaces = options.surfaces ?? {};
+    const manifest = {
+      manifest_version: 3,
+      name: options.name,
+      version: options.version ?? "0.1.0",
+      description: options.description,
+      permissions: options.permissions ?? ["storage"],
+      host_permissions: options.hostPermissions ?? [],
+      icons: options.icons
+    };
+    if (surfaces.popup) manifest.action = { default_popup: surfaces.popup };
+    if (surfaces.options) manifest.options_page = surfaces.options;
+    if (surfaces.sidePanel) manifest.side_panel = { default_path: surfaces.sidePanel };
+    if (surfaces.serviceWorker) manifest.background = { service_worker: surfaces.serviceWorker, type: "module" };
+    if (surfaces.contentScript) {
+      manifest.content_scripts = [
+        {
+          matches: options.hostPermissions?.length ? options.hostPermissions : ["<all_urls>"],
+          js: [surfaces.contentScript]
+        }
+      ];
+    }
+    return manifest;
+  }
+  function isExtensionRuntime(runtime = globalThis.chrome?.runtime) {
+    return Boolean(runtime && typeof runtime === "object");
+  }
+  function createExtensionMessage(type, payload, requestId = crypto.randomUUID()) {
+    return { type, payload, requestId };
+  }
+
   // packages/overlays/src/index.ts
   var stack2 = [];
   function top2() {
@@ -3724,6 +4551,78 @@ ${serialized}`;
       });
     }
     return request2(url, { ...options, method: options.method ?? "POST", body: formData });
+  }
+  function parseCSV(text) {
+    const rows2 = [];
+    let row = [];
+    let cell = "";
+    let quoted = false;
+    for (let index = 0; index < text.length; index += 1) {
+      const char = text[index];
+      const next = text[index + 1];
+      if (char === '"' && quoted && next === '"') {
+        cell += '"';
+        index += 1;
+      } else if (char === '"') {
+        quoted = !quoted;
+      } else if (char === "," && !quoted) {
+        row.push(cell);
+        cell = "";
+      } else if ((char === "\n" || char === "\r") && !quoted) {
+        if (char === "\r" && next === "\n") index += 1;
+        row.push(cell);
+        if (row.some((value) => value !== "")) rows2.push(row);
+        row = [];
+        cell = "";
+      } else {
+        cell += char;
+      }
+    }
+    row.push(cell);
+    if (row.some((value) => value !== "")) rows2.push(row);
+    return rows2;
+  }
+  function csvToObjects(text) {
+    const [head, ...rows2] = parseCSV(text);
+    if (!head) return [];
+    return rows2.map(
+      (row) => head.reduce((acc, key, index) => {
+        acc[key] = row[index] ?? "";
+        return acc;
+      }, {})
+    );
+  }
+  async function loadConnector(connector, options = {}) {
+    let value;
+    if (connector.type === "static") {
+      value = connector.data;
+    } else {
+      if (!connector.src) throw new Error(`Connector source is required for ${connector.type}`);
+      const parseAs = connector.type === "csv" ? "text" : "auto";
+      value = await request2(connector.src, {
+        ...options,
+        method: connector.method ?? "GET",
+        headers: connector.headers ?? options.headers,
+        timeout: connector.timeout ?? options.timeout,
+        parseAs
+      });
+      if (connector.type === "csv") value = csvToObjects(String(value));
+    }
+    return connector.transform ? connector.transform(value) : value;
+  }
+  function bindConnector(connector, handler, options = {}) {
+    let stopped = false;
+    let timer;
+    const load = async () => {
+      const value = await loadConnector(connector, options);
+      if (!stopped) await handler(value);
+    };
+    void load();
+    if (connector.refreshInterval) timer = window.setInterval(() => void load(), connector.refreshInterval);
+    return () => {
+      stopped = true;
+      if (timer) window.clearInterval(timer);
+    };
   }
 
   // packages/router/src/index.ts
@@ -3931,6 +4830,127 @@ ${serialized}`;
   function createArtifactStore(initialState, options = {}) {
     return createMicroAppStore(initialState, options);
   }
+  function makeScopedKey(namespace, key) {
+    return `${namespace}:${key}`;
+  }
+  function stripScope(namespace, key) {
+    return key.startsWith(`${namespace}:`) ? key.slice(namespace.length + 1) : key;
+  }
+  function makeMemoryStorage() {
+    const map = /* @__PURE__ */ new Map();
+    return {
+      get length() {
+        return map.size;
+      },
+      clear() {
+        map.clear();
+      },
+      getItem(key) {
+        return map.get(key) ?? null;
+      },
+      key(index) {
+        return Array.from(map.keys())[index] ?? null;
+      },
+      removeItem(key) {
+        map.delete(key);
+      },
+      setItem(key, value) {
+        map.set(key, value);
+      }
+    };
+  }
+  function createLocalStore(options = {}) {
+    const namespace = options.namespace || "uif";
+    const storage = options.driver === "memory" ? makeMemoryStorage() : window.localStorage;
+    const api = {
+      namespace,
+      async get(key) {
+        const raw = storage.getItem(makeScopedKey(namespace, key));
+        return raw === null ? void 0 : JSON.parse(raw);
+      },
+      async set(key, value) {
+        storage.setItem(makeScopedKey(namespace, key), JSON.stringify(value));
+      },
+      async delete(key) {
+        storage.removeItem(makeScopedKey(namespace, key));
+      },
+      async list() {
+        const items = [];
+        for (let index = 0; index < storage.length; index += 1) {
+          const scopedKey = storage.key(index);
+          if (!scopedKey?.startsWith(`${namespace}:`)) continue;
+          const raw = storage.getItem(scopedKey);
+          if (raw === null) continue;
+          items.push({ key: stripScope(namespace, scopedKey), value: JSON.parse(raw) });
+        }
+        return items;
+      },
+      async clear() {
+        const keys = await api.list();
+        keys.forEach((item) => storage.removeItem(makeScopedKey(namespace, item.key)));
+      },
+      async exportJSON(space = 2) {
+        const entries = await api.list();
+        return JSON.stringify(
+          entries.reduce((acc, item) => {
+            acc[item.key] = item.value;
+            return acc;
+          }, {}),
+          null,
+          space
+        );
+      },
+      async importJSON(json) {
+        const parsed = JSON.parse(json);
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Local store import must be a JSON object");
+        await api.clear();
+        await Promise.all(Object.entries(parsed).map(([key, value]) => api.set(key, value)));
+      }
+    };
+    return api;
+  }
+  function id(prefix = "sync") {
+    return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  }
+  function createSyncQueue(store, key = "sync-queue") {
+    const read = async () => await store.get(key) ?? [];
+    const write = (items) => store.set(key, items);
+    return {
+      async enqueue(action, payload, itemId = id()) {
+        const now = (/* @__PURE__ */ new Date()).toISOString();
+        const item = { id: itemId, action, payload, status: "queued", attempts: 0, createdAt: now, updatedAt: now };
+        await write([...await read(), item]);
+        return item;
+      },
+      async list(status) {
+        const items = await read();
+        return status ? items.filter((item) => item.status === status) : items;
+      },
+      async update(itemId, patch) {
+        const items = await read();
+        const index = items.findIndex((item) => item.id === itemId);
+        if (index < 0) throw new Error(`Sync queue item not found: ${itemId}`);
+        const next = { ...items[index], ...patch, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+        items[index] = next;
+        await write(items);
+        return next;
+      },
+      async remove(itemId) {
+        await write((await read()).filter((item) => item.id !== itemId));
+      },
+      async clear(status) {
+        await write(status ? (await read()).filter((item) => item.status !== status) : []);
+      },
+      async exportJSON(space = 2) {
+        return JSON.stringify(await read(), null, space);
+      },
+      async importJSON(json) {
+        const parsed = JSON.parse(json);
+        if (!Array.isArray(parsed)) throw new Error("Sync queue import must be a JSON array");
+        await write(parsed);
+      }
+    };
+  }
 
   // index.ts
   var apps = /* @__PURE__ */ new WeakMap();
@@ -3945,6 +4965,7 @@ ${serialized}`;
       if (type === "table" && el.tagName === "TABLE") initTable(el);
       if (type === "form" && el.tagName === "FORM") initForm(el);
       if (type === "chart") initChart(el);
+      if (type === "dashboard") initDashboard(el);
       if (type === "realtime") initRealtime(el);
       if (type === "push") initPush(el);
       if (type === "mobile-shell") initMobileShell(el);

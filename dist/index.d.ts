@@ -1,3 +1,5 @@
+import { ChartDatum as ChartDatum$1, ChartOptions as ChartOptions$1 } from '@batoi/uif-charts';
+
 declare const uifAttributes: readonly ["data-uif", "data-uif-id", "data-uif-role", "data-uif-action", "data-uif-target", "data-uif-src", "data-uif-method", "data-uif-trigger", "data-uif-state", "data-uif-bind", "data-uif-model", "data-uif-value", "data-uif-route", "data-uif-mode", "data-uif-options", "data-uif-confirm", "data-uif-disabled", "data-uif-loading", "data-uif-success", "data-uif-error", "data-uif-swap", "data-uif-cache", "data-uif-validate", "data-uif-rule", "data-uif-event", "data-uif-on", "data-uif-refresh", "data-uif-persist"];
 declare const uifValues: readonly ["button", "modal", "drawer", "dropdown", "tabs", "toast", "accordion", "table", "form", "ajax", "route", "shell", "nav", "chart", "realtime", "push", "mobile-shell", "ai-action", "tool-approval"];
 declare const uifActions: readonly ["open", "close", "toggle", "submit", "load", "reload", "delete", "save", "reset", "clear", "select", "activate", "deactivate", "navigate", "swap", "append", "prepend", "remove", "toast", "subscribe", "connect", "disconnect", "approve", "reject"];
@@ -6,6 +8,72 @@ type UIFAttribute = (typeof uifAttributes)[number];
 type UIFValue = (typeof uifValues)[number];
 type UIFAction = (typeof uifActions)[number];
 type UIFState = (typeof uifStates)[number];
+
+type MicroAppStorageMode = 'local-only' | 'local-first' | 'sync-optional' | 'connected' | 'shared';
+type MicroAppLocalStore = 'indexeddb' | 'localstorage' | 'memory' | 'none';
+type MicroAppRealtimeTransport = 'websocket' | 'sse' | 'polling';
+type MicroAppConnectorType = 'api' | 'csv' | 'json' | 'spreadsheet' | 'google-sheet' | 'static';
+type MicroAppConnectorMode = 'readonly' | 'readwrite';
+interface MicroAppStorageManifest {
+    mode?: MicroAppStorageMode;
+    localStore?: MicroAppLocalStore;
+    sharedStore?: boolean;
+    namespace?: string;
+    encrypted?: boolean;
+}
+interface MicroAppRealtimeManifest {
+    enabled?: boolean;
+    channel?: string;
+    transport?: MicroAppRealtimeTransport;
+    fallback?: 'polling' | 'none';
+}
+interface MicroAppConnectorManifest {
+    type: MicroAppConnectorType;
+    name?: string;
+    mode?: MicroAppConnectorMode;
+    src?: string;
+    refreshInterval?: number;
+    schema?: Record<string, unknown>;
+}
+interface MicroAppPermissionsManifest {
+    network?: string[];
+    storage?: boolean;
+    realtime?: boolean;
+    ai?: boolean;
+    mcp?: boolean;
+}
+interface MicroAppManifest {
+    name: string;
+    type: 'micro-app';
+    version?: string;
+    description?: string;
+    entry?: string;
+    storage: Required<Pick<MicroAppStorageManifest, 'mode' | 'localStore' | 'sharedStore'>> & MicroAppStorageManifest;
+    realtime: Required<Pick<MicroAppRealtimeManifest, 'enabled'>> & MicroAppRealtimeManifest;
+    connectors: MicroAppConnectorManifest[];
+    permissions: MicroAppPermissionsManifest;
+    build?: {
+        upgradeable?: boolean;
+        appType?: string;
+    };
+    ui?: {
+        mount?: string;
+        title?: string;
+        icon?: string;
+    };
+    [key: string]: unknown;
+}
+interface MicroAppManifestIssue {
+    path: string;
+    message: string;
+}
+interface MicroAppManifestResult {
+    manifest: MicroAppManifest;
+    issues: MicroAppManifestIssue[];
+    valid: boolean;
+}
+declare function validateMicroAppManifest(input: unknown): MicroAppManifestResult;
+declare function parseMicroAppManifest(input: unknown): MicroAppManifest;
 
 type UIFOptions = Record<string, unknown>;
 
@@ -115,6 +183,41 @@ declare function toggle(el: HTMLElement, options?: EffectOptions): Promise<void>
 declare function expand(el: HTMLElement, options?: EffectOptions): Promise<void>;
 declare function collapse(el: HTMLElement, options?: EffectOptions): Promise<void>;
 
+interface ExtensionSurface {
+    popup?: string;
+    options?: string;
+    sidePanel?: string;
+    contentScript?: string;
+    serviceWorker?: string;
+}
+interface ExtensionManifestOptions {
+    name: string;
+    version?: string;
+    description?: string;
+    permissions?: string[];
+    hostPermissions?: string[];
+    icons?: Record<string, string>;
+    surfaces?: ExtensionSurface;
+}
+interface ExtensionMessage<T = unknown> {
+    type: string;
+    payload?: T;
+    requestId?: string;
+}
+declare function createExtensionManifest(options: ExtensionManifestOptions): Record<string, unknown>;
+declare function isExtensionRuntime(runtime?: unknown): boolean;
+declare function createExtensionMessage<T = unknown>(type: string, payload?: T, requestId?: `${string}-${string}-${string}-${string}-${string}`): ExtensionMessage<T>;
+declare global {
+    interface Window {
+        chrome?: {
+            runtime?: unknown;
+        };
+    }
+    var chrome: {
+        runtime?: unknown;
+    } | undefined;
+}
+
 interface OverlayOptions {
     opener?: HTMLElement | null;
     modal?: boolean;
@@ -143,6 +246,20 @@ interface UIFRequestError extends Error {
     response?: Response;
     data?: unknown;
 }
+type ConnectorType = 'api' | 'json' | 'csv' | 'static' | 'spreadsheet' | 'google-sheet';
+type ConnectorMode = 'readonly' | 'readwrite';
+interface DataConnector<T = unknown> {
+    type: ConnectorType;
+    name?: string;
+    mode?: ConnectorMode;
+    src?: string;
+    method?: string;
+    headers?: HeadersInit;
+    data?: T;
+    timeout?: number;
+    refreshInterval?: number;
+    transform?: (value: unknown) => T | Promise<T>;
+}
 type RequestInterceptor = (url: string, options: RequestOptions) => void | RequestOptions | Promise<void | RequestOptions>;
 type ResponseInterceptor = (response: Response) => void | Response | Promise<void | Response>;
 declare function useRequestInterceptor(fn: RequestInterceptor): () => void;
@@ -153,6 +270,10 @@ declare function get<T = unknown>(url: string, options?: RequestOptions): Promis
 declare function post<T = unknown>(url: string, data?: unknown, options?: RequestOptions): Promise<T>;
 declare function submitForm<T = unknown>(formEl: HTMLFormElement, options?: RequestOptions): Promise<T>;
 declare function upload<T = unknown>(url: string, formData: FormData, options?: RequestOptions): Promise<T>;
+declare function parseCSV(text: string): string[][];
+declare function csvToObjects(text: string): Array<Record<string, string>>;
+declare function loadConnector<T = unknown>(connector: DataConnector<T>, options?: RequestOptions): Promise<T>;
+declare function bindConnector<T = unknown>(connector: DataConnector<T>, handler: (value: T) => void | Promise<void>, options?: RequestOptions): () => void;
 
 type FormErrors = Record<string, string[]>;
 type AsyncRuleHandler = (field: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement, form: HTMLFormElement) => Promise<string[]>;
@@ -791,6 +912,52 @@ declare const table: {
     destroy: typeof destroyComponent;
 };
 
+type DashboardWidgetType = 'metric' | 'chart' | 'table' | 'list' | 'custom';
+type DashboardFilterOperator = 'equals' | 'contains' | 'between' | 'gte' | 'lte';
+interface DashboardWidget {
+    id: string;
+    title: string;
+    type: DashboardWidgetType;
+    description?: string;
+    value?: string | number;
+    change?: string;
+    data?: Array<Record<string, unknown>> | ChartDatum$1[];
+    chart?: ChartOptions$1;
+    columns?: string[];
+    span?: 1 | 2 | 3 | 4 | 'full';
+    html?: string;
+}
+interface DashboardFilter {
+    field: string;
+    operator?: DashboardFilterOperator;
+    value: unknown;
+}
+interface DashboardConfig {
+    id?: string;
+    title: string;
+    description?: string;
+    density?: 'compact' | 'default' | 'roomy';
+    columns?: 1 | 2 | 3 | 4;
+    filters?: DashboardFilter[];
+    widgets: DashboardWidget[];
+}
+interface DashboardRenderOptions {
+    className?: string;
+    emptyText?: string;
+}
+declare function createDashboardConfig(config: DashboardConfig): DashboardConfig;
+declare function applyDashboardFilters<T extends Record<string, unknown>>(rows: T[], filters?: DashboardFilter[]): T[];
+declare function summarizeDashboard(rows: Array<Record<string, unknown>>, field: string): {
+    count: number;
+    sum: number;
+    average: number;
+    min: number;
+    max: number;
+};
+declare function renderDashboardWidget(widget: DashboardWidget, options?: DashboardRenderOptions): string;
+declare function renderDashboard(input: DashboardConfig, options?: DashboardRenderOptions): string;
+declare function initDashboard(el: HTMLElement): void;
+
 interface TableOptions {
     filterInput?: HTMLInputElement | null;
     page?: number;
@@ -880,6 +1047,7 @@ declare function initInstallPrompt(el: HTMLElement): void;
 type State = Record<string, unknown>;
 type Subscriber = (value: unknown) => void;
 type Computed = (state: State) => unknown;
+type SyncStatus = 'queued' | 'syncing' | 'synced' | 'failed';
 interface StoreOptions {
     immutable?: boolean;
     persist?: 'local' | 'session';
@@ -890,6 +1058,42 @@ interface MicroAppStoreOptions extends StoreOptions {
     historyLimit?: number;
 }
 type ArtifactStoreOptions = MicroAppStoreOptions;
+interface LocalStoreOptions {
+    namespace?: string;
+    driver?: 'localstorage' | 'memory';
+}
+interface LocalStore {
+    namespace: string;
+    get<T = unknown>(key: string): Promise<T | undefined>;
+    set<T = unknown>(key: string, value: T): Promise<void>;
+    delete(key: string): Promise<void>;
+    list<T = unknown>(): Promise<Array<{
+        key: string;
+        value: T;
+    }>>;
+    clear(): Promise<void>;
+    exportJSON(space?: number): Promise<string>;
+    importJSON(json: string): Promise<void>;
+}
+interface SyncQueueItem<T = unknown> {
+    id: string;
+    action: string;
+    payload: T;
+    status: SyncStatus;
+    attempts: number;
+    createdAt: string;
+    updatedAt: string;
+    lastError?: string;
+}
+interface SyncQueue<T = unknown> {
+    enqueue(action: string, payload: T, id?: string): Promise<SyncQueueItem<T>>;
+    list(status?: SyncStatus): Promise<SyncQueueItem<T>[]>;
+    update(id: string, patch: Partial<Omit<SyncQueueItem<T>, 'id' | 'createdAt'>>): Promise<SyncQueueItem<T>>;
+    remove(id: string): Promise<void>;
+    clear(status?: SyncStatus): Promise<void>;
+    exportJSON(space?: number): Promise<string>;
+    importJSON(json: string): Promise<void>;
+}
 declare function createStore<T extends State>(initialState: T): {
     get(path?: string): unknown;
     replace(next: State): void;
@@ -948,6 +1152,8 @@ declare function createArtifactStore<T extends State>(initialState: T, options?:
     bind(root?: ParentNode): void;
     destroy(): void;
 };
+declare function createLocalStore(options?: LocalStoreOptions): LocalStore;
+declare function createSyncQueue<T = unknown>(store: LocalStore, key?: string): SyncQueue<T>;
 
 type ChartType = 'line' | 'area' | 'bar' | 'horizontal-bar' | 'stacked-bar' | 'grouped-bar' | 'pie' | 'donut' | 'doughnut' | 'radar' | 'sparkline' | 'metric' | 'progress' | 'ring' | 'gauge' | 'timeline' | 'heatmap' | 'status-heatmap' | 'bullet' | 'histogram' | 'box-plot' | 'scatter' | 'regression' | 'control-chart' | 'distribution' | 'pareto';
 interface ChartDatum {
@@ -1113,7 +1319,7 @@ declare const chart: {
 };
 
 type RealtimeMode = 'sse' | 'websocket' | 'poll';
-type RealtimeState = 'connecting' | 'connected' | 'reconnecting' | 'disconnected' | 'stale' | 'error';
+type RealtimeState = 'idle' | 'connecting' | 'connected' | 'open' | 'reconnecting' | 'disconnected' | 'closed' | 'stale' | 'degraded' | 'error' | 'failed';
 type RealtimeHandler = (payload: unknown) => void;
 interface RealtimeOptions {
     channel: string;
@@ -1124,11 +1330,34 @@ interface RealtimeOptions {
     backoff?: number;
     heartbeat?: number;
 }
+interface RealtimeBindingOptions extends Omit<RealtimeOptions, 'mode'> {
+    transport?: RealtimeMode | 'polling';
+    fallback?: 'polling' | 'none';
+    onMessage?: RealtimeHandler;
+    onState?: (state: RealtimeState) => void;
+}
+interface PresenceUser {
+    id: string;
+    name?: string;
+    color?: string;
+    cursor?: {
+        x: number;
+        y: number;
+    };
+    lastSeen: string;
+    metadata?: Record<string, unknown>;
+}
 declare function getConnectionState(channel: string): RealtimeState;
 declare function subscribe(channel: string, handler: RealtimeHandler): () => void;
 declare function publishLocal(channel: string, payload: unknown): void;
 declare function publishBatched(channel: string, payload: unknown): void;
 declare function connect(options: RealtimeOptions): void;
+declare function bindRealtime(options: RealtimeBindingOptions): () => void;
+declare function updatePresence(channel: string, user: Omit<PresenceUser, 'lastSeen'> & {
+    lastSeen?: string;
+}): PresenceUser;
+declare function removePresence(channel: string, userId: string): void;
+declare function getPresence(channel: string): PresenceUser[];
 declare function disconnect(channel: string): void;
 declare function initRealtime(el: HTMLElement): void;
 declare const realtime: {
@@ -1214,4 +1443,4 @@ interface BatoiUIFApp {
 declare function start(root?: Document | HTMLElement): BatoiUIFApp;
 declare function autoStart(root?: Document | HTMLElement): void;
 
-export { type ArtifactStoreOptions, type BatoiUIFApp, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type DrilldownOptions, type EffectOptions, type FormErrors, type HTMLSwapMode, type HistogramBin, type HistogramOptions, type IconDefinition, type IconName, type IconOptions, type IconRegistry, type MicroAppStoreOptions, type MountIconsOptions, type NotificationItem, type OverlayOptions, type QueryHandler, type QueryInput, type RadResponse, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RequestOptions, type RouterOptions, type StoreOptions, type SummaryStats, type SwapMode, type TableAdapterOptions, type TableOptions, type TrustedHTMLRenderOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFValue, accordion, adaptRecords, adaptTable, addNotification, aiAction, alert, appendStreamingChunk, appendTextElement, applyResponsiveColumns, autoInit, autoStart, badge, bindChartExports, bindRadActions, breadcrumb, button, cacheStrategies, cancelRequest, card, chart, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, connect, correlation, createAdvancedStore, createArtifactStore, createCacheStrategy, createMicroAppStore, createStore, createStreamSurface, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, disconnect, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, fragment, get, getConnectionState, getNotifications, getOverlayStack, getPushSubscription, hasIcon, hide, histogramBins, icon, iconElement, icons, init, initAll, initChart, initComponent, initDeclarativeFilters, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, isInitialized, linearRegression, loadPartial, loadRemoteTable, markNotificationsRead, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseChartData, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queueOfflineTask, ready, realtime, refreshChart, registerAsyncRule, registerComponent, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, rehydrate, renderAIAction, renderAIResultCard, renderAssistantResponse, renderChart, renderDiff, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolTimeline, request, requestNotificationPermission, resolveTarget, selectedRows, serialize, setAccent, setDensity, setTableState, setText, setTrustedHTML, setupInstallPrompt, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, start, stepper, submitForm, subscribe, subscribeToPush, summaryStats, swapContent, swapTrustedHTML, table, tabs, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterServiceWorker, unsubscribeFromPush, upload, useRequestInterceptor, useResponseInterceptor, validateField, validateForm, validateFormAsync, wizard, zScores };
+export { type ArtifactStoreOptions, type BatoiUIFApp, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type ConnectorMode, type ConnectorType, type DashboardConfig, type DashboardFilter, type DashboardFilterOperator, type DashboardRenderOptions, type DashboardWidget, type DashboardWidgetType, type DataConnector, type DrilldownOptions, type EffectOptions, type ExtensionManifestOptions, type ExtensionMessage, type ExtensionSurface, type FormErrors, type HTMLSwapMode, type HistogramBin, type HistogramOptions, type IconDefinition, type IconName, type IconOptions, type IconRegistry, type LocalStore, type LocalStoreOptions, type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type MicroAppStoreOptions, type MountIconsOptions, type NotificationItem, type OverlayOptions, type PresenceUser, type QueryHandler, type QueryInput, type RadResponse, type RealtimeBindingOptions, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RequestOptions, type RouterOptions, type StoreOptions, type SummaryStats, type SwapMode, type SyncQueue, type SyncQueueItem, type TableAdapterOptions, type TableOptions, type TrustedHTMLRenderOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFValue, accordion, adaptRecords, adaptTable, addNotification, aiAction, alert, appendStreamingChunk, appendTextElement, applyDashboardFilters, applyResponsiveColumns, autoInit, autoStart, badge, bindChartExports, bindConnector, bindRadActions, bindRealtime, breadcrumb, button, cacheStrategies, cancelRequest, card, chart, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, connect, correlation, createAdvancedStore, createArtifactStore, createCacheStrategy, createDashboardConfig, createExtensionManifest, createExtensionMessage, createLocalStore, createMicroAppStore, createStore, createStreamSurface, createSyncQueue, csvToObjects, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, disconnect, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, fragment, get, getConnectionState, getNotifications, getOverlayStack, getPresence, getPushSubscription, hasIcon, hide, histogramBins, icon, iconElement, icons, init, initAll, initChart, initComponent, initDashboard, initDeclarativeFilters, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, isExtensionRuntime, isInitialized, linearRegression, loadConnector, loadPartial, loadRemoteTable, markNotificationsRead, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseCSV, parseChartData, parseMicroAppManifest, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queueOfflineTask, ready, realtime, refreshChart, registerAsyncRule, registerComponent, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, rehydrate, removePresence, renderAIAction, renderAIResultCard, renderAssistantResponse, renderChart, renderDashboard, renderDashboardWidget, renderDiff, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolTimeline, request, requestNotificationPermission, resolveTarget, selectedRows, serialize, setAccent, setDensity, setTableState, setText, setTrustedHTML, setupInstallPrompt, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, start, stepper, submitForm, subscribe, subscribeToPush, summarizeDashboard, summaryStats, swapContent, swapTrustedHTML, table, tabs, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterServiceWorker, unsubscribeFromPush, updatePresence, upload, useRequestInterceptor, useResponseInterceptor, validateField, validateForm, validateFormAsync, validateMicroAppManifest, wizard, zScores };

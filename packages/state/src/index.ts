@@ -1,6 +1,7 @@
 type State = Record<string, unknown>;
 type Subscriber = (value: unknown) => void;
 type Computed = (state: State) => unknown;
+type SyncStatus = 'queued' | 'syncing' | 'synced' | 'failed';
 
 export interface StoreOptions {
   immutable?: boolean;
@@ -14,6 +15,43 @@ export interface MicroAppStoreOptions extends StoreOptions {
 }
 
 export type ArtifactStoreOptions = MicroAppStoreOptions;
+
+export interface LocalStoreOptions {
+  namespace?: string;
+  driver?: 'localstorage' | 'memory';
+}
+
+export interface LocalStore {
+  namespace: string;
+  get<T = unknown>(key: string): Promise<T | undefined>;
+  set<T = unknown>(key: string, value: T): Promise<void>;
+  delete(key: string): Promise<void>;
+  list<T = unknown>(): Promise<Array<{ key: string; value: T }>>;
+  clear(): Promise<void>;
+  exportJSON(space?: number): Promise<string>;
+  importJSON(json: string): Promise<void>;
+}
+
+export interface SyncQueueItem<T = unknown> {
+  id: string;
+  action: string;
+  payload: T;
+  status: SyncStatus;
+  attempts: number;
+  createdAt: string;
+  updatedAt: string;
+  lastError?: string;
+}
+
+export interface SyncQueue<T = unknown> {
+  enqueue(action: string, payload: T, id?: string): Promise<SyncQueueItem<T>>;
+  list(status?: SyncStatus): Promise<SyncQueueItem<T>[]>;
+  update(id: string, patch: Partial<Omit<SyncQueueItem<T>, 'id' | 'createdAt'>>): Promise<SyncQueueItem<T>>;
+  remove(id: string): Promise<void>;
+  clear(status?: SyncStatus): Promise<void>;
+  exportJSON(space?: number): Promise<string>;
+  importJSON(json: string): Promise<void>;
+}
 
 function getByPath(obj: State, path: string): unknown {
   return path.split('.').reduce<unknown>((acc, part) => {
@@ -178,4 +216,133 @@ export function createMicroAppStore<T extends State>(initialState: T, options: M
 
 export function createArtifactStore<T extends State>(initialState: T, options: ArtifactStoreOptions = {}) {
   return createMicroAppStore(initialState, options);
+}
+
+function makeScopedKey(namespace: string, key: string): string {
+  return `${namespace}:${key}`;
+}
+
+function stripScope(namespace: string, key: string): string {
+  return key.startsWith(`${namespace}:`) ? key.slice(namespace.length + 1) : key;
+}
+
+function makeMemoryStorage(): Storage {
+  const map = new Map<string, string>();
+  return {
+    get length() {
+      return map.size;
+    },
+    clear() {
+      map.clear();
+    },
+    getItem(key: string) {
+      return map.get(key) ?? null;
+    },
+    key(index: number) {
+      return Array.from(map.keys())[index] ?? null;
+    },
+    removeItem(key: string) {
+      map.delete(key);
+    },
+    setItem(key: string, value: string) {
+      map.set(key, value);
+    },
+  };
+}
+
+export function createLocalStore(options: LocalStoreOptions = {}): LocalStore {
+  const namespace = options.namespace || 'uif';
+  const storage = options.driver === 'memory' ? makeMemoryStorage() : window.localStorage;
+
+  const api: LocalStore = {
+    namespace,
+    async get<T = unknown>(key: string): Promise<T | undefined> {
+      const raw = storage.getItem(makeScopedKey(namespace, key));
+      return raw === null ? undefined : (JSON.parse(raw) as T);
+    },
+    async set<T = unknown>(key: string, value: T): Promise<void> {
+      storage.setItem(makeScopedKey(namespace, key), JSON.stringify(value));
+    },
+    async delete(key: string): Promise<void> {
+      storage.removeItem(makeScopedKey(namespace, key));
+    },
+    async list<T = unknown>(): Promise<Array<{ key: string; value: T }>> {
+      const items: Array<{ key: string; value: T }> = [];
+      for (let index = 0; index < storage.length; index += 1) {
+        const scopedKey = storage.key(index);
+        if (!scopedKey?.startsWith(`${namespace}:`)) continue;
+        const raw = storage.getItem(scopedKey);
+        if (raw === null) continue;
+        items.push({ key: stripScope(namespace, scopedKey), value: JSON.parse(raw) as T });
+      }
+      return items;
+    },
+    async clear(): Promise<void> {
+      const keys = await api.list();
+      keys.forEach((item) => storage.removeItem(makeScopedKey(namespace, item.key)));
+    },
+    async exportJSON(space = 2): Promise<string> {
+      const entries = await api.list();
+      return JSON.stringify(
+        entries.reduce<Record<string, unknown>>((acc, item) => {
+          acc[item.key] = item.value;
+          return acc;
+        }, {}),
+        null,
+        space,
+      );
+    },
+    async importJSON(json: string): Promise<void> {
+      const parsed = JSON.parse(json) as unknown;
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Local store import must be a JSON object');
+      await api.clear();
+      await Promise.all(Object.entries(parsed).map(([key, value]) => api.set(key, value)));
+    },
+  };
+
+  return api;
+}
+
+function id(prefix = 'sync'): string {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+export function createSyncQueue<T = unknown>(store: LocalStore, key = 'sync-queue'): SyncQueue<T> {
+  const read = async (): Promise<SyncQueueItem<T>[]> => (await store.get<SyncQueueItem<T>[]>(key)) ?? [];
+  const write = (items: SyncQueueItem<T>[]) => store.set(key, items);
+  return {
+    async enqueue(action: string, payload: T, itemId = id()): Promise<SyncQueueItem<T>> {
+      const now = new Date().toISOString();
+      const item: SyncQueueItem<T> = { id: itemId, action, payload, status: 'queued', attempts: 0, createdAt: now, updatedAt: now };
+      await write([...(await read()), item]);
+      return item;
+    },
+    async list(status?: SyncStatus): Promise<SyncQueueItem<T>[]> {
+      const items = await read();
+      return status ? items.filter((item) => item.status === status) : items;
+    },
+    async update(itemId: string, patch: Partial<Omit<SyncQueueItem<T>, 'id' | 'createdAt'>>): Promise<SyncQueueItem<T>> {
+      const items = await read();
+      const index = items.findIndex((item) => item.id === itemId);
+      if (index < 0) throw new Error(`Sync queue item not found: ${itemId}`);
+      const next = { ...items[index], ...patch, updatedAt: new Date().toISOString() };
+      items[index] = next;
+      await write(items);
+      return next;
+    },
+    async remove(itemId: string): Promise<void> {
+      await write((await read()).filter((item) => item.id !== itemId));
+    },
+    async clear(status?: SyncStatus): Promise<void> {
+      await write(status ? (await read()).filter((item) => item.status !== status) : []);
+    },
+    async exportJSON(space = 2): Promise<string> {
+      return JSON.stringify(await read(), null, space);
+    },
+    async importJSON(json: string): Promise<void> {
+      const parsed = JSON.parse(json) as unknown;
+      if (!Array.isArray(parsed)) throw new Error('Sync queue import must be a JSON array');
+      await write(parsed as SyncQueueItem<T>[]);
+    },
+  };
 }

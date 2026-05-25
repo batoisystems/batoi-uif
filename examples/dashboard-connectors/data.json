@@ -1,0 +1,6 @@
+[
+  { "label": "North", "region": "North", "revenue": 248, "pipeline": 420, "risk": 3 },
+  { "label": "East", "region": "East", "revenue": 182, "pipeline": 310, "risk": 5 },
+  { "label": "South", "region": "South", "revenue": 205, "pipeline": 360, "risk": 2 },
+  { "label": "West", "region": "West", "revenue": 265, "pipeline": 470, "risk": 4 }
+]
