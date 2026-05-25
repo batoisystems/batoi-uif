@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Mobile Field · Batoi UIF Professional Showcase</title>
     <link rel="stylesheet" href="../../packages/css/index.css">
-    <link rel="stylesheet" href="./showcase.css">
+    <link rel="stylesheet" href="./showcase.css?v=20260525h">
   </head>
   <body>
     <div class="uif-app-shell-fixed showcase-shell">
@@ -24,13 +24,10 @@
           <div class="uif-sidebar-section">Build</div>
           <a href="./rad-admin.html"><span class="showcase-nav-label"><span data-uif-icon="layers" aria-hidden="true"></span>RAD Admin</span></a>
           <a href="./mobile-field.html" aria-current="page"><span class="showcase-nav-label"><span data-uif-icon="phone" aria-hidden="true"></span>Mobile Field</span></a>
-          <div class="uif-sidebar-section">Examples</div>
-          <a href="./"><span class="showcase-nav-label"><span data-uif-icon="dashboard" aria-hidden="true"></span>Showcase</span></a>
-          <a href="../"><span class="showcase-nav-label"><span data-uif-icon="home" aria-hidden="true"></span>All examples</span></a>
-          <a href="../component-gallery/"><span class="showcase-nav-label"><span data-uif-icon="layers" aria-hidden="true"></span>Components</span></a>
-          <a href="../chart-gallery/"><span class="showcase-nav-label"><span data-uif-icon="chart" aria-hidden="true"></span>Charts</span></a>
-          <a href="../icon-gallery/"><span class="showcase-nav-label"><span data-uif-icon="spark" aria-hidden="true"></span>Icons</span></a>
-          <a href="../../dist/uif.esm.js"><span class="showcase-nav-label"><span data-uif-icon="download" aria-hidden="true"></span>Distribution</span></a>
+          <div class="uif-sidebar-section">Library</div>
+          <a class="is-disabled" href="#" aria-disabled="true"><span class="showcase-nav-label"><span data-uif-icon="box" aria-hidden="true"></span>Components</span><span data-uif-icon="lock" aria-hidden="true"></span></a>
+          <a class="is-disabled" href="#" aria-disabled="true"><span class="showcase-nav-label"><span data-uif-icon="document" aria-hidden="true"></span>Patterns</span><span data-uif-icon="lock" aria-hidden="true"></span></a>
+          <a class="is-disabled" href="#" aria-disabled="true"><span class="showcase-nav-label"><span data-uif-icon="theme" aria-hidden="true"></span>Design Tokens</span><span data-uif-icon="lock" aria-hidden="true"></span></a>
         </nav>
         <div class="uif-sidebar-footer"><div class="uif-flex uif-items-center uif-gap-3"><span class="uif-avatar">AR</span><span class="uif-cell-stack"><strong>Ashwini Rath</strong><span class="uif-text-sm uif-text-muted">Platform Admin</span></span><button class="uif-btn uif-btn-secondary uif-icon-btn" type="button" data-showcase-toast="Settings opened" aria-label="Settings"><span data-uif-icon="settings" aria-hidden="true"></span></button></div></div>
       </aside>
@@ -42,23 +39,23 @@
             <div class="showcase-phone-frame">
               <div class="showcase-phone-screen">
                 <div class="uif-mobile-shell">
-                  <header class="uif-mobile-topbar showcase-phone-top"><div class="showcase-phone-status"><strong>9:41</strong><span class="showcase-phone-notch"></span><span>LTE</span></div><div class="showcase-phone-title"><div><h2>Today's Route</h2><p>Synced 4 min ago · 31 km · 6 stops</p></div><div class="uif-cluster"><span class="uif-badge uif-badge-success">Online</span><button class="uif-btn uif-btn-secondary uif-icon-btn" type="button"><span data-uif-icon="heart" aria-hidden="true"></span></button></div></div></header>
+                  <header class="uif-mobile-topbar showcase-phone-top"><div class="showcase-phone-status"><strong>9:41</strong><span class="showcase-phone-notch"></span><span class="showcase-phone-signal">▮▮▮</span></div><div class="showcase-phone-title"><div><h2>Today's Route</h2><p>Synced 4 min ago · 31 km · 6 stops</p></div><div class="uif-cluster"><span class="uif-badge uif-badge-success">Online</span><button class="uif-btn uif-btn-secondary uif-icon-btn" type="button"><span data-uif-icon="bell" aria-hidden="true"></span></button></div></div></header>
                   <main class="uif-mobile-content uif-stack">
-                    <article class="showcase-phone-hero"><div class="showcase-eyebrow">Next stop in 12 min</div><h2>Inspect Site A12</h2><p>⌖ 2.4 km away · Site A12</p><div class="showcase-phone-actions"><button class="uif-btn uif-btn-secondary" type="button"><span data-uif-icon="location" aria-hidden="true"></span>Navigate</button><button class="uif-btn uif-btn-secondary" type="button"><span data-uif-icon="play" aria-hidden="true"></span>Start</button></div></article>
+                    <article class="showcase-phone-hero"><div class="showcase-eyebrow"><span data-uif-icon="send" aria-hidden="true"></span>Next stop in 12 min</div><h2>Inspect Site A12</h2><p><span data-uif-icon="location" aria-hidden="true"></span> 2.4 km away · Site A12</p><div class="showcase-phone-actions"><button class="uif-btn uif-btn-secondary" type="button"><span data-uif-icon="send" aria-hidden="true"></span>Navigate</button><button class="uif-btn uif-btn-secondary" type="button"><span data-uif-icon="play" aria-hidden="true"></span>Start</button></div></article>
                     <div class="showcase-phone-status"><strong>Route · 4 stops</strong><span>2 of 4 done · 31 km</span></div>
-                    <article class="showcase-phone-job is-active"><span class="uif-stat-icon" data-uif-icon="grid" aria-hidden="true"></span><div><strong>Inspect Site A12</strong><p>⌖ 2.4 km away · Site A12</p></div><div><span>9:15</span><span class="uif-badge uif-badge-danger">High</span></div></article>
-                    <article class="showcase-phone-job"><span class="uif-stat-icon" data-uif-icon="layers" aria-hidden="true"></span><div><strong>Replace router</strong><p>⌖ Sector 8 · Hub 7</p></div><div><span>10:30</span><span class="uif-badge uif-badge-warning">Med</span></div></article>
-                    <article class="showcase-phone-job"><span class="uif-stat-icon">⌟</span><div><strong>Collect signature</strong><p>⌖ Warehouse B · Receiving</p></div><div><span>11:45</span><span class="uif-badge uif-badge-success">Low</span></div></article>
-                    <article class="showcase-phone-job"><span class="uif-stat-icon">↯</span><div><strong>Power audit</strong><p>⌖ Cell tower C4 · Grid Section</p></div><div><span>13:00</span><span class="uif-badge uif-badge-warning">Med</span></div></article>
-                    <article class="showcase-sync-card"><span>↻</span><div><strong>All changes synced</strong><p>4 photos, 1 signature uploaded.</p></div></article>
+                    <article class="showcase-phone-job is-active"><span class="uif-stat-icon" data-uif-icon="grid" aria-hidden="true"></span><div><strong>Inspect Site A12</strong><p><span data-uif-icon="location" aria-hidden="true"></span> 2.4 km away · Site A12</p></div><div><span>9:15</span><span class="uif-badge uif-badge-danger">High</span></div></article>
+                    <article class="showcase-phone-job"><span class="uif-stat-icon" data-uif-icon="layers" aria-hidden="true"></span><div><strong>Replace router</strong><p><span data-uif-icon="location" aria-hidden="true"></span> Sector 8 · Hub 7</p></div><div><span>10:30</span><span class="uif-badge uif-badge-warning">Med</span></div></article>
+                    <article class="showcase-phone-job"><span class="uif-stat-icon" data-uif-icon="edit" aria-hidden="true"></span><div><strong>Collect signature</strong><p><span data-uif-icon="location" aria-hidden="true"></span> Warehouse B · Receiving</p></div><div><span>11:45</span><span class="uif-badge uif-badge-success">Low</span></div></article>
+                    <article class="showcase-phone-job"><span class="uif-stat-icon" data-uif-icon="activity" aria-hidden="true"></span><div><strong>Power audit</strong><p><span data-uif-icon="location" aria-hidden="true"></span> Cell tower C4 · Grid Section</p></div><div><span>13:00</span><span class="uif-badge uif-badge-warning">Med</span></div></article>
+                    <article class="showcase-sync-card"><span data-uif-icon="sync" aria-hidden="true"></span><div><strong>All changes synced</strong><p>4 photos, 1 signature uploaded.</p></div></article>
                   </main>
-                  <nav class="uif-mobile-bottom-nav showcase-bottom-nav"><a href="#" aria-current="page"><span data-uif-icon="location" aria-hidden="true"></span><span>Route</span></a><a href="#"><span data-uif-icon="file" aria-hidden="true"></span><span>Jobs</span></a><a href="#"><span data-uif-icon="search" aria-hidden="true"></span><span>Scan</span></a><a href="#"><span data-uif-icon="user" aria-hidden="true"></span><span>Profile</span></a></nav>
+                  <nav class="uif-mobile-bottom-nav showcase-bottom-nav"><a href="#" aria-current="page"><span data-uif-icon="map" aria-hidden="true"></span><span>Route</span></a><a href="#"><span data-uif-icon="file" aria-hidden="true"></span><span>Jobs</span></a><a href="#"><span data-uif-icon="qr-code" aria-hidden="true"></span><span>Scan</span></a><a href="#"><span data-uif-icon="user" aria-hidden="true"></span><span>Profile</span></a></nav>
                 </div>
               </div>
               <span class="uif-text-sm uif-text-muted">iPhone 15 · Field App v3.2 · Live preview</span>
             </div>
             <div class="uif-stack">
-              <article class="uif-card uif-card-flush">
+              <article class="uif-card uif-card-flush showcase-job-detail-card">
                 <div class="uif-card-head"><div><h2 class="uif-text-lg">Job Detail Sheet</h2><p>Tap any job to load this server-rendered sheet. The form posts back with offline-safe retry.</p></div><span class="uif-badge uif-badge-info">Live</span></div>
                 <div class="uif-card-body uif-stack">
                   <div class="showcase-job-banner"><span class="uif-stat-icon" data-uif-icon="grid" aria-hidden="true"></span><div><strong>Inspect Site A12</strong><p>2.4 km away · Site A12 · ETA 9:15</p></div><span class="uif-badge uif-badge-danger">High</span></div>
@@ -70,9 +67,20 @@
                   <div class="showcase-note-action"><button class="uif-btn uif-btn-secondary" type="button"><span data-uif-icon="file" aria-hidden="true"></span>Notes</button><button class="uif-btn" type="button" data-showcase-toast="Job opened"><span data-uif-icon="play" aria-hidden="true"></span>Open job</button></div>
                 </div>
               </article>
-              <section class="showcase-grid-2">
-                <article class="uif-card"><h2 class="uif-text-lg uif-m-0">Offline Queue</h2><p class="uif-text-muted">Pending sync. Retries automatically when online.</p><div class="showcase-sync-meter"><div data-uif="chart" data-uif-chart="ring" data-uif-options='{"label":"Sync"}' data-uif-data='[{"label":"Synced","value":85,"max":100}]'></div><div><strong>5 of 6 synced</strong><br><span class="uif-text-muted">1 photo retrying · cellular</span></div></div><button class="uif-btn uif-btn-secondary uif-w-full" type="button" data-showcase-toast="Sync retry queued">↻ Force sync now</button></article>
-                <article class="uif-card"><h2 class="uif-text-lg uif-m-0">Shell Capabilities</h2><p class="uif-text-muted">What this UIF mobile pattern unlocks.</p><div class="uif-stack uif-mt-3"><div class="showcase-capability"><span data-uif-icon="offline" aria-hidden="true"></span><strong>Offline-first</strong><small>Render with cached state.</small></div><div class="showcase-capability"><span data-uif-icon="shield" aria-hidden="true"></span><strong>Biometric auth</strong><small>TouchID / FaceID gate.</small></div><div class="showcase-capability"><span data-uif-icon="camera" aria-hidden="true"></span><strong>Native capture</strong><small>Photos & signatures.</small></div><div class="showcase-capability"><span data-uif-icon="bell" aria-hidden="true"></span><strong>Push & geo</strong><small>Route-aware reminders.</small></div></div></article>
+              <section class="showcase-grid-2 showcase-mobile-card-grid">
+                <article class="uif-card uif-card-flush showcase-mobile-panel">
+                  <div class="uif-card-head"><div><h2 class="uif-text-lg">Offline Queue</h2><p>Pending sync. Retries automatically when online.</p></div></div>
+                  <div class="uif-card-body">
+                    <div class="showcase-sync-meter"><div class="showcase-sync-ring" aria-label="85 percent synced"><span>85%</span></div><div><strong>5 of 6 synced</strong><span>1 photo retrying · cellular</span></div></div>
+                    <button class="uif-btn uif-btn-secondary uif-w-full" type="button" data-showcase-toast="Sync retry queued"><span data-uif-icon="sync" aria-hidden="true"></span>Force sync now</button>
+                  </div>
+                </article>
+                <article class="uif-card uif-card-flush showcase-mobile-panel">
+                  <div class="uif-card-head"><div><h2 class="uif-text-lg">Shell Capabilities</h2><p>What this UIF mobile pattern unlocks.</p></div></div>
+                  <div class="uif-card-body uif-stack">
+                    <div class="showcase-capability"><span data-uif-icon="offline" aria-hidden="true"></span><strong>Offline-first</strong><small>Render with cached state.</small></div><div class="showcase-capability"><span data-uif-icon="shield" aria-hidden="true"></span><strong>Biometric auth</strong><small>TouchID / FaceID gate.</small></div><div class="showcase-capability"><span data-uif-icon="camera" aria-hidden="true"></span><strong>Native capture</strong><small>Photos & signatures.</small></div><div class="showcase-capability"><span data-uif-icon="bell" aria-hidden="true"></span><strong>Push & geo</strong><small>Route-aware reminders.</small></div>
+                  </div>
+                </article>
               </section>
             </div>
           </section>
