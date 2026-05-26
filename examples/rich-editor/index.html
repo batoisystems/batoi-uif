@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Rich Editor</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/example.css">
+    <style>.editor-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(18rem,.36fr);gap:1rem}.code-box{overflow:auto;max-height:22rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}@media(max-width:64rem){.editor-grid{grid-template-columns:1fr}}</style>
+  </head>
+  <body class="example-page">
+    <main class="example-shell">
+      <div class="example-frame">
+        <header class="example-topbar">
+          <a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Rich HTML editor</span></span></a>
+          <nav class="example-actions" aria-label="Editor examples"><a class="example-pill" href="../markdown-editor/">Markdown</a><a class="example-pill" href="../animation-gallery/">Animations</a><a class="example-pill" href="../event-actions/">Events</a></nav>
+        </header>
+        <section class="example-hero">
+          <div><div class="example-eyebrow">Editor · HTML · form-compatible</div><h1>Rich text editing without a third-party editor runtime.</h1><p>A dependency-free contenteditable editor for common RAD content fields. Server-side sanitization is still required before trusted rendering.</p></div>
+          <button class="uif-btn" data-uif-event="click" data-uif-action="copy" data-uif-target="#rich-code"><span data-uif-icon="copy"></span>Copy markup</button>
+        </section>
+        <section class="editor-grid">
+          <form class="uif-card" data-uif="form" data-uif-validate="false">
+            <label class="uif-field"><span class="uif-field-label">Article body</span><textarea name="body" data-uif="editor" data-uif-mode="html" data-uif-preview="manual" data-uif-toolbar="bold italic underline heading quote code ul ol link clear preview"><h2>Release notes</h2><p><strong>Batoi UIF</strong> now supports first-party rich text editing.</p></textarea></label>
+          </form>
+          <aside class="uif-card uif-card-flush"><div class="uif-card-head"><div><h2>Copyable usage</h2><p>Original textarea remains synchronized for normal form posts.</p></div></div><div class="uif-card-body"><pre class="code-box"><code id="rich-code">&lt;textarea name="body" data-uif="editor" data-uif-mode="html" data-uif-preview="manual"&gt;&lt;/textarea&gt;</code></pre></div></aside>
+        </section>
+      </div>
+    </main>
+    <script type="module">
+      import { autoStart, mountIcons } from '../../dist/uif.esm.js';
+      autoStart();
+      mountIcons(document);
+    </script>
+  </body>
+</html>

@@ -1,3 +1,203 @@
+// packages/core/dist/index.js
+function emit(name, detail, target = document) {
+  target.dispatchEvent(new CustomEvent(name, { detail, bubbles: true }));
+}
+
+// packages/effects/dist/index.js
+function prefersReducedMotion() {
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+}
+function nextFrame() {
+  return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+}
+async function transition(el, className, options = {}) {
+  if (prefersReducedMotion()) {
+    el.classList.add(className);
+    return;
+  }
+  await nextFrame();
+  if (options.delay) await new Promise((resolve) => window.setTimeout(resolve, options.delay));
+  el.classList.add(className);
+  await new Promise((resolve) => window.setTimeout(resolve, options.duration ?? 180));
+}
+async function show(el, options = {}) {
+  el.hidden = false;
+  el.dataset.uifState = "open";
+  await transition(el, options.className ?? "uif-is-visible", options);
+}
+async function hide(el, options = {}) {
+  el.dataset.uifState = "closed";
+  el.classList.remove(options.className ?? "uif-is-visible");
+  if (!prefersReducedMotion()) await new Promise((resolve) => window.setTimeout(resolve, options.duration ?? 180));
+  el.hidden = true;
+}
+async function toggle(el, options = {}) {
+  if (el.hidden || el.dataset.uifState === "closed") await show(el, options);
+  else await hide(el, options);
+}
+async function expand(el, options = {}) {
+  el.style.height = "0px";
+  el.hidden = false;
+  await nextFrame();
+  el.style.height = `${el.scrollHeight}px`;
+  await transition(el, options.className ?? "uif-is-expanded", options);
+  el.style.height = "";
+}
+async function collapse(el, options = {}) {
+  el.style.height = `${el.scrollHeight}px`;
+  await nextFrame();
+  el.style.height = "0px";
+  await hide(el, options);
+  el.style.height = "";
+}
+async function animate(el, animation, options = {}) {
+  const className = options.className ?? `uif-animate-${animation}`;
+  el.classList.remove(className, "uif-is-animating");
+  if (prefersReducedMotion()) {
+    el.dataset.uifAnimation = animation;
+    return;
+  }
+  await nextFrame();
+  if (options.delay) await new Promise((resolve) => window.setTimeout(resolve, options.delay));
+  el.classList.add("uif-is-animating", className);
+  await new Promise((resolve) => window.setTimeout(resolve, options.duration ?? 220));
+  el.classList.remove("uif-is-animating", className);
+}
+
+// packages/actions/src/index.ts
+var handlers = /* @__PURE__ */ new Map();
+var boundRoots = /* @__PURE__ */ new WeakMap();
+function resolveActionTarget(source, targetExpr) {
+  if (!targetExpr) return source;
+  if (targetExpr === "self") return source;
+  if (targetExpr === "parent") return source.parentElement;
+  if (targetExpr.startsWith("closest:")) return source.closest(targetExpr.slice(8));
+  return document.querySelector(targetExpr);
+}
+function registerAction(name, handler) {
+  handlers.set(name, handler);
+}
+function unregisterAction(name) {
+  handlers.delete(name);
+}
+async function dispatchAction(action, context) {
+  const handler = handlers.get(action);
+  if (!handler) return;
+  await handler({ ...context, action });
+}
+function keyMatches(event, key) {
+  if (!key || !(event instanceof KeyboardEvent)) return true;
+  const normalized = key.toLowerCase();
+  const actual = event.key.toLowerCase();
+  return actual === normalized || normalized === "space" && actual === " " || normalized === "esc" && actual === "escape";
+}
+function parseActionSpec(el) {
+  const specs = [];
+  const raw = el.dataset.uifOn;
+  if (raw) {
+    const parsed = JSON.parse(raw);
+    Object.entries(parsed).forEach(([eventSpec, value]) => {
+      const [event, ...mods] = eventSpec.split(".");
+      specs.push({
+        event,
+        action: value.action,
+        target: value.target,
+        prevent: value.prevent ?? mods.includes("prevent"),
+        stop: value.stop ?? mods.includes("stop"),
+        once: value.once ?? mods.includes("once"),
+        key: mods.find((mod) => !["prevent", "stop", "once", "self"].includes(mod))
+      });
+    });
+  }
+  if (el.dataset.uifEvent && el.dataset.uifAction) {
+    const [event, ...mods] = el.dataset.uifEvent.split(".");
+    specs.push({
+      event,
+      action: el.dataset.uifAction,
+      target: el.dataset.uifTarget,
+      prevent: mods.includes("prevent"),
+      stop: mods.includes("stop"),
+      once: mods.includes("once"),
+      key: el.dataset.uifKey || mods.find((mod) => !["prevent", "stop", "once", "self"].includes(mod))
+    });
+  }
+  return specs;
+}
+function bindActions(root = document) {
+  const existing = boundRoots.get(root);
+  if (existing) return existing;
+  const cleanups = [];
+  root.querySelectorAll("[data-uif-event][data-uif-action],[data-uif-on]").forEach((el) => {
+    parseActionSpec(el).forEach((spec) => {
+      const listener = (event) => {
+        if (!keyMatches(event, spec.key)) return;
+        if (spec.prevent) event.preventDefault();
+        if (spec.stop) event.stopPropagation();
+        const target = resolveActionTarget(el, spec.target ?? el.dataset.uifTarget);
+        void dispatchAction(spec.action, { source: el, target, event, value: el.dataset.uifValue });
+      };
+      el.addEventListener(spec.event, listener, { once: spec.once });
+      cleanups.push(() => el.removeEventListener(spec.event, listener));
+    });
+  });
+  const dispose = () => {
+    cleanups.forEach((cleanup) => cleanup());
+    boundRoots.delete(root);
+  };
+  boundRoots.set(root, dispose);
+  return dispose;
+}
+registerAction("show", ({ target }) => {
+  if (target) void show(target);
+});
+registerAction("hide", ({ target }) => {
+  if (target) void hide(target);
+});
+registerAction("toggle", ({ target }) => {
+  if (target) void toggle(target);
+});
+registerAction("animate", ({ source, target }) => {
+  if (target) void animate(target, source.dataset.uifAnimation || "pop");
+});
+registerAction("add-class", ({ source, target }) => {
+  const className = source.dataset.uifClass;
+  if (target && className) target.classList.add(className);
+});
+registerAction("remove-class", ({ source, target }) => {
+  const className = source.dataset.uifClass;
+  if (target && className) target.classList.remove(className);
+});
+registerAction("toggle-class", ({ source, target }) => {
+  const className = source.dataset.uifClass;
+  if (target && className) target.classList.toggle(className);
+});
+registerAction("set-attribute", ({ source, target }) => {
+  const attr = source.dataset.uifAttribute;
+  if (target && attr) target.setAttribute(attr, source.dataset.uifValue ?? "");
+});
+registerAction("remove-attribute", ({ source, target }) => {
+  const attr = source.dataset.uifAttribute;
+  if (target && attr) target.removeAttribute(attr);
+});
+registerAction("set-value", ({ target, value }) => {
+  if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) target.value = value ?? "";
+});
+registerAction("copy", async ({ target, source }) => {
+  const text = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement ? target.value : target?.textContent || source.dataset.uifValue || "";
+  await navigator.clipboard?.writeText(text);
+});
+registerAction("scroll-to", ({ target }) => target?.scrollIntoView({ behavior: "smooth", block: "start" }));
+registerAction("focus", ({ target }) => target?.focus());
+registerAction("submit", ({ target }) => {
+  if (target instanceof HTMLFormElement) target.requestSubmit();
+});
+registerAction("reset", ({ target }) => {
+  if (target instanceof HTMLFormElement) target.reset();
+});
+registerAction("emit", ({ source, target, value }) => {
+  emit(value || source.dataset.uifEventName || "uif:action", { source, target }, target || source);
+});
+
 // packages/dom/dist/index.js
 var initialized = /* @__PURE__ */ new WeakMap();
 var registry = /* @__PURE__ */ new Map();
@@ -142,11 +342,6 @@ function renderAIResultCard(el, content) {
   el.replaceChildren(card2);
 }
 var aiAction = { name: "ai-action", init: renderAIAction };
-
-// packages/core/dist/index.js
-function emit(name, detail, target = document) {
-  target.dispatchEvent(new CustomEvent(name, { detail, bubbles: true }));
-}
 
 // packages/net/dist/index.js
 var requestInterceptors = [];
@@ -1173,49 +1368,6 @@ var chart = {
   destroy: destroyChart
 };
 
-// packages/effects/dist/index.js
-function prefersReducedMotion() {
-  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-}
-function nextFrame() {
-  return new Promise((resolve) => requestAnimationFrame(() => resolve()));
-}
-async function transition(el, className, options = {}) {
-  if (prefersReducedMotion()) {
-    el.classList.add(className);
-    return;
-  }
-  await nextFrame();
-  el.classList.add(className);
-  await new Promise((resolve) => window.setTimeout(resolve, options.duration ?? 180));
-}
-async function show(el, options = {}) {
-  el.hidden = false;
-  el.dataset.uifState = "open";
-  await transition(el, options.className ?? "uif-is-visible", options);
-}
-async function hide(el, options = {}) {
-  el.dataset.uifState = "closed";
-  el.classList.remove(options.className ?? "uif-is-visible");
-  if (!prefersReducedMotion()) await new Promise((resolve) => window.setTimeout(resolve, options.duration ?? 180));
-  el.hidden = true;
-}
-async function expand(el, options = {}) {
-  el.style.height = "0px";
-  el.hidden = false;
-  await nextFrame();
-  el.style.height = `${el.scrollHeight}px`;
-  await transition(el, options.className ?? "uif-is-expanded", options);
-  el.style.height = "";
-}
-async function collapse(el, options = {}) {
-  el.style.height = `${el.scrollHeight}px`;
-  await nextFrame();
-  el.style.height = "0px";
-  await hide(el, options);
-  el.style.height = "";
-}
-
 // packages/overlays/dist/index.js
 var stack = [];
 function top() {
@@ -1298,7 +1450,7 @@ function initModal(el) {
     setState(el, false);
     document.body.classList.remove("uif-modal-open");
   };
-  const toggle2 = () => el.dataset.uifState === "open" ? close() : open();
+  const toggle3 = () => el.dataset.uifState === "open" ? close() : open();
   const onKey3 = (event) => {
     if (event.key === "Escape") close();
     if (event.key !== "Tab" || el.dataset.uifState !== "open") return;
@@ -1332,7 +1484,7 @@ function initModal(el) {
     },
     open,
     close,
-    toggle: toggle2
+    toggle: toggle3
   };
 }
 function initDrawer(el) {
@@ -1367,7 +1519,7 @@ function initDropdown(el) {
     if (panel) void hide(panel);
     trigger2?.setAttribute("aria-expanded", "false");
   };
-  const toggle2 = () => panel?.hasAttribute("hidden") ? open() : close();
+  const toggle3 = () => panel?.hasAttribute("hidden") ? open() : close();
   const onDoc = (event) => {
     const target = eventElement(event);
     if (target && !el.contains(target)) close();
@@ -1377,7 +1529,7 @@ function initDropdown(el) {
   };
   const onClick = (event) => {
     const role = eventElement(event)?.closest("[data-uif-role]")?.dataset.uifRole;
-    if (role === "trigger") toggle2();
+    if (role === "trigger") toggle3();
     if (role === "item") close();
   };
   trigger2?.setAttribute("aria-haspopup", "menu");
@@ -1395,7 +1547,7 @@ function initDropdown(el) {
     },
     open,
     close,
-    toggle: toggle2
+    toggle: toggle3
   };
 }
 function initTabs(el) {
@@ -1451,23 +1603,23 @@ function initAccordion(el) {
     trigger2?.setAttribute("aria-expanded", String(expanded));
     if (panel) void (expanded ? expand(panel) : collapse(panel));
   };
-  const toggle2 = () => setExpanded(trigger2?.getAttribute("aria-expanded") !== "true");
+  const toggle3 = () => setExpanded(trigger2?.getAttribute("aria-expanded") !== "true");
   const onKey3 = (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      toggle2();
+      toggle3();
     }
   };
   trigger2?.setAttribute("aria-controls", panel?.id || "");
   trigger2?.addEventListener("keydown", onKey3);
-  trigger2?.addEventListener("click", toggle2);
+  trigger2?.addEventListener("click", toggle3);
   setExpanded(el.dataset.uifState === "expanded");
   return {
     destroy: () => {
       trigger2?.removeEventListener("keydown", onKey3);
-      trigger2?.removeEventListener("click", toggle2);
+      trigger2?.removeEventListener("click", toggle3);
     },
-    toggle: toggle2
+    toggle: toggle3
   };
 }
 function initButton(el) {
@@ -1493,12 +1645,12 @@ function initDismissible(el) {
 }
 function initCollapse(el) {
   if (!el.dataset.uifState) el.dataset.uifState = el.hidden ? "collapsed" : "expanded";
-  const toggle2 = () => {
+  const toggle3 = () => {
     const expanded = el.dataset.uifState !== "expanded";
     el.dataset.uifState = expanded ? "expanded" : "collapsed";
     void (expanded ? expand(el) : collapse(el));
   };
-  return { destroy: () => void 0, toggle: toggle2 };
+  return { destroy: () => void 0, toggle: toggle3 };
 }
 function initTooltip(el) {
   const panel = document.createElement("div");
@@ -1542,11 +1694,11 @@ function initPopover(el) {
   const close = () => {
     if (panel) void closeOverlay(panel);
   };
-  const toggle2 = () => panel?.dataset.uifState === "open" ? close() : open();
-  trigger2.addEventListener("click", toggle2);
+  const toggle3 = () => panel?.dataset.uifState === "open" ? close() : open();
+  trigger2.addEventListener("click", toggle3);
   panel?.setAttribute("role", panel.getAttribute("role") || "dialog");
   panel?.setAttribute("hidden", "");
-  return { destroy: () => trigger2.removeEventListener("click", toggle2), open, close, toggle: toggle2 };
+  return { destroy: () => trigger2.removeEventListener("click", toggle3), open, close, toggle: toggle3 };
 }
 function initProgress(el) {
   const value = Number(el.dataset.uifValue || el.getAttribute("aria-valuenow") || 0);
@@ -2396,6 +2548,618 @@ function initDashboard(el) {
   el.innerHTML = renderDashboard(config);
 }
 
+// packages/desktop/src/index.ts
+function esc4(value) {
+  return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+}
+function parseJSON(value) {
+  if (!value) return void 0;
+  return JSON.parse(value);
+}
+function safeStorage() {
+  try {
+    return typeof window !== "undefined" ? window.localStorage : void 0;
+  } catch {
+    return void 0;
+  }
+}
+function platformFromRuntime() {
+  const globalValue = globalThis;
+  if (globalValue.__TAURI_INTERNALS__) return "tauri";
+  if (globalValue.process?.versions?.electron) return "electron";
+  if (typeof window !== "undefined") return "browser";
+  return "unknown";
+}
+function normalizeManifest(input) {
+  return {
+    ...input,
+    workspaceMode: input.workspaceMode ?? "none",
+    offlineMode: input.offlineMode ?? "none",
+    aiMode: input.aiMode ?? "none",
+    capabilities: input.capabilities ?? [],
+    navigation: input.navigation ?? []
+  };
+}
+function validateDesktopManifest(manifest) {
+  const errors = [];
+  if (!manifest.id || typeof manifest.id !== "string") errors.push("Desktop manifest requires a string id.");
+  if (!manifest.name || typeof manifest.name !== "string") errors.push("Desktop manifest requires a string name.");
+  if (manifest.navigation?.some((item) => !item.id || !item.label)) errors.push("Every desktop navigation item requires id and label.");
+  return { valid: errors.length === 0, errors };
+}
+function createDesktopManifest(input) {
+  const result = validateDesktopManifest(input);
+  if (!result.valid) throw new Error(result.errors.join(" "));
+  return normalizeManifest(input);
+}
+function parseDesktopManifestElement(element) {
+  const options = parseJSON(element.dataset.uifOptions || element.dataset.uifDesktop);
+  return createDesktopManifest({
+    id: element.dataset.uifDesktopApp || options?.id || "desktop-app",
+    name: options?.name || element.dataset.uifDesktopName || element.getAttribute("aria-label") || "Desktop App",
+    version: options?.version || element.dataset.uifDesktopVersion,
+    workspaceMode: options?.workspaceMode,
+    offlineMode: options?.offlineMode,
+    aiMode: options?.aiMode,
+    capabilities: options?.capabilities,
+    navigation: options?.navigation
+  });
+}
+function detectDesktopPlatform() {
+  return platformFromRuntime();
+}
+function hasDesktopCapability(capability, manifest) {
+  if (manifest?.capabilities?.includes(capability)) return true;
+  if (capability === "offline") return typeof navigator !== "undefined" && "onLine" in navigator;
+  if (capability === "notifications") return typeof Notification !== "undefined";
+  return false;
+}
+function createDesktopShell(options) {
+  return {
+    ...createDesktopManifest(options),
+    title: options.title || options.name,
+    subtitle: options.subtitle,
+    status: {
+      online: options.status?.online ?? (typeof navigator === "undefined" ? true : navigator.onLine),
+      sync: options.status?.sync ?? "idle",
+      queued: options.status?.queued ?? 0,
+      message: options.status?.message,
+      lastSyncedAt: options.status?.lastSyncedAt
+    },
+    actions: options.actions ?? [],
+    bodyHtml: options.bodyHtml ?? ""
+  };
+}
+function renderNav(items = []) {
+  return items.map(
+    (item) => `<a class="uif-desktop-nav-item" href="${esc4(item.href || "#")}"${item.active ? ' aria-current="page"' : ""}${item.permission ? ` data-uif-permission="${esc4(item.permission)}"` : ""}>${item.icon ? `<span data-uif-icon="${esc4(item.icon)}"></span>` : ""}<span>${esc4(item.label)}</span>${item.badge !== void 0 ? `<em>${esc4(item.badge)}</em>` : ""}</a>`
+  ).join("");
+}
+function renderDesktopSyncStatus(status) {
+  const state = status.sync ?? status.state ?? "idle";
+  const queued = status.queued ?? 0;
+  const label = status.message || (state === "offline" ? "Offline" : state === "failed" ? "Sync failed" : queued ? `${queued} queued` : "Synced");
+  return `<span class="uif-desktop-status-pill" data-uif-sync-status="${esc4(state)}"><span aria-hidden="true"></span>${esc4(label)}</span>`;
+}
+function renderDesktopShell(options) {
+  const shell = createDesktopShell(options);
+  return `<section class="uif-desktop-shell" data-uif-desktop-app="${esc4(shell.id)}" data-uif-desktop-platform="${esc4(detectDesktopPlatform())}">
+    <aside class="uif-desktop-sidebar">
+      <div class="uif-desktop-brand"><strong>${esc4(shell.name)}</strong>${shell.version ? `<span>${esc4(shell.version)}</span>` : ""}</div>
+      <nav class="uif-desktop-nav" data-uif="desktop-nav">${renderNav(shell.navigation)}</nav>
+    </aside>
+    <main class="uif-desktop-main">
+      <header class="uif-desktop-topbar">
+        <div><h1>${esc4(shell.title)}</h1>${shell.subtitle ? `<p>${esc4(shell.subtitle)}</p>` : ""}</div>
+        <div class="uif-desktop-actions">${renderNav(shell.actions)}${renderDesktopSyncStatus(shell.status ?? {})}</div>
+      </header>
+      <div class="uif-desktop-content">${shell.bodyHtml}</div>
+      <footer class="uif-desktop-statusbar" data-uif="desktop-status">${renderDesktopSyncStatus(shell.status ?? {})}</footer>
+    </main>
+  </section>`;
+}
+function setDesktopStatus(element, status) {
+  element.querySelectorAll('[data-uif="desktop-status"], .uif-desktop-actions').forEach((target) => {
+    const current = target.matches('[data-uif="desktop-status"]') ? target : target.querySelector("[data-uif-sync-status]");
+    if (!current) return;
+    current.outerHTML = renderDesktopSyncStatus(status);
+  });
+}
+function initDesktopShell(element) {
+  const raw = element.dataset.uifOptions || element.dataset.uifDesktop;
+  if (raw) element.innerHTML = renderDesktopShell(parseJSON(raw));
+  const dispose = bindDesktopOfflineIndicator(element);
+  return dispose;
+}
+function createMemorySettingsStore(namespace = "uif-desktop") {
+  const values = /* @__PURE__ */ new Map();
+  const keyFor = (key) => `${namespace}:${key}`;
+  return {
+    get(key) {
+      return values.get(keyFor(key)) ?? null;
+    },
+    set(key, value) {
+      values.set(keyFor(key), value);
+    },
+    remove(key) {
+      values.delete(keyFor(key));
+    },
+    clear() {
+      [...values.keys()].filter((key) => key.startsWith(`${namespace}:`)).forEach((key) => values.delete(key));
+    }
+  };
+}
+function createLocalSettingsStore(namespace) {
+  const storage = safeStorage();
+  const fallback = createMemorySettingsStore(namespace);
+  const keyFor = (key) => `${namespace}:${key}`;
+  if (!storage) return fallback;
+  return {
+    get(key) {
+      const value = storage.getItem(keyFor(key));
+      return value === null ? null : JSON.parse(value);
+    },
+    set(key, value) {
+      storage.setItem(keyFor(key), JSON.stringify(value));
+    },
+    remove(key) {
+      storage.removeItem(keyFor(key));
+    },
+    clear() {
+      Object.keys(storage).filter((key) => key.startsWith(`${namespace}:`)).forEach((key) => storage.removeItem(key));
+    }
+  };
+}
+function bindDesktopSettings(element, store) {
+  element.querySelectorAll("[data-uif-setting]").forEach(async (field) => {
+    const key = field.dataset.uifSetting;
+    if (!key) return;
+    const value = await store.get(key);
+    if (field instanceof HTMLInputElement && field.type === "checkbox") field.checked = Boolean(value);
+    else if (value !== null) field.value = String(value);
+    field.addEventListener("change", () => {
+      const next = field instanceof HTMLInputElement && field.type === "checkbox" ? field.checked : field.value;
+      void store.set(key, next);
+    });
+  });
+}
+function createWorkspaceSession(input) {
+  return {
+    ...input,
+    roles: input.roles ?? [],
+    permissions: input.permissions ?? []
+  };
+}
+function canUseDesktopAction(session, permission) {
+  if (!permission) return true;
+  if (!session) return false;
+  return Boolean(session.permissions?.includes(permission) || session.permissions?.includes("*"));
+}
+function applyPermissionNavigation(root, session) {
+  root.querySelectorAll("[data-uif-permission]").forEach((element) => {
+    const allowed = canUseDesktopAction(session, element.dataset.uifPermission || "");
+    element.hidden = !allowed;
+    element.setAttribute("aria-hidden", String(!allowed));
+  });
+}
+function renderWorkspaceIdentity(session) {
+  const normalized = createWorkspaceSession(session);
+  return `<div class="uif-desktop-identity"><strong>${esc4(normalized.workspaceName)}</strong><span>${esc4(normalized.userName)}${normalized.roles?.length ? ` \xB7 ${esc4(normalized.roles.join(", "))}` : ""}</span></div>`;
+}
+function summarizeDesktopQueue(queueItems) {
+  const queued = queueItems.filter((item) => item.status === "queued" || !item.status).length;
+  const failed = queueItems.filter((item) => item.status === "failed").length;
+  const syncing = queueItems.filter((item) => item.status === "syncing").length;
+  const state = failed ? "failed" : syncing ? "syncing" : queued ? "queued" : "synced";
+  return {
+    state,
+    queued,
+    failed,
+    syncing,
+    message: failed ? `${failed} failed` : queued ? `${queued} queued` : syncing ? `${syncing} syncing` : "All changes synced"
+  };
+}
+function createDesktopSyncStatus(input = {}) {
+  return {
+    state: input.state ?? "idle",
+    queued: input.queued ?? 0,
+    failed: input.failed ?? 0,
+    syncing: input.syncing ?? 0,
+    message: input.message ?? "Ready",
+    lastSyncedAt: input.lastSyncedAt
+  };
+}
+function bindDesktopOfflineIndicator(element, options = {}) {
+  const update = () => {
+    const online = typeof navigator === "undefined" ? true : navigator.onLine;
+    element.toggleAttribute("data-uif-offline", !online);
+    element.querySelectorAll("[data-uif-offline-label]").forEach((label) => {
+      label.textContent = online ? options.onlineText ?? "Online" : options.offlineText ?? "Offline";
+    });
+  };
+  update();
+  if (typeof window === "undefined") return () => void 0;
+  window.addEventListener("online", update);
+  window.addEventListener("offline", update);
+  return () => {
+    window.removeEventListener("online", update);
+    window.removeEventListener("offline", update);
+  };
+}
+
+// packages/effects/src/index.ts
+function prefersReducedMotion2() {
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+}
+function nextFrame2() {
+  return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+}
+async function transition2(el, className, options = {}) {
+  if (prefersReducedMotion2()) {
+    el.classList.add(className);
+    return;
+  }
+  await nextFrame2();
+  if (options.delay) await new Promise((resolve) => window.setTimeout(resolve, options.delay));
+  el.classList.add(className);
+  await new Promise((resolve) => window.setTimeout(resolve, options.duration ?? 180));
+}
+async function show2(el, options = {}) {
+  el.hidden = false;
+  el.dataset.uifState = "open";
+  await transition2(el, options.className ?? "uif-is-visible", options);
+}
+async function hide2(el, options = {}) {
+  el.dataset.uifState = "closed";
+  el.classList.remove(options.className ?? "uif-is-visible");
+  if (!prefersReducedMotion2()) await new Promise((resolve) => window.setTimeout(resolve, options.duration ?? 180));
+  el.hidden = true;
+}
+async function toggle2(el, options = {}) {
+  if (el.hidden || el.dataset.uifState === "closed") await show2(el, options);
+  else await hide2(el, options);
+}
+async function expand2(el, options = {}) {
+  el.style.height = "0px";
+  el.hidden = false;
+  await nextFrame2();
+  el.style.height = `${el.scrollHeight}px`;
+  await transition2(el, options.className ?? "uif-is-expanded", options);
+  el.style.height = "";
+}
+async function collapse2(el, options = {}) {
+  el.style.height = `${el.scrollHeight}px`;
+  await nextFrame2();
+  el.style.height = "0px";
+  await hide2(el, options);
+  el.style.height = "";
+}
+async function animate2(el, animation, options = {}) {
+  const className = options.className ?? `uif-animate-${animation}`;
+  el.classList.remove(className, "uif-is-animating");
+  if (prefersReducedMotion2()) {
+    el.dataset.uifAnimation = animation;
+    return;
+  }
+  await nextFrame2();
+  if (options.delay) await new Promise((resolve) => window.setTimeout(resolve, options.delay));
+  el.classList.add("uif-is-animating", className);
+  await new Promise((resolve) => window.setTimeout(resolve, options.duration ?? 220));
+  el.classList.remove("uif-is-animating", className);
+}
+async function sequence(steps, options = {}) {
+  for (const step of steps) await animate2(step.el, step.animation, { ...options, ...step.options });
+}
+async function stagger(elements, animation, options = {}) {
+  const delay3 = options.delay ?? 60;
+  await Promise.all([...elements].map((el, index) => animate2(el, animation, { ...options, delay: delay3 * index })));
+}
+function initAnimation(el) {
+  const animation = el.dataset.uifAnimation || "fade-in";
+  const duration = Number(el.dataset.uifDuration || "") || void 0;
+  const delay3 = Number(el.dataset.uifDelay || "") || void 0;
+  const trigger2 = el.dataset.uifTrigger || "load";
+  const run = () => void animate2(el, animation, { duration, delay: delay3 });
+  if (trigger2 === "load") run();
+  if (trigger2 === "hover") {
+    el.addEventListener("mouseenter", run);
+    return;
+  }
+  if (trigger2 === "focus") {
+    el.addEventListener("focusin", run);
+    return;
+  }
+  if (trigger2 === "click") {
+    el.addEventListener("click", run);
+    return;
+  }
+  if (trigger2 === "intersect" && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        run();
+        observer.disconnect();
+      }
+    });
+    observer.observe(el);
+  }
+}
+function initAnimationTriggers(root = document) {
+  root.querySelectorAll('[data-uif="animate"]').forEach(initAnimation);
+}
+function observeMotion(root = document.documentElement) {
+  root.dataset.uifMotion = prefersReducedMotion2() ? "reduce" : "safe";
+}
+
+// packages/editor/src/index.ts
+var editors = /* @__PURE__ */ new WeakMap();
+var defaultToolbar = ["bold", "italic", "heading", "quote", "code", "ul", "ol", "link", "preview"];
+function escapeHtml(value) {
+  return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+}
+function escapeAttr(value) {
+  return escapeHtml(value).replaceAll("`", "&#96;");
+}
+function linesToList(lines, ordered) {
+  const tag = ordered ? "ol" : "ul";
+  const items = lines.map((line) => line.replace(ordered ? /^\s*\d+\.\s+/ : /^\s*[-*+]\s+/, "")).map((line) => `<li>${inlineMarkdown(line)}</li>`).join("");
+  return `<${tag}>${items}</${tag}>`;
+}
+function inlineMarkdown(value) {
+  let output = escapeHtml(value);
+  output = output.replace(/`([^`]+)`/g, "<code>$1</code>");
+  output = output.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  output = output.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  output = output.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|mailto:[^)\s]+|\/[^)\s]*)\)/g, (_match, label, url) => {
+    return `<a href="${escapeAttr(url)}">${escapeHtml(label)}</a>`;
+  });
+  return output;
+}
+function markdownToHtml(markdown) {
+  const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+  const blocks = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i] ?? "";
+    if (!line.trim()) {
+      i += 1;
+      continue;
+    }
+    if (line.startsWith("```")) {
+      const code = [];
+      i += 1;
+      while (i < lines.length && !lines[i]?.startsWith("```")) {
+        code.push(lines[i] ?? "");
+        i += 1;
+      }
+      blocks.push(`<pre><code>${escapeHtml(code.join("\n"))}</code></pre>`);
+      i += 1;
+      continue;
+    }
+    const heading = /^(#{1,6})\s+(.+)$/.exec(line);
+    if (heading) {
+      const level = heading[1].length;
+      blocks.push(`<h${level}>${inlineMarkdown(heading[2])}</h${level}>`);
+      i += 1;
+      continue;
+    }
+    if (/^\s*[-*+]\s+/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^\s*[-*+]\s+/.test(lines[i] ?? "")) {
+        items.push(lines[i] ?? "");
+        i += 1;
+      }
+      blocks.push(linesToList(items, false));
+      continue;
+    }
+    if (/^\s*\d+\.\s+/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i] ?? "")) {
+        items.push(lines[i] ?? "");
+        i += 1;
+      }
+      blocks.push(linesToList(items, true));
+      continue;
+    }
+    if (/^\s*>\s?/.test(line)) {
+      const quotes = [];
+      while (i < lines.length && /^\s*>\s?/.test(lines[i] ?? "")) {
+        quotes.push((lines[i] ?? "").replace(/^\s*>\s?/, ""));
+        i += 1;
+      }
+      blocks.push(`<blockquote>${quotes.map(inlineMarkdown).join("<br>")}</blockquote>`);
+      continue;
+    }
+    if (/^\s*---+\s*$/.test(line)) {
+      blocks.push("<hr>");
+      i += 1;
+      continue;
+    }
+    const para = [];
+    while (i < lines.length && lines[i]?.trim() && !/^(#{1,6})\s+/.test(lines[i] ?? "") && !/^\s*[-*+]\s+/.test(lines[i] ?? "") && !/^\s*\d+\.\s+/.test(lines[i] ?? "") && !/^\s*>\s?/.test(lines[i] ?? "") && !lines[i]?.startsWith("```")) {
+      para.push(lines[i] ?? "");
+      i += 1;
+    }
+    blocks.push(`<p>${para.map(inlineMarkdown).join("<br>")}</p>`);
+  }
+  return blocks.join("\n");
+}
+function htmlToMarkdown(html) {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  doc.querySelectorAll("strong,b").forEach((el) => el.replaceWith(`**${el.textContent ?? ""}**`));
+  doc.querySelectorAll("em,i").forEach((el) => el.replaceWith(`*${el.textContent ?? ""}*`));
+  doc.querySelectorAll("code").forEach((el) => el.replaceWith(`\`${el.textContent ?? ""}\``));
+  doc.querySelectorAll("a").forEach((el) => el.replaceWith(`[${el.textContent ?? ""}](${el.getAttribute("href") ?? "#"})`));
+  doc.querySelectorAll("h1,h2,h3,h4,h5,h6").forEach((el) => {
+    const level = Number(el.tagName.slice(1));
+    el.replaceWith(`${"#".repeat(level)} ${el.textContent ?? ""}
+
+`);
+  });
+  doc.querySelectorAll("li").forEach((el) => el.replaceWith(`- ${el.textContent ?? ""}
+`));
+  doc.querySelectorAll("p,blockquote,pre").forEach((el) => el.replaceWith(`${el.textContent ?? ""}
+
+`));
+  return (doc.body.textContent ?? "").replace(/\n{3,}/g, "\n\n").trim();
+}
+function cleanEditorHtml(html) {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  doc.querySelectorAll("script,style,iframe,object,embed,link,meta").forEach((el) => el.remove());
+  doc.querySelectorAll("*").forEach((el) => {
+    [...el.attributes].forEach((attr) => {
+      if (attr.name.startsWith("on")) el.removeAttribute(attr.name);
+      if ((attr.name === "href" || attr.name === "src") && /^\s*javascript:/i.test(attr.value)) el.removeAttribute(attr.name);
+    });
+  });
+  return doc.body.innerHTML;
+}
+function asInput(el) {
+  if (el instanceof HTMLTextAreaElement || el instanceof HTMLInputElement) return el;
+  const input = el.querySelector('textarea,input[type="hidden"],input[type="text"]');
+  if (!input) throw new Error("Editor requires a textarea or input.");
+  return input;
+}
+function parseOptions(el, options = {}) {
+  return {
+    mode: options.mode ?? el.dataset.uifMode ?? "html",
+    toolbar: options.toolbar ?? el.dataset.uifToolbar?.split(/\s+/).filter(Boolean) ?? defaultToolbar,
+    preview: options.preview ?? el.dataset.uifPreview ?? "manual",
+    height: options.height ?? el.dataset.uifEditorHeight ?? "14rem"
+  };
+}
+function applyMarkdownCommand(value, command) {
+  if (command === "bold") return `${value}**bold text**`;
+  if (command === "italic") return `${value}*italic text*`;
+  if (command === "heading") return `${value}
+## Heading`;
+  if (command === "quote") return `${value}
+> Quote`;
+  if (command === "code") return `${value}
+\`\`\`
+code
+\`\`\``;
+  if (command === "ul") return `${value}
+- Item`;
+  if (command === "ol") return `${value}
+1. Item`;
+  if (command === "link") return `${value}[link](https://example.com)`;
+  if (command === "clear") return "";
+  return value;
+}
+function formatEditor(editor, command, value) {
+  if (editor.mode === "html") {
+    editor.surface.focus();
+    if (command === "heading") document.execCommand("formatBlock", false, value || "h2");
+    else if (command === "quote") document.execCommand("formatBlock", false, "blockquote");
+    else if (command === "code") document.execCommand("formatBlock", false, "pre");
+    else if (command === "ul") document.execCommand("insertUnorderedList");
+    else if (command === "ol") document.execCommand("insertOrderedList");
+    else if (command === "link") document.execCommand("createLink", false, value || "#");
+    else if (command === "clear") document.execCommand("removeFormat");
+    else document.execCommand(command);
+    editor.setValue(cleanEditorHtml(editor.surface.innerHTML));
+    return;
+  }
+  editor.setValue(applyMarkdownCommand(editor.getValue(), command));
+}
+function syncPreview(instance) {
+  if (!instance.preview) return;
+  instance.preview.innerHTML = instance.mode === "markdown" ? markdownToHtml(instance.getValue()) : cleanEditorHtml(instance.getValue());
+}
+function createEditor(el, options = {}) {
+  if (editors.has(el)) return editors.get(el);
+  const input = asInput(el);
+  const config = parseOptions(el, options);
+  const wrapper = document.createElement("div");
+  wrapper.className = "uif-editor";
+  wrapper.dataset.uifMode = config.mode;
+  const toolbar = document.createElement("div");
+  toolbar.className = "uif-editor-toolbar";
+  toolbar.setAttribute("role", "toolbar");
+  const surface = config.mode === "markdown" || config.mode === "plain" ? document.createElement("textarea") : document.createElement("div");
+  surface.className = config.mode === "markdown" || config.mode === "plain" ? "uif-editor-source" : "uif-editor-surface";
+  surface.style.minHeight = config.height;
+  if (surface instanceof HTMLTextAreaElement) {
+    surface.value = input.value;
+    surface.spellcheck = true;
+  } else {
+    surface.contentEditable = "true";
+    surface.innerHTML = config.mode === "html" ? cleanEditorHtml(input.value) : escapeHtml(input.value);
+  }
+  const preview = document.createElement("div");
+  preview.className = "uif-editor-preview";
+  preview.hidden = config.preview === "none";
+  config.toolbar.forEach((command) => {
+    const button2 = document.createElement("button");
+    button2.type = "button";
+    button2.className = "uif-editor-button";
+    button2.dataset.uifEditorCommand = command;
+    button2.setAttribute("aria-label", command);
+    button2.textContent = command;
+    toolbar.append(button2);
+  });
+  input.hidden = true;
+  input.setAttribute("data-uif-editor-input", "true");
+  input.insertAdjacentElement("afterend", wrapper);
+  wrapper.append(toolbar, surface, preview);
+  const instance = {
+    element: wrapper,
+    mode: config.mode,
+    input,
+    surface,
+    preview,
+    getValue() {
+      return input.value;
+    },
+    setValue(next) {
+      input.value = next;
+      if (surface instanceof HTMLTextAreaElement && surface.value !== next) surface.value = next;
+      if (!(surface instanceof HTMLTextAreaElement) && surface.innerHTML !== next) surface.innerHTML = config.mode === "html" ? cleanEditorHtml(next) : escapeHtml(next);
+      syncPreview(instance);
+      emit("uif:editor-change", { value: next, editor: instance }, wrapper);
+    },
+    focus() {
+      surface.focus();
+    },
+    destroy() {
+      wrapper.remove();
+      input.hidden = false;
+      editors.delete(el);
+      emit("uif:editor-destroy", { editor: instance }, input);
+    }
+  };
+  const syncFromSurface = () => {
+    const value = surface instanceof HTMLTextAreaElement ? surface.value : cleanEditorHtml(surface.innerHTML);
+    instance.setValue(value);
+  };
+  surface.addEventListener("input", syncFromSurface);
+  toolbar.addEventListener("click", (event) => {
+    const button2 = event.target instanceof HTMLElement ? event.target.closest("[data-uif-editor-command]") : null;
+    const command = button2?.dataset.uifEditorCommand;
+    if (!command) return;
+    if (command === "preview") {
+      preview.hidden = !preview.hidden;
+      syncPreview(instance);
+      return;
+    }
+    formatEditor(instance, command);
+  });
+  surface.addEventListener("paste", () => window.setTimeout(syncFromSurface));
+  editors.set(el, instance);
+  instance.setValue(input.value);
+  emit("uif:editor-init", { editor: instance }, wrapper);
+  return instance;
+}
+function initEditor(el, options) {
+  return createEditor(el, options);
+}
+function getEditorValue(editor) {
+  return editor.getValue();
+}
+function setEditorValue(editor, value) {
+  editor.setValue(value);
+}
+
 // packages/forms/src/index.ts
 var ruleHandlers = {
   required: (value) => value.trim().length > 0,
@@ -3116,7 +3880,7 @@ var push = { name: "push", init: initPush };
 // packages/rad-adapter/src/index.ts
 var swapModes = /* @__PURE__ */ new Set(["inner", "outer", "append", "prepend", "before", "after"]);
 var bodylessMethods = /* @__PURE__ */ new Set(["GET", "HEAD"]);
-var boundRoots = /* @__PURE__ */ new WeakMap();
+var boundRoots2 = /* @__PURE__ */ new WeakMap();
 function normalizeSwapMode(mode) {
   return swapModes.has(mode ?? "") ? mode : "inner";
 }
@@ -3203,7 +3967,7 @@ async function loadPartial(sourceEl) {
   }
 }
 function bindRadActions(root = document) {
-  const existing = boundRoots.get(root);
+  const existing = boundRoots2.get(root);
   if (existing) return existing;
   const onClick = (event) => {
     const target = event.target instanceof HTMLElement ? event.target : null;
@@ -3226,14 +3990,14 @@ function bindRadActions(root = document) {
   const dispose = () => {
     root.removeEventListener("click", onClick);
     root.removeEventListener("submit", onSubmit);
-    boundRoots.delete(root);
+    boundRoots2.delete(root);
   };
-  boundRoots.set(root, dispose);
+  boundRoots2.set(root, dispose);
   return dispose;
 }
 
 // packages/realtime/src/index.ts
-var handlers = /* @__PURE__ */ new Map();
+var handlers2 = /* @__PURE__ */ new Map();
 var connections = /* @__PURE__ */ new Map();
 var states = /* @__PURE__ */ new Map();
 var presence = /* @__PURE__ */ new Map();
@@ -3253,12 +4017,12 @@ function parsePayload(data) {
   }
 }
 function subscribe(channel, handler) {
-  if (!handlers.has(channel)) handlers.set(channel, /* @__PURE__ */ new Set());
-  handlers.get(channel)?.add(handler);
-  return () => handlers.get(channel)?.delete(handler);
+  if (!handlers2.has(channel)) handlers2.set(channel, /* @__PURE__ */ new Set());
+  handlers2.get(channel)?.add(handler);
+  return () => handlers2.get(channel)?.delete(handler);
 }
 function publishLocal(channel, payload) {
-  handlers.get(channel)?.forEach((handler) => handler(payload));
+  handlers2.get(channel)?.forEach((handler) => handler(payload));
 }
 function publishBatched(channel, payload) {
   window.requestAnimationFrame(() => publishLocal(channel, payload));
@@ -3569,7 +4333,15 @@ var uifAttributes = [
   "data-uif-event",
   "data-uif-on",
   "data-uif-refresh",
-  "data-uif-persist"
+  "data-uif-persist",
+  "data-uif-toolbar",
+  "data-uif-preview",
+  "data-uif-animation",
+  "data-uif-duration",
+  "data-uif-delay",
+  "data-uif-class",
+  "data-uif-attribute",
+  "data-uif-key"
 ];
 var uifValues = [
   "button",
@@ -3581,11 +4353,13 @@ var uifValues = [
   "accordion",
   "table",
   "form",
+  "editor",
   "ajax",
   "route",
   "shell",
   "nav",
   "chart",
+  "animate",
   "realtime",
   "push",
   "mobile-shell",
@@ -3612,6 +4386,17 @@ var uifActions = [
   "prepend",
   "remove",
   "toast",
+  "animate",
+  "add-class",
+  "remove-class",
+  "toggle-class",
+  "set-attribute",
+  "remove-attribute",
+  "set-value",
+  "copy",
+  "scroll-to",
+  "focus",
+  "emit",
   "subscribe",
   "connect",
   "disconnect",
@@ -3752,7 +4537,7 @@ function coerceValue(value) {
   if (value !== "" && !Number.isNaN(Number(value))) return Number(value);
   return value;
 }
-function parseOptions(el) {
+function parseOptions2(el) {
   const raw = el.getAttribute("data-uif-options");
   if (!raw) return {};
   try {
@@ -4059,53 +4844,6 @@ function fragment(html) {
   const template = document.createElement("template");
   template.innerHTML = html;
   return template.content;
-}
-
-// packages/effects/src/index.ts
-function prefersReducedMotion2() {
-  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-}
-function nextFrame2() {
-  return new Promise((resolve) => requestAnimationFrame(() => resolve()));
-}
-async function transition2(el, className, options = {}) {
-  if (prefersReducedMotion2()) {
-    el.classList.add(className);
-    return;
-  }
-  await nextFrame2();
-  el.classList.add(className);
-  await new Promise((resolve) => window.setTimeout(resolve, options.duration ?? 180));
-}
-async function show2(el, options = {}) {
-  el.hidden = false;
-  el.dataset.uifState = "open";
-  await transition2(el, options.className ?? "uif-is-visible", options);
-}
-async function hide2(el, options = {}) {
-  el.dataset.uifState = "closed";
-  el.classList.remove(options.className ?? "uif-is-visible");
-  if (!prefersReducedMotion2()) await new Promise((resolve) => window.setTimeout(resolve, options.duration ?? 180));
-  el.hidden = true;
-}
-async function toggle(el, options = {}) {
-  if (el.hidden || el.dataset.uifState === "closed") await show2(el, options);
-  else await hide2(el, options);
-}
-async function expand2(el, options = {}) {
-  el.style.height = "0px";
-  el.hidden = false;
-  await nextFrame2();
-  el.style.height = `${el.scrollHeight}px`;
-  await transition2(el, options.className ?? "uif-is-expanded", options);
-  el.style.height = "";
-}
-async function collapse2(el, options = {}) {
-  el.style.height = `${el.scrollHeight}px`;
-  await nextFrame2();
-  el.style.height = "0px";
-  await hide2(el, options);
-  el.style.height = "";
 }
 
 // packages/extension-kit/src/index.ts
@@ -4713,6 +5451,7 @@ function createSyncQueue(store, key = "sync-queue") {
 var apps = /* @__PURE__ */ new WeakMap();
 function hydrate(root, disposers) {
   mountIcons(root);
+  disposers.add(bindActions(root));
   disposers.add(initAll(root));
   disposers.add(bindRadActions(root));
   initDeclarativeFilters(root);
@@ -4721,8 +5460,11 @@ function hydrate(root, disposers) {
     const type = el.dataset.uif;
     if (type === "table" && el.tagName === "TABLE") initTable(el);
     if (type === "form" && el.tagName === "FORM") initForm(el);
+    if (type === "editor") initEditor(el);
+    if (type === "animate") initAnimation(el);
     if (type === "chart") initChart(el);
     if (type === "dashboard") initDashboard(el);
+    if (type === "desktop-shell") disposers.add(initDesktopShell(el));
     if (type === "realtime") initRealtime(el);
     if (type === "push") initPush(el);
     if (type === "mobile-shell") initMobileShell(el);
@@ -4765,23 +5507,30 @@ export {
   addNotification,
   aiAction,
   alert,
+  animate2 as animate,
   appendStreamingChunk,
   appendTextElement2 as appendTextElement,
   applyDashboardFilters,
+  applyPermissionNavigation,
   applyResponsiveColumns,
   autoInit2 as autoInit,
   autoStart,
   badge,
+  bindActions,
   bindChartExports,
   bindConnector,
+  bindDesktopOfflineIndicator,
+  bindDesktopSettings,
   bindRadActions,
   bindRealtime,
   breadcrumb,
   button,
   cacheStrategies,
+  canUseDesktopAction,
   cancelRequest2 as cancelRequest,
   card,
   chart,
+  cleanEditorHtml,
   clearErrors,
   closeOverlay2 as closeOverlay,
   closest,
@@ -4795,25 +5544,35 @@ export {
   createArtifactStore,
   createCacheStrategy,
   createDashboardConfig,
+  createDesktopManifest,
+  createDesktopShell,
+  createDesktopSyncStatus,
+  createEditor,
   createExtensionManifest,
   createExtensionMessage,
+  createLocalSettingsStore,
   createLocalStore,
+  createMemorySettingsStore,
   createMicroAppStore,
   createStore,
   createStreamSurface,
   createSyncQueue,
+  createWorkspaceSession,
   csvToObjects,
   cumulativeSum,
   dataTable,
   delegate,
   destroyChart,
   destroyComponent,
+  detectDesktopPlatform,
   disconnect,
+  dispatchAction,
   downloadChartPng,
   downloadChartSvg,
   drawer,
   dropdown,
   emit2 as emit,
+  escapeHtml,
   expand2 as expand,
   exportChartData,
   exportChartPng,
@@ -4824,25 +5583,33 @@ export {
   filterTable,
   flushOfflineQueue,
   form,
+  formatEditor,
   fragment,
   get,
   getConnectionState,
+  getEditorValue,
   getNotifications,
   getOverlayStack,
   getPresence,
   getPushSubscription,
+  hasDesktopCapability,
   hasIcon,
   hide2 as hide,
   histogramBins,
+  htmlToMarkdown,
   icon,
   iconElement,
   icons,
   init,
   initAll,
+  initAnimation,
+  initAnimationTriggers,
   initChart,
   initComponent,
   initDashboard,
   initDeclarativeFilters,
+  initDesktopShell,
+  initEditor,
   initForm,
   initInstallPrompt,
   initMobileShell,
@@ -4863,6 +5630,7 @@ export {
   loadPartial,
   loadRemoteTable,
   markNotificationsRead,
+  markdownToHtml,
   mobileShell,
   modal,
   mount2 as mount,
@@ -4871,6 +5639,7 @@ export {
   nav,
   navbar,
   observe,
+  observeMotion,
   on,
   onAppUpdate,
   onNetworkChange,
@@ -4878,10 +5647,12 @@ export {
   onOnline,
   openOverlay2 as openOverlay,
   pagination,
+  parseActionSpec,
   parseCSV,
   parseChartData,
+  parseDesktopManifestElement,
   parseMicroAppManifest,
-  parseOptions,
+  parseOptions2 as parseOptions,
   percentChange,
   popover,
   positionOverlay2 as positionOverlay,
@@ -4897,6 +5668,7 @@ export {
   ready,
   realtime,
   refreshChart,
+  registerAction,
   registerAsyncRule,
   registerComponent,
   registerIcon,
@@ -4911,6 +5683,8 @@ export {
   renderChart,
   renderDashboard,
   renderDashboardWidget,
+  renderDesktopShell,
+  renderDesktopSyncStatus,
   renderDiff,
   renderPromptPanel,
   renderToolApproval,
@@ -4918,13 +5692,18 @@ export {
   renderToolProgress,
   renderToolResult,
   renderToolTimeline,
+  renderWorkspaceIdentity,
   request2 as request,
   requestNotificationPermission,
+  resolveActionTarget,
   resolveTarget2 as resolveTarget,
   selectedRows,
+  sequence,
   serialize,
   setAccent,
   setDensity,
+  setDesktopStatus,
+  setEditorValue,
   setTableState,
   setText2 as setText,
   setTrustedHTML2 as setTrustedHTML,
@@ -4939,19 +5718,21 @@ export {
   skeleton,
   sortTable,
   spinner,
+  stagger,
   start,
   stepper,
   submitForm,
   subscribe,
   subscribeToPush,
   summarizeDashboard,
+  summarizeDesktopQueue,
   summaryStats,
   swapContent,
   swapTrustedHTML2 as swapTrustedHTML,
   table,
   tabs,
   toast,
-  toggle,
+  toggle2 as toggle,
   toggleOverlay2 as toggleOverlay,
   toolApproval,
   tooltip,
@@ -4964,12 +5745,14 @@ export {
   uifValues,
   unmount,
   unreadCount,
+  unregisterAction,
   unregisterServiceWorker,
   unsubscribeFromPush,
   updatePresence,
   upload,
   useRequestInterceptor,
   useResponseInterceptor,
+  validateDesktopManifest,
   validateField,
   validateForm,
   validateFormAsync,

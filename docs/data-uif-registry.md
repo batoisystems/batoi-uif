@@ -6,7 +6,7 @@ This registry documents the stable declarative surface for Batoi UIF. Attributes
 
 | Attribute | Purpose | Notes |
 | --- | --- | --- |
-| `data-uif` | Declares the component or behavior. | Examples: `modal`, `form`, `ajax`, `chart`, `realtime`, `mobile-shell`, `ai-action`, `tool-approval`. |
+| `data-uif` | Declares the component or behavior. | Examples: `modal`, `form`, `editor`, `ajax`, `chart`, `animate`, `realtime`, `mobile-shell`, `ai-action`, `tool-approval`. |
 | `data-uif-action` | Declares an action on a button, link, form, or row control. | Examples: `open`, `close`, `toggle`, `reload`, `delete`, `save`, `approve`, `reject`. |
 | `data-uif-target` | Points to the affected element. | Supports CSS selectors plus framework helpers such as `self`, `parent`, and `closest:.selector` where supported. |
 | `data-uif-src` | URL for AJAX, form, realtime, push, chart, or remote table data. | Server responses must be governed by the consuming app. |
@@ -29,9 +29,11 @@ This registry documents the stable declarative surface for Batoi UIF. Attributes
 | `accordion` | `@batoi/uif-components` | Accordion container | Disclosure state management. |
 | `table` | `@batoi/uif-table` | `table` | Sorting, filtering, remote rows, selection, row actions. |
 | `form` | `@batoi/uif-forms` | `form` | Validation, async submission, error summary, accessible field errors. |
+| `editor` | `@batoi/uif-editor` | `textarea`, `input`, editor host | Dependency-free HTML and Markdown editing with synchronized form field and preview. |
 | `ajax` | `@batoi/uif-rad-adapter` | `button`, `a`, `form` | Server-rendered partial load and swap. |
 | `route` | `@batoi/uif-router` | `a`, route container | Same-origin partial routing. |
 | `chart` | `@batoi/uif-charts` | `div`, chart host | Dependency-free SVG chart rendering. |
+| `animate` | `@batoi/uif-effects` | Any element | Declarative animation presets with reduced-motion support. |
 | `realtime` | `@batoi/uif-realtime` | Region/controller | SSE, WebSocket, or polling feed updates. |
 | `push` | `@batoi/uif-push` | Button/control | Push subscription helpers. |
 | `install-prompt` | `@batoi/uif-pwa` | Button/control | PWA install prompt. |
@@ -48,6 +50,36 @@ This registry documents the stable declarative surface for Batoi UIF. Attributes
 | `data-uif-validate-async` | Names a registered async validation rule. |
 
 Malformed `pattern` expressions are handled as validation failures rather than runtime crashes.
+
+## Editors
+
+| Attribute | Purpose |
+| --- | --- |
+| `data-uif="editor"` | Enhances a textarea/input into a rich HTML or Markdown editor. |
+| `data-uif-mode` | Editor mode: `html`, `markdown`, or `plain`. |
+| `data-uif-toolbar` | Space-separated toolbar commands such as `bold italic heading quote code ul ol link preview`. |
+| `data-uif-preview` | Preview mode: `none`, `manual`, or `live`. |
+| `data-uif-editor-height` | Minimum editor surface height. |
+
+Markdown preview escapes raw HTML by default. Browser-side cleanup is not a substitute for server-side sanitization before trusted render or storage.
+
+## Animation and Event Actions
+
+| Attribute | Purpose |
+| --- | --- |
+| `data-uif="animate"` | Runs an animation preset on load or configured trigger. |
+| `data-uif-animation` | Animation name such as `fade-in`, `slide-up`, `scale-in`, `pop`, `pulse`, `shake`, or `highlight`. |
+| `data-uif-duration` | Animation duration in milliseconds. |
+| `data-uif-delay` | Animation delay in milliseconds. |
+| `data-uif-event` | Event name for safe declarative action binding, optionally with modifiers such as `click.prevent`. |
+| `data-uif-on` | JSON event/action map for multiple declarative bindings. |
+| `data-uif-class` | Class name used by class actions. |
+| `data-uif-attribute` | Attribute name used by attribute actions. |
+| `data-uif-key` | Keyboard filter for declarative keyboard actions. |
+
+Built-in safe actions include `show`, `hide`, `toggle`, `animate`, `add-class`, `remove-class`, `toggle-class`, `set-attribute`, `remove-attribute`, `set-value`, `copy`, `scroll-to`, `focus`, `submit`, `reset`, and `emit`.
+
+Event actions never evaluate inline JavaScript. Only registered action names can run.
 
 ## Charts
 

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Event Actions</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/example.css">
+    <style>.event-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(18rem,.36fr);gap:1rem}.is-highlighted{box-shadow:0 0 0 .25rem color-mix(in srgb,var(--uif-accent),transparent 72%)}.code-box{overflow:auto;max-height:22rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}@media(max-width:64rem){.event-grid{grid-template-columns:1fr}}</style>
+  </head>
+  <body class="example-page">
+    <main class="example-shell">
+      <div class="example-frame">
+        <header class="example-topbar"><a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Event actions</span></span></a><nav class="example-actions"><a class="example-pill" href="../rich-editor/">Rich editor</a><a class="example-pill" href="../markdown-editor/">Markdown</a><a class="example-pill" href="../animation-gallery/">Animations</a></nav></header>
+        <section class="example-hero"><div><div class="example-eyebrow">Events · actions · no inline JS</div><h1>Declarative interactivity without arbitrary JavaScript execution.</h1><p>Map events to registered actions such as toggle-class, copy, focus, scroll-to, and animate.</p></div></section>
+        <section class="event-grid">
+          <div class="uif-card" id="target-card"><h2>Interactive target</h2><p id="copy-text">This text can be copied using a registered safe action.</p><input class="uif-input uif-mt-3" id="focus-field" placeholder="Focus target"></div>
+          <aside class="uif-card uif-card-flush"><div class="uif-card-head"><div><h2>Actions</h2><p>These buttons use data attributes, not inline scripts.</p></div></div><div class="uif-card-body uif-stack">
+            <button class="uif-btn" data-uif-event="click" data-uif-action="toggle-class" data-uif-target="#target-card" data-uif-class="is-highlighted">Toggle class</button>
+            <button class="uif-btn" data-uif-event="click" data-uif-action="copy" data-uif-target="#copy-text">Copy text</button>
+            <button class="uif-btn" data-uif-event="click" data-uif-action="focus" data-uif-target="#focus-field">Focus input</button>
+            <button class="uif-btn" data-uif-event="click" data-uif-action="animate" data-uif-target="#target-card" data-uif-animation="highlight">Highlight</button>
+          </div></aside>
+        </section>
+        <pre class="code-box uif-mt-4"><code>&lt;button data-uif-event="click" data-uif-action="toggle-class" data-uif-target="#panel" data-uif-class="is-open"&gt;Toggle&lt;/button&gt;</code></pre>
+      </div>
+    </main>
+    <script type="module">
+      import { autoStart, mountIcons } from '../../dist/uif.esm.js';
+      autoStart();
+      mountIcons(document);
+    </script>
+  </body>
+</html>

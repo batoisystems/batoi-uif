@@ -33,7 +33,7 @@ Classic script usage:
 <script>BatoiUIF.autoStart();</script>
 ```
 
-For PHP, RAD, and other server-rendered pages, `BatoiUIF.autoStart()` initializes common `data-uif` components, forms, tables, charts, icons, RAD AJAX actions, realtime regions, push controls, mobile shells, AI actions, and MCP approval widgets without a bundler.
+For PHP, RAD, and other server-rendered pages, `BatoiUIF.autoStart()` initializes common `data-uif` components, forms, editors, tables, charts, icons, animations, event actions, RAD AJAX actions, realtime regions, push controls, mobile shells, AI actions, and MCP approval widgets without a bundler.
 
 The same distribution files can also power **Micro Apps**: self-contained, client-only applications built with static HTML, Batoi UIF CSS/JS, browser APIs, and optional local persistence. Import the ES module from `dist/uif.esm.js`, use `createMicroAppStore()` for local persistence, undo/redo, reset, and JSON import/export, and render charts/icons/components directly in static HTML.
 
@@ -184,6 +184,54 @@ Reference docs:
 ```
 
 See `examples/micro-app-dashboard/` for a copy-ready static Micro App with local persistence, undo/redo, reset, JSON import/export, icons, and charts.
+
+### Rich HTML and Markdown editor
+
+```html
+<textarea
+  name="body"
+  data-uif="editor"
+  data-uif-mode="html"
+  data-uif-toolbar="bold italic heading quote code ul ol link preview">
+  <h2>Draft</h2><p>Edit rich text.</p>
+</textarea>
+```
+
+```html
+<textarea name="notes" data-uif="editor" data-uif-mode="markdown" data-uif-preview="live">
+# Markdown draft
+
+**Batoi UIF** renders a safe preview.
+</textarea>
+```
+
+The editor package is dependency-free and keeps the original form field synchronized. Markdown preview escapes raw HTML by default. Treat browser-side cleanup as convenience only; sanitize and authorize HTML on the server before trusted rendering or storage.
+
+### Declarative animation and event actions
+
+```html
+<button
+  data-uif-event="click"
+  data-uif-action="animate"
+  data-uif-target="#panel"
+  data-uif-animation="pop">
+  Animate
+</button>
+
+<section id="panel" class="uif-card">Panel</section>
+```
+
+```html
+<button
+  data-uif-event="click"
+  data-uif-action="toggle-class"
+  data-uif-target="#panel"
+  data-uif-class="is-expanded">
+  Toggle
+</button>
+```
+
+Event actions use registered action names only. Batoi UIF does not evaluate inline JavaScript from attributes.
 
 ### Dependency-free SVG icon
 

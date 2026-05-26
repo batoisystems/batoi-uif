@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Desktop Offline Dashboard</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/example.css">
+    <style>.offline-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(18rem,.34fr);gap:1rem}.queue-list{display:grid;gap:.65rem}.code-box{overflow:auto;max-height:20rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}@media(max-width:64rem){.offline-grid{grid-template-columns:1fr}}</style>
+  </head>
+  <body class="example-page">
+    <main class="example-shell">
+      <div class="example-frame">
+        <header class="example-topbar">
+          <a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Offline desktop dashboard</span></span></a>
+          <nav class="example-actions" aria-label="Desktop examples"><a class="example-pill" href="../desktop-shell/">Shell</a><a class="example-pill" href="../desktop-workspace/">Workspace</a><a class="example-pill" href="../desktop-ai-approval/">AI approval</a></nav>
+        </header>
+        <section class="example-hero">
+          <div><div class="example-eyebrow">Local-first · queue · dashboard</div><h1>Offline-ready dashboard with queue visibility.</h1><p>Combine dashboard widgets with desktop sync status summaries for field, operations, and evidence collection apps that must keep working without permanent connectivity.</p></div>
+          <button class="uif-btn" type="button" id="toggle-offline"><span data-uif-icon="offline"></span>Simulate offline</button>
+        </section>
+        <section class="offline-grid">
+          <div class="uif-desktop-window">
+            <div class="uif-desktop-window-head"><strong>Desktop Field Dashboard</strong><span id="sync-status"></span></div>
+            <div class="uif-desktop-window-body"><section id="offline-dashboard"></section></div>
+          </div>
+          <aside class="uif-card uif-card-flush">
+            <div class="uif-card-head"><div><h2>Pending queue</h2><p>Queue items stay local until a governed sync endpoint accepts them.</p></div></div>
+            <div class="uif-card-body">
+              <div class="queue-list" id="queue-list"></div>
+              <pre class="code-box" style="margin-top:1rem"><code id="offline-code"></code></pre>
+            </div>
+          </aside>
+        </section>
+      </div>
+    </main>
+    <script type="module">
+      import { createDashboardConfig, mountIcons, renderDashboard, renderDesktopSyncStatus, summarizeDesktopQueue } from '../../dist/uif.esm.js';
+      const queue = [{ status: 'queued', attempts: 0 }, { status: 'queued', attempts: 1 }, { status: 'failed', attempts: 3, lastError: 'Network timeout' }];
+      const rows = [{ label: 'Captured', value: 42 }, { label: 'Reviewed', value: 31 }, { label: 'Synced', value: 27 }, { label: 'Flagged', value: 6 }];
+      const config = createDashboardConfig({
+        title: 'Local Evidence Dashboard',
+        description: 'Rendered from local records and a pending sync queue.',
+        columns: 2,
+        widgets: [
+          { id: 'records', title: 'Local records', type: 'metric', value: 42, change: 'cached' },
+          { id: 'queue', title: 'Pending queue', type: 'metric', value: queue.length, change: 'retry enabled' },
+          { id: 'chart', title: 'Record state', type: 'chart', span: 2, data: rows, chart: { type: 'bar', height: 240, palette: 'professional', exportable: true } },
+          { id: 'table', title: 'Local rows', type: 'table', span: 2, data: rows, columns: ['label', 'value'] },
+        ],
+      });
+      document.querySelector('#offline-dashboard').innerHTML = renderDashboard(config);
+      document.querySelector('#sync-status').innerHTML = renderDesktopSyncStatus(summarizeDesktopQueue(queue));
+      document.querySelector('#queue-list').innerHTML = queue.map((item, index) => `<div class="uif-queue-row"><div class="uif-queue-main"><strong>Action ${index + 1}</strong><span>${item.status} · attempts ${item.attempts}</span></div></div>`).join('');
+      document.querySelector('#offline-code').textContent = `const status = summarizeDesktopQueue(queue);\nrenderDesktopSyncStatus(status);\nrenderDashboard(config);`;
+      document.querySelector('#toggle-offline').addEventListener('click', () => {
+        document.body.toggleAttribute('data-uif-offline');
+      });
+      mountIcons(document);
+    </script>
+  </body>
+</html>

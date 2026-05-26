@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Desktop AI Approval</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/example.css">
+    <style>.approval-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(20rem,.42fr);gap:1rem}.policy-list{display:grid;gap:.75rem}.policy-list li{display:flex;align-items:center;gap:.55rem}.code-box{overflow:auto;max-height:22rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}@media(max-width:64rem){.approval-grid{grid-template-columns:1fr}}</style>
+  </head>
+  <body class="example-page">
+    <main class="example-shell">
+      <div class="example-frame">
+        <header class="example-topbar">
+          <a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Desktop AI approval</span></span></a>
+          <nav class="example-actions" aria-label="Desktop examples"><a class="example-pill" href="../desktop-shell/">Shell</a><a class="example-pill" href="../desktop-workspace/">Workspace</a><a class="example-pill" href="../desktop-offline-dashboard/">Offline dashboard</a></nav>
+        </header>
+        <section class="example-hero">
+          <div><div class="example-eyebrow">AI/MCP · governed UI · desktop</div><h1>Approval desk for server-mediated desktop AI actions.</h1><p>Desktop apps can show assistant, policy, and approval surfaces while keeping provider calls, MCP tools, credentials, audit logging, and filesystem access on the governed backend.</p></div>
+          <button class="uif-btn" type="button" data-copy="#approval-code"><span data-uif-icon="copy"></span>Copy markup</button>
+        </section>
+        <section class="approval-grid">
+          <div class="uif-desktop-shell" style="min-height:42rem">
+            <aside class="uif-desktop-sidebar"><div class="uif-desktop-brand"><strong>AI Approval Desk</strong><span>UI-only surface</span></div><nav class="uif-desktop-nav"><a class="uif-desktop-nav-item" href="#" aria-current="page"><span data-uif-icon="approval"></span><span>Approvals</span><em>3</em></a><a class="uif-desktop-nav-item" href="#"><span data-uif-icon="shield"></span><span>Policies</span></a><a class="uif-desktop-nav-item" href="#"><span data-uif-icon="activity"></span><span>Audit</span></a></nav></aside>
+            <main class="uif-desktop-main">
+              <header class="uif-desktop-topbar"><div><h1>Tool Approval</h1><p>Human review before a governed backend executes the action.</p></div><span class="uif-desktop-status-pill" data-uif-sync-status="queued"><span></span>Review required</span></header>
+              <div class="uif-desktop-content">
+                <div class="uif-stat-grid"><article class="uif-stat-card"><div class="uif-stat-card-label">Pending</div><div class="uif-stat-card-value">3</div><div class="uif-stat-card-meta">Human approval required</div></article><article class="uif-stat-card"><div class="uif-stat-card-label">Policy checks</div><div class="uif-stat-card-value">5</div><div class="uif-stat-card-meta">Server validated</div></article></div>
+                <section class="uif-desktop-panel" style="margin-top:1rem"><div class="uif-desktop-panel-head"><strong>Requested action</strong><span class="uif-badge uif-badge-danger">High risk</span></div><div class="uif-desktop-panel-body"><div data-uif="tool-approval" data-uif-tool="workspace.export_evidence" data-uif-risk="high" data-uif-irreversible="true"></div></div></section>
+              </div>
+              <footer class="uif-desktop-statusbar">No privileged operation runs in the browser.</footer>
+            </main>
+          </div>
+          <aside class="uif-card uif-card-flush">
+            <div class="uif-card-head"><div><h2>Boundary checklist</h2><p>The desktop client renders context and sends decisions to a server endpoint.</p></div></div>
+            <div class="uif-card-body">
+              <ul class="policy-list">
+                <li><span data-uif-icon="check"></span> Provider keys stay server-side.</li>
+                <li><span data-uif-icon="check"></span> MCP tools execute server-side only.</li>
+                <li><span data-uif-icon="check"></span> Audit trail is written by the backend.</li>
+              </ul>
+              <pre class="code-box" style="margin-top:1rem"><code id="approval-code">&lt;div data-uif="tool-approval" data-uif-tool="workspace.export_evidence" data-uif-risk="high" data-uif-irreversible="true"&gt;&lt;/div&gt;</code></pre>
+            </div>
+          </aside>
+        </section>
+      </div>
+    </main>
+    <script type="module">
+      import { autoStart, mountIcons } from '../../dist/uif.esm.js';
+      autoStart();
+      mountIcons(document);
+      document.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-copy]');
+        if (!button) return;
+        await navigator.clipboard?.writeText(document.querySelector(button.dataset.copy).textContent);
+      });
+    </script>
+  </body>
+</html>

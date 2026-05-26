@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Desktop Workspace</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/example.css">
+    <style>.workspace-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(20rem,.42fr);gap:1rem}.policy-list{display:grid;gap:.75rem}.code-box{overflow:auto;max-height:22rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}@media(max-width:64rem){.workspace-grid{grid-template-columns:1fr}}</style>
+  </head>
+  <body class="example-page">
+    <main class="example-shell">
+      <div class="example-frame">
+        <header class="example-topbar">
+          <a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Desktop workspace</span></span></a>
+          <nav class="example-actions" aria-label="Desktop examples">
+            <a class="example-pill" href="../desktop-shell/">Shell</a>
+            <a class="example-pill" href="../desktop-offline-dashboard/">Offline dashboard</a>
+            <a class="example-pill" href="../desktop-ai-approval/">AI approval</a>
+          </nav>
+        </header>
+        <section class="example-hero">
+          <div><div class="example-eyebrow">Workspace-connected · permissions · audit</div><h1>Desktop workspace session without client-side authority.</h1><p>Render identity, filter navigation by permissions, and post auditable actions through server-mediated endpoints. The client only presents allowed UI hints.</p></div>
+          <button class="uif-btn" type="button" data-copy="#workspace-code"><span data-uif-icon="copy"></span>Copy code</button>
+        </section>
+        <section class="workspace-grid">
+          <div class="uif-desktop-shell" style="min-height:42rem">
+            <aside class="uif-desktop-sidebar">
+              <div class="uif-desktop-brand"><strong>Batoi Workspace</strong><span>Connected profile</span></div>
+              <nav class="uif-desktop-nav">
+                <a class="uif-desktop-nav-item" href="#" aria-current="page" data-uif-permission="records:read"><span data-uif-icon="dashboard"></span><span>Overview</span></a>
+                <a class="uif-desktop-nav-item" href="#" data-uif-permission="records:write"><span data-uif-icon="edit"></span><span>Editor</span></a>
+                <a class="uif-desktop-nav-item" href="#" data-uif-permission="admin:users"><span data-uif-icon="users"></span><span>Admin users</span></a>
+              </nav>
+            </aside>
+            <main class="uif-desktop-main">
+              <header class="uif-desktop-topbar"><div><h1>Workspace Console</h1><p>Permission-aware desktop navigation.</p></div><div id="workspace-identity"></div></header>
+              <div class="uif-desktop-content">
+                <div class="uif-stat-grid">
+                  <article class="uif-stat-card"><div class="uif-stat-card-label">Permissions</div><div class="uif-stat-card-value">2</div><div class="uif-stat-card-meta">Server remains authoritative</div></article>
+                  <article class="uif-stat-card"><div class="uif-stat-card-label">Audit queue</div><div class="uif-stat-card-value">1</div><div class="uif-stat-card-meta">Ready to submit</div></article>
+                </div>
+                <form class="uif-desktop-panel" style="margin-top:1rem" data-uif="form" data-uif-action="/workspace/audit" data-uif-method="POST">
+                  <div class="uif-desktop-panel-head"><strong>Audit event demo</strong><span class="uif-badge uif-badge-info">Server-mediated</span></div>
+                  <div class="uif-desktop-panel-body uif-form-grid">
+                    <label class="uif-field"><span class="uif-field-label">Action</span><input class="uif-input" name="action" value="desktop.workspace.opened"></label>
+                    <label class="uif-field"><span class="uif-field-label">Workspace</span><input class="uif-input" name="workspace" value="Operations"></label>
+                    <button class="uif-btn" type="button">Queue audit event</button>
+                  </div>
+                </form>
+              </div>
+              <footer class="uif-desktop-statusbar"><span class="uif-desktop-status-pill" data-uif-sync-status="synced"><span></span>Policy checked</span></footer>
+            </main>
+          </div>
+          <aside class="uif-card uif-card-flush">
+            <div class="uif-card-head"><div><h2>Session model</h2><p>Use permissions for UI hints only. Enforce every operation on the server.</p></div></div>
+            <div class="uif-card-body"><pre class="code-box"><code id="workspace-code"></code></pre></div>
+          </aside>
+        </section>
+      </div>
+    </main>
+    <script type="module">
+      import { applyPermissionNavigation, autoStart, createWorkspaceSession, mountIcons, renderWorkspaceIdentity } from '../../dist/uif.esm.js';
+      const session = createWorkspaceSession({ workspaceId: 'ops', workspaceName: 'Operations', userId: 'ar', userName: 'Ashwini Rath', roles: ['Platform Admin'], permissions: ['records:read', 'records:write'] });
+      document.querySelector('#workspace-identity').innerHTML = renderWorkspaceIdentity(session);
+      applyPermissionNavigation(document, session);
+      document.querySelector('#workspace-code').textContent = `const session = createWorkspaceSession(${JSON.stringify(session, null, 2)});\napplyPermissionNavigation(document, session);`;
+      autoStart();
+      mountIcons(document);
+      document.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-copy]');
+        if (!button) return;
+        await navigator.clipboard?.writeText(document.querySelector(button.dataset.copy).textContent);
+      });
+    </script>
+  </body>
+</html>

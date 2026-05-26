@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Animation Gallery</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/example.css">
+    <style>.anim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:1rem}.anim-card{display:grid;place-items:center;min-height:8rem}.code-box{overflow:auto;margin-top:1rem;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}</style>
+  </head>
+  <body class="example-page">
+    <main class="example-shell">
+      <div class="example-frame">
+        <header class="example-topbar"><a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Animation gallery</span></span></a><nav class="example-actions"><a class="example-pill" href="../rich-editor/">Rich editor</a><a class="example-pill" href="../markdown-editor/">Markdown</a><a class="example-pill" href="../event-actions/">Events</a></nav></header>
+        <section class="example-hero"><div><div class="example-eyebrow">Effects · CSS animation · reduced motion</div><h1>Animation presets without Animate.css.</h1><p>Use declarative event actions or <code>data-uif="animate"</code> for small UI transitions that respect reduced-motion preferences.</p></div></section>
+        <section class="anim-grid">
+          <article class="uif-card anim-card" id="fade"><strong>fade-in</strong></article>
+          <article class="uif-card anim-card" id="slide"><strong>slide-up</strong></article>
+          <article class="uif-card anim-card" id="pop"><strong>pop</strong></article>
+          <article class="uif-card anim-card" id="shake"><strong>shake</strong></article>
+        </section>
+        <div class="uif-cluster uif-mt-4">
+          <button class="uif-btn" data-uif-event="click" data-uif-action="animate" data-uif-target="#fade" data-uif-animation="fade-in">Fade</button>
+          <button class="uif-btn" data-uif-event="click" data-uif-action="animate" data-uif-target="#slide" data-uif-animation="slide-up">Slide</button>
+          <button class="uif-btn" data-uif-event="click" data-uif-action="animate" data-uif-target="#pop" data-uif-animation="pop">Pop</button>
+          <button class="uif-btn" data-uif-event="click" data-uif-action="animate" data-uif-target="#shake" data-uif-animation="shake">Shake</button>
+        </div>
+        <pre class="code-box"><code>&lt;button data-uif-event="click" data-uif-action="animate" data-uif-target="#panel" data-uif-animation="pop"&gt;Animate&lt;/button&gt;</code></pre>
+      </div>
+    </main>
+    <script type="module">
+      import { autoStart, mountIcons } from '../../dist/uif.esm.js';
+      autoStart();
+      mountIcons(document);
+    </script>
+  </body>
+</html>

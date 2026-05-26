@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Desktop Shell</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/example.css">
+    <style>
+      .desktop-demo-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(18rem,.36fr);gap:1rem}.desktop-preview{height:42rem;border:1px solid #d8e0ea;border-radius:.75rem;background:#fff;overflow:hidden;box-shadow:0 18px 44px rgba(16,24,40,.1)}.desktop-copy{width:100%;min-height:22rem;padding:1rem;border:1px solid #d8e0ea;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}@media(max-width:64rem){.desktop-demo-grid{grid-template-columns:1fr}.desktop-preview{height:auto;min-height:38rem}}
+    </style>
+  </head>
+  <body class="example-page">
+    <main class="example-shell">
+      <div class="example-frame">
+        <header class="example-topbar">
+          <a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Desktop shell</span></span></a>
+          <nav class="example-actions" aria-label="Desktop examples">
+            <a class="example-pill" href="../">All examples</a>
+            <a class="example-pill" href="../desktop-workspace/">Workspace</a>
+            <a class="example-pill" href="../desktop-offline-dashboard/">Offline dashboard</a>
+            <a class="example-pill" href="../desktop-ai-approval/">AI approval</a>
+          </nav>
+        </header>
+        <section class="example-hero">
+          <div>
+            <div class="example-eyebrow">Desktop profile · shell · settings</div>
+            <h1>Installable app shell with dependency-free UIF primitives.</h1>
+            <p>Use the desktop shell helper to render a sidebar, titlebar, action area, content region, and sync status using plain HTML, CSS, and JavaScript.</p>
+          </div>
+          <button class="uif-btn" type="button" data-copy="#desktop-code"><span data-uif-icon="copy"></span>Copy code</button>
+        </section>
+        <section class="desktop-demo-grid">
+          <div class="desktop-preview">
+            <section data-uif="desktop-shell" data-uif-options='{"id":"desk-shell","name":"Batoi Desk","version":"v1.0","title":"Command Workspace","subtitle":"Desktop shell rendered from declarative data-uif options.","offlineMode":"queue","capabilities":["offline","workspace"],"navigation":[{"id":"home","label":"Home","icon":"home","href":"#","active":true},{"id":"records","label":"Records","icon":"table","href":"#","badge":18},{"id":"settings","label":"Settings","icon":"settings","href":"#"}],"actions":[{"id":"new","label":"New item","icon":"plus","href":"#"}],"status":{"sync":"queued","queued":3},"bodyHtml":"<div class=\"uif-stat-grid\"><article class=\"uif-stat-card\"><div class=\"uif-stat-card-label\">Local records</div><div class=\"uif-stat-card-value\">248</div><div class=\"uif-stat-card-meta\">Cached for desktop use</div></article><article class=\"uif-stat-card\"><div class=\"uif-stat-card-label\">Queue</div><div class=\"uif-stat-card-value\">3</div><div class=\"uif-stat-card-meta\">Pending sync actions</div></article></div><div class=\"uif-desktop-window\" style=\"margin-top:1rem\"><div class=\"uif-desktop-window-head\"><strong>Settings</strong><span data-uif-offline-label>Online</span></div><div class=\"uif-desktop-window-body\"><label class=\"uif-field\"><span class=\"uif-field-label\">Density</span><select class=\"uif-input\" data-uif-setting=\"density\"><option>comfortable</option><option>compact</option></select></label></div></div>"}'></section>
+          </div>
+          <aside class="uif-card uif-card-flush">
+            <div class="uif-card-head"><div><h2>Copyable shell</h2><p>Render declaratively or call <code>renderDesktopShell()</code> from JavaScript.</p></div></div>
+            <div class="uif-card-body"><textarea id="desktop-code" class="desktop-copy" readonly></textarea></div>
+          </aside>
+        </section>
+      </div>
+    </main>
+    <script type="module">
+      import { autoStart, bindDesktopSettings, createLocalSettingsStore, mountIcons } from '../../dist/uif.esm.js';
+      const source = document.querySelector('[data-uif="desktop-shell"]').outerHTML;
+      document.querySelector('#desktop-code').value = source.replace(/\sdata-uif-options=/, '\n  data-uif-options=');
+      autoStart();
+      bindDesktopSettings(document, createLocalSettingsStore('desktop-shell-example'));
+      mountIcons(document);
+      document.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-copy]');
+        if (!button) return;
+        await navigator.clipboard?.writeText(document.querySelector(button.dataset.copy).value);
+      });
+    </script>
+  </body>
+</html>
