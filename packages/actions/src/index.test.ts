@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { bindActions, dispatchAction, parseActionSpec, registerAction, resolveActionTarget, unregisterAction } from './index.js';
+import { bindActions, dispatchAction, dispatchActions, getActionDiagnostics, parseActionSpec, registerAction, resolveActionTarget, unregisterAction } from './index.js';
 
 describe('@batoi/uif-actions', () => {
   it('resolves common targets', () => {
@@ -33,5 +33,37 @@ describe('@batoi/uif-actions', () => {
     await dispatchAction('direct-test', { source: document.createElement('button'), target: null });
     expect(handler).toHaveBeenCalledOnce();
     unregisterAction('direct-test');
+  });
+
+  it('parses and dispatches action chains', async () => {
+    document.body.innerHTML = '<button data-uif-event="click.prevent" data-uif-actions=\'[{"action":"chain-a"},{"action":"chain-b","value":"done"}]\'></button>';
+    const calls: string[] = [];
+    registerAction('chain-a', () => calls.push('a'));
+    registerAction('chain-b', ({ value }) => calls.push(value ?? ''));
+    const spec = parseActionSpec(document.querySelector('button') as HTMLElement)[0];
+    expect(spec.chain).toHaveLength(2);
+    await dispatchActions(spec.chain ?? [], { source: document.querySelector('button') as HTMLElement, target: null });
+    expect(calls).toEqual(['a', 'done']);
+    unregisterAction('chain-a');
+    unregisterAction('chain-b');
+  });
+
+  it('binds action chains, confirmation, conditions, params, and aria sync', () => {
+    vi.stubGlobal('confirm', vi.fn(() => true));
+    document.body.innerHTML = '<input id="gate" checked type="checkbox"><section id="panel"></section><button data-uif-event="click.prevent" data-uif-confirm="Proceed?" data-uif-if="#gate:checked" data-uif-actions=\'[{"action":"toggle-class","target":"#panel","class":"is-open"}]\'>Run</button>';
+    const dispose = bindActions(document);
+    const button = document.querySelector('button') as HTMLButtonElement;
+    button.click();
+    expect(document.querySelector('#panel')?.classList.contains('is-open')).toBe(true);
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+    dispose();
+  });
+
+  it('reports diagnostics for missing targets and unknown actions', async () => {
+    const button = document.createElement('button');
+    document.body.append(button);
+    await dispatchActions([{ event: 'click', action: 'missing-action', target: '#missing' }], { source: button, target: null });
+    expect(getActionDiagnostics().some((item) => item.message.includes('Unknown action'))).toBe(true);
+    expect(getActionDiagnostics().some((item) => item.message.includes('Missing target'))).toBe(true);
   });
 });

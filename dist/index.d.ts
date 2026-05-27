@@ -108,6 +108,7 @@ interface ActionContext {
     event?: Event;
     action: string;
     value?: string;
+    params?: Record<string, unknown>;
 }
 type ActionHandler = (context: ActionContext) => void | Promise<void>;
 interface ParsedAction {
@@ -118,11 +119,31 @@ interface ParsedAction {
     stop?: boolean;
     once?: boolean;
     key?: string;
+    self?: boolean;
+    outside?: boolean;
+    debounce?: number;
+    throttle?: number;
+    value?: string;
+    className?: string;
+    attribute?: string;
+    confirm?: string;
+    condition?: string;
+    params?: Record<string, unknown>;
+    chain?: ParsedAction[];
 }
+interface ActionDiagnostic {
+    level: 'warning' | 'error';
+    message: string;
+    source: HTMLElement;
+    action?: string;
+}
+declare function getActionDiagnostics(): ActionDiagnostic[];
+declare function clearActionDiagnostics(): void;
 declare function resolveActionTarget(source: HTMLElement, targetExpr?: string): HTMLElement | null;
 declare function registerAction(name: string, handler: ActionHandler): void;
 declare function unregisterAction(name: string): void;
 declare function dispatchAction(action: string, context: Omit<ActionContext, 'action'>): Promise<void>;
+declare function dispatchActions(actions: ParsedAction[], context: Omit<ActionContext, 'action'>): Promise<void>;
 declare function parseActionSpec(el: HTMLElement): ParsedAction[];
 declare function bindActions(root?: Document | HTMLElement): () => void;
 
@@ -200,12 +221,25 @@ interface EffectOptions {
     className?: string;
     duration?: number;
     delay?: number;
+    easing?: string;
+    repeat?: number;
+    direction?: 'normal' | 'reverse' | 'alternate';
+    fill?: FillMode;
+    once?: boolean;
 }
 interface AnimationStep {
     el: HTMLElement;
     animation: string;
     options?: EffectOptions;
 }
+interface AnimationPreset {
+    name: string;
+    category: 'entrance' | 'exit' | 'attention' | 'loading' | 'layout';
+    duration: number;
+    repeat?: boolean;
+    description: string;
+}
+declare const animationPresets: AnimationPreset[];
 declare function transition(el: HTMLElement, className: string, options?: EffectOptions): Promise<void>;
 declare function show(el: HTMLElement, options?: EffectOptions): Promise<void>;
 declare function hide(el: HTMLElement, options?: EffectOptions): Promise<void>;
@@ -214,19 +248,31 @@ declare function expand(el: HTMLElement, options?: EffectOptions): Promise<void>
 declare function collapse(el: HTMLElement, options?: EffectOptions): Promise<void>;
 declare function animate(el: HTMLElement, animation: string, options?: EffectOptions): Promise<void>;
 declare function sequence(steps: AnimationStep[], options?: EffectOptions): Promise<void>;
+declare function timeline(steps: AnimationStep[], options?: EffectOptions): Promise<void>;
 declare function stagger(elements: Iterable<HTMLElement>, animation: string, options?: EffectOptions): Promise<void>;
+declare function animateGroup(root: ParentNode, selector: string, animation: string, options?: EffectOptions): Promise<void>;
+declare function cancelAnimation(el: HTMLElement): void;
 declare function initAnimation(el: HTMLElement): void;
 declare function initAnimationTriggers(root?: ParentNode): void;
 declare function observeMotion(root?: HTMLElement): void;
 
 type EditorMode = 'html' | 'markdown' | 'plain';
 type EditorPreviewMode = 'none' | 'manual' | 'live';
-type EditorCommand = 'bold' | 'italic' | 'underline' | 'heading' | 'quote' | 'code' | 'ul' | 'ol' | 'link' | 'undo' | 'redo' | 'preview' | 'source' | 'clear';
+type EditorLayout = 'source' | 'preview' | 'split' | 'tabs';
+type EditorCommand = 'bold' | 'italic' | 'underline' | 'strike' | 'heading' | 'paragraph' | 'quote' | 'code' | 'hr' | 'ul' | 'ol' | 'task' | 'link' | 'image' | 'table' | 'undo' | 'redo' | 'preview' | 'source' | 'fullscreen' | 'clear';
 interface EditorOptions {
     mode?: EditorMode;
     toolbar?: string[];
     preview?: EditorPreviewMode;
     height?: string;
+    layout?: EditorLayout;
+    status?: boolean;
+    placeholder?: string;
+    autosave?: boolean;
+    autosaveDelay?: number;
+    autosaveUrl?: string;
+    required?: boolean;
+    maxLength?: number;
 }
 interface EditorInstance {
     element: HTMLElement;
@@ -234,15 +280,38 @@ interface EditorInstance {
     input: HTMLTextAreaElement | HTMLInputElement;
     surface: HTMLElement;
     preview?: HTMLElement;
+    status?: HTMLElement;
+    dirty: boolean;
+    sourceMode: boolean;
     getValue(): string;
     setValue(value: string): void;
     focus(): void;
     destroy(): void;
 }
+interface EditorCommandContext {
+    editor: EditorInstance;
+    command: EditorCommand;
+    value?: string;
+}
+type EditorCommandHandler = (context: EditorCommandContext) => void;
+type EditorHookName = 'beforeInput' | 'afterInput' | 'beforeCommand' | 'afterCommand' | 'beforePaste' | 'afterPaste' | 'beforePreview' | 'afterPreview' | 'validate' | 'autosave' | 'uploadImage';
+interface EditorHookContext {
+    editor: EditorInstance;
+    value: string;
+    command?: EditorCommand;
+    file?: File;
+}
+type EditorHookHandler = (context: EditorHookContext) => void | string | Promise<void | string>;
+declare function registerEditorCommand(name: EditorCommand | string, handler: EditorCommandHandler): void;
+declare function unregisterEditorCommand(name: EditorCommand | string): void;
+declare function registerEditorHook(name: EditorHookName, handler: EditorHookHandler): () => void;
 declare function escapeHtml(value: unknown): string;
 declare function markdownToHtml(markdown: string): string;
 declare function htmlToMarkdown(html: string): string;
 declare function cleanEditorHtml(html: string): string;
+declare function validateEditor(editor: EditorInstance): string[];
+declare function queryEditorCommand(editor: EditorInstance, command: EditorCommand | string): boolean;
+declare function runEditorCommand(editor: EditorInstance, command: EditorCommand, value?: string): void;
 declare function formatEditor(editor: EditorInstance, command: EditorCommand, value?: string): void;
 declare function createEditor(el: HTMLElement, options?: EditorOptions): EditorInstance;
 declare function initEditor(el: HTMLElement, options?: EditorOptions): EditorInstance;
@@ -1603,4 +1672,4 @@ interface BatoiUIFApp {
 declare function start(root?: Document | HTMLElement): BatoiUIFApp;
 declare function autoStart(root?: Document | HTMLElement): void;
 
-export { type ActionContext, type ActionHandler, type AnimationStep, type ArtifactStoreOptions, type BatoiUIFApp, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type ConnectorMode, type ConnectorType, type DashboardConfig, type DashboardFilter, type DashboardFilterOperator, type DashboardRenderOptions, type DashboardWidget, type DashboardWidgetType, type DataConnector, type DesktopAiMode, type DesktopAppManifest, type DesktopCapability, type DesktopNavigationItem, type DesktopOfflineMode, type DesktopPlatform, type DesktopSettingsStore, type DesktopShellOptions, type DesktopShellStatus, type DesktopSyncQueueItem, type DesktopSyncState, type DesktopSyncStatus, type DesktopValidationResult, type DesktopWorkspaceMode, type DesktopWorkspaceSession, type DrilldownOptions, type EditorCommand, type EditorInstance, type EditorMode, type EditorOptions, type EditorPreviewMode, type EffectOptions, type ExtensionManifestOptions, type ExtensionMessage, type ExtensionSurface, type FormErrors, type HTMLSwapMode, type HistogramBin, type HistogramOptions, type IconDefinition, type IconName, type IconOptions, type IconRegistry, type LocalStore, type LocalStoreOptions, type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type MicroAppStoreOptions, type MountIconsOptions, type NotificationItem, type OverlayOptions, type ParsedAction, type PresenceUser, type QueryHandler, type QueryInput, type RadResponse, type RealtimeBindingOptions, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RequestOptions, type RouterOptions, type StoreOptions, type SummaryStats, type SwapMode, type SyncQueue, type SyncQueueItem, type TableAdapterOptions, type TableOptions, type TrustedHTMLRenderOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFValue, accordion, adaptRecords, adaptTable, addNotification, aiAction, alert, animate, appendStreamingChunk, appendTextElement, applyDashboardFilters, applyPermissionNavigation, applyResponsiveColumns, autoInit, autoStart, badge, bindActions, bindChartExports, bindConnector, bindDesktopOfflineIndicator, bindDesktopSettings, bindRadActions, bindRealtime, breadcrumb, button, cacheStrategies, canUseDesktopAction, cancelRequest, card, chart, cleanEditorHtml, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, connect, correlation, createAdvancedStore, createArtifactStore, createCacheStrategy, createDashboardConfig, createDesktopManifest, createDesktopShell, createDesktopSyncStatus, createEditor, createExtensionManifest, createExtensionMessage, createLocalSettingsStore, createLocalStore, createMemorySettingsStore, createMicroAppStore, createStore, createStreamSurface, createSyncQueue, createWorkspaceSession, csvToObjects, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, detectDesktopPlatform, disconnect, dispatchAction, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, escapeHtml, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, formatEditor, fragment, get, getConnectionState, getEditorValue, getNotifications, getOverlayStack, getPresence, getPushSubscription, hasDesktopCapability, hasIcon, hide, histogramBins, htmlToMarkdown, icon, iconElement, icons, init, initAll, initAnimation, initAnimationTriggers, initChart, initComponent, initDashboard, initDeclarativeFilters, initDesktopShell, initEditor, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, isExtensionRuntime, isInitialized, linearRegression, loadConnector, loadPartial, loadRemoteTable, markNotificationsRead, markdownToHtml, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, observeMotion, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseActionSpec, parseCSV, parseChartData, parseDesktopManifestElement, parseMicroAppManifest, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queueOfflineTask, ready, realtime, refreshChart, registerAction, registerAsyncRule, registerComponent, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, rehydrate, removePresence, renderAIAction, renderAIResultCard, renderAssistantResponse, renderChart, renderDashboard, renderDashboardWidget, renderDesktopShell, renderDesktopSyncStatus, renderDiff, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolTimeline, renderWorkspaceIdentity, request, requestNotificationPermission, resolveActionTarget, resolveTarget, selectedRows, sequence, serialize, setAccent, setDensity, setDesktopStatus, setEditorValue, setTableState, setText, setTrustedHTML, setupInstallPrompt, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, stagger, start, stepper, submitForm, subscribe, subscribeToPush, summarizeDashboard, summarizeDesktopQueue, summaryStats, swapContent, swapTrustedHTML, table, tabs, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterAction, unregisterServiceWorker, unsubscribeFromPush, updatePresence, upload, useRequestInterceptor, useResponseInterceptor, validateDesktopManifest, validateField, validateForm, validateFormAsync, validateMicroAppManifest, wizard, zScores };
+export { type ActionContext, type ActionDiagnostic, type ActionHandler, type AnimationPreset, type AnimationStep, type ArtifactStoreOptions, type BatoiUIFApp, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type ConnectorMode, type ConnectorType, type DashboardConfig, type DashboardFilter, type DashboardFilterOperator, type DashboardRenderOptions, type DashboardWidget, type DashboardWidgetType, type DataConnector, type DesktopAiMode, type DesktopAppManifest, type DesktopCapability, type DesktopNavigationItem, type DesktopOfflineMode, type DesktopPlatform, type DesktopSettingsStore, type DesktopShellOptions, type DesktopShellStatus, type DesktopSyncQueueItem, type DesktopSyncState, type DesktopSyncStatus, type DesktopValidationResult, type DesktopWorkspaceMode, type DesktopWorkspaceSession, type DrilldownOptions, type EditorCommand, type EditorCommandContext, type EditorCommandHandler, type EditorHookContext, type EditorHookHandler, type EditorHookName, type EditorInstance, type EditorLayout, type EditorMode, type EditorOptions, type EditorPreviewMode, type EffectOptions, type ExtensionManifestOptions, type ExtensionMessage, type ExtensionSurface, type FormErrors, type HTMLSwapMode, type HistogramBin, type HistogramOptions, type IconDefinition, type IconName, type IconOptions, type IconRegistry, type LocalStore, type LocalStoreOptions, type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type MicroAppStoreOptions, type MountIconsOptions, type NotificationItem, type OverlayOptions, type ParsedAction, type PresenceUser, type QueryHandler, type QueryInput, type RadResponse, type RealtimeBindingOptions, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RequestOptions, type RouterOptions, type StoreOptions, type SummaryStats, type SwapMode, type SyncQueue, type SyncQueueItem, type TableAdapterOptions, type TableOptions, type TrustedHTMLRenderOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFValue, accordion, adaptRecords, adaptTable, addNotification, aiAction, alert, animate, animateGroup, animationPresets, appendStreamingChunk, appendTextElement, applyDashboardFilters, applyPermissionNavigation, applyResponsiveColumns, autoInit, autoStart, badge, bindActions, bindChartExports, bindConnector, bindDesktopOfflineIndicator, bindDesktopSettings, bindRadActions, bindRealtime, breadcrumb, button, cacheStrategies, canUseDesktopAction, cancelAnimation, cancelRequest, card, chart, cleanEditorHtml, clearActionDiagnostics, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, connect, correlation, createAdvancedStore, createArtifactStore, createCacheStrategy, createDashboardConfig, createDesktopManifest, createDesktopShell, createDesktopSyncStatus, createEditor, createExtensionManifest, createExtensionMessage, createLocalSettingsStore, createLocalStore, createMemorySettingsStore, createMicroAppStore, createStore, createStreamSurface, createSyncQueue, createWorkspaceSession, csvToObjects, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, detectDesktopPlatform, disconnect, dispatchAction, dispatchActions, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, escapeHtml, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, formatEditor, fragment, get, getActionDiagnostics, getConnectionState, getEditorValue, getNotifications, getOverlayStack, getPresence, getPushSubscription, hasDesktopCapability, hasIcon, hide, histogramBins, htmlToMarkdown, icon, iconElement, icons, init, initAll, initAnimation, initAnimationTriggers, initChart, initComponent, initDashboard, initDeclarativeFilters, initDesktopShell, initEditor, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, isExtensionRuntime, isInitialized, linearRegression, loadConnector, loadPartial, loadRemoteTable, markNotificationsRead, markdownToHtml, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, observeMotion, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseActionSpec, parseCSV, parseChartData, parseDesktopManifestElement, parseMicroAppManifest, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queryEditorCommand, queueOfflineTask, ready, realtime, refreshChart, registerAction, registerAsyncRule, registerComponent, registerEditorCommand, registerEditorHook, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, rehydrate, removePresence, renderAIAction, renderAIResultCard, renderAssistantResponse, renderChart, renderDashboard, renderDashboardWidget, renderDesktopShell, renderDesktopSyncStatus, renderDiff, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolTimeline, renderWorkspaceIdentity, request, requestNotificationPermission, resolveActionTarget, resolveTarget, runEditorCommand, selectedRows, sequence, serialize, setAccent, setDensity, setDesktopStatus, setEditorValue, setTableState, setText, setTrustedHTML, setupInstallPrompt, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, stagger, start, stepper, submitForm, subscribe, subscribeToPush, summarizeDashboard, summarizeDesktopQueue, summaryStats, swapContent, swapTrustedHTML, table, tabs, timeline, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterAction, unregisterEditorCommand, unregisterServiceWorker, unsubscribeFromPush, updatePresence, upload, useRequestInterceptor, useResponseInterceptor, validateDesktopManifest, validateEditor, validateField, validateForm, validateFormAsync, validateMicroAppManifest, wizard, zScores };

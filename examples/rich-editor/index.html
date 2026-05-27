@@ -3,16 +3,18 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Batoi UIF Rich Editor</title>
+    <title>Batoi UIF Rich Editor Builder</title>
     <link rel="stylesheet" href="../../dist/uif.css">
     <link rel="stylesheet" href="../shared/example.css">
-    <style>.editor-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(18rem,.36fr);gap:1rem}.code-box{overflow:auto;max-height:22rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}@media(max-width:64rem){.editor-grid{grid-template-columns:1fr}}</style>
+    <style>
+      .builder-grid{display:grid;grid-template-columns:minmax(18rem,.32fr) minmax(0,1fr);gap:1rem}.builder-panel{display:grid;gap:1rem;align-content:start}.builder-control{display:grid;gap:.4rem}.builder-control span{font-size:.78rem;font-weight:800;color:#667085}.builder-checks{display:grid;gap:.55rem}.builder-checks label{display:flex;align-items:center;gap:.5rem;font-weight:700;color:#344054}.builder-preview{display:grid;gap:1rem}.builder-output{display:grid;gap:.75rem}.builder-card{border:1px solid #dfe3e8;border-radius:.75rem;background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.05);overflow:hidden}.builder-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1rem;border-bottom:1px solid #eef1f4}.builder-card-head h2,.builder-card-head p{margin:0}.builder-card-head p{margin-top:.18rem;color:#667085;font-size:.86rem}.builder-card-body{padding:1rem}.code-box{overflow:auto;max-height:24rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}.status-strip{display:flex;flex-wrap:wrap;gap:.5rem}.status-strip span{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .55rem;border-radius:999px;background:#edf7ff;color:#0b72bd;font-size:.78rem;font-weight:800}@media(max-width:64rem){.builder-grid{grid-template-columns:1fr}}
+    </style>
   </head>
   <body class="example-page">
     <main class="example-shell">
       <div class="example-frame">
         <header class="example-topbar">
-          <a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Rich HTML editor</span></span></a>
+          <a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Rich editor builder</span></span></a>
           <nav class="example-actions" aria-label="Feature examples">
             <a class="example-pill" href="../"><span data-uif-icon="home"></span>All examples</a>
             <a class="example-pill is-primary" href="../rich-editor/"><span data-uif-icon="edit"></span>Rich editor</a>
@@ -22,21 +24,91 @@
           </nav>
         </header>
         <section class="example-hero">
-          <div><div class="example-eyebrow">Editor · HTML · form-compatible</div><h1>Rich text editing without a third-party editor runtime.</h1><p>A dependency-free contenteditable editor for common RAD content fields. Server-side sanitization is still required before trusted rendering.</p></div>
+          <div><div class="example-eyebrow">HTML editor · source view · form sync</div><h1>Configure a dependency-free rich text field.</h1><p>Rich mode is the default. Use the Source icon only when you need to inspect or edit HTML, then toggle back to the rich surface.</p></div>
           <button class="uif-btn" data-uif-event="click" data-uif-action="copy" data-uif-target="#rich-code"><span data-uif-icon="copy"></span>Copy markup</button>
         </section>
-        <section class="editor-grid">
-          <form class="uif-card" data-uif="form" data-uif-validate="false">
-            <label class="uif-field"><span class="uif-field-label">Article body</span><textarea name="body" data-uif="editor" data-uif-mode="html" data-uif-preview="manual" data-uif-toolbar="bold italic underline heading quote code ul ol link clear preview"><h2>Release notes</h2><p><strong>Batoi UIF</strong> now supports first-party rich text editing.</p></textarea></label>
-          </form>
-          <aside class="uif-card uif-card-flush"><div class="uif-card-head"><div><h2>Copyable usage</h2><p>Original textarea remains synchronized for normal form posts.</p></div></div><div class="uif-card-body"><pre class="code-box"><code id="rich-code">&lt;textarea name="body" data-uif="editor" data-uif-mode="html" data-uif-preview="manual"&gt;&lt;/textarea&gt;</code></pre></div></aside>
+        <section class="builder-grid">
+          <aside class="builder-card builder-panel">
+            <div class="builder-card-head"><div><h2>Options</h2><p>Change the editor contract and generated markup.</p></div></div>
+            <div class="builder-card-body builder-panel">
+              <label class="builder-control"><span>Height</span><select class="uif-input" id="editor-height"><option value="14rem">Compact</option><option value="18rem" selected>Standard</option><option value="24rem">Long form</option></select></label>
+              <div class="builder-control"><span>Toolbar groups</span><div class="builder-checks" id="toolbar-options">
+                <label><input type="checkbox" value="history" checked> History</label>
+                <label><input type="checkbox" value="inline" checked> Inline text</label>
+                <label><input type="checkbox" value="block" checked> Blocks</label>
+                <label><input type="checkbox" value="list" checked> Lists</label>
+                <label><input type="checkbox" value="insert" checked> Inserts</label>
+                <label><input type="checkbox" value="view" checked> Source toggle</label>
+              </div></div>
+              <label class="builder-control"><span>Status bar</span><select class="uif-input" id="status-mode"><option value="true">Show word and dirty state</option><option value="false">Hide status</option></select></label>
+              <label class="builder-control"><span>Validation</span><select class="uif-input" id="required-mode"><option value="true">Required field</option><option value="false">Optional field</option></select></label>
+              <label class="builder-control"><span>Autosave contract</span><select class="uif-input" id="autosave-mode"><option value="false">Off</option><option value="true">Emit autosave hook</option></select></label>
+            </div>
+          </aside>
+          <div class="builder-preview">
+            <form class="builder-card" data-uif="form" data-uif-validate="false">
+              <div class="builder-card-head"><div><h2>Live editor</h2><p>Original textarea remains the submitted form field.</p></div><div class="status-strip"><span>HTML</span><span>Safe cleanup</span><span>No runtime dependency</span></div></div>
+              <div class="builder-card-body" id="editor-host"></div>
+            </form>
+            <div class="builder-card builder-output">
+              <div class="builder-card-head"><div><h2>Generated code</h2><p>Paste this into a RAD form or server-rendered page.</p></div><button class="uif-btn uif-btn-secondary" data-uif-event="click" data-uif-action="copy" data-uif-target="#rich-code"><span data-uif-icon="copy"></span>Copy</button></div>
+              <div class="builder-card-body"><pre class="code-box"><code id="rich-code"></code></pre></div>
+            </div>
+          </div>
         </section>
       </div>
     </main>
     <script type="module">
-      import { autoStart, mountIcons } from '../../dist/uif.esm.js';
+      import { autoStart, createEditor, mountIcons } from '../../dist/uif.esm.js';
       autoStart();
       mountIcons(document);
+
+      const groups = {
+        history: ['undo', 'redo'],
+        inline: ['bold', 'italic', 'underline', 'strike', 'code'],
+        block: ['paragraph', 'heading', 'quote'],
+        list: ['ul', 'ol', 'task'],
+        insert: ['link', 'image', 'table', 'hr'],
+        view: ['source']
+      };
+      const host = document.querySelector('#editor-host');
+      const code = document.querySelector('#rich-code');
+      const controls = document.querySelectorAll('#editor-height,#status-mode,#required-mode,#autosave-mode,#toolbar-options input');
+      let editor;
+
+      function selectedToolbar() {
+        return [...document.querySelectorAll('#toolbar-options input:checked')].flatMap((input) => groups[input.value]);
+      }
+
+      function markup() {
+        const toolbar = selectedToolbar().join(' ');
+        return `<textarea
+  name="body"
+  data-uif="editor"
+  data-uif-mode="html"
+  data-uif-preview="none"
+  data-uif-editor-height="${document.querySelector('#editor-height').value}"
+  data-uif-editor-status="${document.querySelector('#status-mode').value}"
+  data-uif-required="${document.querySelector('#required-mode').value}"
+  data-uif-autosave="${document.querySelector('#autosave-mode').value}"
+  data-uif-autosave-delay="1200"
+  data-uif-toolbar="${toolbar}">
+<h2>Release notes</h2>
+<p><strong>Batoi UIF</strong> supports rich HTML editing, source view, and form sync.</p>
+</textarea>`;
+      }
+
+      function render() {
+        if (editor) editor.destroy();
+        host.innerHTML = markup();
+        const textarea = host.querySelector('textarea');
+        editor = createEditor(textarea);
+        code.textContent = markup();
+        mountIcons(document);
+      }
+
+      controls.forEach((control) => control.addEventListener('change', render));
+      render();
     </script>
   </body>
 </html>

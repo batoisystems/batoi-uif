@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { animate, hide, initAnimationTriggers, observeMotion, show, toggle } from './index.js';
+import { animate, animationPresets, cancelAnimation, hide, initAnimationTriggers, observeMotion, show, toggle } from './index.js';
 
 describe('effects', () => {
   it('shows, hides, and toggles with reduced motion', async () => {
@@ -23,5 +23,15 @@ describe('effects', () => {
     initAnimationTriggers(document);
     observeMotion(document.documentElement);
     expect(document.documentElement.dataset.uifMotion).toBe('safe');
+  });
+
+  it('exposes preset metadata and supports cancellation', async () => {
+    expect(animationPresets.some((preset) => preset.name === 'highlight')).toBe(true);
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false })));
+    const el = document.createElement('div');
+    const pending = animate(el, 'pulse', { duration: 20, repeat: 2 });
+    cancelAnimation(el);
+    await pending;
+    expect(el.classList.contains('uif-is-animating')).toBe(false);
   });
 });

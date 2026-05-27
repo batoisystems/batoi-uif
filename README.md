@@ -159,7 +159,7 @@ Planned application capability packages:
 
 Supported core chart types include `line`, `area`, `bar`, `horizontal-bar`, `grouped-bar`, `stacked-bar`, `pie`, `donut`, `doughnut`, `radar`, and `sparkline`. Compact app charts include `metric`, `progress`, `ring`, `gauge`, `timeline`, `heatmap`, and `bullet`. Statistical visualizations include `histogram`, `box-plot`, `scatter`, `regression`, `control-chart`, `distribution`, and `pareto`, backed by dependency-free helpers such as `summaryStats()`, `histogramBins()`, `movingAverage()`, `linearRegression()`, and `correlation()`.
 
-Open `examples/index.html` for a landing page that links to every bundled example. See `examples/component-gallery/` for live component examples with copy-ready markup, including professional app patterns such as button matrices, toolbars, form sections, skeletons, metric rows, hero banners, summaries, inspectors, stat cards, empty states, filter builders, command palettes, notification panels, and native picker wrappers. See `examples/chart-gallery/` for one declarative example of every supported chart type. See `examples/professional-showcase/` for a richer product-grade app surface with a fixed shell, KPI dashboard, CRM pipeline, governed AI approval desk, mobile field console, RAD admin table, and statistical analytics using the same lean JS/CSS library.
+Open `examples/index.html` for a landing page that links to every bundled example. See `examples/component-gallery/` for live component examples with copy-ready markup, including professional app patterns such as button matrices, toolbars, form sections, skeletons, metric rows, hero banners, summaries, inspectors, stat cards, empty states, filter builders, command palettes, notification panels, and native picker wrappers. See `examples/chart-gallery/` for one declarative example of every supported chart type. See `examples/rich-editor/`, `examples/markdown-editor/`, `examples/animation-gallery/`, and `examples/event-actions/` for builder-style examples where users can tune options, preview behavior, and copy generated code. See `examples/professional-showcase/` for a richer product-grade app surface with a fixed shell, KPI dashboard, CRM pipeline, governed AI approval desk, mobile field console, RAD admin table, and statistical analytics using the same lean JS/CSS library.
 
 Reference docs:
 
@@ -192,7 +192,11 @@ See `examples/micro-app-dashboard/` for a copy-ready static Micro App with local
   name="body"
   data-uif="editor"
   data-uif-mode="html"
-  data-uif-toolbar="bold italic heading quote code ul ol link preview">
+  data-uif-toolbar="undo redo bold italic strike heading quote code ul ol task link image table preview source"
+  data-uif-editor-status="true"
+  data-uif-required="true"
+  data-uif-autosave="true"
+  data-uif-autosave-delay="1200">
   <h2>Draft</h2><p>Edit rich text.</p>
 </textarea>
 ```
@@ -205,7 +209,7 @@ See `examples/micro-app-dashboard/` for a copy-ready static Micro App with local
 </textarea>
 ```
 
-The editor package is dependency-free and keeps the original form field synchronized. Markdown preview escapes raw HTML by default. Treat browser-side cleanup as convenience only; sanitize and authorize HTML on the server before trusted rendering or storage.
+The editor package is dependency-free and keeps the original form field synchronized. Markdown preview escapes raw HTML by default and supports a practical subset including tables, task lists, images, links, strikethrough, code blocks, and blockquotes. Editor hooks such as `registerEditorHook("autosave", handler)`, `registerEditorHook("validate", handler)`, and `registerEditorHook("uploadImage", handler)` provide integration points without shipping upload or storage authority to the browser. Treat browser-side cleanup as convenience only; sanitize and authorize HTML on the server before trusted rendering or storage.
 
 ### Declarative animation and event actions
 
@@ -232,6 +236,21 @@ The editor package is dependency-free and keeps the original form field synchron
 ```
 
 Event actions use registered action names only. Batoi UIF does not evaluate inline JavaScript from attributes.
+
+Action chains can express multi-step interactions without inline scripts:
+
+```html
+<button
+  data-uif-event="click.prevent"
+  data-uif-confirm="Toggle this panel?"
+  data-uif-if="#panel"
+  data-uif-actions='[
+    {"action":"toggle-class","target":"#panel","class":"is-expanded"},
+    {"action":"animate","target":"#panel","value":"highlight"}
+  ]'>
+  Toggle and highlight
+</button>
+```
 
 ### Dependency-free SVG icon
 

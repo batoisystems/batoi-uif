@@ -3,38 +3,111 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Batoi UIF Event Actions</title>
+    <title>Batoi UIF Event Action Builder</title>
     <link rel="stylesheet" href="../../dist/uif.css">
     <link rel="stylesheet" href="../shared/example.css">
-    <style>.event-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(18rem,.36fr);gap:1rem}.is-highlighted{box-shadow:0 0 0 .25rem color-mix(in srgb,var(--uif-accent),transparent 72%)}.code-box{overflow:auto;max-height:22rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}@media(max-width:64rem){.event-grid{grid-template-columns:1fr}}</style>
+    <style>
+      .builder-grid{display:grid;grid-template-columns:minmax(18rem,.32fr) minmax(0,1fr);gap:1rem}.builder-card{border:1px solid #dfe3e8;border-radius:.75rem;background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.05);overflow:hidden}.builder-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1rem;border-bottom:1px solid #eef1f4}.builder-card-head h2,.builder-card-head p{margin:0}.builder-card-head p{margin-top:.18rem;color:#667085;font-size:.86rem}.builder-card-body{padding:1rem}.builder-panel{display:grid;gap:1rem;align-content:start}.builder-control{display:grid;gap:.4rem}.builder-control span{font-size:.78rem;font-weight:800;color:#667085}.recipe-list{display:grid;gap:.6rem}.recipe-list button{display:flex;justify-content:space-between;gap:1rem;width:100%;padding:.75rem;border:1px solid #dfe3e8;border-radius:.65rem;background:#fbfcfd;text-align:left;cursor:pointer}.recipe-list button[aria-pressed="true"]{border-color:#0b72bd;background:#e7f1fb;color:#0b72bd}.target-panel{padding:1rem;border:1px solid #dfe3e8;border-radius:.75rem;background:#fbfcfd}.target-panel.is-open,.target-panel[data-uif-state="active"]{background:#e7f1fb;border-color:#0b72bd}.code-box{overflow:auto;max-height:24rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}.action-row{display:flex;flex-wrap:wrap;gap:.5rem}.status-line{min-height:1.5rem;color:#667085;font-weight:700}@media(max-width:64rem){.builder-grid{grid-template-columns:1fr}}
+    </style>
   </head>
   <body class="example-page">
     <main class="example-shell">
       <div class="example-frame">
-        <header class="example-topbar"><a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Event actions</span></span></a><nav class="example-actions" aria-label="Feature examples">
+        <header class="example-topbar"><a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Event action builder</span></span></a><nav class="example-actions" aria-label="Feature examples">
             <a class="example-pill" href="../"><span data-uif-icon="home"></span>All examples</a>
             <a class="example-pill" href="../rich-editor/"><span data-uif-icon="edit"></span>Rich editor</a>
             <a class="example-pill" href="../markdown-editor/"><span data-uif-icon="document"></span>Markdown</a>
             <a class="example-pill" href="../animation-gallery/"><span data-uif-icon="spark"></span>Animations</a>
             <a class="example-pill is-primary" href="../event-actions/"><span data-uif-icon="code"></span>Event actions</a>
           </nav></header>
-        <section class="example-hero"><div><div class="example-eyebrow">Events · actions · no inline JS</div><h1>Declarative interactivity without arbitrary JavaScript execution.</h1><p>Map events to registered actions such as toggle-class, copy, focus, scroll-to, and animate.</p></div></section>
-        <section class="event-grid">
-          <div class="uif-card" id="target-card"><h2>Interactive target</h2><p id="copy-text">This text can be copied using a registered safe action.</p><input class="uif-input uif-mt-3" id="focus-field" placeholder="Focus target"></div>
-          <aside class="uif-card uif-card-flush"><div class="uif-card-head"><div><h2>Actions</h2><p>These buttons use data attributes, not inline scripts.</p></div></div><div class="uif-card-body uif-stack">
-            <button class="uif-btn" data-uif-event="click" data-uif-action="toggle-class" data-uif-target="#target-card" data-uif-class="is-highlighted">Toggle class</button>
-            <button class="uif-btn" data-uif-event="click" data-uif-action="copy" data-uif-target="#copy-text">Copy text</button>
-            <button class="uif-btn" data-uif-event="click" data-uif-action="focus" data-uif-target="#focus-field">Focus input</button>
-            <button class="uif-btn" data-uif-event="click" data-uif-action="animate" data-uif-target="#target-card" data-uif-animation="highlight">Highlight</button>
-          </div></aside>
+        <section class="example-hero"><div><div class="example-eyebrow">Declarative actions · no inline JS</div><h1>Build jQuery-style interactions with safe data attributes.</h1><p>Pick a recipe, tune event modifiers and targets, then copy the generated declarative markup or JSON action chain.</p></div><button class="uif-btn" data-uif-event="click" data-uif-action="copy" data-uif-target="#event-code"><span data-uif-icon="copy"></span>Copy code</button></section>
+        <section class="builder-grid">
+          <aside class="builder-card builder-panel">
+            <div class="builder-card-head"><div><h2>Recipe</h2><p>Common interactions without inline JavaScript.</p></div></div>
+            <div class="builder-card-body builder-panel">
+              <div class="recipe-list" id="recipes"></div>
+              <label class="builder-control"><span>Event</span><select class="uif-input" id="event-name"><option value="click.prevent">click.prevent</option><option value="keydown.enter.prevent">keydown.enter.prevent</option><option value="click.prevent.once">click.once</option><option value="click.prevent.debounce:300">click.debounce:300</option></select></label>
+              <label class="builder-control"><span>Target</span><input class="uif-input" id="target-selector" value="#demo-panel"></label>
+            </div>
+          </aside>
+          <div class="builder-panel">
+            <div class="builder-card">
+              <div class="builder-card-head"><div><h2>Live playground</h2><p>Generated buttons are rebound using UIF action binding.</p></div><span class="uif-badge uif-badge-info">registered actions only</span></div>
+              <div class="builder-card-body builder-panel">
+                <div class="target-panel" id="demo-panel"><strong id="copy-text">Customer risk panel</strong><p>Use actions to toggle state, copy text, focus fields, update text, and run animations.</p><input class="uif-input" id="focus-target" placeholder="Focusable target"></div>
+                <div class="action-row" id="button-host"></div>
+                <div class="status-line" id="status-target">Choose a recipe and run it.</div>
+              </div>
+            </div>
+            <div class="builder-card">
+              <div class="builder-card-head"><div><h2>Generated code</h2><p>Use either compact attributes or `data-uif-actions` for chains.</p></div><button class="uif-btn uif-btn-secondary" data-uif-event="click" data-uif-action="copy" data-uif-target="#event-code"><span data-uif-icon="copy"></span>Copy</button></div>
+              <div class="builder-card-body"><pre class="code-box"><code id="event-code"></code></pre></div>
+            </div>
+          </div>
         </section>
-        <pre class="code-box uif-mt-4"><code>&lt;button data-uif-event="click" data-uif-action="toggle-class" data-uif-target="#panel" data-uif-class="is-open"&gt;Toggle&lt;/button&gt;</code></pre>
       </div>
     </main>
     <script type="module">
-      import { autoStart, mountIcons } from '../../dist/uif.esm.js';
+      import { autoStart, bindActions, mountIcons } from '../../dist/uif.esm.js';
       autoStart();
       mountIcons(document);
+
+      const recipes = [
+        { id: 'toggle', title: 'Toggle panel', action: 'toggle-class', extra: 'data-uif-class="is-open"', label: 'Toggle open' },
+        { id: 'copy', title: 'Copy text', action: 'copy', target: '#copy-text', label: 'Copy title' },
+        { id: 'focus', title: 'Focus input', action: 'focus', target: '#focus-target', label: 'Focus field' },
+        { id: 'animate', title: 'Animate', action: 'animate', extra: 'data-uif-animation="highlight"', label: 'Highlight' },
+        { id: 'chain', title: 'Action chain', chain: [
+          { action: 'toggle-class', target: '#demo-panel', class: 'is-open' },
+          { action: 'set-text', target: '#status-target', value: 'Action chain completed.' },
+          { action: 'animate', target: '#demo-panel', value: 'highlight' }
+        ], label: 'Run chain' }
+      ];
+      let current = recipes[0];
+      let dispose;
+
+      function renderRecipes() {
+        document.querySelector('#recipes').innerHTML = recipes.map((recipe) => `<button type="button" data-id="${recipe.id}" aria-pressed="${recipe.id === current.id}"><strong>${recipe.title}</strong><span>${recipe.chain ? 'chain' : recipe.action}</span></button>`).join('');
+      }
+
+      function codeFor(recipe) {
+        const eventName = document.querySelector('#event-name').value;
+        const target = recipe.target || document.querySelector('#target-selector').value;
+        if (recipe.chain) {
+          return `<button
+  data-uif-event="${eventName}"
+  data-uif-actions='${JSON.stringify(recipe.chain)}'>
+  ${recipe.label}
+</button>`;
+        }
+        return `<button
+  data-uif-event="${eventName}"
+  data-uif-action="${recipe.action}"
+  data-uif-target="${target}"
+  ${recipe.extra || ''}>
+  ${recipe.label}
+</button>`;
+      }
+
+      function renderButton() {
+        if (dispose) dispose();
+        const html = codeFor(current);
+        document.querySelector('#button-host').innerHTML = html.replace('<button', '<button class="uif-btn"');
+        document.querySelector('#event-code').textContent = html;
+        dispose = bindActions(document.querySelector('#button-host'));
+        mountIcons(document);
+      }
+
+      document.querySelector('#recipes').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-id]');
+        if (!button) return;
+        current = recipes.find((recipe) => recipe.id === button.dataset.id);
+        renderRecipes();
+        renderButton();
+      });
+      document.querySelectorAll('#event-name,#target-selector').forEach((control) => control.addEventListener('input', renderButton));
+      renderRecipes();
+      renderButton();
     </script>
   </body>
 </html>

@@ -3,16 +3,18 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Batoi UIF Markdown Editor</title>
+    <title>Batoi UIF Markdown Editor Builder</title>
     <link rel="stylesheet" href="../../dist/uif.css">
     <link rel="stylesheet" href="../shared/example.css">
-    <style>.editor-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(18rem,.36fr);gap:1rem}.code-box{overflow:auto;max-height:22rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}@media(max-width:64rem){.editor-grid{grid-template-columns:1fr}}</style>
+    <style>
+      .builder-grid{display:grid;grid-template-columns:minmax(18rem,.32fr) minmax(0,1fr);gap:1rem}.builder-card{border:1px solid #dfe3e8;border-radius:.75rem;background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.05);overflow:hidden}.builder-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1rem;border-bottom:1px solid #eef1f4}.builder-card-head h2,.builder-card-head p{margin:0}.builder-card-head p{margin-top:.18rem;color:#667085;font-size:.86rem}.builder-card-body{padding:1rem}.builder-panel{display:grid;gap:1rem;align-content:start}.builder-control{display:grid;gap:.4rem}.builder-control span{font-size:.78rem;font-weight:800;color:#667085}.code-box{overflow:auto;max-height:24rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}.feature-list{display:grid;gap:.55rem}.feature-list label{display:flex;align-items:center;gap:.5rem;font-weight:700;color:#344054}.markdown-preview-box{min-height:10rem;padding:1rem;border:1px dashed #cfd6df;border-radius:.65rem;background:#fbfcfd}@media(max-width:64rem){.builder-grid{grid-template-columns:1fr}}
+    </style>
   </head>
   <body class="example-page">
     <main class="example-shell">
       <div class="example-frame">
         <header class="example-topbar">
-          <a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Markdown editor</span></span></a>
+          <a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Markdown builder</span></span></a>
           <nav class="example-actions" aria-label="Feature examples">
             <a class="example-pill" href="../"><span data-uif-icon="home"></span>All examples</a>
             <a class="example-pill" href="../rich-editor/"><span data-uif-icon="edit"></span>Rich editor</a>
@@ -22,27 +24,96 @@
           </nav>
         </header>
         <section class="example-hero">
-          <div><div class="example-eyebrow">Editor · Markdown · escaped preview</div><h1>Markdown editing with live preview and no parser dependency.</h1><p>The v1 helper supports a practical Markdown subset and escapes raw HTML by default.</p></div>
+          <div><div class="example-eyebrow">Markdown · source toggle · escaped HTML</div><h1>Build a Markdown field for docs, notes, and policies.</h1><p>Edit Markdown source by default. Use the Source icon to toggle between raw Markdown and rendered output, then copy markup or generated HTML.</p></div>
           <button class="uif-btn" data-uif-event="click" data-uif-action="copy" data-uif-target="#markdown-code"><span data-uif-icon="copy"></span>Copy markup</button>
         </section>
-        <section class="editor-grid">
-          <form class="uif-card" data-uif="form" data-uif-validate="false">
-            <label class="uif-field"><span class="uif-field-label">Release note</span><textarea name="notes" data-uif="editor" data-uif-mode="markdown" data-uif-preview="live" data-uif-toolbar="bold italic heading quote code ul ol link preview"># Markdown draft
-
-**Batoi UIF** renders a safe preview.
-
-- Dependency-free
-- Form-compatible
-- Server sanitation still required before trusted render</textarea></label>
-          </form>
-          <aside class="uif-card uif-card-flush"><div class="uif-card-head"><div><h2>Copyable usage</h2><p>Use a textarea with <code>data-uif-mode="markdown"</code>.</p></div></div><div class="uif-card-body"><pre class="code-box"><code id="markdown-code">&lt;textarea name="notes" data-uif="editor" data-uif-mode="markdown" data-uif-preview="live"&gt;&lt;/textarea&gt;</code></pre></div></aside>
+        <section class="builder-grid">
+          <aside class="builder-card builder-panel">
+            <div class="builder-card-head"><div><h2>Options</h2><p>Configure the Markdown editing surface.</p></div></div>
+            <div class="builder-card-body builder-panel">
+              <label class="builder-control"><span>Mode switch</span><select class="uif-input" disabled><option>Source icon toggles rendered view</option></select></label>
+              <label class="builder-control"><span>Height</span><select class="uif-input" id="height"><option value="14rem">Compact</option><option value="18rem" selected>Standard</option><option value="24rem">Long form</option></select></label>
+              <div class="builder-control"><span>Enabled examples</span><div class="feature-list">
+                <label><input type="checkbox" checked disabled> Tables</label>
+                <label><input type="checkbox" checked disabled> Task lists</label>
+                <label><input type="checkbox" checked disabled> Images</label>
+                <label><input type="checkbox" checked disabled> Strikethrough</label>
+                <label><input type="checkbox" checked disabled> Safe links</label>
+              </div></div>
+            </div>
+          </aside>
+          <div class="builder-panel">
+            <div class="builder-card">
+              <div class="builder-card-head"><div><h2>Markdown editor</h2><p>Source is the editing view; rendered output is available from the Source toolbar toggle.</p></div></div>
+              <div class="builder-card-body" id="markdown-host"></div>
+            </div>
+            <div class="builder-card">
+              <div class="builder-card-head"><div><h2>Rendered HTML snapshot</h2><p>Use this to inspect what the browser-side preview generates.</p></div><button class="uif-btn uif-btn-secondary" data-uif-event="click" data-uif-action="copy" data-uif-target="#html-code"><span data-uif-icon="copy"></span>Copy HTML</button></div>
+              <div class="builder-card-body"><div class="markdown-preview-box" id="rendered-html"></div><pre class="code-box uif-mt-3"><code id="html-code"></code></pre></div>
+            </div>
+            <div class="builder-card">
+              <div class="builder-card-head"><div><h2>Generated markup</h2><p>Textarea remains form-compatible for normal posts.</p></div><button class="uif-btn uif-btn-secondary" data-uif-event="click" data-uif-action="copy" data-uif-target="#markdown-code"><span data-uif-icon="copy"></span>Copy</button></div>
+              <div class="builder-card-body"><pre class="code-box"><code id="markdown-code"></code></pre></div>
+            </div>
+          </div>
         </section>
       </div>
     </main>
     <script type="module">
-      import { autoStart, mountIcons } from '../../dist/uif.esm.js';
+      import { autoStart, createEditor, markdownToHtml, mountIcons } from '../../dist/uif.esm.js';
       autoStart();
       mountIcons(document);
+
+      const sample = `# Release brief
+
+**Batoi UIF** now supports practical Markdown editing.
+
+- [x] Safe preview
+- [ ] Server-side sanitization before trusted render
+
+| Area | Status |
+| --- | --- |
+| Editor | Ready |
+| Actions | In progress |
+
+Visit https://example.com for more.`;
+      const host = document.querySelector('#markdown-host');
+      const code = document.querySelector('#markdown-code');
+      const htmlCode = document.querySelector('#html-code');
+      const rendered = document.querySelector('#rendered-html');
+      let editor;
+
+      function markup() {
+        return `<textarea
+  name="notes"
+  data-uif="editor"
+  data-uif-mode="markdown"
+  data-uif-preview="manual"
+  data-uif-editor-layout="source"
+  data-uif-editor-height="${document.querySelector('#height').value}"
+  data-uif-toolbar="undo redo bold italic strike heading quote code ul ol task link image table hr source">
+${sample}
+</textarea>`;
+      }
+
+      function syncHtml() {
+        const html = markdownToHtml(editor.getValue());
+        rendered.innerHTML = html;
+        htmlCode.textContent = html;
+      }
+
+      function render() {
+        if (editor) editor.destroy();
+        host.innerHTML = markup();
+        editor = createEditor(host.querySelector('textarea'));
+        code.textContent = markup();
+        editor.surface.addEventListener('input', syncHtml);
+        syncHtml();
+        mountIcons(document);
+      }
+
+      document.querySelectorAll('#height').forEach((control) => control.addEventListener('change', render));
+      render();
     </script>
   </body>
 </html>

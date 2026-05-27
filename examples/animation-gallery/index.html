@@ -6,7 +6,9 @@
     <title>Batoi UIF Animation Gallery</title>
     <link rel="stylesheet" href="../../dist/uif.css">
     <link rel="stylesheet" href="../shared/example.css">
-    <style>.anim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:1rem}.anim-card{display:grid;place-items:center;min-height:8rem}.code-box{overflow:auto;margin-top:1rem;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}</style>
+    <style>
+      .builder-grid{display:grid;grid-template-columns:minmax(18rem,.3fr) minmax(0,1fr);gap:1rem}.builder-card{border:1px solid #dfe3e8;border-radius:.75rem;background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.05);overflow:hidden}.builder-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1rem;border-bottom:1px solid #eef1f4}.builder-card-head h2,.builder-card-head p{margin:0}.builder-card-head p{margin-top:.18rem;color:#667085;font-size:.86rem}.builder-card-body{padding:1rem}.builder-panel{display:grid;gap:1rem;align-content:start}.builder-control{display:grid;gap:.4rem}.builder-control span{font-size:.78rem;font-weight:800;color:#667085}.preset-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:.75rem}.preset-card{display:grid;gap:.35rem;padding:.8rem;border:1px solid #dfe3e8;border-radius:.65rem;background:#fbfcfd;text-align:left;cursor:pointer}.preset-card[aria-pressed="true"]{border-color:#0b72bd;background:#e7f1fb;color:#0b72bd}.stage{display:grid;place-items:center;min-height:17rem;border:1px dashed #cfd6df;border-radius:.75rem;background:linear-gradient(135deg,#f8fafc,#eef6ff)}.stage-object{width:min(22rem,80%);padding:1.25rem;border:1px solid #dfe3e8;border-radius:.85rem;background:#fff;box-shadow:0 16px 40px rgba(16,24,40,.12)}.code-box{overflow:auto;max-height:24rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}@media(max-width:64rem){.builder-grid{grid-template-columns:1fr}}
+    </style>
   </head>
   <body class="example-page">
     <main class="example-shell">
@@ -18,26 +20,84 @@
             <a class="example-pill is-primary" href="../animation-gallery/"><span data-uif-icon="spark"></span>Animations</a>
             <a class="example-pill" href="../event-actions/"><span data-uif-icon="code"></span>Event actions</a>
           </nav></header>
-        <section class="example-hero"><div><div class="example-eyebrow">Effects · CSS animation · reduced motion</div><h1>Animation presets without Animate.css.</h1><p>Use declarative event actions or <code>data-uif="animate"</code> for small UI transitions that respect reduced-motion preferences.</p></div></section>
-        <section class="anim-grid">
-          <article class="uif-card anim-card" id="fade"><strong>fade-in</strong></article>
-          <article class="uif-card anim-card" id="slide"><strong>slide-up</strong></article>
-          <article class="uif-card anim-card" id="pop"><strong>pop</strong></article>
-          <article class="uif-card anim-card" id="shake"><strong>shake</strong></article>
+        <section class="example-hero"><div><div class="example-eyebrow">Effects · presets · timeline</div><h1>Choose an animation preset and copy the declarative code.</h1><p>Use dependency-free CSS animation presets for app UI, with duration, delay, repeat, trigger, and reduced-motion support.</p></div><button class="uif-btn" id="play"><span data-uif-icon="play"></span>Run preview</button></section>
+        <section class="builder-grid">
+          <aside class="builder-card builder-panel">
+            <div class="builder-card-head"><div><h2>Controls</h2><p>Tune the behavior and generated attributes.</p></div></div>
+            <div class="builder-card-body builder-panel">
+              <label class="builder-control"><span>Trigger</span><select class="uif-input" id="trigger"><option value="click">Click</option><option value="load">Load</option><option value="hover">Hover</option><option value="intersect">Intersect</option></select></label>
+              <label class="builder-control"><span>Duration</span><input class="uif-input" id="duration" type="range" min="120" max="1200" value="260"></label>
+              <label class="builder-control"><span>Delay</span><input class="uif-input" id="delay" type="range" min="0" max="600" value="0"></label>
+              <label class="builder-control"><span>Repeat</span><select class="uif-input" id="repeat"><option value="">Once</option><option value="2">Twice</option><option value="3">Three times</option></select></label>
+            </div>
+          </aside>
+          <div class="builder-panel">
+            <div class="builder-card">
+              <div class="builder-card-head"><div><h2>Preset catalog</h2><p>Entrance, exit, attention, loading, and layout presets.</p></div></div>
+              <div class="builder-card-body"><div class="preset-grid" id="presets"></div></div>
+            </div>
+            <div class="builder-card">
+              <div class="builder-card-head"><div><h2>Preview stage</h2><p>Run the current preset against this card.</p></div><button class="uif-btn uif-btn-secondary" id="sequence"><span data-uif-icon="spark"></span>Run sequence</button></div>
+              <div class="builder-card-body"><div class="stage"><article class="stage-object" id="target"><strong>Operational card</strong><p>Animations should support attention and feedback without external libraries.</p></article></div></div>
+            </div>
+            <div class="builder-card">
+              <div class="builder-card-head"><div><h2>Generated code</h2><p>Copy declarative markup or JavaScript helper usage.</p></div><button class="uif-btn uif-btn-secondary" data-uif-event="click" data-uif-action="copy" data-uif-target="#animation-code"><span data-uif-icon="copy"></span>Copy</button></div>
+              <div class="builder-card-body"><pre class="code-box"><code id="animation-code"></code></pre></div>
+            </div>
+          </div>
         </section>
-        <div class="uif-cluster uif-mt-4">
-          <button class="uif-btn" data-uif-event="click" data-uif-action="animate" data-uif-target="#fade" data-uif-animation="fade-in">Fade</button>
-          <button class="uif-btn" data-uif-event="click" data-uif-action="animate" data-uif-target="#slide" data-uif-animation="slide-up">Slide</button>
-          <button class="uif-btn" data-uif-event="click" data-uif-action="animate" data-uif-target="#pop" data-uif-animation="pop">Pop</button>
-          <button class="uif-btn" data-uif-event="click" data-uif-action="animate" data-uif-target="#shake" data-uif-animation="shake">Shake</button>
-        </div>
-        <pre class="code-box"><code>&lt;button data-uif-event="click" data-uif-action="animate" data-uif-target="#panel" data-uif-animation="pop"&gt;Animate&lt;/button&gt;</code></pre>
       </div>
     </main>
     <script type="module">
-      import { autoStart, mountIcons } from '../../dist/uif.esm.js';
+      import { animate, animationPresets, autoStart, mountIcons, sequence } from '../../dist/uif.esm.js';
       autoStart();
       mountIcons(document);
+
+      const target = document.querySelector('#target');
+      const code = document.querySelector('#animation-code');
+      const presets = document.querySelector('#presets');
+      let current = 'pop';
+
+      function renderPresets() {
+        presets.innerHTML = animationPresets.map((preset) => `<button class="preset-card" type="button" data-name="${preset.name}" aria-pressed="${preset.name === current}"><strong>${preset.name}</strong><span>${preset.category}</span><small>${preset.description}</small></button>`).join('');
+      }
+
+      function options() {
+        return {
+          duration: Number(document.querySelector('#duration').value),
+          delay: Number(document.querySelector('#delay').value),
+          repeat: Number(document.querySelector('#repeat').value) || undefined
+        };
+      }
+
+      function updateCode() {
+        code.textContent = `<div
+  data-uif="animate"
+  data-uif-animation="${current}"
+  data-uif-trigger="${document.querySelector('#trigger').value}"
+  data-uif-duration="${document.querySelector('#duration').value}"
+  data-uif-delay="${document.querySelector('#delay').value}"
+  data-uif-repeat="${document.querySelector('#repeat').value}">
+  ...
+</div>`;
+      }
+
+      presets.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-name]');
+        if (!button) return;
+        current = button.dataset.name;
+        renderPresets();
+        updateCode();
+        void animate(target, current, options());
+      });
+      document.querySelector('#play').addEventListener('click', () => void animate(target, current, options()));
+      document.querySelector('#sequence').addEventListener('click', () => void sequence([
+        { el: target, animation: 'highlight', options: { duration: 420 } },
+        { el: target, animation: current, options: options() }
+      ]));
+      document.querySelectorAll('#trigger,#duration,#delay,#repeat').forEach((control) => control.addEventListener('input', updateCode));
+      renderPresets();
+      updateCode();
     </script>
   </body>
 </html>

@@ -60,8 +60,16 @@ Malformed `pattern` expressions are handled as validation failures rather than r
 | `data-uif-toolbar` | Space-separated toolbar commands such as `bold italic heading quote code ul ol link preview`. |
 | `data-uif-preview` | Preview mode: `none`, `manual`, or `live`. |
 | `data-uif-editor-height` | Minimum editor surface height. |
+| `data-uif-editor-layout` | Editor layout: `source`, `preview`, `split`, or `tabs` where supported. |
+| `data-uif-editor-status` | Shows or hides editor status text for words, characters, and dirty state. |
+| `data-uif-placeholder` | Placeholder text for the enhanced editor surface. |
+| `data-uif-required` | Marks an editor as required for browser-side validation feedback. |
+| `data-uif-maxlength` | Maximum character count used by `validateEditor()`. |
+| `data-uif-autosave` | When `true`, schedules autosave after editor changes. |
+| `data-uif-autosave-delay` | Autosave debounce delay in milliseconds. |
+| `data-uif-autosave-url` | Optional JSON POST endpoint for autosave; omit to use registered autosave hooks/events only. |
 
-Markdown preview escapes raw HTML by default. Browser-side cleanup is not a substitute for server-side sanitization before trusted render or storage.
+Markdown preview escapes raw HTML by default and supports a practical subset including headings, lists, task lists, tables, links, images, code blocks, blockquotes, strikethrough, and horizontal rules. Browser-side cleanup is not a substitute for server-side sanitization before trusted render or storage.
 
 ## Animation and Event Actions
 
@@ -71,15 +79,25 @@ Markdown preview escapes raw HTML by default. Browser-side cleanup is not a subs
 | `data-uif-animation` | Animation name such as `fade-in`, `slide-up`, `scale-in`, `pop`, `pulse`, `shake`, or `highlight`. |
 | `data-uif-duration` | Animation duration in milliseconds. |
 | `data-uif-delay` | Animation delay in milliseconds. |
+| `data-uif-repeat` | Optional animation repeat count. |
+| `data-uif-easing` | Optional CSS timing function override. |
+| `data-uif-once` | Runs an animation trigger once unless set to `false`. |
 | `data-uif-event` | Event name for safe declarative action binding, optionally with modifiers such as `click.prevent`. |
 | `data-uif-on` | JSON event/action map for multiple declarative bindings. |
+| `data-uif-actions` | JSON action chain for ordered multi-step interactions. |
+| `data-uif-confirm` | Confirmation prompt shown before an action or chain runs. |
+| `data-uif-if` | Simple condition selector; action runs only when the selector matches. Use `!selector` for inverse, `online`, or `offline`. |
 | `data-uif-class` | Class name used by class actions. |
 | `data-uif-attribute` | Attribute name used by attribute actions. |
 | `data-uif-key` | Keyboard filter for declarative keyboard actions. |
 
-Built-in safe actions include `show`, `hide`, `toggle`, `animate`, `add-class`, `remove-class`, `toggle-class`, `set-attribute`, `remove-attribute`, `set-value`, `copy`, `scroll-to`, `focus`, `submit`, `reset`, and `emit`.
+Supported event modifiers include `prevent`, `stop`, `once`, `self`, `outside`, `debounce:ms`, `throttle:ms`, and common keyboard filters such as `enter`, `escape`, and `space`.
+
+Built-in safe actions include `show`, `hide`, `toggle`, `animate`, `add-class`, `remove-class`, `toggle-class`, `set-attribute`, `remove-attribute`, `toggle-attribute`, `set-value`, `set-text`, `set-html-safe`, `toggle-state`, `copy`, `scroll-to`, `focus`, `submit`, `reset`, and `emit`.
 
 Event actions never evaluate inline JavaScript. Only registered action names can run.
+
+Developer diagnostics are available through `getActionDiagnostics()` and `uif:action-diagnostic` events. Missing targets, unknown action names, and invalid JSON action specs are reported without throwing runtime crashes.
 
 ## Charts
 
