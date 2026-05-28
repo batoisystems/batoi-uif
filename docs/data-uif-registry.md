@@ -57,10 +57,10 @@ Malformed `pattern` expressions are handled as validation failures rather than r
 | --- | --- |
 | `data-uif="editor"` | Enhances a textarea/input into a rich HTML or Markdown editor. |
 | `data-uif-mode` | Editor mode: `html`, `markdown`, or `plain`. |
-| `data-uif-toolbar` | Space-separated toolbar commands such as `bold italic heading quote code ul ol link preview`. |
+| `data-uif-toolbar` | Space-separated toolbar commands such as `bold italic heading quote code ul ol task link image table preview source`. Link, image, and table open editor dialogs when triggered from the toolbar. |
 | `data-uif-preview` | Preview mode: `none`, `manual`, or `live`. |
 | `data-uif-editor-height` | Minimum editor surface height. |
-| `data-uif-editor-layout` | Editor layout: `source`, `preview`, `split`, or `tabs` where supported. |
+| `data-uif-editor-layout` | Editor layout: `source`, `preview`, `split`, `tabs`, `modal`, or `drawer` where supported. |
 | `data-uif-editor-status` | Shows or hides editor status text for words, characters, and dirty state. |
 | `data-uif-placeholder` | Placeholder text for the enhanced editor surface. |
 | `data-uif-required` | Marks an editor as required for browser-side validation feedback. |
@@ -70,6 +70,8 @@ Malformed `pattern` expressions are handled as validation failures rather than r
 | `data-uif-autosave-url` | Optional JSON POST endpoint for autosave; omit to use registered autosave hooks/events only. |
 
 Markdown preview escapes raw HTML by default and supports a practical subset including headings, lists, task lists, tables, links, images, code blocks, blockquotes, strikethrough, and horizontal rules. Browser-side cleanup is not a substitute for server-side sanitization before trusted render or storage.
+
+Editor command values can also be passed programmatically through `runEditorCommand(editor, command, value)`. Structured values are supported for links, images, and tables. Current command coverage includes `link-edit`, `link-remove`, `image-edit`, `image-remove`, `table-row-before`, `table-row-after`, `table-row-delete`, `table-col-before`, `table-col-after`, `table-col-delete`, `table-header-toggle`, and `table-delete`. Task lists support checkbox state synchronization plus Enter/Backspace continuation behavior in HTML and Markdown modes.
 
 ## Animation and Event Actions
 

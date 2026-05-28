@@ -202,14 +202,14 @@ See `examples/micro-app-dashboard/` for a copy-ready static Micro App with local
 ```
 
 ```html
-<textarea name="notes" data-uif="editor" data-uif-mode="markdown" data-uif-preview="live">
+<textarea name="notes" data-uif="editor" data-uif-mode="markdown" data-uif-preview="live" data-uif-editor-layout="split">
 # Markdown draft
 
 **Batoi UIF** renders a safe preview.
 </textarea>
 ```
 
-The editor package is dependency-free and keeps the original form field synchronized. Markdown preview escapes raw HTML by default and supports a practical subset including tables, task lists, images, links, strikethrough, code blocks, and blockquotes. Editor hooks such as `registerEditorHook("autosave", handler)`, `registerEditorHook("validate", handler)`, and `registerEditorHook("uploadImage", handler)` provide integration points without shipping upload or storage authority to the browser. Treat browser-side cleanup as convenience only; sanitize and authorize HTML on the server before trusted rendering or storage.
+The editor package is dependency-free and keeps the original form field synchronized. Rich HTML mode includes WYSIWYG dialogs for links, images, and tables, table row/column tools, task-list keyboard behavior, source view, and editor-managed undo/redo. Markdown preview escapes raw HTML by default and supports layouts such as `source`, `preview`, `split`, `tabs`, `modal`, and `drawer`, plus a practical subset including tables, task lists, images, links, strikethrough, code blocks, and blockquotes. Editor hooks such as `registerEditorHook("autosave", handler)`, `registerEditorHook("validate", handler)`, and `registerEditorHook("uploadImage", handler)` provide integration points without shipping upload or storage authority to the browser. Treat browser-side cleanup as convenience only; sanitize and authorize HTML on the server before trusted rendering or storage.
 
 ### Declarative animation and event actions
 

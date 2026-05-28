@@ -1,7 +1,7 @@
 type EditorMode = 'html' | 'markdown' | 'plain';
 type EditorPreviewMode = 'none' | 'manual' | 'live';
-type EditorLayout = 'source' | 'preview' | 'split' | 'tabs';
-type EditorCommand = 'bold' | 'italic' | 'underline' | 'strike' | 'heading' | 'paragraph' | 'quote' | 'code' | 'hr' | 'ul' | 'ol' | 'task' | 'link' | 'image' | 'table' | 'undo' | 'redo' | 'preview' | 'source' | 'fullscreen' | 'clear';
+type EditorLayout = 'source' | 'preview' | 'split' | 'tabs' | 'modal' | 'drawer';
+type EditorCommand = 'bold' | 'italic' | 'underline' | 'strike' | 'heading' | 'paragraph' | 'quote' | 'code' | 'hr' | 'ul' | 'ol' | 'task' | 'link' | 'link-edit' | 'link-remove' | 'image' | 'image-edit' | 'image-remove' | 'table' | 'table-row-before' | 'table-row-after' | 'table-row-delete' | 'table-col-before' | 'table-col-after' | 'table-col-delete' | 'table-delete' | 'table-header-toggle' | 'undo' | 'redo' | 'preview' | 'source' | 'fullscreen' | 'clear';
 interface EditorOptions {
     mode?: EditorMode;
     toolbar?: string[];
@@ -33,7 +33,7 @@ interface EditorInstance {
 interface EditorCommandContext {
     editor: EditorInstance;
     command: EditorCommand;
-    value?: string;
+    value?: unknown;
 }
 type EditorCommandHandler = (context: EditorCommandContext) => void;
 type EditorHookName = 'beforeInput' | 'afterInput' | 'beforeCommand' | 'afterCommand' | 'beforePaste' | 'afterPaste' | 'beforePreview' | 'afterPreview' | 'validate' | 'autosave' | 'uploadImage';
@@ -44,6 +44,22 @@ interface EditorHookContext {
     file?: File;
 }
 type EditorHookHandler = (context: EditorHookContext) => void | string | Promise<void | string>;
+interface EditorLinkValue {
+    text?: string;
+    href?: string;
+    title?: string;
+    target?: '_self' | '_blank';
+}
+interface EditorImageValue {
+    src?: string;
+    alt?: string;
+    caption?: string;
+}
+interface EditorTableValue {
+    rows?: number;
+    columns?: number;
+    header?: boolean;
+}
 declare function registerEditorCommand(name: EditorCommand | string, handler: EditorCommandHandler): void;
 declare function unregisterEditorCommand(name: EditorCommand | string): void;
 declare function registerEditorHook(name: EditorHookName, handler: EditorHookHandler): () => void;
@@ -53,11 +69,12 @@ declare function htmlToMarkdown(html: string): string;
 declare function cleanEditorHtml(html: string): string;
 declare function validateEditor(editor: EditorInstance): string[];
 declare function queryEditorCommand(editor: EditorInstance, command: EditorCommand | string): boolean;
-declare function runEditorCommand(editor: EditorInstance, command: EditorCommand, value?: string): void;
-declare function formatEditor(editor: EditorInstance, command: EditorCommand, value?: string): void;
+declare function runEditorCommand(editor: EditorInstance, command: EditorCommand, value?: unknown): void;
+declare function formatEditor(editor: EditorInstance, command: EditorCommand, value?: unknown): void;
+declare function setEditorPreviewLayout(editor: EditorInstance, layout: EditorLayout): void;
 declare function createEditor(el: HTMLElement, options?: EditorOptions): EditorInstance;
 declare function initEditor(el: HTMLElement, options?: EditorOptions): EditorInstance;
 declare function getEditorValue(editor: EditorInstance): string;
 declare function setEditorValue(editor: EditorInstance, value: string): void;
 
-export { type EditorCommand, type EditorCommandContext, type EditorCommandHandler, type EditorHookContext, type EditorHookHandler, type EditorHookName, type EditorInstance, type EditorLayout, type EditorMode, type EditorOptions, type EditorPreviewMode, cleanEditorHtml, createEditor, escapeHtml, formatEditor, getEditorValue, htmlToMarkdown, initEditor, markdownToHtml, queryEditorCommand, registerEditorCommand, registerEditorHook, runEditorCommand, setEditorValue, unregisterEditorCommand, validateEditor };
+export { type EditorCommand, type EditorCommandContext, type EditorCommandHandler, type EditorHookContext, type EditorHookHandler, type EditorHookName, type EditorImageValue, type EditorInstance, type EditorLayout, type EditorLinkValue, type EditorMode, type EditorOptions, type EditorPreviewMode, type EditorTableValue, cleanEditorHtml, createEditor, escapeHtml, formatEditor, getEditorValue, htmlToMarkdown, initEditor, markdownToHtml, queryEditorCommand, registerEditorCommand, registerEditorHook, runEditorCommand, setEditorPreviewLayout, setEditorValue, unregisterEditorCommand, validateEditor };

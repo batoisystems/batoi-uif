@@ -2,7 +2,7 @@ import { emit } from '@batoi/uif-core';
 
 export type EditorMode = 'html' | 'markdown' | 'plain';
 export type EditorPreviewMode = 'none' | 'manual' | 'live';
-export type EditorLayout = 'source' | 'preview' | 'split' | 'tabs';
+export type EditorLayout = 'source' | 'preview' | 'split' | 'tabs' | 'modal' | 'drawer';
 export type EditorCommand =
   | 'bold'
   | 'italic'
@@ -17,8 +17,20 @@ export type EditorCommand =
   | 'ol'
   | 'task'
   | 'link'
+  | 'link-edit'
+  | 'link-remove'
   | 'image'
+  | 'image-edit'
+  | 'image-remove'
   | 'table'
+  | 'table-row-before'
+  | 'table-row-after'
+  | 'table-row-delete'
+  | 'table-col-before'
+  | 'table-col-after'
+  | 'table-col-delete'
+  | 'table-delete'
+  | 'table-header-toggle'
   | 'undo'
   | 'redo'
   | 'preview'
@@ -59,7 +71,7 @@ export interface EditorInstance {
 export interface EditorCommandContext {
   editor: EditorInstance;
   command: EditorCommand;
-  value?: string;
+  value?: unknown;
 }
 
 export type EditorCommandHandler = (context: EditorCommandContext) => void;
@@ -85,10 +97,30 @@ export interface EditorHookContext {
 
 export type EditorHookHandler = (context: EditorHookContext) => void | string | Promise<void | string>;
 
+export interface EditorLinkValue {
+  text?: string;
+  href?: string;
+  title?: string;
+  target?: '_self' | '_blank';
+}
+
+export interface EditorImageValue {
+  src?: string;
+  alt?: string;
+  caption?: string;
+}
+
+export interface EditorTableValue {
+  rows?: number;
+  columns?: number;
+  header?: boolean;
+}
+
 const editors = new WeakMap<HTMLElement, EditorInstance>();
 const editorListeners = new WeakMap<EditorInstance, Array<() => void>>();
 const editorInitialValue = new WeakMap<EditorInstance, string>();
 const editorHistory = new WeakMap<EditorInstance, { undo: string[]; redo: string[]; last: string }>();
+const editorActiveTableCell = new WeakMap<EditorInstance, HTMLTableCellElement>();
 const commandHandlers = new Map<string, EditorCommandHandler>();
 const hookHandlers = new Map<EditorHookName, Set<EditorHookHandler>>();
 const editorAutosaveTimers = new WeakMap<EditorInstance, number>();
@@ -107,8 +139,20 @@ const commandLabels: Record<string, string> = {
   ol: 'Numbered list',
   task: 'Task list',
   link: 'Link',
+  'link-edit': 'Edit link',
+  'link-remove': 'Remove link',
   image: 'Image',
+  'image-edit': 'Edit image',
+  'image-remove': 'Remove image',
   table: 'Table',
+  'table-row-before': 'Add row before',
+  'table-row-after': 'Add row',
+  'table-row-delete': 'Delete row',
+  'table-col-before': 'Add column before',
+  'table-col-after': 'Add column',
+  'table-col-delete': 'Delete column',
+  'table-delete': 'Delete table',
+  'table-header-toggle': 'Toggle header',
   undo: 'Undo',
   redo: 'Redo',
   preview: 'Preview',
@@ -187,6 +231,11 @@ function editorCommandIcon(command: string): string {
 
 function isSafeUrl(value: string): boolean {
   return /^(https?:\/\/|mailto:|\/|#)/i.test(value.trim());
+}
+
+function safeUrl(value: unknown, fallback: string): string {
+  const candidate = String(value ?? '').trim();
+  return isSafeUrl(candidate) ? candidate : fallback;
 }
 
 function linesToList(lines: string[], ordered: boolean): string {
@@ -407,7 +456,447 @@ function insertAtSelection(surface: HTMLTextAreaElement, value: string): string 
   return next;
 }
 
-function applyMarkdownCommand(editor: EditorInstance, command: EditorCommand, value?: string): string {
+function currentTextareaLine(surface: HTMLTextAreaElement): { end: number; line: string; start: number } {
+  const before = surface.value.slice(0, surface.selectionStart);
+  const after = surface.value.slice(surface.selectionStart);
+  const start = before.lastIndexOf('\n') + 1;
+  const nextBreak = after.indexOf('\n');
+  const end = nextBreak === -1 ? surface.value.length : surface.selectionStart + nextBreak;
+  return { start, end, line: surface.value.slice(start, end) };
+}
+
+function handleMarkdownTaskKey(surface: HTMLTextAreaElement, event: KeyboardEvent): boolean {
+  const { start, end, line } = currentTextareaLine(surface);
+  const task = /^(\s*[-*+]\s+\[[ xX]\]\s*)(.*)$/.exec(line);
+  if (!task) return false;
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    if (!task[2].trim()) {
+      const removeStart = start > 0 && surface.value[start - 1] === '\n' ? start - 1 : start;
+      surface.value = `${surface.value.slice(0, removeStart)}${surface.value.slice(end + (surface.value[end] === '\n' ? 1 : 0))}`;
+      surface.setSelectionRange(removeStart, removeStart);
+      return true;
+    }
+    const insert = `\n${task[1].replace(/\[[xX]\]/, '[ ]')}`;
+    insertAtSelection(surface, insert);
+    return true;
+  }
+  if (event.key === 'Backspace' && !task[2].trim() && surface.selectionStart === end && surface.selectionEnd === end) {
+    event.preventDefault();
+    surface.value = `${surface.value.slice(0, start)}${surface.value.slice(end)}`;
+    surface.setSelectionRange(start, start);
+    return true;
+  }
+  return false;
+}
+
+function richSurface(editor: EditorInstance): HTMLElement | null {
+  return editor.surface instanceof HTMLTextAreaElement ? null : editor.surface;
+}
+
+function richRange(editor: EditorInstance): Range | null {
+  const surface = richSurface(editor);
+  if (!surface) return null;
+  const selection = document.getSelection();
+  if (selection?.rangeCount) {
+    const range = selection.getRangeAt(0);
+    if (surface.contains(range.commonAncestorContainer)) return range;
+  }
+  const range = document.createRange();
+  range.selectNodeContents(surface);
+  range.collapse(false);
+  return range;
+}
+
+function setRichCaretAfter(node: Node): void {
+  const range = document.createRange();
+  range.setStartAfter(node);
+  range.collapse(true);
+  const selection = document.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+}
+
+function insertRichHtml(editor: EditorInstance, html: string): void {
+  const range = richRange(editor);
+  if (!range) return;
+  const template = document.createElement('template');
+  template.innerHTML = cleanEditorHtml(html);
+  const fragment = template.content;
+  const last = fragment.lastChild;
+  range.deleteContents();
+  range.insertNode(fragment);
+  if (last) setRichCaretAfter(last);
+}
+
+function wrapRichSelection(editor: EditorInstance, tagName: string, fallback: string, attrs: Record<string, string> = {}): void {
+  const range = richRange(editor);
+  if (!range) return;
+  const node = document.createElement(tagName);
+  Object.entries(attrs).forEach(([name, attrValue]) => node.setAttribute(name, attrValue));
+  if (range.collapsed) {
+    node.textContent = fallback;
+  } else {
+    node.append(range.extractContents());
+  }
+  range.deleteContents();
+  range.insertNode(node);
+  setRichCaretAfter(node);
+}
+
+function selectedRichText(editor: EditorInstance, fallback: string): string {
+  const range = richRange(editor);
+  return range && !range.collapsed ? range.toString() : fallback;
+}
+
+function currentRichElement<T extends Element>(editor: EditorInstance, selector: string): T | null {
+  const surface = richSurface(editor);
+  if (!surface) return null;
+  const selection = document.getSelection();
+  const node = selection?.rangeCount ? selection.getRangeAt(0).commonAncestorContainer : null;
+  const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+  const selectedNode = range?.startContainer.childNodes.item(range.startOffset);
+  if (selectedNode instanceof Element) {
+    const selected = selectedNode.matches(selector) ? selectedNode : selectedNode.querySelector(selector);
+    if (selected instanceof Element && surface.contains(selected)) return selected as T;
+  }
+  const element = node instanceof Element ? node : node?.parentElement;
+  const closest = element?.closest<T>(selector);
+  return closest && surface.contains(closest) ? closest : null;
+}
+
+function currentLink(editor: EditorInstance): HTMLAnchorElement | null {
+  return currentRichElement<HTMLAnchorElement>(editor, 'a[href]');
+}
+
+function currentImage(editor: EditorInstance): HTMLImageElement | null {
+  const image = currentRichElement<HTMLImageElement>(editor, 'img');
+  if (image) return image;
+  return currentRichElement<HTMLElement>(editor, 'figure')?.querySelector('img') ?? null;
+}
+
+function currentTaskItem(editor: EditorInstance): HTMLLIElement | null {
+  return currentRichElement<HTMLLIElement>(editor, '.uif-task-list li');
+}
+
+function setCaretInside(element: HTMLElement): void {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  range.collapse(false);
+  const selection = document.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+}
+
+function handleRichTaskKey(editor: EditorInstance, event: KeyboardEvent): boolean {
+  const item = currentTaskItem(editor);
+  if (!item) return false;
+  const label = item.querySelector('label') ?? item;
+  const text = (label.textContent ?? '').trim();
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    if (!text) {
+      item.remove();
+      return true;
+    }
+    const next = document.createElement('li');
+    next.innerHTML = '<label><input type="checkbox"> </label>';
+    item.after(next);
+    setCaretInside(next.querySelector('label') ?? next);
+    return true;
+  }
+  if (event.key === 'Backspace' && !text) {
+    event.preventDefault();
+    item.remove();
+    return true;
+  }
+  return false;
+}
+
+function applyLinkAttributes(linkEl: HTMLAnchorElement, link: Required<EditorLinkValue>): void {
+  linkEl.href = link.href;
+  linkEl.setAttribute('href', link.href);
+  if (link.text) linkEl.textContent = link.text;
+  if (link.title) linkEl.title = link.title;
+  else linkEl.removeAttribute('title');
+  if (link.target === '_blank') {
+    linkEl.target = '_blank';
+    linkEl.rel = 'noopener noreferrer';
+  } else {
+    linkEl.removeAttribute('target');
+    linkEl.removeAttribute('rel');
+  }
+}
+
+function applyImageAttributes(imageEl: HTMLImageElement, image: Required<EditorImageValue>): void {
+  imageEl.src = image.src;
+  imageEl.setAttribute('src', image.src);
+  imageEl.alt = image.alt;
+}
+
+function linkValue(value?: unknown, fallbackText = 'Link text'): Required<EditorLinkValue> {
+  if (typeof value === 'object' && value) {
+    const data = value as EditorLinkValue;
+    return {
+      text: String(data.text || fallbackText),
+      href: safeUrl(data.href, '#'),
+      title: String(data.title || ''),
+      target: data.target === '_blank' ? '_blank' : '_self',
+    };
+  }
+  return { text: fallbackText, href: safeUrl(value, '#'), title: '', target: '_self' };
+}
+
+function imageValue(value?: unknown): Required<EditorImageValue> {
+  if (typeof value === 'object' && value) {
+    const data = value as EditorImageValue;
+    return {
+      src: safeUrl(data.src, '/favicon.ico'),
+      alt: String(data.alt || 'Image'),
+      caption: String(data.caption || ''),
+    };
+  }
+  return { src: safeUrl(value, '/favicon.ico'), alt: 'Image', caption: '' };
+}
+
+function tableValue(value?: unknown): Required<EditorTableValue> {
+  if (typeof value === 'object' && value) {
+    const data = value as EditorTableValue;
+    return {
+      rows: Math.max(1, Math.min(12, Number(data.rows) || 2)),
+      columns: Math.max(1, Math.min(8, Number(data.columns) || 2)),
+      header: data.header !== false,
+    };
+  }
+  return { rows: 2, columns: 2, header: true };
+}
+
+function tableHtml(value?: unknown): string {
+  const config = tableValue(value);
+  const headers = Array.from({ length: config.columns }, (_item, index) => `<th>Column ${String.fromCharCode(65 + index)}</th>`).join('');
+  const bodyRows = Array.from({ length: config.rows }, () => {
+    const cells = Array.from({ length: config.columns }, (_item, index) => `<td>Value ${String.fromCharCode(65 + index)}</td>`).join('');
+    return `<tr>${cells}</tr>`;
+  }).join('');
+  return `<table>${config.header ? `<thead><tr>${headers}</tr></thead>` : ''}<tbody>${bodyRows}</tbody></table>`;
+}
+
+function currentTableCell(): HTMLTableCellElement | null {
+  const selection = document.getSelection();
+  const node = selection?.rangeCount ? selection.getRangeAt(0).commonAncestorContainer : null;
+  const element = node instanceof Element ? node : node?.parentElement;
+  return element?.closest('td,th') ?? null;
+}
+
+function currentTable(): HTMLTableElement | null {
+  return currentTableCell()?.closest('table') ?? null;
+}
+
+function applyTableCommand(editor: EditorInstance, command: EditorCommand): boolean {
+  const table = currentTable();
+  const cell = currentTableCell() ?? editorActiveTableCell.get(editor) ?? null;
+  const activeTable = table ?? cell?.closest('table') ?? null;
+  if (!activeTable || !cell) return false;
+  const row = cell.parentElement as HTMLTableRowElement;
+  const cellIndex = cell.cellIndex;
+  if (command === 'table-row-before') {
+    const previous = row.cloneNode(true) as HTMLTableRowElement;
+    previous.querySelectorAll('th,td').forEach((item) => (item.textContent = ''));
+    row.before(previous);
+    previous.querySelector<HTMLElement>('td,th')?.focus();
+    return true;
+  }
+  if (command === 'table-row-after') {
+    const next = row.cloneNode(true) as HTMLTableRowElement;
+    next.querySelectorAll('th,td').forEach((item) => (item.textContent = ''));
+    row.after(next);
+    next.querySelector<HTMLElement>('td,th')?.focus();
+    return true;
+  }
+  if (command === 'table-row-delete') {
+    row.remove();
+    if (!activeTable.querySelector('tr')) activeTable.remove();
+    return true;
+  }
+  if (command === 'table-col-before') {
+    let insertedCurrent: Element | null = null;
+    activeTable.querySelectorAll('tr').forEach((tableRow) => {
+      const ref = tableRow.children.item(cellIndex);
+      const tag = ref?.tagName === 'TH' ? 'th' : 'td';
+      const next = document.createElement(tag);
+      next.textContent = '';
+      ref?.before(next);
+      if (tableRow === row) insertedCurrent = next;
+    });
+    if (insertedCurrent) {
+      const range = document.createRange();
+      range.selectNodeContents(insertedCurrent);
+      range.collapse(true);
+      document.getSelection()?.removeAllRanges();
+      document.getSelection()?.addRange(range);
+    }
+    return true;
+  }
+  if (command === 'table-col-after') {
+    let insertedCurrent: Element | null = null;
+    activeTable.querySelectorAll('tr').forEach((tableRow) => {
+      const ref = tableRow.children.item(cellIndex);
+      const tag = ref?.tagName === 'TH' ? 'th' : 'td';
+      const next = document.createElement(tag);
+      next.textContent = '';
+      ref?.after(next);
+      if (tableRow === row) insertedCurrent = next;
+    });
+    if (insertedCurrent) {
+      const range = document.createRange();
+      range.selectNodeContents(insertedCurrent);
+      range.collapse(true);
+      document.getSelection()?.removeAllRanges();
+      document.getSelection()?.addRange(range);
+    }
+    return true;
+  }
+  if (command === 'table-col-delete') {
+    activeTable.querySelectorAll('tr').forEach((tableRow) => tableRow.children.item(cellIndex)?.remove());
+    if (!activeTable.querySelector('td,th')) activeTable.remove();
+    return true;
+  }
+  if (command === 'table-delete') {
+    activeTable.remove();
+    return true;
+  }
+  if (command === 'table-header-toggle') {
+    const head = activeTable.tHead;
+    if (head) {
+      const first = head.rows.item(0);
+      if (first) activeTable.tBodies.item(0)?.prepend(first);
+      head.remove();
+    } else {
+      const first = activeTable.tBodies.item(0)?.rows.item(0);
+      if (first) {
+        const thead = activeTable.createTHead();
+        thead.append(first);
+        first.querySelectorAll('td').forEach((td) => {
+          const th = document.createElement('th');
+          th.innerHTML = td.innerHTML;
+          td.replaceWith(th);
+        });
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+function applyRichHtmlCommand(editor: EditorInstance, command: EditorCommand, value?: unknown): void {
+  if (command === 'bold') wrapRichSelection(editor, 'strong', 'bold text');
+  else if (command === 'italic') wrapRichSelection(editor, 'em', 'italic text');
+  else if (command === 'underline') wrapRichSelection(editor, 'u', 'underlined text');
+  else if (command === 'strike') wrapRichSelection(editor, 's', 'deleted text');
+  else if (command === 'heading') insertRichHtml(editor, `<h2>${escapeHtml(selectedRichText(editor, 'Heading'))}</h2>`);
+  else if (command === 'paragraph') insertRichHtml(editor, `<p>${escapeHtml(selectedRichText(editor, 'Paragraph text'))}</p>`);
+  else if (command === 'quote') insertRichHtml(editor, `<blockquote>${escapeHtml(selectedRichText(editor, 'Quote'))}</blockquote>`);
+  else if (command === 'code') insertRichHtml(editor, `<pre><code>${escapeHtml(selectedRichText(editor, 'code'))}</code></pre>`);
+  else if (command === 'ul') insertRichHtml(editor, `<ul><li>${escapeHtml(selectedRichText(editor, 'Item'))}</li></ul>`);
+  else if (command === 'ol') insertRichHtml(editor, `<ol><li>${escapeHtml(selectedRichText(editor, 'Item'))}</li></ol>`);
+  else if (command === 'task') insertRichHtml(editor, '<ul class="uif-task-list"><li><label><input type="checkbox"> Task</label></li></ul>');
+  else if (command === 'hr') insertRichHtml(editor, '<hr>');
+  else if (command === 'link' || command === 'link-edit') {
+    const link = linkValue(value, selectedRichText(editor, 'Link text'));
+    const existing = currentLink(editor);
+    if (existing) {
+      applyLinkAttributes(existing, link);
+      return;
+    }
+    const attrs: Record<string, string> = { href: link.href };
+    if (link.title) attrs.title = link.title;
+    if (link.target === '_blank') {
+      attrs.target = '_blank';
+      attrs.rel = 'noopener noreferrer';
+    }
+    wrapRichSelection(editor, 'a', link.text, attrs);
+  } else if (command === 'link-remove') {
+    const existing = currentLink(editor);
+    if (!existing) return;
+    existing.replaceWith(document.createTextNode(existing.textContent ?? ''));
+  } else if (command === 'image' || command === 'image-edit') {
+    const image = imageValue(value);
+    const existing = currentImage(editor);
+    if (existing) {
+      applyImageAttributes(existing, image);
+      const figure = existing.closest('figure');
+      if (figure) {
+        let caption = figure.querySelector('figcaption');
+        if (image.caption) {
+          if (!caption) {
+            caption = document.createElement('figcaption');
+            figure.append(caption);
+          }
+          caption.textContent = image.caption;
+        } else {
+          caption?.remove();
+        }
+      }
+      return;
+    }
+    const img = `<img src="${escapeAttr(image.src)}" alt="${escapeAttr(image.alt)}">`;
+    insertRichHtml(editor, image.caption ? `<figure>${img}<figcaption>${escapeHtml(image.caption)}</figcaption></figure>` : img);
+  } else if (command === 'image-remove') {
+    const existing = currentImage(editor);
+    if (!existing) return;
+    const figure = existing.closest('figure');
+    if (figure) figure.remove();
+    else existing.remove();
+  } else if (command === 'table') insertRichHtml(editor, tableHtml(value));
+  else if (command.startsWith('table-')) applyTableCommand(editor, command);
+  else if (command === 'clear') {
+    const surface = richSurface(editor);
+    if (surface) surface.textContent = surface.textContent ?? '';
+  } else if (command !== 'preview' && command !== 'source' && command !== 'fullscreen') {
+    document.execCommand(command);
+  }
+}
+
+function applyHtmlSourceCommand(editor: EditorInstance, command: EditorCommand, value?: unknown): string {
+  const surface = editor.surface instanceof HTMLTextAreaElement ? editor.surface : null;
+  if (!surface) return editor.getValue();
+  if (command === 'bold') return wrapSelection(surface, '<strong>', '</strong>', 'bold text');
+  if (command === 'italic') return wrapSelection(surface, '<em>', '</em>', 'italic text');
+  if (command === 'underline') return wrapSelection(surface, '<u>', '</u>', 'underlined text');
+  if (command === 'strike') return wrapSelection(surface, '<s>', '</s>', 'deleted text');
+  if (command === 'heading') return wrapSelection(surface, `<${value || 'h2'}>`, `</${value || 'h2'}>`, 'Heading');
+  if (command === 'paragraph') return wrapSelection(surface, '<p>', '</p>', 'Paragraph text');
+  if (command === 'quote') return wrapSelection(surface, '<blockquote>', '</blockquote>', 'Quote');
+  if (command === 'code') return wrapSelection(surface, '<pre><code>', '</code></pre>', 'code');
+  if (command === 'hr') return insertAtSelection(surface, '\n<hr>\n');
+  if (command === 'ul') return insertAtSelection(surface, '\n<ul><li>Item</li></ul>\n');
+  if (command === 'ol') return insertAtSelection(surface, '\n<ol><li>Item</li></ol>\n');
+  if (command === 'task') return insertAtSelection(surface, '\n<ul class="uif-task-list"><li><input type="checkbox" disabled> Task</li></ul>\n');
+  if (command === 'link' || command === 'link-edit') {
+    const link = linkValue(value, 'link');
+    const target = link.target === '_blank' ? ' target="_blank" rel="noopener noreferrer"' : '';
+    const title = link.title ? ` title="${escapeAttr(link.title)}"` : '';
+    return wrapSelection(surface, `<a href="${escapeAttr(link.href)}"${title}${target}>`, '</a>', link.text);
+  }
+  if (command === 'image' || command === 'image-edit') {
+    const image = imageValue(value);
+    const img = `<img src="${escapeAttr(image.src)}" alt="${escapeAttr(image.alt)}">`;
+    return insertAtSelection(surface, image.caption ? `<figure>${img}<figcaption>${escapeHtml(image.caption)}</figcaption></figure>` : img);
+  }
+  if (command === 'table') return insertAtSelection(surface, `\n${tableHtml(value)}\n`);
+  if (command === 'clear') return cleanEditorHtml(surface.value);
+  return surface.value;
+}
+
+function markdownTable(value?: unknown): string {
+  const config = tableValue(value);
+  const header = `| ${Array.from({ length: config.columns }, (_item, index) => `Column ${String.fromCharCode(65 + index)}`).join(' | ')} |`;
+  const rule = `| ${Array.from({ length: config.columns }, () => '---').join(' | ')} |`;
+  const rows = Array.from({ length: config.rows }, () => `| ${Array.from({ length: config.columns }, (_item, index) => `Value ${String.fromCharCode(65 + index)}`).join(' | ')} |`);
+  return `\n${[header, rule, ...rows].join('\n')}\n`;
+}
+
+function applyMarkdownCommand(editor: EditorInstance, command: EditorCommand, value?: unknown): string {
   const surface = editor.surface instanceof HTMLTextAreaElement ? editor.surface : null;
   if (!surface) return editor.getValue();
   if (command === 'bold') return wrapSelection(surface, '**', '**', 'bold text');
@@ -421,9 +910,16 @@ function applyMarkdownCommand(editor: EditorInstance, command: EditorCommand, va
   if (command === 'ul') return insertAtSelection(surface, '\n- Item\n');
   if (command === 'ol') return insertAtSelection(surface, '\n1. Item\n');
   if (command === 'task') return insertAtSelection(surface, '\n- [ ] Task\n');
-  if (command === 'link') return wrapSelection(surface, '[', `](${isSafeUrl(value ?? '') ? value : 'https://example.com'})`, 'link');
-  if (command === 'image') return insertAtSelection(surface, `\n![Image alt](${isSafeUrl(value ?? '') ? value : 'https://example.com/image.png'})\n`);
-  if (command === 'table') return insertAtSelection(surface, '\n| Column A | Column B |\n| --- | --- |\n| Value A | Value B |\n');
+  if (command === 'link' || command === 'link-edit') {
+    const link = linkValue(value, 'link');
+    if (surface.selectionStart === surface.selectionEnd) return insertAtSelection(surface, `[${link.text}](${link.href})`);
+    return wrapSelection(surface, '[', `](${link.href})`, link.text);
+  }
+  if (command === 'image' || command === 'image-edit') {
+    const image = imageValue(value);
+    return insertAtSelection(surface, `\n![${image.alt}](${image.src})${image.caption ? `\n\n${image.caption}` : ''}\n`);
+  }
+  if (command === 'table') return insertAtSelection(surface, markdownTable(value));
   if (command === 'clear') return '';
   return surface.value;
 }
@@ -439,6 +935,17 @@ function updateStatus(instance: EditorInstance): void {
   const chars = value.length;
   const state = instance.dirty ? 'Unsaved changes' : 'Clean';
   instance.status.textContent = `${words} words · ${chars} characters · ${state}`;
+}
+
+function syncRichControlAttributes(root: HTMLElement): void {
+  root.querySelectorAll<HTMLInputElement>('input[type="checkbox"],input[type="radio"]').forEach((input) => {
+    if (input.checked) input.setAttribute('checked', '');
+    else input.removeAttribute('checked');
+  });
+  root.querySelectorAll<HTMLOptionElement>('option').forEach((option) => {
+    if (option.selected) option.setAttribute('selected', '');
+    else option.removeAttribute('selected');
+  });
 }
 
 export function validateEditor(editor: EditorInstance): string[] {
@@ -519,7 +1026,7 @@ export function queryEditorCommand(editor: EditorInstance, command: EditorComman
   }
 }
 
-export function runEditorCommand(editor: EditorInstance, command: EditorCommand, value?: string): void {
+export function runEditorCommand(editor: EditorInstance, command: EditorCommand, value?: unknown): void {
   const custom = commandHandlers.get(command);
   if (custom) {
     void runEditorHooks('beforeCommand', { editor, value: editor.getValue(), command });
@@ -529,26 +1036,21 @@ export function runEditorCommand(editor: EditorInstance, command: EditorCommand,
   }
   void runEditorHooks('beforeCommand', { editor, value: editor.getValue(), command });
   if (editor.mode === 'html') {
+    if (editor.surface instanceof HTMLTextAreaElement) {
+      if (command === 'undo') restoreHistory(editor, 'undo');
+      else if (command === 'redo') restoreHistory(editor, 'redo');
+      else editor.setValue(applyHtmlSourceCommand(editor, command, value));
+      void runEditorHooks('afterCommand', { editor, value: editor.getValue(), command });
+      return;
+    }
     editor.surface.focus();
     if (command === 'undo') restoreHistory(editor, 'undo');
     else if (command === 'redo') restoreHistory(editor, 'redo');
-    else if (command === 'heading') document.execCommand('formatBlock', false, value || 'h2');
-    else if (command === 'paragraph') document.execCommand('formatBlock', false, 'p');
-    else if (command === 'quote') document.execCommand('formatBlock', false, 'blockquote');
-    else if (command === 'code') document.execCommand('formatBlock', false, 'pre');
-    else if (command === 'strike') document.execCommand('strikeThrough');
-    else if (command === 'ul') document.execCommand('insertUnorderedList');
-    else if (command === 'ol') document.execCommand('insertOrderedList');
-    else if (command === 'hr') document.execCommand('insertHorizontalRule');
-    else if (command === 'link') document.execCommand('createLink', false, isSafeUrl(value ?? '') ? value : '#');
-    else if (command === 'image') {
-      const imageUrl = isSafeUrl(value ?? '') ? String(value) : '';
-      void runEditorHooks('uploadImage', { editor, value: imageUrl });
-      document.execCommand('insertImage', false, imageUrl);
+    else {
+      if (command === 'image') void runEditorHooks('uploadImage', { editor, value: imageValue(value).src });
+      applyRichHtmlCommand(editor, command, value);
     }
-    else if (command === 'table') document.execCommand('insertHTML', false, '<table><thead><tr><th>Column A</th><th>Column B</th></tr></thead><tbody><tr><td>Value A</td><td>Value B</td></tr></tbody></table>');
-    else if (command === 'clear') document.execCommand('removeFormat');
-    else if (command !== 'preview' && command !== 'source' && command !== 'fullscreen') document.execCommand(command);
+    syncRichControlAttributes(editor.surface);
     editor.setValue(cleanEditorHtml(editor.surface.innerHTML));
     void runEditorHooks('afterCommand', { editor, value: editor.getValue(), command });
     return;
@@ -559,13 +1061,174 @@ export function runEditorCommand(editor: EditorInstance, command: EditorCommand,
   void runEditorHooks('afterCommand', { editor, value: editor.getValue(), command });
 }
 
-export function formatEditor(editor: EditorInstance, command: EditorCommand, value?: string): void {
+export function formatEditor(editor: EditorInstance, command: EditorCommand, value?: unknown): void {
   runEditorCommand(editor, command, value);
 }
 
 function syncPreview(instance: EditorInstance): void {
   if (!instance.preview) return;
   instance.preview.innerHTML = instance.mode === 'markdown' ? markdownToHtml(instance.getValue()) : cleanEditorHtml(instance.getValue());
+}
+
+function openPreviewOverlay(editor: EditorInstance, layout: EditorLayout): void {
+  if (!editor.preview) return;
+  syncPreview(editor);
+  const backdrop = document.createElement('div');
+  backdrop.className = 'uif-editor-preview-backdrop';
+  const panel = document.createElement('div');
+  panel.className = layout === 'drawer' ? 'uif-editor-preview-drawer' : 'uif-editor-preview-modal';
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-modal', 'true');
+  panel.innerHTML = `<div class="uif-editor-preview-head"><strong>Preview</strong><button type="button" class="uif-editor-preview-close" aria-label="Close preview">&times;</button></div><div class="uif-editor-preview-content">${editor.preview.innerHTML}</div>`;
+  const close = () => {
+    panel.remove();
+    backdrop.remove();
+    editor.surface.focus();
+  };
+  backdrop.addEventListener('click', close);
+  const closeButton = panel.querySelector('button');
+  closeButton?.addEventListener('click', close);
+  closeButton?.addEventListener('keydown', (event) => {
+    if (!(event instanceof KeyboardEvent) || (event.key !== 'Enter' && event.key !== ' ')) return;
+    event.preventDefault();
+    close();
+  });
+  document.addEventListener('keydown', function onKeydown(event) {
+    if (event.key !== 'Escape') return;
+    document.removeEventListener('keydown', onKeydown);
+    close();
+  });
+  document.body.append(backdrop, panel);
+  panel.querySelector<HTMLButtonElement>('button')?.focus();
+}
+
+export function setEditorPreviewLayout(editor: EditorInstance, layout: EditorLayout): void {
+  editor.element.dataset.uifEditorLayout = layout;
+  const body = editor.element.querySelector<HTMLElement>('.uif-editor-body');
+  body?.classList.toggle('uif-editor-body-split', layout === 'split');
+  body?.classList.toggle('uif-editor-body-tabs', layout === 'tabs');
+  if (editor.mode === 'markdown' && editor.preview) {
+    syncPreview(editor);
+    editor.surface.hidden = layout === 'preview';
+    editor.preview.hidden = layout === 'source' || layout === 'modal' || layout === 'drawer';
+    if (layout === 'split') {
+      editor.surface.hidden = false;
+      editor.preview.hidden = false;
+    }
+    if (layout === 'tabs') {
+      editor.surface.hidden = !editor.sourceMode;
+      editor.preview.hidden = editor.sourceMode;
+    }
+    editor.sourceMode = !editor.surface.hidden;
+  }
+  emit('uif:editor-layout-change', { editor, layout }, editor.element);
+}
+
+function formField(name: string, label: string, value = '', type = 'text'): string {
+  return `<label class="uif-editor-dialog-field"><span>${escapeHtml(label)}</span><input class="uif-input" type="${type}" name="${escapeAttr(name)}" value="${escapeAttr(value)}"></label>`;
+}
+
+function currentLinkValue(editor: EditorInstance): Required<EditorLinkValue> {
+  const link = currentLink(editor);
+  return {
+    text: link?.textContent || selectedRichText(editor, 'Link text'),
+    href: link?.getAttribute('href') || 'https://example.com',
+    title: link?.getAttribute('title') || '',
+    target: link?.getAttribute('target') === '_blank' ? '_blank' : '_self',
+  };
+}
+
+function currentImageValue(editor: EditorInstance): Required<EditorImageValue> {
+  const image = currentImage(editor);
+  const figure = image?.closest('figure');
+  return {
+    src: image?.getAttribute('src') || '/favicon.ico',
+    alt: image?.getAttribute('alt') || 'Image',
+    caption: figure?.querySelector('figcaption')?.textContent || '',
+  };
+}
+
+function positionEditorCommandDialog(dialog: HTMLElement, anchor?: HTMLElement): void {
+  const margin = 8;
+  const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+  dialog.style.removeProperty('right');
+  dialog.style.removeProperty('bottom');
+  if (viewportWidth <= 640) {
+    dialog.dataset.uifEditorDialogPlacement = 'sheet';
+    dialog.style.left = `${margin}px`;
+    dialog.style.right = `${margin}px`;
+    dialog.style.top = 'auto';
+    dialog.style.bottom = `${margin}px`;
+    return;
+  }
+  dialog.dataset.uifEditorDialogPlacement = 'popover';
+  const anchorRect = anchor?.getBoundingClientRect() || editorToolbarAnchorRect(dialog);
+  const width = dialog.offsetWidth || 360;
+  const height = dialog.offsetHeight || 240;
+  const left = Math.min(Math.max(anchorRect.left, margin), Math.max(margin, viewportWidth - width - margin));
+  const preferredTop = anchorRect.bottom + margin;
+  const top = preferredTop + height > viewportHeight - margin ? Math.max(margin, anchorRect.top - height - margin) : preferredTop;
+  dialog.style.left = `${left}px`;
+  dialog.style.top = `${top}px`;
+}
+
+function editorToolbarAnchorRect(dialog: HTMLElement): DOMRect {
+  const fallback = dialog.getBoundingClientRect();
+  return new DOMRect(fallback.left, fallback.top, fallback.width, fallback.height);
+}
+
+function openEditorCommandDialog(editor: EditorInstance, command: EditorCommand, apply: (value: unknown) => void, anchor?: HTMLElement): void {
+  document.querySelectorAll('.uif-editor-dialog').forEach((existing) => existing.remove());
+  const dialog = document.createElement('form');
+  dialog.className = 'uif-editor-dialog';
+  dialog.setAttribute('role', 'dialog');
+  dialog.setAttribute('aria-label', editorCommandLabel(command));
+  if (command === 'link') {
+    const link = editor.mode === 'html' ? currentLinkValue(editor) : { text: 'link', href: 'https://example.com', title: '', target: '_self' as const };
+    dialog.innerHTML = `<div class="uif-editor-dialog-grid">${formField('text', 'Text', link.text)}${formField('href', 'URL', link.href)}${formField('title', 'Title', link.title)}<label class="uif-editor-dialog-check"><input type="checkbox" name="blank"${link.target === '_blank' ? ' checked' : ''}> Open in new tab</label></div>`;
+  } else if (command === 'image') {
+    const image = editor.mode === 'html' ? currentImageValue(editor) : { src: '/favicon.ico', alt: 'Image', caption: '' };
+    dialog.innerHTML = `<div class="uif-editor-dialog-grid">${formField('src', 'Image URL', image.src)}${formField('alt', 'Alt text', image.alt)}${formField('caption', 'Caption', image.caption)}</div>`;
+  } else if (command === 'table') {
+    dialog.innerHTML = `<div class="uif-editor-dialog-grid">${formField('rows', 'Rows', '2', 'number')}${formField('columns', 'Columns', '2', 'number')}<label class="uif-editor-dialog-check"><input type="checkbox" name="header" checked> Header row</label></div>`;
+  }
+  dialog.insertAdjacentHTML('beforeend', '<div class="uif-editor-dialog-actions"><button type="button" class="uif-btn uif-btn-secondary" data-uif-editor-dialog-cancel>Cancel</button><button type="submit" class="uif-btn">Apply</button></div>');
+  const closeDialog = (restoreFocus = true) => {
+    dialog.remove();
+    document.removeEventListener('pointerdown', handleOutsidePointer, true);
+    window.removeEventListener('resize', handleViewportChange);
+    window.removeEventListener('scroll', handleViewportChange, true);
+    if (restoreFocus) editor.focus();
+  };
+  const handleOutsidePointer = (event: PointerEvent) => {
+    const target = event.target instanceof Node ? event.target : null;
+    if (!target || dialog.contains(target) || anchor?.contains(target)) return;
+    closeDialog(false);
+  };
+  const handleViewportChange = () => positionEditorCommandDialog(dialog, anchor);
+  dialog.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const data = new FormData(dialog);
+    if (command === 'link') apply({ text: data.get('text'), href: data.get('href'), title: data.get('title'), target: data.get('blank') ? '_blank' : '_self' });
+    if (command === 'image') apply({ src: data.get('src'), alt: data.get('alt'), caption: data.get('caption') });
+    if (command === 'table') apply({ rows: data.get('rows'), columns: data.get('columns'), header: Boolean(data.get('header')) });
+    closeDialog(false);
+  });
+  dialog.querySelector('[data-uif-editor-dialog-cancel]')?.addEventListener('click', () => {
+    closeDialog();
+  });
+  dialog.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    closeDialog();
+  });
+  document.body.append(dialog);
+  positionEditorCommandDialog(dialog, anchor);
+  document.addEventListener('pointerdown', handleOutsidePointer, true);
+  window.addEventListener('resize', handleViewportChange);
+  window.addEventListener('scroll', handleViewportChange, true);
+  dialog.querySelector<HTMLInputElement>('input')?.focus();
 }
 
 export function createEditor(el: HTMLElement, options: EditorOptions = {}): EditorInstance {
@@ -594,7 +1257,7 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
   }
   const preview = document.createElement('div');
   preview.className = 'uif-editor-preview';
-  preview.hidden = config.preview === 'none' || (config.layout === 'source' && config.preview !== 'live');
+  preview.hidden = config.preview === 'none';
   const status = document.createElement('div');
   status.className = 'uif-editor-status';
   status.setAttribute('role', 'status');
@@ -615,8 +1278,23 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
   input.setAttribute('data-uif-editor-input', 'true');
   input.insertAdjacentElement('afterend', wrapper);
   body.append(surface, preview);
-  if (config.layout === 'split') body.classList.add('uif-editor-body-split');
   wrapper.append(toolbar, body);
+  const tableTools = document.createElement('div');
+  tableTools.className = 'uif-editor-table-tools';
+  tableTools.hidden = true;
+  tableTools.innerHTML = [
+    ['table-row-before', 'Row before'],
+    ['table-row-after', 'Row'],
+    ['table-col-before', 'Column before'],
+    ['table-col-after', 'Column'],
+    ['table-row-delete', 'Delete row'],
+    ['table-col-delete', 'Delete column'],
+    ['table-header-toggle', 'Header'],
+    ['table-delete', 'Delete table'],
+  ]
+    .map(([command, label]) => `<button type="button" class="uif-editor-tool-chip" data-uif-editor-command="${command}">${label}</button>`)
+    .join('');
+  if (config.mode === 'html') wrapper.append(tableTools);
   if (config.status) wrapper.append(status);
   const instance: EditorInstance = {
     element: wrapper,
@@ -660,20 +1338,71 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
   editorInitialValue.set(instance, input.value);
   editorHistory.set(instance, { undo: [], redo: [], last: input.value });
   editorListeners.set(instance, []);
+  let savedRange: Range | null = null;
+  const saveRichSelection = () => {
+    if (surface instanceof HTMLTextAreaElement || instance.surface !== surface) return;
+    const selection = document.getSelection();
+    if (!selection?.rangeCount) return;
+    const range = selection.getRangeAt(0);
+    if (!surface.contains(range.commonAncestorContainer)) return;
+    savedRange = range.cloneRange();
+  };
+  const restoreRichSelection = () => {
+    if (!savedRange || surface instanceof HTMLTextAreaElement || instance.surface !== surface) return;
+    const selection = document.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(savedRange);
+  };
   const syncFromSurface = () => {
+    if (!(surface instanceof HTMLTextAreaElement)) syncRichControlAttributes(surface);
     const value = surface instanceof HTMLTextAreaElement ? surface.value : cleanEditorHtml(surface.innerHTML);
     void runEditorHooks('beforeInput', { editor: instance, value });
     instance.setValue(value);
     void runEditorHooks('afterInput', { editor: instance, value });
   };
+  const updateActiveTableCell = (target: EventTarget | null) => {
+    const cell = target instanceof Element ? target.closest<HTMLTableCellElement>('td,th') : null;
+    if (cell && surface.contains(cell)) editorActiveTableCell.set(instance, cell);
+  };
+  const updateTableTools = (target?: EventTarget | null) => {
+    if (config.mode !== 'html') return;
+    updateActiveTableCell(target ?? null);
+    const cell = currentTableCell() ?? editorActiveTableCell.get(instance) ?? null;
+    tableTools.hidden = !cell?.closest('table');
+  };
   surface.addEventListener('input', syncFromSurface);
+  surface.addEventListener('change', syncFromSurface);
+  surface.addEventListener('keyup', (event) => {
+    saveRichSelection();
+    updateTableTools(event.target);
+  });
+  surface.addEventListener('mouseup', (event) => {
+    saveRichSelection();
+    updateTableTools(event.target);
+  });
   surface.addEventListener('focus', () => emit('uif:editor-focus', { editor: instance }, wrapper));
   surface.addEventListener('blur', () => emit('uif:editor-blur', { editor: instance }, wrapper));
+  toolbar.addEventListener('mousedown', (event) => {
+    if (event.target instanceof Element && event.target.closest('[data-uif-editor-command]')) event.preventDefault();
+  });
+  toolbar.addEventListener('keydown', (event) => {
+    if (!(event instanceof KeyboardEvent)) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-uif-editor-command]') : null;
+    if (!button) return;
+    event.preventDefault();
+    button.click();
+  });
   toolbar.addEventListener('click', (event) => {
-    const button = event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('[data-uif-editor-command]') : null;
+    const button = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-uif-editor-command]') : null;
     const command = button?.dataset.uifEditorCommand as EditorCommand | undefined;
     if (!button || !command) return;
     if (command === 'preview') {
+      const layout = (instance.element.dataset.uifEditorLayout as EditorLayout | undefined) ?? config.layout;
+      if (config.mode === 'markdown' && (layout === 'modal' || layout === 'drawer')) {
+        openPreviewOverlay(instance, layout);
+        return;
+      }
       void runEditorHooks('beforePreview', { editor: instance, value: instance.getValue(), command });
       preview.hidden = !preview.hidden;
       button.setAttribute('aria-pressed', String(!preview.hidden));
@@ -719,10 +1448,37 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
       return;
     }
     emit('uif:editor-command', { editor: instance, command }, wrapper);
+    restoreRichSelection();
+    if ((command === 'link' || command === 'image' || command === 'table') && !(event instanceof CustomEvent)) {
+      openEditorCommandDialog(instance, command, (value) => {
+        restoreRichSelection();
+        formatEditor(instance, command, value);
+        saveRichSelection();
+        updateTableTools();
+      }, button);
+      return;
+    }
     formatEditor(instance, command);
+    saveRichSelection();
+    updateTableTools();
+  });
+  tableTools.addEventListener('click', (event) => {
+    const button = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-uif-editor-command]') : null;
+    const command = button?.dataset.uifEditorCommand as EditorCommand | undefined;
+    if (!command) return;
+    formatEditor(instance, command);
+    updateTableTools();
   });
   surface.addEventListener('keydown', (event) => {
     if (!(event instanceof KeyboardEvent)) return;
+    if (surface instanceof HTMLTextAreaElement && handleMarkdownTaskKey(surface, event)) {
+      syncFromSurface();
+      return;
+    }
+    if (!(surface instanceof HTMLTextAreaElement) && handleRichTaskKey(instance, event)) {
+      syncFromSurface();
+      return;
+    }
     const key = event.key.toLowerCase();
     if (!(event.metaKey || event.ctrlKey)) return;
     if (key === 'b') {
@@ -754,6 +1510,7 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
   });
   editors.set(el, instance);
   instance.setValue(input.value);
+  setEditorPreviewLayout(instance, config.layout);
   emit('uif:editor-init', { editor: instance }, wrapper);
   return instance;
 }
