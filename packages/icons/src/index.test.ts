@@ -36,6 +36,14 @@ describe('icons', () => {
     expect(markup).toContain('fill="currentColor"');
   });
 
+  it('includes the Batoi UIF brand mark', () => {
+    const markup = icon('uif', { title: 'Batoi UIF' });
+    expect(hasIcon('uif')).toBe(true);
+    expect(markup).toContain('viewBox="0 0 64 64"');
+    expect(markup).toContain('<title>Batoi UIF</title>');
+    expect(markup).toContain('stroke="currentColor"');
+  });
+
   it('includes a broad first-party icon set for application interfaces', () => {
     expect(Object.keys(icons).length).toBeGreaterThanOrEqual(120);
     [

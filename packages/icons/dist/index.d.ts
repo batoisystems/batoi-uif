@@ -389,6 +389,10 @@ declare const icons: {
     readonly trash: {
         readonly body: "<path d=\"M3 6h18\"></path><path d=\"M8 6V4h8v2\"></path><path d=\"M19 6l-1 15H6L5 6\"></path><path d=\"M10 11v6\"></path><path d=\"M14 11v6\"></path>";
     };
+    readonly uif: {
+        readonly body: "<path d=\"M18 16 L18 38 Q18 52 32 52 Q46 52 46 38 L46 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><rect x=\"46\" y=\"12\" width=\"12\" height=\"12\" rx=\"3\" fill=\"currentColor\" stroke=\"none\"></rect>";
+        readonly viewBox: "0 0 64 64";
+    };
     readonly undo: {
         readonly body: "<path d=\"M3 7v6h6\"></path><path d=\"M3 13a8 8 0 1 1 2.3 5.7\"></path>";
     };
