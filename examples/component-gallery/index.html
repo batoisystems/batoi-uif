@@ -142,6 +142,35 @@
             <div class="component-card-head">
               <div>
                 <div class="example-eyebrow">Overlay</div>
+                <h2>Off-canvas</h2>
+                <p>Bootstrap migration alias for drawer-style viewport panels.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <button class="uif-btn uif-btn-secondary" data-uif-action="open" data-uif-target="#gallery-offcanvas"><span data-uif-icon="sidebar"></span>Open off-canvas</button>
+              <aside id="gallery-offcanvas" class="uif-offcanvas uif-offcanvas-left" data-uif="offcanvas" hidden>
+                <div class="component-drawer-inner">
+                  <h3>Navigation</h3>
+                  <nav class="uif-sidebar-nav" aria-label="Off-canvas navigation">
+                    <a href="#overlays" aria-current="page">Overlays</a>
+                    <a href="#navigation">Navigation</a>
+                    <a href="#feedback">Feedback</a>
+                  </nav>
+                  <button class="uif-btn" data-uif-action="close">Close panel</button>
+                </div>
+              </aside>
+            </div>
+            <pre><code>&lt;button data-uif-action="open" data-uif-target="#offcanvas"&gt;Open&lt;/button&gt;
+&lt;aside id="offcanvas" class="uif-offcanvas uif-offcanvas-left" data-uif="offcanvas" hidden&gt;
+  &lt;button data-uif-action="close"&gt;Close&lt;/button&gt;
+&lt;/aside&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Overlay</div>
                 <h2>Dropdown</h2>
                 <p>Toggleable menu with outside-click and Escape handling.</p>
               </div>
@@ -161,6 +190,26 @@
   &lt;button data-uif-role="trigger"&gt;Actions&lt;/button&gt;
   &lt;div data-uif-role="panel" hidden&gt;...&lt;/div&gt;
 &lt;/div&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Overlay</div>
+                <h2>Tooltip</h2>
+                <p>Text-safe hover and focus help for icon controls and form hints.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div class="uif-cluster">
+                <button class="uif-btn uif-btn-secondary uif-icon-btn" type="button" data-uif="tooltip" data-uif-message="Refreshes the current table." aria-label="Refresh table"><span data-uif-icon="refresh"></span></button>
+                <label class="uif-field">Workspace key <input class="uif-input" value="batoi-demo" data-uif="tooltip" data-uif-message="Used by RAD partial routes and audit entries."></label>
+              </div>
+            </div>
+            <pre><code>&lt;button data-uif="tooltip" data-uif-message="Refreshes the current table" aria-label="Refresh"&gt;
+  &lt;span data-uif-icon="refresh"&gt;&lt;/span&gt;
+&lt;/button&gt;</code></pre>
           </article>
 
           <article id="navigation" class="uif-card component-card">

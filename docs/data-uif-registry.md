@@ -23,7 +23,10 @@ This registry documents the stable declarative surface for Batoi UIF. Attributes
 | `button` | `@batoi/uif-components` | `button`, `a` | Button state and declarative action hooks. |
 | `modal` | `@batoi/uif-components` | Dialog container | ARIA dialog role, open/close, Escape close, focus behavior. |
 | `drawer` | `@batoi/uif-components` | Drawer container | Side-panel open/close behavior. |
+| `offcanvas` | `@batoi/uif-components` | Off-canvas container | Alias/equivalent for drawer-style viewport-edge panels. |
 | `dropdown` | `@batoi/uif-components` | Menu container | Toggle, outside click close, Escape close. |
+| `tooltip` | `@batoi/uif-components` | Trigger element | Text-safe hover/focus help surface with `role="tooltip"` and `aria-describedby`. |
+| `popover` | `@batoi/uif-components` | Trigger/panel container | Click-triggered floating panel for richer contextual content. |
 | `tabs` | `@batoi/uif-components` | Tab group container | ARIA tabs and panel state. |
 | `toast` | `@batoi/uif-components` | Toast region/item | Dismiss and status behavior. |
 | `accordion` | `@batoi/uif-components` | Accordion container | Disclosure state management. |
@@ -72,6 +75,27 @@ Malformed `pattern` expressions are handled as validation failures rather than r
 Markdown preview escapes raw HTML by default and supports a practical subset including headings, lists, task lists, tables, links, images, code blocks, blockquotes, strikethrough, and horizontal rules. Browser-side cleanup is not a substitute for server-side sanitization before trusted render or storage.
 
 Editor command values can also be passed programmatically through `runEditorCommand(editor, command, value)`. Structured values are supported for links, images, and tables. Current command coverage includes `link-edit`, `link-remove`, `image-edit`, `image-remove`, `table-row-before`, `table-row-after`, `table-row-delete`, `table-col-before`, `table-col-after`, `table-col-delete`, `table-header-toggle`, and `table-delete`. Task lists support checkbox state synchronization plus Enter/Backspace continuation behavior in HTML and Markdown modes.
+
+## Overlays
+
+| Attribute | Purpose |
+| --- | --- |
+| `data-uif="modal"` | Enhances a dialog container. |
+| `data-uif="drawer"` | Enhances a side-panel container. |
+| `data-uif="offcanvas"` | Enhances a drawer-equivalent off-canvas container. |
+| `data-uif="tooltip"` | Enhances a trigger element with text-safe hover/focus help. |
+| `data-uif="popover"` | Enhances a trigger/panel container for contextual content. |
+| `data-uif-placement` | Planned placement hint for floating overlays, such as `top`, `right`, `bottom`, `left`, or `auto`. |
+| `data-uif-delay` | Planned tooltip/popover delay in milliseconds. |
+| `data-uif-container` | Planned render container hint, such as `body`, `self`, or a selector. |
+| `data-uif-html` | Defaults to `false`; tooltip content is text-safe by default. |
+| `data-uif-backdrop` | Planned drawer/off-canvas backdrop mode: `true`, `false`, or `static`. |
+| `data-uif-scroll` | Planned drawer/off-canvas body scroll policy. |
+| `data-uif-breakpoint` | Planned responsive drawer/off-canvas breakpoint hint. |
+
+Current tooltip content comes from `data-uif-message` or the trigger's `title` attribute. The title is removed after initialization and the generated tooltip panel is associated through `aria-describedby`.
+
+`drawer` is the preferred UIF term for app and RAD side panels. `offcanvas` is supported as a Bootstrap migration alias for the same behavior.
 
 ## Animation and Event Actions
 

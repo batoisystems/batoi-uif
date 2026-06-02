@@ -43,6 +43,11 @@ declare const drawer: {
     init: typeof initDrawer;
     destroy: typeof destroyComponent;
 };
+declare const offcanvas: {
+    name: string;
+    init: typeof initDrawer;
+    destroy: typeof destroyComponent;
+};
 declare const dropdown: {
     name: string;
     init: typeof initDropdown;
@@ -164,4 +169,4 @@ declare const table: {
     destroy: typeof destroyComponent;
 };
 
-export { type ComponentInstance, accordion, alert, badge, breadcrumb, button, card, collapseComponent, combobox, commandMenu, destroyComponent, drawer, dropdown, fileUpload, initAll, initComponent, modal, nav, navbar, pagination, popover, progress, showToast, sidebar, skeleton, spinner, stepper, table, tabs, toast, tooltip, wizard };
+export { type ComponentInstance, accordion, alert, badge, breadcrumb, button, card, collapseComponent, combobox, commandMenu, destroyComponent, drawer, dropdown, fileUpload, initAll, initComponent, modal, nav, navbar, offcanvas, pagination, popover, progress, showToast, sidebar, skeleton, spinner, stepper, table, tabs, toast, tooltip, wizard };

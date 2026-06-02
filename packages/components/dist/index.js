@@ -411,6 +411,7 @@ function handleAction(event) {
 var inits = {
   modal: initModal,
   drawer: initDrawer,
+  offcanvas: initDrawer,
   dropdown: initDropdown,
   tabs: initTabs,
   toast: initToast,
@@ -478,6 +479,7 @@ function showToast(message, options = {}) {
 var button = { name: "button", init: initButton, destroy: destroyComponent };
 var modal = { name: "modal", init: initModal, destroy: destroyComponent };
 var drawer = { name: "drawer", init: initDrawer, destroy: destroyComponent };
+var offcanvas = { name: "offcanvas", init: initDrawer, destroy: destroyComponent };
 var dropdown = { name: "dropdown", init: initDropdown, destroy: destroyComponent };
 var tabs = { name: "tabs", init: initTabs, destroy: destroyComponent };
 var toast = { name: "toast", init: initToast, destroy: destroyComponent };
@@ -521,6 +523,7 @@ export {
   modal,
   nav,
   navbar,
+  offcanvas,
   pagination,
   popover,
   progress,

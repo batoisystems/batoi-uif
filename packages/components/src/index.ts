@@ -444,6 +444,7 @@ function handleAction(event: Event): void {
 const inits: Record<string, ComponentInit> = {
   modal: initModal,
   drawer: initDrawer,
+  offcanvas: initDrawer,
   dropdown: initDropdown,
   tabs: initTabs,
   toast: initToast,
@@ -516,6 +517,7 @@ export function showToast(message: string, options: { type?: string; duration?: 
 export const button = { name: 'button', init: initButton, destroy: destroyComponent };
 export const modal = { name: 'modal', init: initModal, destroy: destroyComponent };
 export const drawer = { name: 'drawer', init: initDrawer, destroy: destroyComponent };
+export const offcanvas = { name: 'offcanvas', init: initDrawer, destroy: destroyComponent };
 export const dropdown = { name: 'dropdown', init: initDropdown, destroy: destroyComponent };
 export const tabs = { name: 'tabs', init: initTabs, destroy: destroyComponent };
 export const toast = { name: 'toast', init: initToast, destroy: destroyComponent };

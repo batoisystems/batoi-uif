@@ -2032,6 +2032,7 @@ function handleAction(event) {
 var inits = {
   modal: initModal,
   drawer: initDrawer,
+  offcanvas: initDrawer,
   dropdown: initDropdown,
   tabs: initTabs,
   toast: initToast,
@@ -2099,6 +2100,7 @@ function showToast(message, options = {}) {
 var button = { name: "button", init: initButton, destroy: destroyComponent };
 var modal = { name: "modal", init: initModal, destroy: destroyComponent };
 var drawer = { name: "drawer", init: initDrawer, destroy: destroyComponent };
+var offcanvas = { name: "offcanvas", init: initDrawer, destroy: destroyComponent };
 var dropdown = { name: "dropdown", init: initDropdown, destroy: destroyComponent };
 var tabs = { name: "tabs", init: initTabs, destroy: destroyComponent };
 var toast = { name: "toast", init: initToast, destroy: destroyComponent };
@@ -5674,6 +5676,12 @@ var uifAttributes = [
   "data-uif-animation",
   "data-uif-duration",
   "data-uif-delay",
+  "data-uif-placement",
+  "data-uif-container",
+  "data-uif-html",
+  "data-uif-backdrop",
+  "data-uif-scroll",
+  "data-uif-breakpoint",
   "data-uif-class",
   "data-uif-attribute",
   "data-uif-key"
@@ -5682,10 +5690,13 @@ var uifValues = [
   "button",
   "modal",
   "drawer",
+  "offcanvas",
   "dropdown",
   "tabs",
   "toast",
   "accordion",
+  "tooltip",
+  "popover",
   "table",
   "form",
   "editor",
@@ -6981,6 +6992,7 @@ export {
   navbar,
   observe,
   observeMotion,
+  offcanvas,
   on,
   onAppUpdate,
   onNetworkChange,

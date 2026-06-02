@@ -103,7 +103,7 @@ Core framework packages:
 - `@batoi/uif-forms` for validation, async submission, and accessible error rendering.
 - `@batoi/uif-router` for lightweight route behavior.
 - `@batoi/uif-pwa` for service worker, install prompt, online/offline, and cache helpers.
-- `@batoi/uif-components` for dependency-free components such as buttons, modals, drawers, dropdowns, tabs, toasts, accordions, cards, nav, and tables.
+- `@batoi/uif-components` for dependency-free components such as buttons, modals, drawers/off-canvas panels, dropdowns, tooltips, popovers, tabs, toasts, accordions, cards, command menus, nav, and tables.
 - `@batoi/uif-rad-adapter` for Batoi RAD partial updates, content swaps, action binding, and rehydration.
 
 Planned application capability packages:
@@ -332,7 +332,7 @@ Important attributes include:
 - `data-uif-icon-class`
 - `data-uif-icon-hidden`
 
-Expected v1 `data-uif` values include `button`, `modal`, `drawer`, `dropdown`, `tabs`, `toast`, `accordion`, `table`, `form`, `ajax`, `route`, `shell`, `nav`, `chart`, `realtime`, `push`, `mobile-shell`, `ai-action`, and `tool-approval`.
+Expected v1 `data-uif` values include `button`, `modal`, `drawer`, `offcanvas`, `dropdown`, `tooltip`, `popover`, `tabs`, `toast`, `accordion`, `table`, `form`, `ajax`, `route`, `shell`, `nav`, `chart`, `realtime`, `push`, `mobile-shell`, `ai-action`, and `tool-approval`.
 
 ## Development
 
@@ -353,7 +353,7 @@ If working before that migration is complete, use the currently available worksp
 
 - v0.1 foundation: npm workspaces, TypeScript source, core, CSS, DOM, net, forms, baseline tests.
 - v0.2 RAD adapter: partial updates, content swap, confirmation, loading states, JSON response handling, rehydration.
-- v0.3 components: modal, drawer, dropdown, tabs, toast, accordion, card, nav, table.
+- v0.3 components: modal, drawer/off-canvas, dropdown, tooltip, popover, tabs, toast, accordion, card, nav, table.
 - v0.4 charts/dashboard: SVG-first chart package and dashboard example.
 - v0.5 realtime/push/mobile: SSE, WebSocket, polling fallback, notifications, mobile shell.
 - v0.6 AI/MCP UI: action cards, approval cards, progress/result UI, audit trail, server-mediated flows.
