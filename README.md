@@ -1,4 +1,10 @@
-# Batoi UIF — Unified Interface Framework
+<p align="center">
+  <img src="docs/assets/logo/uif-mono.svg" width="72" alt="Batoi UIF">
+</p>
+
+<h1 align="center">Batoi UIF</h1>
+
+<p align="center">Dependency-free Unified Interface Framework</p>
 
 Batoi UIF is a dependency-free frontend application interface framework for server-rendered, progressive, mobile-ready, real-time, AI-enabled web applications.
 
