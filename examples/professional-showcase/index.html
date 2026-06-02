@@ -8,22 +8,23 @@
     <link rel="stylesheet" href="./showcase.css?v=20260525h">
   </head>
   <body>
-    <div class="uif-app-shell-fixed showcase-shell">
-      <aside class="uif-sidebar uif-sidebar-fixed showcase-sidebar">
+    <div id="showcase-shell" class="uif-app-shell-fixed showcase-shell" data-uif="shell" data-uif-route="command-center" data-uif-sidebar-key="showcase:sidebar" data-uif-density-key="showcase:density">
+      <a class="uif-skip-link" data-uif-role="skip-link">Skip to content</a>
+      <aside class="uif-sidebar uif-sidebar-fixed showcase-sidebar" data-uif-role="sidebar">
         <div class="uif-sidebar-brand">
           <img class="showcase-brand-mark" src="https://www.batoi.com/pub/assets/2022/03/05/batoi-green-favicon-622345836cf01.png" alt="Batoi">
           <span><strong>Batoi UIF</strong><span class="uif-text-sm uif-text-muted">Examples · v2.6</span></span>
-          <button class="uif-btn uif-btn-secondary uif-icon-btn showcase-collapse" type="button" aria-label="Collapse sidebar">⌃</button>
+          <button class="uif-btn uif-btn-secondary uif-icon-btn showcase-collapse" type="button" data-uif-action="toggle" data-uif-target="#showcase-shell" aria-label="Collapse sidebar">⌃</button>
         </div>
         <div class="uif-px-3 uif-py-3"><label class="uif-search"><span data-uif-icon="search" aria-hidden="true"></span><input type="search" placeholder="Search pages..." data-showcase-filter=".showcase-section,[data-row],[data-deal]"><kbd>⌘K</kbd></label></div>
-        <nav class="uif-sidebar-nav" aria-label="Showcase scenarios">
+        <nav class="uif-sidebar-nav" data-uif-role="nav" aria-label="Showcase scenarios">
           <div class="uif-sidebar-section">Operate</div>
-          <a href="./" aria-current="page"><span class="showcase-nav-label"><span data-uif-icon="grid" aria-hidden="true"></span>Command Center</span></a>
-          <a href="./crm-pipeline.html"><span class="showcase-nav-label"><span data-uif-icon="users" aria-hidden="true"></span>CRM Pipeline</span><span class="uif-badge">24</span></a>
-          <a href="./ai-approval.html"><span class="showcase-nav-label"><span data-uif-icon="approval" aria-hidden="true"></span>AI Approval</span><span class="uif-badge uif-badge-warning">12</span></a>
+          <a href="./" data-uif-route="command-center" aria-current="page"><span class="showcase-nav-label"><span data-uif-icon="grid" aria-hidden="true"></span>Command Center</span></a>
+          <a href="./crm-pipeline.html" data-uif-route="crm-pipeline"><span class="showcase-nav-label"><span data-uif-icon="users" aria-hidden="true"></span>CRM Pipeline</span><span class="uif-badge">24</span></a>
+          <a href="./ai-approval.html" data-uif-route="ai-approval"><span class="showcase-nav-label"><span data-uif-icon="approval" aria-hidden="true"></span>AI Approval</span><span class="uif-badge uif-badge-warning">12</span></a>
           <div class="uif-sidebar-section">Build</div>
-          <a href="./rad-admin.html"><span class="showcase-nav-label"><span data-uif-icon="layers" aria-hidden="true"></span>RAD Admin</span></a>
-          <a href="./mobile-field.html"><span class="showcase-nav-label"><span data-uif-icon="phone" aria-hidden="true"></span>Mobile Field</span></a>
+          <a href="./rad-admin.html" data-uif-route="rad-admin"><span class="showcase-nav-label"><span data-uif-icon="layers" aria-hidden="true"></span>RAD Admin</span></a>
+          <a href="./mobile-field.html" data-uif-route="mobile-field"><span class="showcase-nav-label"><span data-uif-icon="phone" aria-hidden="true"></span>Mobile Field</span></a>
           <div class="uif-sidebar-section">Library</div>
           <a class="is-disabled" href="#" aria-disabled="true"><span class="showcase-nav-label"><span data-uif-icon="box" aria-hidden="true"></span>Components</span><span data-uif-icon="lock" aria-hidden="true"></span></a>
           <a class="is-disabled" href="#" aria-disabled="true"><span class="showcase-nav-label"><span data-uif-icon="document" aria-hidden="true"></span>Patterns</span><span data-uif-icon="lock" aria-hidden="true"></span></a>
@@ -34,7 +35,7 @@
       <div class="uif-shell-content showcase-content">
         <header class="uif-topbar showcase-topbar"><div class="showcase-topbar-title"><div class="uif-breadcrumbs"><span>Workspace</span><span>/</span><span>Operate</span><span>/</span><strong>Command Center</strong></div><h1 class="uif-text-xl">Command Center</h1></div><label class="uif-search showcase-search"><span data-uif-icon="search" aria-hidden="true"></span><input type="search" placeholder="Search records, deals, users..."><kbd>⌘K</kbd></label><div class="uif-page-actions"><button class="uif-btn uif-btn-secondary uif-icon-btn" type="button" data-showcase-toast="Notifications reviewed" aria-label="Notifications"><span data-uif-icon="bell" aria-hidden="true"></span></button><button class="uif-btn uif-btn-secondary uif-icon-btn" type="button" data-showcase-toast="Workspace switcher opened" aria-label="Workspace"><span data-uif-icon="grid" aria-hidden="true"></span></button><button class="uif-btn uif-btn-secondary" type="button" data-showcase-theme><span data-uif-icon="theme" aria-hidden="true"></span>Theme</button><button class="uif-btn" type="button" data-showcase-toast="New workflow started"><span data-uif-icon="plus" aria-hidden="true"></span>New</button></div></header>
         <section class="uif-page-head showcase-command-head"><div class="uif-page-title"><div class="showcase-eyebrow">Operate · Quarter-to-date</div><h2>Command Center</h2><p>Executive operating view for revenue, incidents, and delivery health across all workspaces.</p></div><div class="uif-page-actions"><button class="uif-btn uif-btn-secondary" type="button" data-showcase-toast="Quarter filter applied"><span data-uif-icon="calendar" aria-hidden="true"></span>This quarter</button><button class="uif-btn uif-btn-secondary" type="button" data-showcase-toast="Scenario export queued"><span data-uif-icon="download" aria-hidden="true"></span>Export</button><button class="uif-btn" type="button" data-showcase-toast="Executive brief prepared"><span data-uif-icon="spark" aria-hidden="true"></span>Run brief</button></div></section>
-        <main class="uif-scroll-region showcase-page-grid">
+        <main class="uif-scroll-region showcase-page-grid" data-uif-role="main">
           <section class="showcase-section showcase-page-grid">
             <div class="showcase-grid-4">
               <article class="uif-card uif-stat showcase-kpi showcase-kpi-blue">

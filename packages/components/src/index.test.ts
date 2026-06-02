@@ -4,6 +4,7 @@ import { destroyComponent, initAll, showToast } from './index.js';
 
 afterEach(() => {
   document.body.innerHTML = '';
+  window.localStorage.clear();
   vi.unstubAllGlobals();
 });
 
@@ -93,5 +94,55 @@ describe('components', () => {
     document.querySelector('button')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(panel?.hidden).toBe(false);
     expect(panel?.dataset.uifState).toBe('open');
+  });
+
+  it('initializes workspace shells with persisted sidebar, density, skip link, and active route state', () => {
+    window.localStorage.setItem('workspace-sidebar', 'collapsed');
+    window.localStorage.setItem('workspace-density', 'compact');
+    document.body.innerHTML = `
+      <div id="workspace-shell" data-uif="shell" data-uif-route="guard" data-uif-sidebar-key="workspace-sidebar" data-uif-density-key="workspace-density">
+        <a data-uif-role="skip-link">Skip</a>
+        <aside data-uif-role="sidebar">
+          <nav data-uif-role="nav">
+            <a href="/core" data-uif-route="core">Core</a>
+            <a href="/guard" data-uif-route="guard">Guard</a>
+            <button data-uif-action="toggle-section" data-uif-state="expanded">Build</button>
+            <div data-uif-role="section-panel"><a href="/build">Routes</a></div>
+          </nav>
+        </aside>
+        <button id="toggle" data-uif-action="toggle" data-uif-target="#workspace-shell">Toggle sidebar</button>
+        <button id="density" data-uif-action="set-density" data-uif-density="comfortable">Comfortable</button>
+        <main data-uif-role="main">Workspace</main>
+      </div>`;
+    initAll(document);
+
+    const shell = document.querySelector<HTMLElement>('#workspace-shell');
+    const main = document.querySelector<HTMLElement>('[data-uif-role="main"]');
+    const skip = document.querySelector<HTMLAnchorElement>('[data-uif-role="skip-link"]');
+    const active = document.querySelector<HTMLAnchorElement>('a[data-uif-route="guard"]');
+    const sectionTrigger = document.querySelector<HTMLButtonElement>('[data-uif-action="toggle-section"]');
+    const sectionPanel = document.querySelector<HTMLElement>('[data-uif-role="section-panel"]');
+
+    expect(shell?.dataset.uifSidebar).toBe('collapsed');
+    expect(shell?.dataset.uifDensity).toBe('compact');
+    expect(shell?.classList.contains('uif-shell-sidebar-collapsed')).toBe(true);
+    expect(main?.id).toBe('workspace-shell-main');
+    expect(skip?.getAttribute('href')).toBe('#workspace-shell-main');
+    expect(active?.getAttribute('aria-current')).toBe('page');
+    expect(active?.classList.contains('is-active')).toBe(true);
+    expect(sectionTrigger?.getAttribute('aria-expanded')).toBe('true');
+    expect(sectionPanel?.hidden).toBe(false);
+
+    document.querySelector('#toggle')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(shell?.dataset.uifSidebar).toBe('expanded');
+    expect(window.localStorage.getItem('workspace-sidebar')).toBe('expanded');
+
+    document.querySelector('#density')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(shell?.dataset.uifDensity).toBe('comfortable');
+    expect(window.localStorage.getItem('workspace-density')).toBe('comfortable');
+
+    sectionTrigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(sectionTrigger?.getAttribute('aria-expanded')).toBe('false');
+    expect(sectionPanel?.hidden).toBe(true);
   });
 });

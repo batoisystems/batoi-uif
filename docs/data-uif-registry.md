@@ -35,6 +35,7 @@ This registry documents the stable declarative surface for Batoi UIF. Attributes
 | `editor` | `@batoi/uif-editor` | `textarea`, `input`, editor host | Dependency-free HTML and Markdown editing with synchronized form field and preview. |
 | `ajax` | `@batoi/uif-rad-adapter` | `button`, `a`, `form` | Server-rendered partial load and swap. |
 | `route` | `@batoi/uif-router` | `a`, route container | Same-origin partial routing. |
+| `shell` | `@batoi/uif-components` | Application shell container | Workspace shell state, sidebar collapse, density preference, active nav, skip target, and nested section disclosure. |
 | `chart` | `@batoi/uif-charts` | `div`, chart host | Dependency-free SVG chart rendering. |
 | `animate` | `@batoi/uif-effects` | Any element | Declarative animation presets with reduced-motion support. |
 | `realtime` | `@batoi/uif-realtime` | Region/controller | SSE, WebSocket, or polling feed updates. |
@@ -96,6 +97,25 @@ Editor command values can also be passed programmatically through `runEditorComm
 Current tooltip content comes from `data-uif-message` or the trigger's `title` attribute. The title is removed after initialization and the generated tooltip panel is associated through `aria-describedby`.
 
 `drawer` is the preferred UIF term for app and RAD side panels. `offcanvas` is supported as a Bootstrap migration alias for the same behavior.
+
+## Workspace Shells
+
+| Attribute | Purpose |
+| --- | --- |
+| `data-uif="shell"` | Enhances a server-rendered workspace shell. |
+| `data-uif-route` | Names the current route so matching nav links can receive `aria-current="page"` and `is-active`. |
+| `data-uif-sidebar-key` | Optional `localStorage` key for persisted sidebar collapsed/expanded state. |
+| `data-uif-density-key` | Optional `localStorage` key for persisted density state. |
+| `data-uif-density` | Initial density value, commonly `compact` or `comfortable`. |
+| `data-uif-role="skip-link"` | Link that is pointed to the shell's main content region. |
+| `data-uif-role="sidebar"` | Sidebar or product navigation region. |
+| `data-uif-role="nav"` | Keyboard-enabled shell navigation region. |
+| `data-uif-role="main"` | Main content region; receives an id and `tabindex="-1"` when needed. |
+| `data-uif-action="toggle"` | Toggles the shell sidebar when targeted at the shell. |
+| `data-uif-action="toggle-sidebar"` | Explicit sidebar toggle action. |
+| `data-uif-action="toggle-section"` | Toggles the next section panel or the configured `data-uif-target`. |
+
+Shell behavior is intentionally server-rendered friendly. The HTML remains meaningful without JavaScript, while UIF adds preference persistence, active navigation state, section disclosure, and safe rehydration after partial swaps.
 
 ## Animation and Event Actions
 

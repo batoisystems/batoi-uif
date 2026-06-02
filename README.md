@@ -103,7 +103,7 @@ Core framework packages:
 - `@batoi/uif-forms` for validation, async submission, and accessible error rendering.
 - `@batoi/uif-router` for lightweight route behavior.
 - `@batoi/uif-pwa` for service worker, install prompt, online/offline, and cache helpers.
-- `@batoi/uif-components` for dependency-free components such as buttons, modals, drawers/off-canvas panels, dropdowns, tooltips, popovers, tabs, toasts, accordions, cards, command menus, nav, and tables.
+- `@batoi/uif-components` for dependency-free components such as buttons, workspace shells, modals, drawers/off-canvas panels, dropdowns, tooltips, popovers, tabs, toasts, accordions, cards, command menus, nav, and tables.
 - `@batoi/uif-rad-adapter` for Batoi RAD partial updates, content swaps, action binding, and rehydration.
 
 Planned application capability packages:
@@ -164,6 +164,7 @@ Open `examples/index.html` for a landing page that links to every bundled exampl
 Reference docs:
 
 - `docs/data-uif-registry.md` lists the canonical declarative `data-uif-*` surface.
+- `docs/rad-workspace-migration.md` shows how RAD workspace shells, registers, manage forms, analytics routes, and editor routes can move to UIF without Bootstrap, jQuery, Chart.js, Bootstrap Table, or Summernote.
 - `docs/security.md` explains the trusted HTML boundary, safe text rendering, and AI/MCP server-side governance model.
 
 ### Micro App
@@ -326,6 +327,9 @@ Important attributes include:
 - `data-uif-validate`
 - `data-uif-rule`
 - `data-uif-refresh`
+- `data-uif-density`
+- `data-uif-sidebar-key`
+- `data-uif-density-key`
 - `data-uif-icon`
 - `data-uif-icon-title`
 - `data-uif-icon-size`
