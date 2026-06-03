@@ -98,6 +98,17 @@ Current tooltip content comes from `data-uif-message` or the trigger's `title` a
 
 `drawer` is the preferred UIF term for app and RAD side panels. `offcanvas` is supported as a Bootstrap migration alias for the same behavior.
 
+Drawers and off-canvas panels use a scroll-safe two-row layout by default. Put fixed controls in a header row and long content in a body row:
+
+```html
+<div data-uif="offcanvas" class="uif-offcanvas uif-offcanvas-right">
+  <div data-uif-role="header">Panel title and actions</div>
+  <div data-uif-role="body">Scrollable panel content</div>
+</div>
+```
+
+The `.uif-drawer-body`, `.uif-offcanvas-body`, and `[data-uif-role="body"]` body regions set `min-height: 0`, vertical scrolling, contained overscroll, and touch scrolling so fixed drawers do not force page-level scrolling.
+
 ## Workspace Shells
 
 | Attribute | Purpose |

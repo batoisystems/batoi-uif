@@ -125,16 +125,21 @@
             <div class="component-demo">
               <button class="uif-btn uif-btn-secondary" data-uif-action="open" data-uif-target="#gallery-drawer"><span data-uif-icon="sidebar"></span>Open drawer</button>
               <aside id="gallery-drawer" class="uif-drawer uif-drawer-right" data-uif="drawer" hidden>
-                <div class="component-drawer-inner">
+                <div class="component-drawer-inner" data-uif-role="header">
                   <h3>Account filters</h3>
+                  <button class="uif-btn uif-btn-secondary" data-uif-action="close">Close</button>
+                </div>
+                <div class="component-drawer-inner" data-uif-role="body">
                   <label class="uif-field">Stage <select class="uif-input"><option>All stages</option><option>Review</option></select></label>
+                  <label class="uif-field">Owner <select class="uif-input"><option>Any owner</option><option>Support</option></select></label>
                   <button class="uif-btn" data-uif-action="close">Apply filters</button>
                 </div>
               </aside>
             </div>
             <pre><code>&lt;button data-uif-action="open" data-uif-target="#drawer"&gt;Open drawer&lt;/button&gt;
 &lt;aside id="drawer" class="uif-drawer uif-drawer-right" data-uif="drawer" hidden&gt;
-  &lt;button data-uif-action="close"&gt;Close&lt;/button&gt;
+  &lt;div data-uif-role="header"&gt;Panel title and actions&lt;/div&gt;
+  &lt;div data-uif-role="body"&gt;Scrollable panel content&lt;/div&gt;
 &lt;/aside&gt;</code></pre>
           </article>
 
@@ -150,20 +155,23 @@
             <div class="component-demo">
               <button class="uif-btn uif-btn-secondary" data-uif-action="open" data-uif-target="#gallery-offcanvas"><span data-uif-icon="sidebar"></span>Open off-canvas</button>
               <aside id="gallery-offcanvas" class="uif-offcanvas uif-offcanvas-left" data-uif="offcanvas" hidden>
-                <div class="component-drawer-inner">
+                <div class="component-drawer-inner" data-uif-role="header">
                   <h3>Navigation</h3>
+                  <button class="uif-btn uif-btn-secondary" data-uif-action="close">Close</button>
+                </div>
+                <div class="component-drawer-inner" data-uif-role="body">
                   <nav class="uif-sidebar-nav" aria-label="Off-canvas navigation">
                     <a href="#overlays" aria-current="page">Overlays</a>
                     <a href="#navigation">Navigation</a>
                     <a href="#feedback">Feedback</a>
                   </nav>
-                  <button class="uif-btn" data-uif-action="close">Close panel</button>
                 </div>
               </aside>
             </div>
             <pre><code>&lt;button data-uif-action="open" data-uif-target="#offcanvas"&gt;Open&lt;/button&gt;
 &lt;aside id="offcanvas" class="uif-offcanvas uif-offcanvas-left" data-uif="offcanvas" hidden&gt;
-  &lt;button data-uif-action="close"&gt;Close&lt;/button&gt;
+  &lt;div data-uif-role="header"&gt;Navigation&lt;/div&gt;
+  &lt;div data-uif-role="body"&gt;Scrollable links&lt;/div&gt;
 &lt;/aside&gt;</code></pre>
           </article>
 
