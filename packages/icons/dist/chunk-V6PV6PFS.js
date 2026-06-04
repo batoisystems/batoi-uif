@@ -1,0 +1,46 @@
+// src/sets/admin-security.ts
+var adminSecurityIcons = {
+  alert: { body: '<path d="m12 3 10 18H2L12 3z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path>' },
+  approval: { body: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path><path d="m9 12 2 2 4-4"></path>' },
+  audit: { body: '<path d="M3 3v18h18"></path><path d="m7 14 3-3 3 2 5-6"></path>' },
+  award: { body: '<circle cx="12" cy="8" r="5"></circle><path d="m8.5 12.5-2 8 5.5-3 5.5 3-2-8"></path>' },
+  brain: { body: '<path d="M9 4a3 3 0 0 0-3 3v1a4 4 0 0 0 0 8v1a3 3 0 0 0 5 2.2V4.8A3 3 0 0 0 9 4z"></path><path d="M15 4a3 3 0 0 1 3 3v1a4 4 0 0 1 0 8v1a3 3 0 0 1-5 2.2V4.8A3 3 0 0 1 15 4z"></path><path d="M7 10h4"></path><path d="M13 14h4"></path>' },
+  briefcase: { body: '<rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M3 12h18"></path><path d="M10 12v2h4v-2"></path>' },
+  building: { body: '<rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 7h.01"></path><path d="M12 7h.01"></path><path d="M16 7h.01"></path><path d="M8 11h.01"></path><path d="M12 11h.01"></path><path d="M16 11h.01"></path><path d="M9 21v-5h6v5"></path>' },
+  calculator: { body: '<rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M8 7h8"></path><path d="M8 11h.01"></path><path d="M12 11h.01"></path><path d="M16 11h.01"></path><path d="M8 15h.01"></path><path d="M12 15h.01"></path><path d="M16 15h.01"></path>' },
+  error: { body: '<circle cx="12" cy="12" r="9"></circle><path d="M15 9 9 15"></path><path d="m9 9 6 6"></path>' },
+  eye: { body: '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle>' },
+  "eye-off": { body: '<path d="M2 2l20 20"></path><path d="M9.9 5.2A10.7 10.7 0 0 1 12 5c6.5 0 10 7 10 7a16.7 16.7 0 0 1-3.1 4.1"></path><path d="M14.1 14.1A3 3 0 0 1 9.9 9.9"></path><path d="M6.6 6.6A16.2 16.2 0 0 0 2 12s3.5 7 10 7c1.6 0 3-.4 4.2-1"></path>' },
+  help: { body: '<circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.8 2.8 0 0 1 5 1.8c0 2.2-2.5 2.4-2.5 4.2"></path><path d="M12 18h.01"></path>' },
+  info: { body: '<circle cx="12" cy="12" r="9"></circle><path d="M12 10v6"></path><path d="M12 7h.01"></path>' },
+  key: { body: '<circle cx="7.5" cy="12.5" r="3.5"></circle><path d="M11 12.5h10"></path><path d="M17 12.5v3"></path><path d="M20 12.5v3"></path>' },
+  lock: { body: '<rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path>' },
+  policy: { body: '<path d="M7 3h10l3 4v14H4V3h3z"></path><path d="M8 13h8"></path><path d="M8 17h5"></path><path d="M14 3v5h5"></path>' },
+  shield: { body: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>' },
+  success: { body: '<circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path>' },
+  accessibility: { body: '<circle cx="12" cy="4" r="2"></circle><path d="M4 8h16"></path><path d="M12 6v7"></path><path d="M8 22l4-9 4 9"></path>' },
+  badge: { body: '<path d="M8 3h8l5 5v8l-5 5H8l-5-5V8l5-5z"></path><path d="m8.5 12 2.5 2.5L16 9"></path>' },
+  "check-square": { body: '<rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="m8 12 3 3 5-6"></path>' },
+  fingerprint: { body: '<path d="M3 11a9 9 0 0 1 18 0"></path><path d="M6 19a12 12 0 0 0 2-7 4 4 0 0 1 8 0c0 2.8-.7 5.5-2 7.8"></path><path d="M9 22a15 15 0 0 0 3-10"></path><path d="M12 2a9 9 0 0 1 9 9c0 1.5-.2 3-.6 4.4"></path><path d="M3.6 15A8 8 0 0 0 4 12"></path>' },
+  id: { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="2"></circle><path d="M6 16a3 3 0 0 1 6 0"></path><path d="M14 9h4"></path><path d="M14 13h4"></path><path d="M14 17h3"></path>' },
+  "life-buoy": { body: '<circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><path d="m4.9 4.9 4.3 4.3"></path><path d="m14.8 14.8 4.3 4.3"></path><path d="m19.1 4.9-4.3 4.3"></path><path d="m9.2 14.8-4.3 4.3"></path>' },
+  "scale-balanced": { body: '<path d="M12 3v18"></path><path d="M5 21h14"></path><path d="M6 7h12"></path><path d="m6 7-3 6h6L6 7z"></path><path d="m18 7-3 6h6l-3-6z"></path>' },
+  "shield-check": { body: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path><path d="m9 12 2 2 4-4"></path>' },
+  "shield-lock": { body: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path><rect x="8.5" y="11" width="7" height="5" rx="1"></rect><path d="M10 11V9a2 2 0 0 1 4 0v2"></path>' },
+  "shield-x": { body: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path><path d="m9.5 9.5 5 5"></path><path d="m14.5 9.5-5 5"></path>' },
+  "user-check": { body: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="m16 11 2 2 4-4"></path>' },
+  "user-cog": { body: '<path d="M14 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="8" cy="7" r="4"></circle><circle cx="18" cy="15" r="2"></circle><path d="M18 11v1"></path><path d="M18 18v1"></path><path d="m15.2 12.2.7.7"></path><path d="m20.1 17.1.7.7"></path>' },
+  "user-minus": { body: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M16 11h6"></path>' },
+  "user-plus": { body: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M19 8v6"></path><path d="M16 11h6"></path>' },
+  "user-x": { body: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="m17 8 5 5"></path><path d="m22 8-5 5"></path>' },
+  "users-round": { body: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>' },
+  unlock: { body: '<rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 7.5-2"></path>' },
+  user: { body: '<path d="M20 21a8 8 0 1 0-16 0"></path><circle cx="12" cy="7" r="4"></circle>' },
+  users: { body: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>' },
+  warning: { body: '<path d="m12 3 10 18H2L12 3z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path>' },
+  "x-circle": { body: '<circle cx="12" cy="12" r="9"></circle><path d="M15 9 9 15"></path><path d="m9 9 6 6"></path>' }
+};
+
+export {
+  adminSecurityIcons
+};

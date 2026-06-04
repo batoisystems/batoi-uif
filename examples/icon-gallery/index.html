@@ -9,13 +9,14 @@
     <style>
       .icon-toolbar {
         display: grid;
-        grid-template-columns: minmax(14rem, 1fr) auto;
+        grid-template-columns: minmax(14rem, 1fr) minmax(12rem, 16rem) auto;
         gap: 0.75rem;
         align-items: center;
         margin-bottom: 1rem;
       }
 
-      .icon-search {
+      .icon-search,
+      .icon-filter {
         min-height: 2.75rem;
         padding: 0.5rem 0.85rem;
         border: 1px solid #dfe3e8;
@@ -26,7 +27,8 @@
         box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
       }
 
-      .icon-search:focus {
+      .icon-search:focus,
+      .icon-filter:focus {
         border-color: #0b72bd;
         outline: 3px solid rgba(11, 114, 189, 0.14);
       }
@@ -45,7 +47,7 @@
 
       .icon-card {
         display: grid;
-        grid-template-rows: auto auto 1fr auto;
+        grid-template-rows: auto auto auto auto 1fr auto;
         gap: 0.75rem;
         min-width: 0;
         padding: 1rem;
@@ -53,6 +55,48 @@
         border-radius: 0.75rem;
         background: #fff;
         box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+      }
+
+      .icon-category {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        min-height: 1.65rem;
+        padding: 0.2rem 0.45rem;
+        border: 1px solid #d8e9f7;
+        border-radius: 0.45rem;
+        background: #f4f9fd;
+        color: #0b72bd;
+        font-size: 0.72rem;
+        font-weight: 750;
+      }
+
+      .icon-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        min-height: 1.65rem;
+      }
+
+      .icon-tag {
+        display: inline-flex;
+        align-items: center;
+        max-width: 100%;
+        min-height: 1.45rem;
+        padding: 0.16rem 0.4rem;
+        border: 1px solid #e7eaee;
+        border-radius: 0.4rem;
+        background: #f8fafc;
+        color: #667085;
+        font-size: 0.68rem;
+        font-weight: 700;
+        line-height: 1.1;
+      }
+
+      .icon-tag.is-alias {
+        border-color: #d8e9f7;
+        background: #f4f9fd;
+        color: #0b72bd;
       }
 
       .icon-preview {
@@ -194,6 +238,9 @@
 
         <div class="icon-toolbar">
           <input class="icon-search" id="icon-search" type="search" placeholder="Search icons..." autocomplete="off">
+          <select class="icon-filter" id="icon-category" aria-label="Filter icons by category">
+            <option value="">All categories</option>
+          </select>
           <span class="icon-count" id="icon-count">Loading icons...</span>
         </div>
 
@@ -202,10 +249,11 @@
     </main>
 
     <script type="module">
-      import { icon, icons, mountIcons } from '../../dist/uif.esm.js?v=20260524-batoi-icon-v2';
+      import { getIconMetadata, icon, iconSets, icons, mountIcons, searchIcons } from '../../dist/uif.esm.js?v=20260524-batoi-icon-v3';
 
       const grid = document.querySelector('#icon-grid');
       const search = document.querySelector('#icon-search');
+      const category = document.querySelector('#icon-category');
       const total = document.querySelector('#icon-total');
       const count = document.querySelector('#icon-count');
 
@@ -229,21 +277,40 @@
         return `import { icon } from 'batoi-uif';\nconst svg = icon('${name}', { title: '${titleFor(name)}' });`;
       }
 
+      function chipsFor(metadata) {
+        if (!metadata) return '';
+        const aliases = metadata.aliases.slice(0, 2).map((alias) => `<span class="icon-tag is-alias">${escapeHtml(alias)}</span>`);
+        const tags = metadata.tags
+          .filter((tag) => tag !== metadata.name && tag !== metadata.category)
+          .slice(0, 3)
+          .map((tag) => `<span class="icon-tag">${escapeHtml(tag)}</span>`);
+        return [...aliases, ...tags].join('');
+      }
+
       const iconNames = Object.keys(icons).sort((a, b) => a.localeCompare(b));
       total.textContent = `${iconNames.length} icons`;
 
-      function renderIcons(filter = '') {
-        const query = filter.trim().toLowerCase();
-        const visible = iconNames.filter((name) => name.includes(query));
+      Object.entries(iconSets).forEach(([name, registry]) => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = `${titleFor(name)} (${Object.keys(registry).length})`;
+        category.append(option);
+      });
+
+      function renderIcons() {
+        const visible = searchIcons(search.value, { category: category.value });
         count.textContent = `${visible.length} of ${iconNames.length} icons`;
         grid.innerHTML = visible.map((name) => {
           const declarative = markupFor(name);
           const js = scriptFor(name);
           const svg = icon(name, { title: titleFor(name) });
+          const metadata = getIconMetadata(name);
           return `
             <article class="icon-card" data-icon-name="${escapeHtml(name)}">
               <div class="icon-preview ${name === 'batoi' ? 'is-brand' : ''}" aria-hidden="true">${svg}</div>
               <h2>${escapeHtml(name)}</h2>
+              <span class="icon-category">${escapeHtml(metadata?.category ?? 'uncategorized')}</span>
+              <div class="icon-tags">${chipsFor(metadata)}</div>
               <pre class="icon-code"><code>${escapeHtml(declarative)}</code></pre>
               <div class="icon-actions">
                 <button class="icon-copy" type="button" data-copy="${escapeHtml(name)}"><span data-uif-icon="copy"></span>Name</button>
@@ -287,7 +354,8 @@
         }, 1200);
       });
 
-      search.addEventListener('input', () => renderIcons(search.value));
+      search.addEventListener('input', renderIcons);
+      category.addEventListener('change', renderIcons);
       mountIcons(document);
       renderIcons();
     </script>

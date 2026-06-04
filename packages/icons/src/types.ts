@@ -11,3 +11,19 @@ export interface IconOptions {
 }
 
 export type IconRegistry = Record<string, IconDefinition>;
+
+export type IconStatus = 'stable' | 'draft' | 'deprecated';
+
+export interface IconMetadata {
+  aliases: string[];
+  category: string;
+  name: string;
+  since?: string;
+  status: IconStatus;
+  tags: string[];
+}
+
+export interface IconSearchOptions {
+  category?: string;
+  includeDeprecated?: boolean;
+}

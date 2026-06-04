@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Batoi UIF Table Scenarios</title>
+    <link rel="stylesheet" href="../../dist/uif.css">
+    <link rel="stylesheet" href="../shared/example.css">
+    <style>
+      .table-scenarios-page {
+        background: #f4f6f8;
+      }
+
+      .table-scenarios-page .example-frame {
+        width: min(100%, 94rem);
+      }
+
+      .table-grid {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .table-card {
+        display: grid;
+        gap: 1rem;
+        padding: 1rem;
+        border: 1px solid #dfe5ed;
+        border-radius: 0.5rem;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+      }
+
+      .table-card-head,
+      .table-toolbar,
+      .table-footer,
+      .table-event-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .table-card-head h2,
+      .table-card-head p {
+        margin: 0;
+      }
+
+      .table-card-head p {
+        margin-top: 0.2rem;
+        color: #667085;
+        font-size: 0.9rem;
+      }
+
+      .table-toolbar {
+        justify-content: flex-start;
+        padding: 0.75rem;
+        border: 1px solid #e7ebf0;
+        border-radius: 0.5rem;
+        background: #fbfcfe;
+      }
+
+      .table-toolbar .uif-field {
+        min-width: min(16rem, 100%);
+      }
+
+      .table-shell {
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        background: #fff;
+        overflow: hidden;
+      }
+
+      .table-shell .uif-table th {
+        color: #667085;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .table-shell .uif-table tbody tr:hover {
+        background: #f8fbff;
+      }
+
+      .table-event-log {
+        display: grid;
+        gap: 0.35rem;
+        min-height: 4rem;
+        padding: 0.75rem;
+        border: 1px solid #e7ebf0;
+        border-radius: 0.5rem;
+        background: #fbfcfe;
+        color: #475467;
+        font-size: 0.86rem;
+      }
+
+      .table-event-row strong {
+        color: #111827;
+      }
+
+      .table-code {
+        margin: 0;
+        max-height: 18rem;
+        overflow: auto;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        background: #111827;
+        color: #e5e7eb;
+        font-size: 0.82rem;
+      }
+
+      .table-kpi-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.75rem;
+      }
+
+      .table-kpi {
+        display: grid;
+        gap: 0.25rem;
+        padding: 0.85rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        background: #fbfcfe;
+      }
+
+      .table-kpi strong {
+        font-size: 1.35rem;
+      }
+
+      .table-kpi span {
+        color: #667085;
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+
+      @media (max-width: 48rem) {
+        .table-kpi-row {
+          grid-template-columns: 1fr;
+        }
+
+        .table-card {
+          padding: 0.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body class="example-page table-scenarios-page">
+    <main class="example-shell">
+      <div class="example-frame">
+        <header class="example-topbar">
+          <a class="example-brand" href="../">
+            <span class="example-brand-mark" data-uif-icon="batoi" data-uif-icon-title="Batoi"></span>
+            <span><strong>Batoi UIF</strong><span>Examples · Tables</span></span>
+          </a>
+          <div class="example-actions">
+            <a class="example-pill" href="../"><span data-uif-icon="home"></span>All examples</a>
+            <a class="example-pill" href="../component-gallery/"><span data-uif-icon="grid"></span>Components</a>
+            <a class="example-pill" href="../rad-crud/"><span data-uif-icon="table"></span>RAD CRUD</a>
+            <a class="example-pill is-primary" href="../../dist/uif.esm.js"><span data-uif-icon="download"></span>Distribution</a>
+          </div>
+        </header>
+
+        <section class="example-hero">
+          <div>
+            <div class="example-eyebrow">Tables · Registers · Data grids</div>
+            <h1>Table scenarios for RAD and product screens.</h1>
+            <p>Sort, filter, paginate, select, act on rows, and switch responsive behavior using native table markup and `data-uif-*` attributes.</p>
+          </div>
+          <div class="example-meta" aria-label="Table scenario summary">
+            <span class="example-pill"><span data-uif-icon="table"></span>5 scenarios</span>
+            <span class="example-pill"><span data-uif-icon="shield"></span>Native semantics</span>
+            <span class="example-pill"><span data-uif-icon="sync"></span>Remote mock</span>
+          </div>
+        </section>
+
+        <nav class="example-tabs" aria-label="Table scenario navigation">
+          <a href="#local" aria-current="page">Local</a>
+          <a href="#remote">Remote</a>
+          <a href="#responsive">Responsive</a>
+          <a href="#selection">Selection</a>
+          <a href="#rad">RAD register</a>
+        </nav>
+
+        <section class="table-grid">
+          <article id="local" class="table-card">
+            <div class="table-card-head">
+              <div>
+                <div class="example-eyebrow">Scenario 1</div>
+                <h2>Local account register</h2>
+                <p>Client-side search, column filters, typed sorting, reset, and responsive cell labels for small-to-medium lists.</p>
+              </div>
+              <span class="uif-badge uif-badge-info">Local mode</span>
+            </div>
+            <div class="table-toolbar">
+              <label class="uif-field"><span>Search</span><input class="uif-input" type="search" placeholder="Search accounts" data-uif-table-filter="#local-accounts"></label>
+              <label class="uif-field"><span>Status</span><select class="uif-input" data-uif-table-filter="#local-accounts" data-uif-filter-column="status" data-uif-filter-op="equals"><option value="">All statuses</option><option value="active">Active</option><option value="review">Review</option><option value="paused">Paused</option></select></label>
+              <label class="uif-field"><span>Minimum ARR</span><input class="uif-input" type="number" min="0" step="1000" placeholder="50000" data-uif-table-filter="#local-accounts" data-uif-filter-column="arr" data-uif-filter-op="min"></label>
+              <button class="uif-btn uif-btn-secondary" type="button" data-uif-table-reset="#local-accounts">Reset</button>
+            </div>
+            <div class="table-shell uif-table-wrap">
+              <table id="local-accounts" class="uif-table" data-uif="table" data-uif-mode="local" data-uif-responsive="stack">
+                <caption class="uif-sr-only">Local accounts with sortable typed columns</caption>
+                <thead>
+                  <tr>
+                    <th data-uif-sort="account" data-uif-label="Account" data-uif-priority="1">Account</th>
+                    <th data-uif-sort="arr" data-uif-type="currency" data-uif-label="ARR" data-uif-align="end" data-uif-priority="2">ARR</th>
+                    <th data-uif-sort="renewal" data-uif-type="date" data-uif-label="Renewal" data-uif-priority="3">Renewal</th>
+                    <th data-uif-sort="status" data-uif-label="Status" data-uif-priority="1">Status</th>
+                    <th data-uif-label="Owner" data-uif-hide="md">Owner</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Metro Finance</td><td data-uif-value="42000">$42,000</td><td>2026-07-15</td><td>Review</td><td>Asha</td></tr>
+                  <tr><td>Kalinga Retail</td><td data-uif-value="118000">$118,000</td><td>2026-08-02</td><td>Active</td><td>Ravi</td></tr>
+                  <tr><td>Eastern Health</td><td data-uif-value="76000">$76,000</td><td>2026-06-28</td><td>Paused</td><td>Nina</td></tr>
+                  <tr><td>Blue Harbor</td><td data-uif-value="94000">$94,000</td><td>2026-09-11</td><td>Active</td><td>Asha</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article id="remote" class="table-card">
+            <div class="table-card-head">
+              <div>
+                <div class="example-eyebrow">Scenario 2</div>
+                <h2>Remote table with query state</h2>
+                <p>Mocked server-side sort, filter, page, and page-size requests using the same URL parameters a RAD endpoint would receive.</p>
+              </div>
+              <span class="uif-badge uif-badge-warning">Mock endpoint</span>
+            </div>
+            <form class="table-toolbar" data-uif-table-controls="#remote-accounts">
+              <label class="uif-field"><span>Search</span><input class="uif-input" name="q" type="search" placeholder="Search remote rows" data-uif-table-filter="#remote-accounts"></label>
+              <label class="uif-field"><span>Status</span><select class="uif-input" name="status" data-uif-table-filter="#remote-accounts" data-uif-filter-column="status" data-uif-filter-op="equals"><option value="">All statuses</option><option value="active">Active</option><option value="review">Review</option><option value="paused">Paused</option></select></label>
+              <label class="uif-field"><span>Page size</span><select class="uif-input" data-uif-table-page-size="#remote-accounts"><option value="3">3 rows</option><option value="5">5 rows</option></select></label>
+              <button class="uif-btn uif-btn-secondary" type="button" data-uif-table-reset="#remote-accounts">Reset</button>
+            </form>
+            <div class="table-shell uif-table-wrap">
+              <table id="remote-accounts" class="uif-table" data-uif="table" data-uif-mode="remote" data-uif-src="/uif-mock/accounts" data-uif-key="id" data-uif-columns="account,arr,status,owner" data-uif-page-size="3" data-uif-responsive="stack">
+                <caption class="uif-sr-only">Remote accounts loaded from a mock endpoint</caption>
+                <thead>
+                  <tr>
+                    <th data-uif-sort="account" data-uif-label="Account">Account</th>
+                    <th data-uif-sort="arr" data-uif-type="currency" data-uif-label="ARR" data-uif-align="end">ARR</th>
+                    <th data-uif-sort="status" data-uif-label="Status">Status</th>
+                    <th data-uif-sort="owner" data-uif-label="Owner">Owner</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <nav class="uif-pagination" aria-label="Remote account pages">
+                <button class="uif-btn uif-btn-secondary" type="button" data-uif-table-page="prev" data-uif-target="#remote-accounts">Previous</button>
+                <span class="uif-table-status" data-uif-table-page-label="#remote-accounts">Page 1</span>
+                <button class="uif-btn uif-btn-secondary" type="button" data-uif-table-page="next" data-uif-target="#remote-accounts">Next</button>
+              </nav>
+              <span id="remote-query" class="uif-table-summary">Waiting for first request.</span>
+            </div>
+          </article>
+
+          <article id="responsive" class="table-card">
+            <div class="table-card-head">
+              <div>
+                <div class="example-eyebrow">Scenario 3</div>
+                <h2>Responsive priority and stack modes</h2>
+                <p>Columns carry labels and priorities, so dense tables can scroll on desktop and become label/value rows on narrow screens.</p>
+              </div>
+              <span class="uif-badge uif-badge-success">Resize viewport</span>
+            </div>
+            <div class="table-kpi-row">
+              <div class="table-kpi"><strong>Scroll</strong><span>Use `.uif-table-wrap` for dense grids.</span></div>
+              <div class="table-kpi"><strong>Stack</strong><span>Use `data-uif-responsive="stack"`.</span></div>
+              <div class="table-kpi"><strong>Priority</strong><span>Use `data-uif-priority` on headers.</span></div>
+              <div class="table-kpi"><strong>Labels</strong><span>Use `data-uif-label` for mobile cells.</span></div>
+            </div>
+            <div class="table-shell uif-table-wrap">
+              <table id="responsive-orders" class="uif-table uif-table-sticky-head" data-uif="table" data-uif-responsive="stack">
+                <caption class="uif-sr-only">Responsive order queue</caption>
+                <thead>
+                  <tr>
+                    <th data-uif-sort="order" data-uif-label="Order" data-uif-priority="1">Order</th>
+                    <th data-uif-sort="customer" data-uif-label="Customer" data-uif-priority="1">Customer</th>
+                    <th data-uif-sort="amount" data-uif-type="currency" data-uif-label="Amount" data-uif-align="end" data-uif-priority="2">Amount</th>
+                    <th data-uif-label="Channel" data-uif-priority="4">Channel</th>
+                    <th data-uif-label="SLA" data-uif-priority="3">SLA</th>
+                    <th class="uif-table-actions" data-uif-label="Action" data-uif-priority="1">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>ORD-2041</td><td>Sundar Foods</td><td data-uif-value="1420">$1,420</td><td>Partner</td><td>4h</td><td><button class="uif-btn uif-btn-secondary" type="button">Open</button></td></tr>
+                  <tr><td>ORD-2042</td><td>Metro Finance</td><td data-uif-value="892">$892</td><td>Direct</td><td>12h</td><td><button class="uif-btn uif-btn-secondary" type="button">Open</button></td></tr>
+                  <tr><td>ORD-2043</td><td>Blue Harbor</td><td data-uif-value="2210">$2,210</td><td>Marketplace</td><td>2h</td><td><button class="uif-btn uif-btn-secondary" type="button">Open</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article id="selection" class="table-card">
+            <div class="table-card-head">
+              <div>
+                <div class="example-eyebrow">Scenario 4</div>
+                <h2>Selection, bulk actions, and row actions</h2>
+                <p>Row checkboxes expose selected counts and stable IDs. Bulk and row actions emit events for governed server-side handlers.</p>
+              </div>
+              <span class="uif-badge"><strong id="selected-count">0</strong>&nbsp;selected</span>
+            </div>
+            <div class="table-toolbar">
+              <button class="uif-btn" type="button" data-uif-table-action="assign" data-uif-target="#approval-table">Assign</button>
+              <button class="uif-btn uif-btn-danger" type="button" data-uif-table-action="archive" data-uif-target="#approval-table">Archive</button>
+              <span class="uif-table-summary">Selected IDs: <strong id="selected-ids">none</strong></span>
+            </div>
+            <div class="table-shell uif-table-wrap">
+              <table id="approval-table" class="uif-table" data-uif="table" data-uif-selection-target="#selected-count">
+                <caption class="uif-sr-only">Approval queue with selectable rows</caption>
+                <thead><tr><th><input type="checkbox" data-uif-role="select-all" aria-label="Select all approvals"></th><th data-uif-sort="request">Request</th><th data-uif-sort="risk">Risk</th><th data-uif-sort="owner">Owner</th><th>Action</th></tr></thead>
+                <tbody>
+                  <tr data-uif-row-id="req-1001"><td><input type="checkbox" data-uif-role="row-select" value="req-1001" aria-label="Select request 1001"></td><td>Export billing report</td><td>Medium</td><td>Ada</td><td><button class="uif-btn uif-btn-secondary" type="button" data-uif-row-action="review">Review</button></td></tr>
+                  <tr data-uif-row-id="req-1002"><td><input type="checkbox" data-uif-role="row-select" value="req-1002" aria-label="Select request 1002"></td><td>Update workspace region</td><td>High</td><td>Grace</td><td><button class="uif-btn uif-btn-secondary" type="button" data-uif-row-action="review">Review</button></td></tr>
+                  <tr data-uif-row-id="req-1003"><td><input type="checkbox" data-uif-role="row-select" value="req-1003" aria-label="Select request 1003"></td><td>Refresh connector cache</td><td>Low</td><td>Linus</td><td><button class="uif-btn uif-btn-secondary" type="button" data-uif-row-action="review">Review</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="table-events" class="table-event-log" aria-live="polite">
+              <div class="table-event-row"><strong>Events</strong><span>Interact with selection or action buttons.</span></div>
+            </div>
+          </article>
+
+          <article id="rad" class="table-card">
+            <div class="table-card-head">
+              <div>
+                <div class="example-eyebrow">Scenario 5</div>
+                <h2>RAD register starter</h2>
+                <p>Copy-ready server-rendered markup for a register route with filters, pagination hooks, row actions, and progressive enhancement.</p>
+              </div>
+              <span class="uif-badge uif-badge-info">Server-friendly</span>
+            </div>
+            <pre class="table-code"><code>&lt;form class="uif-table-toolbar" data-uif-table-controls="#users-table"&gt;
+  &lt;input class="uif-input" name="q" type="search" data-uif-table-filter="#users-table"&gt;
+  &lt;select class="uif-input" name="status" data-uif-table-filter="#users-table" data-uif-filter-column="status" data-uif-filter-op="equals"&gt;...&lt;/select&gt;
+  &lt;button type="button" data-uif-table-reset="#users-table"&gt;Reset&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;table id="users-table" class="uif-table" data-uif="table" data-uif-mode="remote" data-uif-src="/workspace/users" data-uif-key="id" data-uif-page-size="25"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;&lt;input type="checkbox" data-uif-role="select-all" aria-label="Select all users"&gt;&lt;/th&gt;
+      &lt;th data-uif-sort="name" data-uif-label="Name"&gt;Name&lt;/th&gt;
+      &lt;th data-uif-sort="status" data-uif-label="Status"&gt;Status&lt;/th&gt;
+      &lt;th data-uif-label="Action"&gt;Action&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;&lt;!-- server JSON rows or trusted HTML rows --&gt;&lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+          </article>
+        </section>
+      </div>
+    </main>
+
+    <script type="module">
+      import { autoStart, mountIcons } from '../../dist/uif.esm.js';
+
+      const remoteRows = [
+        { id: 'acct-1', account: 'Metro Finance', arr: '$42,000', status: 'review', owner: 'Asha' },
+        { id: 'acct-2', account: 'Kalinga Retail', arr: '$118,000', status: 'active', owner: 'Ravi' },
+        { id: 'acct-3', account: 'Eastern Health', arr: '$76,000', status: 'paused', owner: 'Nina' },
+        { id: 'acct-4', account: 'Blue Harbor', arr: '$94,000', status: 'active', owner: 'Asha' },
+        { id: 'acct-5', account: 'Cedar Logistics', arr: '$51,000', status: 'review', owner: 'Ravi' },
+        { id: 'acct-6', account: 'Northstar Labs', arr: '$134,000', status: 'active', owner: 'Nina' },
+        { id: 'acct-7', account: 'Greenline Energy', arr: '$63,000', status: 'paused', owner: 'Asha' }
+      ];
+
+      const originalFetch = window.fetch.bind(window);
+      window.fetch = async (input, init) => {
+        const url = new URL(String(input), window.location.href);
+        if (url.pathname !== '/uif-mock/accounts') return originalFetch(input, init);
+        const page = Math.max(1, Number(url.searchParams.get('page') || 1));
+        const pageSize = Math.max(1, Number(url.searchParams.get('pageSize') || 3));
+        const query = (url.searchParams.get('q') || '').toLowerCase();
+        const status = url.searchParams.get('filters[status]') || '';
+        const sort = url.searchParams.get('sort') || 'account';
+        const direction = url.searchParams.get('direction') || 'asc';
+        const filtered = remoteRows
+          .filter((row) => !query || Object.values(row).join(' ').toLowerCase().includes(query))
+          .filter((row) => !status || row.status === status)
+          .sort((a, b) => {
+            const av = sort === 'arr' ? Number(a.arr.replace(/[^0-9.-]+/g, '')) : String(a[sort] || '');
+            const bv = sort === 'arr' ? Number(b.arr.replace(/[^0-9.-]+/g, '')) : String(b[sort] || '');
+            const compared = typeof av === 'number' && typeof bv === 'number' ? av - bv : String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: 'base' });
+            return direction === 'desc' ? -compared : compared;
+          });
+        const start = (page - 1) * pageSize;
+        const rows = filtered.slice(start, start + pageSize);
+        return Response.json({ rows, page, pageSize, total: filtered.length, totalPages: Math.max(1, Math.ceil(filtered.length / pageSize)), sort, direction });
+      };
+
+      const queryLabel = document.querySelector('#remote-query');
+      document.addEventListener('uif:table-before-load', (event) => {
+        if (event.detail.table?.id !== 'remote-accounts' || !queryLabel) return;
+        const url = event.detail.url;
+        queryLabel.textContent = `${url.pathname}?${url.searchParams.toString()}`;
+      });
+
+      const events = document.querySelector('#table-events');
+      const selectedIds = document.querySelector('#selected-ids');
+      document.addEventListener('uif:table-selection', (event) => {
+        if (event.detail.table?.id !== 'approval-table') return;
+        if (selectedIds) selectedIds.textContent = event.detail.ids.length ? event.detail.ids.join(', ') : 'none';
+      });
+      document.addEventListener('uif:table-bulk-action', (event) => {
+        if (event.detail.table?.id !== 'approval-table' || !events) return;
+        events.innerHTML = `<div class="table-event-row"><strong>Bulk action</strong><span>${event.detail.action}: ${event.detail.ids.join(', ') || 'no rows'}</span></div>`;
+      });
+      document.addEventListener('uif:table-row-action', (event) => {
+        if (event.detail.table?.id !== 'approval-table' || !events) return;
+        events.innerHTML = `<div class="table-event-row"><strong>Row action</strong><span>${event.detail.action}: ${event.detail.id}</span></div>`;
+      });
+
+      autoStart();
+      mountIcons(document);
+    </script>
+  </body>
+</html>

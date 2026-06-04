@@ -1,0 +1,45 @@
+// src/sets/content.ts
+var contentIcons = {
+  archive: { body: '<rect x="3" y="4" width="18" height="4" rx="1"></rect><path d="M5 8v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path>' },
+  camera: { body: '<path d="M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5z"></path><circle cx="12" cy="13" r="3"></circle>' },
+  copy: { body: '<rect x="9" y="9" width="13" height="13" rx="2"></rect><rect x="2" y="2" width="13" height="13" rx="2"></rect>' },
+  document: { body: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M8 13h8"></path><path d="M8 17h6"></path>' },
+  edit: { body: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>' },
+  file: { body: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path>' },
+  folder: { body: '<path d="M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"></path>' },
+  image: { body: '<rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8" cy="10" r="2"></circle><path d="m21 15-4-4-5 5-2-2-4 5"></path>' },
+  printer: { body: '<path d="M7 9V3h10v6"></path><path d="M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"></path><path d="M7 14h10v7H7z"></path>' },
+  save: { body: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><path d="M17 21v-8H7v8"></path><path d="M7 3v5h8"></path>' },
+  "align-center": { body: '<path d="M7 6h10"></path><path d="M4 12h16"></path><path d="M8 18h8"></path>' },
+  "align-left": { body: '<path d="M4 6h16"></path><path d="M4 12h10"></path><path d="M4 18h16"></path>' },
+  "align-right": { body: '<path d="M4 6h16"></path><path d="M10 12h10"></path><path d="M4 18h16"></path>' },
+  "book-open": { body: '<path d="M3 5a6 6 0 0 1 6-2l3 1v17l-3-1a6 6 0 0 0-6 2V5z"></path><path d="M21 5a6 6 0 0 0-6-2l-3 1v17l3-1a6 6 0 0 1 6 2V5z"></path>' },
+  bookmark: { body: '<path d="M6 3h12a1 1 0 0 1 1 1v18l-7-4-7 4V4a1 1 0 0 1 1-1z"></path>' },
+  "camera-off": { body: '<path d="M2 2l20 20"></path><path d="M9.5 4h5L16 7h3a2 2 0 0 1 2 2v8.5"></path><path d="M18 20H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2"></path><path d="M9.9 10.4A3 3 0 0 0 14 14.6"></path>' },
+  clipboard: { body: '<rect x="5" y="4" width="14" height="18" rx="2"></rect><path d="M9 4a3 3 0 0 1 6 0"></path><path d="M9 4h6"></path><path d="M8 10h8"></path><path d="M8 14h8"></path><path d="M8 18h5"></path>' },
+  "clipboard-check": { body: '<rect x="5" y="4" width="14" height="18" rx="2"></rect><path d="M9 4a3 3 0 0 1 6 0"></path><path d="M9 4h6"></path><path d="m8 15 2 2 5-5"></path>' },
+  "clipboard-list": { body: '<rect x="5" y="4" width="14" height="18" rx="2"></rect><path d="M9 4a3 3 0 0 1 6 0"></path><path d="M9 4h6"></path><path d="M9 11h.01"></path><path d="M12 11h4"></path><path d="M9 16h.01"></path><path d="M12 16h4"></path>' },
+  "copy-check": { body: '<rect x="9" y="9" width="13" height="13" rx="2"></rect><rect x="2" y="2" width="13" height="13" rx="2"></rect><path d="m12 16 2 2 5-5"></path>' },
+  "file-check": { body: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="m8 15 2 2 5-5"></path>' },
+  "file-code": { body: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="m10 13-2 2 2 2"></path><path d="m14 13 2 2-2 2"></path>' },
+  "file-down": { body: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M12 12v6"></path><path d="m9 15 3 3 3-3"></path>' },
+  "file-minus": { body: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M9 15h6"></path>' },
+  "file-plus": { body: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M12 12v6"></path><path d="M9 15h6"></path>' },
+  "file-text": { body: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M8 13h8"></path><path d="M8 17h8"></path><path d="M8 9h2"></path>' },
+  "file-up": { body: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M12 18v-6"></path><path d="m9 15 3-3 3 3"></path>' },
+  "file-x": { body: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="m9 13 6 6"></path><path d="m15 13-6 6"></path>' },
+  "folder-open": { body: '<path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v1"></path><path d="M3 10h18l-2 9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z"></path>' },
+  "folder-plus": { body: '<path d="M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"></path><path d="M12 11v6"></path><path d="M9 14h6"></path>' },
+  "folder-sync": { body: '<path d="M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v3"></path><path d="M3 10v8a2 2 0 0 0 2 2h7"></path><path d="M21 17a4 4 0 0 1-6.8 2.8L13 18"></path><path d="M13 21v-3h3"></path><path d="M15 14a4 4 0 0 1 6.8 2.8L23 18"></path><path d="M23 15v3h-3"></path>' },
+  "image-plus": { body: '<rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8" cy="10" r="2"></circle><path d="m21 15-4-4-5 5-2-2-4 5"></path><path d="M16 6v6"></path><path d="M13 9h6"></path>' },
+  indent: { body: '<path d="M3 6h18"></path><path d="M11 12h10"></path><path d="M3 18h18"></path><path d="m3 10 4 2-4 2v-4z"></path>' },
+  pencil: { body: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>' },
+  scissors: { body: '<circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M20 4 8.1 15.9"></path><path d="M8.1 8.1 20 20"></path>' },
+  sticky: { body: '<path d="M5 3h14a2 2 0 0 1 2 2v10l-6 6H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path><path d="M15 21v-6h6"></path>' },
+  "video-off": { body: '<path d="M2 2l20 20"></path><rect x="3" y="6" width="14" height="12" rx="2"></rect><path d="m17 10 4-3v10l-4-3"></path>' },
+  video: { body: '<rect x="3" y="6" width="14" height="12" rx="2"></rect><path d="m17 10 4-3v10l-4-3"></path>' }
+};
+
+export {
+  contentIcons
+};

@@ -1,0 +1,31 @@
+// src/sets/devices.ts
+var deviceIcons = {
+  battery: { body: '<rect x="3" y="7" width="16" height="10" rx="2"></rect><path d="M21 11v2"></path><path d="M7 11v2"></path><path d="M10 11v2"></path><path d="M13 11v2"></path>' },
+  bluetooth: { body: '<path d="m7 7 10 10-5 4V3l5 4L7 17"></path>' },
+  cloud: { body: '<path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 21 11.5 3.8 3.8 0 0 1 17.5 19z"></path>' },
+  cpu: { body: '<rect x="7" y="7" width="10" height="10" rx="2"></rect><path d="M9 1v3"></path><path d="M15 1v3"></path><path d="M9 20v3"></path><path d="M15 20v3"></path><path d="M1 9h3"></path><path d="M1 15h3"></path><path d="M20 9h3"></path><path d="M20 15h3"></path>' },
+  database: { body: '<ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"></path><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"></path>' },
+  desktop: { body: '<rect x="3" y="4" width="18" height="12" rx="2"></rect><path d="M8 20h8"></path><path d="M12 16v4"></path>' },
+  laptop: { body: '<rect x="5" y="4" width="14" height="10" rx="2"></rect><path d="M3 20h18l-2-4H5l-2 4z"></path>' },
+  offline: { body: '<path d="M2 2 22 22"></path><path d="M8.5 16.5a5 5 0 0 1 7 0"></path><path d="M5 13a10 10 0 0 1 4-2.4"></path><path d="M19 13a10 10 0 0 0-9.5-3"></path>' },
+  phone: { body: '<rect x="7" y="2" width="10" height="20" rx="2"></rect><path d="M11 18h2"></path>' },
+  server: { body: '<rect x="3" y="4" width="18" height="6" rx="2"></rect><rect x="3" y="14" width="18" height="6" rx="2"></rect><path d="M7 7h.01"></path><path d="M7 17h.01"></path>' },
+  chip: { body: '<rect x="6" y="6" width="12" height="12" rx="2"></rect><path d="M9 1v3"></path><path d="M15 1v3"></path><path d="M9 20v3"></path><path d="M15 20v3"></path><path d="M1 9h3"></path><path d="M1 15h3"></path><path d="M20 9h3"></path><path d="M20 15h3"></path><path d="M10 10h4v4h-4z"></path>' },
+  "cloud-download": { body: '<path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 21 11.5 3.8 3.8 0 0 1 17.5 19z"></path><path d="M12 11v8"></path><path d="m8 15 4 4 4-4"></path>' },
+  "cloud-upload": { body: '<path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 21 11.5 3.8 3.8 0 0 1 17.5 19z"></path><path d="M12 19v-8"></path><path d="m8 15 4-4 4 4"></path>' },
+  "database-backup": { body: '<ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"></path><path d="M4 11v4c0 1.7 3.6 3 8 3"></path><path d="M16 16h5v5"></path><path d="M21 16a5 5 0 1 0-1.5 3.5"></path>' },
+  "database-zap": { body: '<ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"></path><path d="M4 11v6c0 1.7 3.6 3 8 3"></path><path d="m17 14-3 5h4l-2 4"></path>' },
+  "device-tablet": { body: '<rect x="5" y="2" width="14" height="20" rx="2"></rect><path d="M11 18h2"></path>' },
+  "hard-drive": { body: '<path d="M6 3h12l4 9v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-7l4-9z"></path><path d="M2 12h20"></path><path d="M6 17h.01"></path><path d="M10 17h.01"></path>' },
+  headphones: { body: '<path d="M4 14v-2a8 8 0 0 1 16 0v2"></path><rect x="3" y="14" width="4" height="7" rx="2"></rect><rect x="17" y="14" width="4" height="7" rx="2"></rect>' },
+  keyboard: { body: '<rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M7 9h.01"></path><path d="M11 9h.01"></path><path d="M15 9h.01"></path><path d="M19 9h.01"></path><path d="M7 13h.01"></path><path d="M11 13h6"></path><path d="M19 13h.01"></path><path d="M8 17h8"></path>' },
+  monitor: { body: '<rect x="3" y="4" width="18" height="12" rx="2"></rect><path d="M8 20h8"></path><path d="M12 16v4"></path>' },
+  "plug-zap": { body: '<path d="M13 2 8 12h5l-2 10 5-12h-5l2-8z"></path><path d="M4 14h4"></path><path d="M3 18h6"></path><path d="M16 6h5"></path><path d="M15 10h6"></path>' },
+  "server-cog": { body: '<rect x="3" y="4" width="18" height="6" rx="2"></rect><rect x="3" y="14" width="12" height="6" rx="2"></rect><path d="M7 7h.01"></path><path d="M7 17h.01"></path><circle cx="19" cy="17" r="2"></circle><path d="M19 13v1"></path><path d="M19 20v1"></path><path d="M16.5 14.5l.7.7"></path><path d="m20.8 18.8.7.7"></path>' },
+  "wifi-off": { body: '<path d="M2 2l20 20"></path><path d="M5 13a10 10 0 0 1 5.2-2.7"></path><path d="M19 13a10 10 0 0 0-9.5-3"></path><path d="M8.5 16.5a5 5 0 0 1 7 0"></path><path d="M12 20h.01"></path>' },
+  wifi: { body: '<path d="M5 13a10 10 0 0 1 14 0"></path><path d="M8.5 16.5a5 5 0 0 1 7 0"></path><path d="M12 20h.01"></path>' }
+};
+
+export {
+  deviceIcons
+};
