@@ -68,6 +68,45 @@ declare const deviceIcons: {
     readonly 'wifi-off': {
         readonly body: "<path d=\"M2 2l20 20\"></path><path d=\"M5 13a10 10 0 0 1 5.2-2.7\"></path><path d=\"M19 13a10 10 0 0 0-9.5-3\"></path><path d=\"M8.5 16.5a5 5 0 0 1 7 0\"></path><path d=\"M12 20h.01\"></path>";
     };
+    readonly 'bluetooth-connected': {
+        readonly body: "<path d=\"m7 7 10 10-5 4V3l5 4L7 17\"></path><path d=\"M3 12h3\"></path><path d=\"M18 12h3\"></path>";
+    };
+    readonly 'cloud-check': {
+        readonly body: "<path d=\"M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 21 11.5 3.8 3.8 0 0 1 17.5 19z\"></path><path d=\"m9 14 2 2 5-5\"></path>";
+    };
+    readonly 'cloud-x': {
+        readonly body: "<path d=\"M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 21 11.5 3.8 3.8 0 0 1 17.5 19z\"></path><path d=\"m10 12 5 5\"></path><path d=\"m15 12-5 5\"></path>";
+    };
+    readonly 'database-check': {
+        readonly body: "<ellipse cx=\"12\" cy=\"5\" rx=\"8\" ry=\"3\"></ellipse><path d=\"M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5\"></path><path d=\"M4 11v6c0 1.7 3.6 3 8 3\"></path><path d=\"m14 18 2 2 5-5\"></path>";
+    };
+    readonly 'database-lock': {
+        readonly body: "<ellipse cx=\"12\" cy=\"5\" rx=\"8\" ry=\"3\"></ellipse><path d=\"M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5\"></path><path d=\"M4 11v5c0 1.5 2.8 2.7 6.5 3\"></path><rect x=\"14\" y=\"15\" width=\"7\" height=\"5\" rx=\"1\"></rect><path d=\"M15.5 15v-2a2 2 0 0 1 4 0v2\"></path>";
+    };
+    readonly mouse: {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"5\"></rect><path d=\"M12 6v4\"></path><path d=\"M7 10h10\"></path>";
+    };
+    readonly network: {
+        readonly body: "<rect x=\"9\" y=\"3\" width=\"6\" height=\"5\" rx=\"1\"></rect><rect x=\"3\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"></rect><rect x=\"15\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M12 8v4\"></path><path d=\"M6 16v-4h12v4\"></path>";
+    };
+    readonly 'monitor-smartphone': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"13\" height=\"10\" rx=\"2\"></rect><path d=\"M7 18h6\"></path><path d=\"M10 14v4\"></path><rect x=\"17\" y=\"10\" width=\"5\" height=\"10\" rx=\"1\"></rect><path d=\"M19 18h1\"></path>";
+    };
+    readonly router: {
+        readonly body: "<rect x=\"4\" y=\"12\" width=\"16\" height=\"7\" rx=\"2\"></rect><path d=\"M8 12V8\"></path><path d=\"M16 12V8\"></path><path d=\"M7 16h.01\"></path><path d=\"M11 16h.01\"></path>";
+    };
+    readonly 'router-wifi': {
+        readonly body: "<rect x=\"4\" y=\"13\" width=\"16\" height=\"6\" rx=\"2\"></rect><path d=\"M8 13V9\"></path><path d=\"M16 13V9\"></path><path d=\"M7 16h.01\"></path><path d=\"M11 16h.01\"></path><path d=\"M8 6a6 6 0 0 1 8 0\"></path><path d=\"M10 9a3 3 0 0 1 4 0\"></path>";
+    };
+    readonly smartphone: {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path>";
+    };
+    readonly tablet: {
+        readonly body: "<rect x=\"5\" y=\"2\" width=\"14\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path>";
+    };
+    readonly usb: {
+        readonly body: "<path d=\"M12 3v12\"></path><path d=\"m9 6 3-3 3 3\"></path><circle cx=\"6\" cy=\"15\" r=\"2\"></circle><circle cx=\"18\" cy=\"15\" r=\"2\"></circle><path d=\"M12 15H8\"></path><path d=\"M12 15h4\"></path><path d=\"M12 15v6\"></path><circle cx=\"12\" cy=\"21\" r=\"1\"></circle>";
+    };
     readonly wifi: {
         readonly body: "<path d=\"M5 13a10 10 0 0 1 14 0\"></path><path d=\"M8.5 16.5a5 5 0 0 1 7 0\"></path><path d=\"M12 20h.01\"></path>";
     };

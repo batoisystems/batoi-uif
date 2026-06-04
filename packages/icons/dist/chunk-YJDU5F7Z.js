@@ -51,6 +51,21 @@ var workflowIcons = {
   timer: { body: '<circle cx="12" cy="13" r="8"></circle><path d="M12 13l3-3"></path><path d="M9 2h6"></path><path d="M12 2v3"></path>' },
   wrench: { body: '<path d="M14.7 6.3a4 4 0 0 0-5.5 5.5L3 18v3h3l6.2-6.2a4 4 0 0 0 5.5-5.5l-2.5 2.5-3-3 2.5-2.5z"></path>' },
   upload: { body: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m17 8-5-5-5 5"></path><path d="M12 3v12"></path>' },
+  automation: { body: '<path d="M4 7h5"></path><path d="M15 7h5"></path><circle cx="12" cy="7" r="3"></circle><path d="M4 17h5"></path><path d="M15 17h5"></path><circle cx="12" cy="17" r="3"></circle><path d="M12 10v4"></path>' },
+  backlog: { body: '<rect x="4" y="5" width="16" height="4" rx="1"></rect><rect x="4" y="12" width="16" height="4" rx="1"></rect><rect x="4" y="19" width="12" height="2" rx="1"></rect>' },
+  dependency: { body: '<rect x="3" y="5" width="6" height="6" rx="2"></rect><rect x="15" y="13" width="6" height="6" rx="2"></rect><path d="M9 8h3a4 4 0 0 1 4 4v1"></path><path d="m13 10 3 3 3-3"></path>' },
+  "git-branch": { body: '<circle cx="6" cy="6" r="3"></circle><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M6 9v6"></path><path d="M9 6h3a6 6 0 0 1 6 6v3"></path>' },
+  "git-commit": { body: '<circle cx="12" cy="12" r="4"></circle><path d="M2 12h6"></path><path d="M16 12h6"></path>' },
+  "git-merge": { body: '<circle cx="6" cy="6" r="3"></circle><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M6 9v6"></path><path d="M9 6c6 0 9 3 9 9"></path>' },
+  "git-pull-request": { body: '<circle cx="6" cy="6" r="3"></circle><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M6 9v6"></path><path d="M18 15V8a2 2 0 0 0-2-2h-3"></path><path d="m14 3-3 3 3 3"></path>' },
+  milestone: { body: '<path d="M4 5h10l6 7-6 7H4z"></path><path d="M9 9h5"></path><path d="M9 13h7"></path>' },
+  "route-turn": { body: '<path d="M4 6h8a4 4 0 0 1 4 4v11"></path><path d="m12 17 4 4 4-4"></path><circle cx="4" cy="6" r="2"></circle>' },
+  "status-dot": { body: '<circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3"></circle>' },
+  "task-check": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="m8 12 2 2 5-5"></path><path d="M8 17h8"></path>' },
+  "task-clock": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="12" cy="12" r="4"></circle><path d="M12 10v2l1.5 1"></path><path d="M8 18h8"></path>' },
+  "task-x": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="m9 10 6 6"></path><path d="m15 10-6 6"></path>' },
+  timeline: { body: '<path d="M5 4v16"></path><circle cx="5" cy="7" r="2"></circle><circle cx="5" cy="17" r="2"></circle><path d="M9 7h12"></path><path d="M9 17h12"></path>' },
+  webhook: { body: '<path d="M18 16.5A4 4 0 1 1 14 12"></path><path d="M6 16.5A4 4 0 1 0 10 12"></path><path d="M12 5a4 4 0 0 1 2 7.5"></path><path d="M12 5a4 4 0 0 0-2 7.5"></path>' },
   workflow: { body: '<rect x="3" y="4" width="6" height="6" rx="2"></rect><rect x="15" y="14" width="6" height="6" rx="2"></rect><path d="M9 7h3a3 3 0 0 1 3 3v4"></path><path d="M12 17H9a3 3 0 0 1-3-3v-4"></path>' }
 };
 

@@ -209,6 +209,84 @@ declare const coreUiIcons: {
     readonly undo: {
         readonly body: "<path d=\"M3 7v6h6\"></path><path d=\"M3 13a8 8 0 1 1 2.3 5.7\"></path>";
     };
+    readonly 'arrow-left-right': {
+        readonly body: "<path d=\"M8 7 3 12l5 5\"></path><path d=\"M3 12h18\"></path><path d=\"m16 7 5 5-5 5\"></path>";
+    };
+    readonly 'arrow-up-down': {
+        readonly body: "<path d=\"M7 8 12 3l5 5\"></path><path d=\"M12 3v18\"></path><path d=\"m7 16 5 5 5-5\"></path>";
+    };
+    readonly ban: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M5.6 5.6 18.4 18.4\"></path>";
+    };
+    readonly 'check-check': {
+        readonly body: "<path d=\"m3 12 3 3 5-6\"></path><path d=\"m12 12 3 3 6-8\"></path>";
+    };
+    readonly circle: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle>";
+    };
+    readonly 'circle-alert': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v6\"></path><path d=\"M12 17h.01\"></path>";
+    };
+    readonly 'circle-help': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M9.5 9a2.8 2.8 0 0 1 5 1.8c0 2.2-2.5 2.4-2.5 4.2\"></path><path d=\"M12 18h.01\"></path>";
+    };
+    readonly ellipsis: {
+        readonly body: "<path d=\"M5 12h.01\"></path><path d=\"M12 12h.01\"></path><path d=\"M19 12h.01\"></path>";
+    };
+    readonly 'ellipsis-vertical': {
+        readonly body: "<path d=\"M12 5h.01\"></path><path d=\"M12 12h.01\"></path><path d=\"M12 19h.01\"></path>";
+    };
+    readonly maximize2: {
+        readonly body: "<path d=\"M15 3h6v6\"></path><path d=\"m21 3-7 7\"></path><path d=\"M9 21H3v-6\"></path><path d=\"m3 21 7-7\"></path>";
+    };
+    readonly minimize: {
+        readonly body: "<path d=\"M8 3H3v5\"></path><path d=\"M16 3h5v5\"></path><path d=\"M21 16v5h-5\"></path><path d=\"M8 21H3v-5\"></path><path d=\"M8 8h8v8H8z\"></path>";
+    };
+    readonly minimize2: {
+        readonly body: "<path d=\"M4 14h6v6\"></path><path d=\"m10 14-7 7\"></path><path d=\"M20 10h-6V4\"></path><path d=\"m14 10 7-7\"></path>";
+    };
+    readonly move: {
+        readonly body: "<path d=\"M12 2v20\"></path><path d=\"m8 6 4-4 4 4\"></path><path d=\"m8 18 4 4 4-4\"></path><path d=\"M2 12h20\"></path><path d=\"m6 8-4 4 4 4\"></path><path d=\"m18 8 4 4-4 4\"></path>";
+    };
+    readonly 'move-horizontal': {
+        readonly body: "<path d=\"M4 12h16\"></path><path d=\"m8 8-4 4 4 4\"></path><path d=\"m16 8 4 4-4 4\"></path>";
+    };
+    readonly 'move-vertical': {
+        readonly body: "<path d=\"M12 4v16\"></path><path d=\"m8 8 4-4 4 4\"></path><path d=\"m8 16 4 4 4-4\"></path>";
+    };
+    readonly 'panel-close': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M9 4v16\"></path><path d=\"m15 9-3 3 3 3\"></path>";
+    };
+    readonly 'panel-open': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M9 4v16\"></path><path d=\"m12 9 3 3-3 3\"></path>";
+    };
+    readonly pin: {
+        readonly body: "<path d=\"M12 17v5\"></path><path d=\"M8 3h8l-1 6 4 4v2H5v-2l4-4-1-6z\"></path>";
+    };
+    readonly 'pin-off': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><path d=\"M12 17v5\"></path><path d=\"M8 3h8l-1 6 4 4v2h-4\"></path><path d=\"M9 15H5v-2l3-3\"></path>";
+    };
+    readonly 'rotate-counter-clockwise': {
+        readonly body: "<path d=\"M3 12a9 9 0 1 0 2.6-6.4\"></path><path d=\"M3 3v6h6\"></path>";
+    };
+    readonly scan: {
+        readonly body: "<path d=\"M7 3H5a2 2 0 0 0-2 2v2\"></path><path d=\"M17 3h2a2 2 0 0 1 2 2v2\"></path><path d=\"M21 17v2a2 2 0 0 1-2 2h-2\"></path><path d=\"M7 21H5a2 2 0 0 1-2-2v-2\"></path><path d=\"M7 12h10\"></path>";
+    };
+    readonly 'scan-line': {
+        readonly body: "<path d=\"M7 3H5a2 2 0 0 0-2 2v2\"></path><path d=\"M17 3h2a2 2 0 0 1 2 2v2\"></path><path d=\"M21 17v2a2 2 0 0 1-2 2h-2\"></path><path d=\"M7 21H5a2 2 0 0 1-2-2v-2\"></path><path d=\"M3 12h18\"></path>";
+    };
+    readonly select: {
+        readonly body: "<path d=\"M4 4h16v16H4z\"></path><path d=\"m8 12 3 3 5-6\"></path>";
+    };
+    readonly 'toggle-left': {
+        readonly body: "<rect x=\"3\" y=\"7\" width=\"18\" height=\"10\" rx=\"5\"></rect><circle cx=\"8\" cy=\"12\" r=\"3\"></circle>";
+    };
+    readonly 'toggle-right': {
+        readonly body: "<rect x=\"3\" y=\"7\" width=\"18\" height=\"10\" rx=\"5\"></rect><circle cx=\"16\" cy=\"12\" r=\"3\"></circle>";
+    };
+    readonly 'x-square': {
+        readonly body: "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M15 9 9 15\"></path><path d=\"m9 9 6 6\"></path>";
+    };
     readonly 'zoom-in': {
         readonly body: "<circle cx=\"11\" cy=\"11\" r=\"7\"></circle><path d=\"m20 20-4-4\"></path><path d=\"M11 8v6\"></path><path d=\"M8 11h6\"></path>";
     };

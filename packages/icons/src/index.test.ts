@@ -61,9 +61,10 @@ describe('icons', () => {
   });
 
   it('includes a broad first-party icon set for application interfaces', () => {
-    expect(Object.keys(icons).length).toBeGreaterThanOrEqual(280);
+    expect(Object.keys(icons).length).toBeGreaterThanOrEqual(380);
     [
       'archive',
+      'automation',
       'bank',
       'barcode',
       'book-open',
@@ -74,23 +75,32 @@ describe('icons', () => {
       'cloud-upload',
       'dashboard',
       'database-backup',
+      'database-lock',
       'donut-chart',
       'eye-off',
+      'file-image',
       'file-code',
       'folder',
+      'folder-lock',
       'folder-open',
       'gauge-chart',
+      'git-pull-request',
       'kanban',
       'layout-dashboard',
       'mail',
       'megaphone',
+      'package-check',
       'server',
+      'shield-alert',
       'shield-lock',
       'shopping-bag',
+      'shopping-cart-plus',
       'sort-asc',
       'store',
+      'task-check',
       'truck',
       'user-plus',
+      'warehouse',
       'wallet',
       'workflow',
     ].forEach((name) => {

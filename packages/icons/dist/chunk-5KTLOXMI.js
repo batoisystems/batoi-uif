@@ -17,7 +17,22 @@ var commerceIcons = {
   ticket: { body: '<path d="M3 9a3 3 0 0 0 0 6v3h18v-3a3 3 0 0 0 0-6V6H3v3z"></path><path d="M13 6v12"></path>' },
   truck: { body: '<path d="M3 6h11v10H3z"></path><path d="M14 10h4l3 3v3h-7v-6z"></path><circle cx="7" cy="18" r="2"></circle><circle cx="17" cy="18" r="2"></circle>' },
   vault: { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="12" cy="12" r="4"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path><path d="M18 9h.01"></path><path d="M18 15h.01"></path>' },
-  wallet: { body: '<path d="M4 7h14a3 3 0 0 1 3 3v8H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h12"></path><path d="M16 13h5"></path><path d="M17 13h.01"></path>' }
+  wallet: { body: '<path d="M4 7h14a3 3 0 0 1 3 3v8H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h12"></path><path d="M16 13h5"></path><path d="M17 13h.01"></path>' },
+  coins: { body: '<ellipse cx="8" cy="6" rx="5" ry="3"></ellipse><path d="M3 6v4c0 1.7 2.2 3 5 3s5-1.3 5-3V6"></path><path d="M11 9.5c1-.9 2.5-1.5 4-1.5 2.8 0 5 1.3 5 3s-2.2 3-5 3c-1.5 0-3-.4-4-1.1"></path><path d="M10 13v3c0 1.7 2.2 3 5 3s5-1.3 5-3v-5"></path>' },
+  coupon: { body: '<path d="M3 9a3 3 0 0 0 0 6v3h18v-3a3 3 0 0 0 0-6V6H3v3z"></path><path d="M8 9h.01"></path><path d="M16 15h.01"></path><path d="m9 16 6-8"></path>' },
+  "dollar-sign": { body: '<path d="M12 2v20"></path><path d="M17 5.5A5 5 0 0 0 12 4c-3 0-5 1.5-5 3.5 0 5 10 2.5 10 7.5 0 2-2 3.5-5 3.5a6 6 0 0 1-5.5-2.5"></path>' },
+  "hand-coins": { body: '<path d="M3 15h4l4 4h6a3 3 0 0 0 3-3"></path><path d="M7 15l3-3h4a2 2 0 0 1 0 4h-3"></path><circle cx="17" cy="6" r="3"></circle><path d="M17 4v4"></path><path d="M15 6h4"></path>' },
+  "package-check": { body: '<path d="m21 8-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="m8 15 2 2 5-5"></path>' },
+  "package-open": { body: '<path d="m21 8-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path><path d="m3 8 9 5 9-5"></path>' },
+  "package-plus": { body: '<path d="m21 8-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 11v6"></path><path d="M9 14h6"></path>' },
+  "package-x": { body: '<path d="m21 8-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="m9.5 12.5 5 5"></path><path d="m14.5 12.5-5 5"></path>' },
+  percent: { body: '<path d="m19 5-14 14"></path><circle cx="7" cy="7" r="2"></circle><circle cx="17" cy="17" r="2"></circle>' },
+  refund: { body: '<path d="M9 7H4v5"></path><path d="M4 12a8 8 0 1 0 2.3-5.7"></path><path d="M12 8v8"></path><path d="M15 10.5A3 3 0 0 0 12 9c-1.7 0-3 1-3 2.3 0 3.2 6 1.4 6 4.6 0 1.2-1.3 2.1-3 2.1a4 4 0 0 1-3.5-1.8"></path>' },
+  scale: { body: '<path d="M12 3v18"></path><path d="M5 21h14"></path><path d="M6 7h12"></path><path d="m6 7-3 6h6L6 7z"></path><path d="m18 7-3 6h6l-3-6z"></path>' },
+  ship: { body: '<path d="M3 17h18l-2 4H5l-2-4z"></path><path d="M5 17V8h14v9"></path><path d="M9 8V4h6v4"></path><path d="M8 12h.01"></path><path d="M12 12h.01"></path><path d="M16 12h.01"></path>' },
+  "shopping-cart-check": { body: '<circle cx="9" cy="20" r="1"></circle><circle cx="17" cy="20" r="1"></circle><path d="M3 4h2l2.5 11h10L20 7H6"></path><path d="m9 11 2 2 5-5"></path>' },
+  "shopping-cart-plus": { body: '<circle cx="9" cy="20" r="1"></circle><circle cx="17" cy="20" r="1"></circle><path d="M3 4h2l2.5 11h10L20 7H6"></path><path d="M13 9v6"></path><path d="M10 12h6"></path>' },
+  warehouse: { body: '<path d="M3 21V8l9-5 9 5v13"></path><path d="M7 21v-8h10v8"></path><path d="M7 13h10"></path><path d="M7 17h10"></path>' }
 };
 
 export {

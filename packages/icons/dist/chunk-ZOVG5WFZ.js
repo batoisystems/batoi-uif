@@ -1,15 +1,15 @@
 import {
   deviceIcons
-} from "./chunk-GBKVVZNO.js";
+} from "./chunk-PPL5Q4JY.js";
 import {
   domainIcons
 } from "./chunk-6CH55W35.js";
 import {
   workflowIcons
-} from "./chunk-DRFLJAOH.js";
+} from "./chunk-YJDU5F7Z.js";
 import {
   adminSecurityIcons
-} from "./chunk-V6PV6PFS.js";
+} from "./chunk-QPSC4BBD.js";
 import {
   brandIcons
 } from "./chunk-44AFBWBG.js";
@@ -18,16 +18,16 @@ import {
 } from "./chunk-HD2LSIUM.js";
 import {
   commerceIcons
-} from "./chunk-C2I3D5AH.js";
+} from "./chunk-5KTLOXMI.js";
 import {
   communicationIcons
 } from "./chunk-7KLRSPIE.js";
 import {
   contentIcons
-} from "./chunk-YKKVYMPI.js";
+} from "./chunk-LX5QE37S.js";
 import {
   coreUiIcons
-} from "./chunk-ZELYVSGL.js";
+} from "./chunk-MNCYAV4C.js";
 
 // src/sets/index.ts
 var iconSets = {

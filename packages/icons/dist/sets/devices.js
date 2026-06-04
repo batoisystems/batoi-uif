@@ -1,6 +1,6 @@
 import {
   deviceIcons
-} from "../chunk-GBKVVZNO.js";
+} from "../chunk-PPL5Q4JY.js";
 export {
   deviceIcons
 };

@@ -107,6 +107,63 @@ declare const contentIcons: {
     readonly sticky: {
         readonly body: "<path d=\"M5 3h14a2 2 0 0 1 2 2v10l-6 6H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\"></path><path d=\"M15 21v-6h6\"></path>";
     };
+    readonly 'clipboard-copy': {
+        readonly body: "<rect x=\"8\" y=\"8\" width=\"12\" height=\"12\" rx=\"2\"></rect><path d=\"M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2\"></path><path d=\"M12 13h4\"></path><path d=\"M14 11v4\"></path>";
+    };
+    readonly 'clipboard-x': {
+        readonly body: "<rect x=\"5\" y=\"4\" width=\"14\" height=\"18\" rx=\"2\"></rect><path d=\"M9 4a3 3 0 0 1 6 0\"></path><path d=\"M9 4h6\"></path><path d=\"m9 13 6 6\"></path><path d=\"m15 13-6 6\"></path>";
+    };
+    readonly crop: {
+        readonly body: "<path d=\"M6 2v14a2 2 0 0 0 2 2h14\"></path><path d=\"M18 22V8a2 2 0 0 0-2-2H2\"></path>";
+    };
+    readonly eraser: {
+        readonly body: "<path d=\"m7 21-4-4 10-10a3 3 0 0 1 4 0l4 4-10 10H7z\"></path><path d=\"m12 12 5 5\"></path><path d=\"M7 21h14\"></path>";
+    };
+    readonly 'file-archive': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M10 12h4\"></path><path d=\"M10 16h4\"></path><path d=\"M12 12v8\"></path>";
+    };
+    readonly 'file-audio': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M9 17v-4l4-2v6l-4-2\"></path><path d=\"M16 13a3 3 0 0 1 0 4\"></path>";
+    };
+    readonly 'file-image': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><circle cx=\"9\" cy=\"13\" r=\"1.5\"></circle><path d=\"m8 19 3-3 2 2 3-4 2 3\"></path>";
+    };
+    readonly 'file-json': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M10 13c-1 0-1 .8-1 1.5S9 16 8 16\"></path><path d=\"M14 13c1 0 1 .8 1 1.5S15 16 16 16\"></path>";
+    };
+    readonly 'file-lock': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><rect x=\"8\" y=\"14\" width=\"8\" height=\"5\" rx=\"1\"></rect><path d=\"M10 14v-2a2 2 0 0 1 4 0v2\"></path>";
+    };
+    readonly 'file-spreadsheet': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h8\"></path><path d=\"M12 13v6\"></path>";
+    };
+    readonly 'file-video': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><rect x=\"8\" y=\"13\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"m14 15 3-2v5l-3-2\"></path>";
+    };
+    readonly 'folder-check': {
+        readonly body: "<path d=\"M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z\"></path><path d=\"m8 14 2 2 5-5\"></path>";
+    };
+    readonly 'folder-down': {
+        readonly body: "<path d=\"M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z\"></path><path d=\"M12 10v7\"></path><path d=\"m9 14 3 3 3-3\"></path>";
+    };
+    readonly 'folder-lock': {
+        readonly body: "<path d=\"M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z\"></path><rect x=\"8\" y=\"13\" width=\"8\" height=\"5\" rx=\"1\"></rect><path d=\"M10 13v-2a2 2 0 0 1 4 0v2\"></path>";
+    };
+    readonly 'folder-up': {
+        readonly body: "<path d=\"M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z\"></path><path d=\"M12 17v-7\"></path><path d=\"m9 13 3-3 3 3\"></path>";
+    };
+    readonly 'folder-x': {
+        readonly body: "<path d=\"M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z\"></path><path d=\"m9 12 6 6\"></path><path d=\"m15 12-6 6\"></path>";
+    };
+    readonly newspaper: {
+        readonly body: "<path d=\"M4 5h14a2 2 0 0 1 2 2v12H6a2 2 0 0 1-2-2V5z\"></path><path d=\"M4 17H3a1 1 0 0 1-1-1V7\"></path><path d=\"M8 9h6\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h5\"></path>";
+    };
+    readonly paintbrush: {
+        readonly body: "<path d=\"M18 3a3 3 0 0 1 3 3c0 4-5 4-5 8\"></path><path d=\"M16 14a4 4 0 0 1-8 0c0-2 2-4 4-4s4 2 4 4z\"></path><path d=\"M8 18c0 2-2 3-5 3 1-2 1-4 3-5\"></path>";
+    };
+    readonly palette: {
+        readonly body: "<path d=\"M12 3a9 9 0 0 0 0 18h1.5a2 2 0 0 0 1-3.7 1.5 1.5 0 0 1 1-2.8H17a4 4 0 0 0 4-4C21 6.4 17 3 12 3z\"></path><path d=\"M7.5 10h.01\"></path><path d=\"M10 7h.01\"></path><path d=\"M14 7h.01\"></path>";
+    };
     readonly 'video-off': {
         readonly body: "<path d=\"M2 2l20 20\"></path><rect x=\"3\" y=\"6\" width=\"14\" height=\"12\" rx=\"2\"></rect><path d=\"m17 10 4-3v10l-4-3\"></path>";
     };

@@ -1,6 +1,6 @@
 import {
   coreUiIcons
-} from "../chunk-ZELYVSGL.js";
+} from "../chunk-MNCYAV4C.js";
 export {
   coreUiIcons
 };
