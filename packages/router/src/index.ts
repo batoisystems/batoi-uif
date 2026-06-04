@@ -1,4 +1,4 @@
-import { autoInit, resolveTarget } from '@batoi/uif-dom';
+import { autoInit, resolveTarget, swapTrustedHTML } from '@batoi/uif-dom';
 import { request } from '@batoi/uif-net';
 
 export interface RouterOptions {
@@ -15,7 +15,7 @@ async function loadRoute(url: string, target: HTMLElement | null, options: Route
   const source = options.routes?.[new URL(url, window.location.href).pathname] || url;
   const html = await request<string>(source, { method: 'GET', parseAs: 'text' });
   if (target && typeof html === 'string') {
-    target.innerHTML = html;
+    swapTrustedHTML(target, html, 'inner');
     autoInit(target);
     if (options.restoreFocus !== false) target.querySelector<HTMLElement>('[tabindex],a,button,input,select,textarea')?.focus();
   }

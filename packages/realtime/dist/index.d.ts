@@ -8,6 +8,7 @@ interface RealtimeOptions {
     interval?: number;
     reconnect?: boolean;
     backoff?: number;
+    maxBackoff?: number;
     heartbeat?: number;
 }
 interface RealtimeBindingOptions extends Omit<RealtimeOptions, 'mode'> {

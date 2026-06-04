@@ -5,7 +5,9 @@ export * from './micro-app.js';
 export interface UIFApp {
   root: Document | HTMLElement;
   options: UIFOptions;
+  destroyed: boolean;
   destroy(): void;
+  restart(options?: UIFOptions): UIFApp;
 }
 
 export interface UIFPlugin {
@@ -24,6 +26,7 @@ export interface UIFLifecycleEvent<T = unknown> extends CustomEvent<T> {
 }
 
 const plugins = new Map<string, UIFPlugin>();
+const apps = new WeakMap<Document | HTMLElement, UIFApp>();
 
 function coerceValue(value: string): unknown {
   if (value === 'true') return true;
@@ -75,15 +78,27 @@ export function setAccent(color: string, target: HTMLElement = document.document
 }
 
 export function init(root: Document | HTMLElement = document, options: UIFOptions = {}): UIFApp {
+  const existing = apps.get(root);
+  if (existing && !existing.destroyed) return existing;
+
   emit('uif:before-init', { root, options }, root);
   const app: UIFApp = {
     root,
     options,
+    destroyed: false,
     destroy() {
+      if (app.destroyed) return;
       emit('uif:before-destroy', { root }, root);
+      app.destroyed = true;
+      apps.delete(root);
       emit('uif:destroy', { root }, root);
     },
+    restart(nextOptions: UIFOptions = options) {
+      app.destroy();
+      return init(root, nextOptions);
+    },
   };
+  apps.set(root, app);
 
   for (const plugin of plugins.values()) {
     try {

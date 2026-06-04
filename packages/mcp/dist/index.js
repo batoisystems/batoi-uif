@@ -35,6 +35,22 @@ function renderToolApproval(el) {
     if (action === "approve" || action === "reject") emit(`uif:tool-${action}`, { tool, risk, irreversible }, el);
   });
 }
+function renderApprovalPolicy(el, checks) {
+  const section = document.createElement("section");
+  section.className = "uif-tool-policy";
+  section.setAttribute("role", "region");
+  appendTextElement(section, "h3", "Policy checks");
+  const list = document.createElement("ul");
+  checks.forEach((check) => {
+    const item = document.createElement("li");
+    item.dataset.uifState = check.state;
+    appendTextElement(item, "strong", check.label);
+    if (check.detail) appendTextElement(item, "span", check.detail);
+    list.append(item);
+  });
+  section.append(list);
+  el.replaceChildren(section);
+}
 function renderToolProgress(el, message) {
   const progress = appendTextElement(document.createElement("div"), "div", message, "uif-tool-progress");
   progress.setAttribute("role", "status");
@@ -74,13 +90,72 @@ function renderToolResult(el, result) {
   const pre = appendTextElement(document.createElement("div"), "pre", JSON.stringify(result, null, 2), "uif-tool-result");
   el.replaceChildren(pre);
 }
+function renderToolReviewFlow(el, request) {
+  const review = document.createElement("section");
+  review.className = "uif-tool-review";
+  review.dataset.risk = request.risk ?? "medium";
+  review.setAttribute("role", "region");
+  const header = document.createElement("header");
+  appendTextElement(header, "strong", request.tool);
+  appendTextElement(header, "span", `${request.risk ?? "medium"}${request.irreversible ? " irreversible" : ""}`, "uif-risk-badge");
+  review.append(header);
+  if (request.payload !== void 0) {
+    const payload = document.createElement("section");
+    payload.className = "uif-tool-payload";
+    appendTextElement(payload, "h3", "Payload preview");
+    appendTextElement(payload, "pre", JSON.stringify(request.payload, null, 2));
+    review.append(payload);
+  }
+  if (request.policy?.length) {
+    const policyHost = document.createElement("div");
+    renderApprovalPolicy(policyHost, request.policy);
+    review.append(...Array.from(policyHost.childNodes));
+  }
+  if (request.timeline?.length) {
+    const timelineHost = document.createElement("div");
+    renderToolTimeline(timelineHost, request.timeline);
+    review.append(...Array.from(timelineHost.childNodes));
+  }
+  if (request.diff) {
+    const diffHost = document.createElement("div");
+    renderDiff(diffHost, request.diff.before, request.diff.after);
+    review.append(...Array.from(diffHost.childNodes));
+  }
+  if (request.result !== void 0) {
+    const resultHost = document.createElement("div");
+    renderToolResult(resultHost, request.result);
+    review.append(...Array.from(resultHost.childNodes));
+  }
+  if (request.audit?.length) {
+    const auditHost = document.createElement("div");
+    renderToolAuditTrail(auditHost, request.audit);
+    review.append(...Array.from(auditHost.childNodes));
+  }
+  const actions = document.createElement("footer");
+  ["approve", "reject"].forEach((action) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.uifAction = action;
+    button.textContent = action.charAt(0).toUpperCase() + action.slice(1);
+    actions.append(button);
+  });
+  review.append(actions);
+  el.replaceChildren(review);
+  el.addEventListener("click", (event) => {
+    const target = event.target instanceof HTMLElement ? event.target.closest("[data-uif-action]") : null;
+    const action = target?.dataset.uifAction;
+    if (action === "approve" || action === "reject") emit(`uif:tool-${action}`, { tool: request.tool, risk: request.risk ?? "medium", irreversible: Boolean(request.irreversible), payload: request.payload }, el);
+  });
+}
 var toolApproval = { name: "tool-approval", init: renderToolApproval };
 export {
+  renderApprovalPolicy,
   renderDiff,
   renderToolApproval,
   renderToolAuditTrail,
   renderToolProgress,
   renderToolResult,
+  renderToolReviewFlow,
   renderToolTimeline,
   toolApproval
 };

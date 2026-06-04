@@ -59,7 +59,7 @@ export async function unsubscribeFromPush(): Promise<boolean> {
 
 export function showInAppNotification(message: string, options: { type?: string } = {}): HTMLElement {
   addNotification({ message, type: options.type ?? 'info' });
-  return showToast(message, { type: options.type ?? 'info' });
+  return showToast(message, { type: options.type ?? 'info', dismissible: false });
 }
 
 async function postSubscription(src: string | undefined, payload: unknown): Promise<void> {

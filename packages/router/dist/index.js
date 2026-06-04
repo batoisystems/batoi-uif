@@ -1,11 +1,11 @@
 // src/index.ts
-import { autoInit, resolveTarget } from "@batoi/uif-dom";
+import { autoInit, resolveTarget, swapTrustedHTML } from "@batoi/uif-dom";
 import { request } from "@batoi/uif-net";
 async function loadRoute(url, target, options = {}) {
   const source = options.routes?.[new URL(url, window.location.href).pathname] || url;
   const html = await request(source, { method: "GET", parseAs: "text" });
   if (target && typeof html === "string") {
-    target.innerHTML = html;
+    swapTrustedHTML(target, html, "inner");
     autoInit(target);
     if (options.restoreFocus !== false) target.querySelector("[tabindex],a,button,input,select,textarea")?.focus();
   }

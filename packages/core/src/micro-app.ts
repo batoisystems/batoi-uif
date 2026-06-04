@@ -69,6 +69,16 @@ export interface MicroAppManifestResult {
   valid: boolean;
 }
 
+export interface MicroAppConnectorWorkflow {
+  name: string;
+  type: MicroAppConnectorType;
+  mode: MicroAppConnectorMode;
+  src?: string;
+  refreshInterval?: number;
+  permission: 'local' | 'allowed' | 'blocked';
+  reason?: string;
+}
+
 const storageModes = new Set<MicroAppStorageMode>(['local-only', 'local-first', 'sync-optional', 'connected', 'shared']);
 const localStores = new Set<MicroAppLocalStore>(['indexeddb', 'localstorage', 'memory', 'none']);
 const transports = new Set<MicroAppRealtimeTransport>(['websocket', 'sse', 'polling']);
@@ -181,4 +191,70 @@ export function parseMicroAppManifest(input: unknown): MicroAppManifest {
     throw new Error(`Invalid Micro App manifest: ${message}`);
   }
   return result.manifest;
+}
+
+function sameOrigin(src: string): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return new URL(src, window.location.href).origin === window.location.origin;
+  } catch {
+    return false;
+  }
+}
+
+function sourceAllowed(src: string | undefined, permissions: MicroAppPermissionsManifest): boolean {
+  if (!src) return false;
+  const network = permissions.network ?? [];
+  if (network.includes('*')) return true;
+  if (network.includes('self') && sameOrigin(src)) return true;
+  try {
+    const url = new URL(src, typeof window === 'undefined' ? 'http://localhost/' : window.location.href);
+    return network.some((entry) => entry === src || entry === url.origin || (entry.endsWith('*') && src.startsWith(entry.slice(0, -1))));
+  } catch {
+    return network.includes(src);
+  }
+}
+
+export function listMicroAppConnectorWorkflows(manifest: MicroAppManifest): MicroAppConnectorWorkflow[] {
+  return manifest.connectors.map((connector, index) => {
+    const name = connector.name || `Connector ${index + 1}`;
+    if (connector.type === 'static') {
+      return {
+        name,
+        type: connector.type,
+        mode: connector.mode ?? 'readonly',
+        src: connector.src,
+        refreshInterval: connector.refreshInterval,
+        permission: 'local',
+      };
+    }
+    if (!connector.src) {
+      return {
+        name,
+        type: connector.type,
+        mode: connector.mode ?? 'readonly',
+        refreshInterval: connector.refreshInterval,
+        permission: 'blocked',
+        reason: 'Connector source is required.',
+      };
+    }
+    const allowed = sourceAllowed(connector.src, manifest.permissions);
+    return {
+      name,
+      type: connector.type,
+      mode: connector.mode ?? 'readonly',
+      src: connector.src,
+      refreshInterval: connector.refreshInterval,
+      permission: allowed ? 'allowed' : 'blocked',
+      reason: allowed ? undefined : 'Connector source is not listed in permissions.network.',
+    };
+  });
+}
+
+export function validateMicroAppConnectorWorkflows(manifest: MicroAppManifest): MicroAppManifestIssue[] {
+  return listMicroAppConnectorWorkflows(manifest)
+    .map((workflow, index): MicroAppManifestIssue | undefined =>
+      workflow.permission === 'blocked' ? { path: `connectors.${index}.src`, message: workflow.reason ?? 'Connector is blocked' } : undefined,
+    )
+    .filter((issue): issue is MicroAppManifestIssue => Boolean(issue));
 }

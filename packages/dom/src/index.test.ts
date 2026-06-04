@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { isInitialized, mount, registerComponent, resolveTarget, setText, setTrustedHTML, swapTrustedHTML, unmount } from './index.js';
+import { isInitialized, mount, registerComponent, resolveTarget, setSafeHTML, setText, setTrustedHTML, swapTrustedHTML, unmount } from './index.js';
 
 describe('dom', () => {
   it('resolves target expressions', () => {
@@ -31,6 +31,15 @@ describe('dom', () => {
     expect(() => setTrustedHTML(target, '<strong>Unsafe</strong>')).toThrow(/untrusted HTML/);
     setTrustedHTML(target, '<strong>Trusted</strong>', { trusted: true });
     expect(target.innerHTML).toBe('<strong>Trusted</strong>');
+  });
+
+  it('renders limited safe HTML without event handlers or unsafe URLs', () => {
+    const target = document.createElement('div');
+    setSafeHTML(target, '<p onclick="alert(1)">Hello <a href="javascript:alert(1)">link</a></p><script>alert(1)</script>');
+    expect(target.querySelector('script')).toBeNull();
+    expect(target.querySelector('p')?.hasAttribute('onclick')).toBe(false);
+    expect(target.querySelector('a')?.hasAttribute('href')).toBe(false);
+    expect(target.textContent).toContain('Hello link');
   });
 
   it('swaps trusted HTML and returns the updated element', () => {

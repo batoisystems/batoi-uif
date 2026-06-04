@@ -1,14 +1,22 @@
 // src/index.ts
 import { appendTextElement } from "@batoi/uif-dom";
-import { request } from "@batoi/uif-net";
+import { cancelRequest, request } from "@batoi/uif-net";
 var handlers = /* @__PURE__ */ new Map();
 var connections = /* @__PURE__ */ new Map();
 var states = /* @__PURE__ */ new Map();
 var presence = /* @__PURE__ */ new Map();
 var elementSubscriptions = /* @__PURE__ */ new WeakMap();
+var reconnectAttempts = /* @__PURE__ */ new Map();
+var reconnectTimers = /* @__PURE__ */ new Map();
+function requestKey(channel) {
+  return `realtime:${channel}`;
+}
+function dispatchRealtimeEvent(name, detail) {
+  window.dispatchEvent(new CustomEvent(name, { detail }));
+}
 function setState(channel, state) {
   states.set(channel, state);
-  window.dispatchEvent(new CustomEvent("uif:realtime-state", { detail: { channel, state } }));
+  dispatchRealtimeEvent("uif:realtime-state", { channel, state });
 }
 function getConnectionState(channel) {
   return states.get(channel) ?? "idle";
@@ -26,64 +34,121 @@ function subscribe(channel, handler) {
   return () => handlers.get(channel)?.delete(handler);
 }
 function publishLocal(channel, payload) {
+  dispatchRealtimeEvent("uif:realtime-message", { channel, payload });
   handlers.get(channel)?.forEach((handler) => handler(payload));
 }
 function publishBatched(channel, payload) {
   window.requestAnimationFrame(() => publishLocal(channel, payload));
 }
+function closeConnection(channel, emitState = true) {
+  const timer = reconnectTimers.get(channel);
+  if (timer) window.clearTimeout(timer);
+  reconnectTimers.delete(channel);
+  connections.get(channel)?.close();
+  connections.delete(channel);
+  cancelRequest(requestKey(channel));
+  if (emitState) setState(channel, "disconnected");
+}
+function resetReconnect(channel) {
+  reconnectAttempts.delete(channel);
+}
+function scheduleReconnect(options, error) {
+  dispatchRealtimeEvent("uif:realtime-error", { channel: options.channel, error });
+  if (options.reconnect === false) {
+    setState(options.channel, "disconnected");
+    return;
+  }
+  closeConnection(options.channel, false);
+  const attempts = (reconnectAttempts.get(options.channel) ?? 0) + 1;
+  reconnectAttempts.set(options.channel, attempts);
+  const base = options.backoff ?? 500;
+  const delay = Math.min(base * 2 ** (attempts - 1), options.maxBackoff ?? base * 8);
+  setState(options.channel, "reconnecting");
+  reconnectTimers.set(
+    options.channel,
+    window.setTimeout(() => connect(options), delay)
+  );
+}
 function connect(options) {
   const mode = options.mode ?? "poll";
-  disconnect(options.channel);
+  closeConnection(options.channel, false);
   setState(options.channel, "connecting");
-  let attempts = 0;
-  const reconnect = () => {
-    if (options.reconnect === false) {
-      setState(options.channel, "disconnected");
-      return;
-    }
-    attempts += 1;
-    setState(options.channel, "reconnecting");
-    window.setTimeout(() => connect(options), (options.backoff ?? 500) * attempts);
+  const markConnected = () => {
+    resetReconnect(options.channel);
+    setState(options.channel, "connected");
+    dispatchRealtimeEvent("uif:realtime-open", { channel: options.channel, mode });
   };
   if (mode === "sse" && options.src && "EventSource" in window) {
     const source = new EventSource(options.src);
-    source.onopen = () => setState(options.channel, "connected");
+    let closed2 = false;
+    source.onopen = markConnected;
     source.onmessage = (event) => publishLocal(options.channel, parsePayload(event.data));
-    source.onerror = reconnect;
-    connections.set(options.channel, { close: () => source.close() });
+    source.onerror = (event) => {
+      if (!closed2) scheduleReconnect(options, event);
+    };
+    connections.set(options.channel, {
+      close: () => {
+        closed2 = true;
+        source.close();
+      }
+    });
     return;
   }
   if (mode === "websocket" && options.src && "WebSocket" in window) {
     const socket = new WebSocket(options.src);
-    socket.onopen = () => setState(options.channel, "connected");
+    let closed2 = false;
+    socket.onopen = markConnected;
     socket.onmessage = (event) => publishLocal(options.channel, parsePayload(event.data));
-    socket.onerror = reconnect;
-    socket.onclose = reconnect;
-    connections.set(options.channel, { close: () => socket.close() });
+    socket.onerror = (event) => {
+      if (!closed2) scheduleReconnect(options, event);
+    };
+    socket.onclose = (event) => {
+      if (!closed2) scheduleReconnect(options, event);
+    };
+    connections.set(options.channel, {
+      close: () => {
+        closed2 = true;
+        socket.close();
+      }
+    });
     return;
   }
   let inFlight = false;
-  const timer = window.setInterval(async () => {
-    if (!options.src) return;
+  let closed = false;
+  let timer;
+  let heartbeatTimer;
+  const poll = async () => {
+    if (closed || !options.src) return;
     if (inFlight) return;
     inFlight = true;
     try {
-      const response = await request(options.src, { method: "GET", parseAs: "json", key: `realtime:${options.channel}`, timeout: options.interval ?? 5e3 });
-      setState(options.channel, "connected");
+      const response = await request(options.src, { method: "GET", parseAs: "json", key: requestKey(options.channel), timeout: options.interval ?? 5e3 });
+      if (closed) return;
+      markConnected();
       publishLocal(options.channel, response);
-    } catch {
+      timer = window.setTimeout(poll, options.interval ?? 5e3);
+    } catch (error) {
+      if (closed) return;
       setState(options.channel, "error");
-      reconnect();
+      scheduleReconnect(options, error);
     } finally {
       inFlight = false;
     }
-  }, options.interval ?? 5e3);
+  };
   if (options.heartbeat) {
-    window.setTimeout(() => {
+    heartbeatTimer = window.setTimeout(() => {
       if (getConnectionState(options.channel) === "connecting") setState(options.channel, "stale");
     }, options.heartbeat);
   }
-  connections.set(options.channel, { close: () => window.clearInterval(timer) });
+  poll();
+  connections.set(options.channel, {
+    close: () => {
+      closed = true;
+      if (timer) window.clearTimeout(timer);
+      if (heartbeatTimer) window.clearTimeout(heartbeatTimer);
+      cancelRequest(requestKey(options.channel));
+    }
+  });
 }
 function bindRealtime(options) {
   const mode = options.transport === "polling" ? "poll" : options.transport;
@@ -116,9 +181,9 @@ function getPresence(channel) {
   return Array.from(presence.get(channel)?.values() ?? []);
 }
 function disconnect(channel) {
-  connections.get(channel)?.close();
-  connections.delete(channel);
-  setState(channel, "disconnected");
+  resetReconnect(channel);
+  closeConnection(channel);
+  dispatchRealtimeEvent("uif:realtime-close", { channel });
 }
 function initRealtime(el) {
   const channel = el.dataset.uifChannel;

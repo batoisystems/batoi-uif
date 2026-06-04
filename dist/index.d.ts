@@ -72,15 +72,28 @@ interface MicroAppManifestResult {
     issues: MicroAppManifestIssue[];
     valid: boolean;
 }
+interface MicroAppConnectorWorkflow {
+    name: string;
+    type: MicroAppConnectorType;
+    mode: MicroAppConnectorMode;
+    src?: string;
+    refreshInterval?: number;
+    permission: 'local' | 'allowed' | 'blocked';
+    reason?: string;
+}
 declare function validateMicroAppManifest(input: unknown): MicroAppManifestResult;
 declare function parseMicroAppManifest(input: unknown): MicroAppManifest;
+declare function listMicroAppConnectorWorkflows(manifest: MicroAppManifest): MicroAppConnectorWorkflow[];
+declare function validateMicroAppConnectorWorkflows(manifest: MicroAppManifest): MicroAppManifestIssue[];
 
 type UIFOptions = Record<string, unknown>;
 
 interface UIFApp {
     root: Document | HTMLElement;
     options: UIFOptions;
+    destroyed: boolean;
     destroy(): void;
+    restart(options?: UIFOptions): UIFApp;
 }
 interface UIFPlugin {
     name: string;
@@ -158,6 +171,10 @@ interface TrustedHTMLRenderOptions {
     trusted?: boolean;
     context?: string;
 }
+interface SafeHTMLRenderOptions {
+    allowedTags?: string[];
+    allowedAttributes?: string[];
+}
 declare function registerComponent(name: string, component: Omit<UIFDomComponent, 'name'>): void;
 declare function registerComponent(component: UIFDomComponent): void;
 declare function qs<T extends Element = Element>(selector: string, root?: ParentNode): T | null;
@@ -166,6 +183,8 @@ declare function closest<T extends Element = Element>(el: Element, selector: str
 declare function resolveTarget(sourceEl: HTMLElement, targetExpression?: string): HTMLElement | null;
 declare function setText(target: Element | null, value: unknown): void;
 declare function appendTextElement<K extends keyof HTMLElementTagNameMap>(parent: Element, tagName: K, text: unknown, className?: string): HTMLElementTagNameMap[K];
+declare function sanitizeHTML(html: string, options?: SafeHTMLRenderOptions): DocumentFragment;
+declare function setSafeHTML(target: Element | null, html: string, options?: SafeHTMLRenderOptions): void;
 declare function setTrustedHTML(target: Element | null, html: string, options?: TrustedHTMLRenderOptions): void;
 declare function swapTrustedHTML(targetEl: HTMLElement, html: string, mode?: HTMLSwapMode): HTMLElement;
 declare function mount(root?: Root): void;
@@ -373,8 +392,11 @@ declare global {
 interface OverlayOptions {
     opener?: HTMLElement | null;
     modal?: boolean;
+    inert?: boolean;
     restoreFocus?: boolean;
-    placement?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end';
+    closeOnEscape?: boolean;
+    placement?: 'auto' | 'bottom' | 'bottom-start' | 'bottom-end' | 'top' | 'top-start' | 'top-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end';
+    offset?: number;
 }
 declare function getOverlayStack(): HTMLElement[];
 declare function openOverlay(el: HTMLElement, options?: OverlayOptions): Promise<void>;
@@ -428,9 +450,14 @@ declare function loadConnector<T = unknown>(connector: DataConnector<T>, options
 declare function bindConnector<T = unknown>(connector: DataConnector<T>, handler: (value: T) => void | Promise<void>, options?: RequestOptions): () => void;
 
 type FormErrors = Record<string, string[]>;
-type AsyncRuleHandler = (field: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement, form: HTMLFormElement) => Promise<string[]>;
+type FormField = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+type AsyncRuleHandler = (field: FormField, form: HTMLFormElement, signal: AbortSignal) => Promise<string[]>;
+type FieldAdapter = (field: FormField) => string;
+type ValidationMessageHandler = (field: FormField, rule: string, arg: string | undefined) => string;
 declare function registerAsyncRule(name: string, handler: AsyncRuleHandler): void;
-declare function validateField(fieldEl: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): string[];
+declare function registerFieldAdapter(name: string, adapter: FieldAdapter): void;
+declare function registerValidationMessage(name: string, handler: ValidationMessageHandler): void;
+declare function validateField(fieldEl: FormField): string[];
 declare function validateForm(formEl: HTMLFormElement): FormErrors;
 declare function clearErrors(formEl: HTMLFormElement): void;
 declare function showErrors(formEl: HTMLFormElement, errors: FormErrors): void;
@@ -834,6 +861,438 @@ declare const icons: {
     readonly trash: {
         readonly body: "<path d=\"M3 6h18\"></path><path d=\"M8 6V4h8v2\"></path><path d=\"M19 6l-1 15H6L5 6\"></path><path d=\"M10 11v6\"></path><path d=\"M14 11v6\"></path>";
     };
+    readonly accessibility: {
+        readonly body: "<circle cx=\"12\" cy=\"4\" r=\"2\"></circle><path d=\"M4 8h16\"></path><path d=\"M12 6v7\"></path><path d=\"M8 22l4-9 4 9\"></path>";
+    };
+    readonly 'align-center': {
+        readonly body: "<path d=\"M7 6h10\"></path><path d=\"M4 12h16\"></path><path d=\"M8 18h8\"></path>";
+    };
+    readonly 'align-left': {
+        readonly body: "<path d=\"M4 6h16\"></path><path d=\"M4 12h10\"></path><path d=\"M4 18h16\"></path>";
+    };
+    readonly 'align-right': {
+        readonly body: "<path d=\"M4 6h16\"></path><path d=\"M10 12h10\"></path><path d=\"M4 18h16\"></path>";
+    };
+    readonly anchor: {
+        readonly body: "<circle cx=\"12\" cy=\"5\" r=\"3\"></circle><path d=\"M12 8v13\"></path><path d=\"M5 12H2a10 10 0 0 0 20 0h-3\"></path>";
+    };
+    readonly 'arrow-down-left': {
+        readonly body: "<path d=\"M17 7 7 17\"></path><path d=\"M17 17H7V7\"></path>";
+    };
+    readonly 'arrow-down-right': {
+        readonly body: "<path d=\"m7 7 10 10\"></path><path d=\"M7 17h10V7\"></path>";
+    };
+    readonly 'arrow-up-left': {
+        readonly body: "<path d=\"M17 17 7 7\"></path><path d=\"M7 17V7h10\"></path>";
+    };
+    readonly 'arrow-up-right': {
+        readonly body: "<path d=\"M7 17 17 7\"></path><path d=\"M7 7h10v10\"></path>";
+    };
+    readonly badge: {
+        readonly body: "<path d=\"M8 3h8l5 5v8l-5 5H8l-5-5V8l5-5z\"></path><path d=\"m8.5 12 2.5 2.5L16 9\"></path>";
+    };
+    readonly 'badge-dollar': {
+        readonly body: "<path d=\"M8 3h8l5 5v8l-5 5H8l-5-5V8l5-5z\"></path><path d=\"M12 7v10\"></path><path d=\"M15 9.5A3 3 0 0 0 12 8c-1.7 0-3 1-3 2.3 0 3.2 6 1.4 6 4.6 0 1.2-1.3 2.1-3 2.1a4 4 0 0 1-3.5-1.8\"></path>";
+    };
+    readonly 'badge-percent': {
+        readonly body: "<path d=\"M8 3h8l5 5v8l-5 5H8l-5-5V8l5-5z\"></path><path d=\"m8 16 8-8\"></path><circle cx=\"9\" cy=\"9\" r=\"1\"></circle><circle cx=\"15\" cy=\"15\" r=\"1\"></circle>";
+    };
+    readonly barcode: {
+        readonly body: "<path d=\"M4 5v14\"></path><path d=\"M7 5v14\"></path><path d=\"M11 5v14\"></path><path d=\"M13 5v14\"></path><path d=\"M17 5v14\"></path><path d=\"M20 5v14\"></path>";
+    };
+    readonly 'bell-off': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><path d=\"M6.2 6.2A6 6 0 0 0 6 8c0 7-3 7-3 7h12\"></path><path d=\"M18 14.8c-.7-1-1-2.7-1-6.8a5.9 5.9 0 0 0-8.8-5.1\"></path><path d=\"M13.7 21a2 2 0 0 1-3.4 0\"></path>";
+    };
+    readonly 'book-open': {
+        readonly body: "<path d=\"M3 5a6 6 0 0 1 6-2l3 1v17l-3-1a6 6 0 0 0-6 2V5z\"></path><path d=\"M21 5a6 6 0 0 0-6-2l-3 1v17l3-1a6 6 0 0 1 6 2V5z\"></path>";
+    };
+    readonly bookmark: {
+        readonly body: "<path d=\"M6 3h12a1 1 0 0 1 1 1v18l-7-4-7 4V4a1 1 0 0 1 1-1z\"></path>";
+    };
+    readonly branch: {
+        readonly body: "<circle cx=\"6\" cy=\"6\" r=\"3\"></circle><circle cx=\"18\" cy=\"6\" r=\"3\"></circle><circle cx=\"12\" cy=\"18\" r=\"3\"></circle><path d=\"M8.5 8.5 12 15\"></path><path d=\"m15.5 8.5-3.5 6.5\"></path>";
+    };
+    readonly bug: {
+        readonly body: "<rect x=\"7\" y=\"8\" width=\"10\" height=\"12\" rx=\"5\"></rect><path d=\"M9 8 7 5\"></path><path d=\"m15 8 2-3\"></path><path d=\"M3 13h4\"></path><path d=\"M17 13h4\"></path><path d=\"M4 19l3-2\"></path><path d=\"m17 17 3 2\"></path><path d=\"M12 8v12\"></path>";
+    };
+    readonly 'calendar-check': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"m8 16 2 2 5-5\"></path>";
+    };
+    readonly 'calendar-clock': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><circle cx=\"15\" cy=\"16\" r=\"3\"></circle><path d=\"M15 14.5V16l1 1\"></path>";
+    };
+    readonly 'calendar-days': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"M8 14h.01\"></path><path d=\"M12 14h.01\"></path><path d=\"M16 14h.01\"></path><path d=\"M8 18h.01\"></path><path d=\"M12 18h.01\"></path>";
+    };
+    readonly 'calendar-plus': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"M12 14v6\"></path><path d=\"M9 17h6\"></path>";
+    };
+    readonly 'calendar-x': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"m9 14 6 6\"></path><path d=\"m15 14-6 6\"></path>";
+    };
+    readonly 'camera-off': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><path d=\"M9.5 4h5L16 7h3a2 2 0 0 1 2 2v8.5\"></path><path d=\"M18 20H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2\"></path><path d=\"M9.9 10.4A3 3 0 0 0 14 14.6\"></path>";
+    };
+    readonly 'chart-candlestick': {
+        readonly body: "<path d=\"M4 3v18h17\"></path><path d=\"M8 7v8\"></path><rect x=\"6\" y=\"9\" width=\"4\" height=\"4\"></rect><path d=\"M14 5v11\"></path><rect x=\"12\" y=\"7\" width=\"4\" height=\"6\"></rect><path d=\"M20 10v8\"></path><rect x=\"18\" y=\"12\" width=\"4\" height=\"4\"></rect>";
+    };
+    readonly 'chart-column': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><rect x=\"6\" y=\"11\" width=\"3\" height=\"6\"></rect><rect x=\"11\" y=\"7\" width=\"3\" height=\"10\"></rect><rect x=\"16\" y=\"13\" width=\"3\" height=\"4\"></rect>";
+    };
+    readonly 'chart-no-axes': {
+        readonly body: "<path d=\"m4 16 4-5 3 3 4-7 5 4\"></path><circle cx=\"8\" cy=\"11\" r=\"1\"></circle><circle cx=\"15\" cy=\"7\" r=\"1\"></circle><circle cx=\"20\" cy=\"11\" r=\"1\"></circle>";
+    };
+    readonly 'chart-stacked': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 17V8\"></path><path d=\"M12 17V5\"></path><path d=\"M17 17v-6\"></path><path d=\"M7 12h10\"></path>";
+    };
+    readonly 'check-square': {
+        readonly body: "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"m8 12 3 3 5-6\"></path>";
+    };
+    readonly 'chevrons-down': {
+        readonly body: "<path d=\"m7 7 5 5 5-5\"></path><path d=\"m7 13 5 5 5-5\"></path>";
+    };
+    readonly 'chevrons-left': {
+        readonly body: "<path d=\"m11 17-5-5 5-5\"></path><path d=\"m18 17-5-5 5-5\"></path>";
+    };
+    readonly 'chevrons-right': {
+        readonly body: "<path d=\"m6 17 5-5-5-5\"></path><path d=\"m13 17 5-5-5-5\"></path>";
+    };
+    readonly 'chevrons-up': {
+        readonly body: "<path d=\"m7 17 5-5 5 5\"></path><path d=\"m7 11 5-5 5 5\"></path>";
+    };
+    readonly chip: {
+        readonly body: "<rect x=\"6\" y=\"6\" width=\"12\" height=\"12\" rx=\"2\"></rect><path d=\"M9 1v3\"></path><path d=\"M15 1v3\"></path><path d=\"M9 20v3\"></path><path d=\"M15 20v3\"></path><path d=\"M1 9h3\"></path><path d=\"M1 15h3\"></path><path d=\"M20 9h3\"></path><path d=\"M20 15h3\"></path><path d=\"M10 10h4v4h-4z\"></path>";
+    };
+    readonly clipboard: {
+        readonly body: "<rect x=\"5\" y=\"4\" width=\"14\" height=\"18\" rx=\"2\"></rect><path d=\"M9 4a3 3 0 0 1 6 0\"></path><path d=\"M9 4h6\"></path><path d=\"M8 10h8\"></path><path d=\"M8 14h8\"></path><path d=\"M8 18h5\"></path>";
+    };
+    readonly 'clipboard-check': {
+        readonly body: "<rect x=\"5\" y=\"4\" width=\"14\" height=\"18\" rx=\"2\"></rect><path d=\"M9 4a3 3 0 0 1 6 0\"></path><path d=\"M9 4h6\"></path><path d=\"m8 15 2 2 5-5\"></path>";
+    };
+    readonly 'clipboard-list': {
+        readonly body: "<rect x=\"5\" y=\"4\" width=\"14\" height=\"18\" rx=\"2\"></rect><path d=\"M9 4a3 3 0 0 1 6 0\"></path><path d=\"M9 4h6\"></path><path d=\"M9 11h.01\"></path><path d=\"M12 11h4\"></path><path d=\"M9 16h.01\"></path><path d=\"M12 16h4\"></path>";
+    };
+    readonly 'cloud-download': {
+        readonly body: "<path d=\"M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 21 11.5 3.8 3.8 0 0 1 17.5 19z\"></path><path d=\"M12 11v8\"></path><path d=\"m8 15 4 4 4-4\"></path>";
+    };
+    readonly 'cloud-upload': {
+        readonly body: "<path d=\"M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 21 11.5 3.8 3.8 0 0 1 17.5 19z\"></path><path d=\"M12 19v-8\"></path><path d=\"m8 15 4-4 4 4\"></path>";
+    };
+    readonly columns: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M9 4v16\"></path><path d=\"M15 4v16\"></path>";
+    };
+    readonly 'copy-check': {
+        readonly body: "<rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"></rect><rect x=\"2\" y=\"2\" width=\"13\" height=\"13\" rx=\"2\"></rect><path d=\"m12 16 2 2 5-5\"></path>";
+    };
+    readonly 'corner-down-left': {
+        readonly body: "<path d=\"M9 10 4 15l5 5\"></path><path d=\"M20 4v7a4 4 0 0 1-4 4H4\"></path>";
+    };
+    readonly 'corner-down-right': {
+        readonly body: "<path d=\"m15 10 5 5-5 5\"></path><path d=\"M4 4v7a4 4 0 0 0 4 4h12\"></path>";
+    };
+    readonly 'corner-up-left': {
+        readonly body: "<path d=\"M9 14 4 9l5-5\"></path><path d=\"M20 20v-7a4 4 0 0 0-4-4H4\"></path>";
+    };
+    readonly 'corner-up-right': {
+        readonly body: "<path d=\"m15 14 5-5-5-5\"></path><path d=\"M4 20v-7a4 4 0 0 1 4-4h12\"></path>";
+    };
+    readonly 'database-backup': {
+        readonly body: "<ellipse cx=\"12\" cy=\"5\" rx=\"8\" ry=\"3\"></ellipse><path d=\"M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5\"></path><path d=\"M4 11v4c0 1.7 3.6 3 8 3\"></path><path d=\"M16 16h5v5\"></path><path d=\"M21 16a5 5 0 1 0-1.5 3.5\"></path>";
+    };
+    readonly 'database-zap': {
+        readonly body: "<ellipse cx=\"12\" cy=\"5\" rx=\"8\" ry=\"3\"></ellipse><path d=\"M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5\"></path><path d=\"M4 11v6c0 1.7 3.6 3 8 3\"></path><path d=\"m17 14-3 5h4l-2 4\"></path>";
+    };
+    readonly 'device-tablet': {
+        readonly body: "<rect x=\"5\" y=\"2\" width=\"14\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path>";
+    };
+    readonly 'file-check': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"m8 15 2 2 5-5\"></path>";
+    };
+    readonly 'file-code': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"m10 13-2 2 2 2\"></path><path d=\"m14 13 2 2-2 2\"></path>";
+    };
+    readonly 'file-down': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M12 12v6\"></path><path d=\"m9 15 3 3 3-3\"></path>";
+    };
+    readonly 'file-minus': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M9 15h6\"></path>";
+    };
+    readonly 'file-plus': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M12 12v6\"></path><path d=\"M9 15h6\"></path>";
+    };
+    readonly 'file-text': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h8\"></path><path d=\"M8 9h2\"></path>";
+    };
+    readonly 'file-up': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M12 18v-6\"></path><path d=\"m9 15 3-3 3 3\"></path>";
+    };
+    readonly 'file-x': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"m9 13 6 6\"></path><path d=\"m15 13-6 6\"></path>";
+    };
+    readonly fingerprint: {
+        readonly body: "<path d=\"M3 11a9 9 0 0 1 18 0\"></path><path d=\"M6 19a12 12 0 0 0 2-7 4 4 0 0 1 8 0c0 2.8-.7 5.5-2 7.8\"></path><path d=\"M9 22a15 15 0 0 0 3-10\"></path><path d=\"M12 2a9 9 0 0 1 9 9c0 1.5-.2 3-.6 4.4\"></path><path d=\"M3.6 15A8 8 0 0 0 4 12\"></path>";
+    };
+    readonly flask: {
+        readonly body: "<path d=\"M9 2h6\"></path><path d=\"M10 2v6l-5.5 9.5A3 3 0 0 0 7.1 22h9.8a3 3 0 0 0 2.6-4.5L14 8V2\"></path><path d=\"M7 16h10\"></path>";
+    };
+    readonly 'folder-open': {
+        readonly body: "<path d=\"M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v1\"></path><path d=\"M3 10h18l-2 9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z\"></path>";
+    };
+    readonly 'folder-plus': {
+        readonly body: "<path d=\"M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z\"></path><path d=\"M12 11v6\"></path><path d=\"M9 14h6\"></path>";
+    };
+    readonly 'folder-sync': {
+        readonly body: "<path d=\"M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v3\"></path><path d=\"M3 10v8a2 2 0 0 0 2 2h7\"></path><path d=\"M21 17a4 4 0 0 1-6.8 2.8L13 18\"></path><path d=\"M13 21v-3h3\"></path><path d=\"M15 14a4 4 0 0 1 6.8 2.8L23 18\"></path><path d=\"M23 15v3h-3\"></path>";
+    };
+    readonly gift: {
+        readonly body: "<rect x=\"3\" y=\"8\" width=\"18\" height=\"13\" rx=\"2\"></rect><path d=\"M3 12h18\"></path><path d=\"M12 8v13\"></path><path d=\"M12 8H8.5A2.5 2.5 0 1 1 11 5.5L12 8z\"></path><path d=\"M12 8h3.5A2.5 2.5 0 1 0 13 5.5L12 8z\"></path>";
+    };
+    readonly grab: {
+        readonly body: "<path d=\"M8 5h.01\"></path><path d=\"M12 5h.01\"></path><path d=\"M16 5h.01\"></path><path d=\"M8 12h.01\"></path><path d=\"M12 12h.01\"></path><path d=\"M16 12h.01\"></path><path d=\"M8 19h.01\"></path><path d=\"M12 19h.01\"></path><path d=\"M16 19h.01\"></path>";
+    };
+    readonly 'hard-drive': {
+        readonly body: "<path d=\"M6 3h12l4 9v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-7l4-9z\"></path><path d=\"M2 12h20\"></path><path d=\"M6 17h.01\"></path><path d=\"M10 17h.01\"></path>";
+    };
+    readonly headphones: {
+        readonly body: "<path d=\"M4 14v-2a8 8 0 0 1 16 0v2\"></path><rect x=\"3\" y=\"14\" width=\"4\" height=\"7\" rx=\"2\"></rect><rect x=\"17\" y=\"14\" width=\"4\" height=\"7\" rx=\"2\"></rect>";
+    };
+    readonly 'heart-pulse': {
+        readonly body: "<path d=\"M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z\"></path><path d=\"M3 13h4l2-4 3 8 2-4h7\"></path>";
+    };
+    readonly history: {
+        readonly body: "<path d=\"M3 12a9 9 0 1 0 3-6.7L3 8\"></path><path d=\"M3 3v5h5\"></path><path d=\"M12 7v5l3 2\"></path>";
+    };
+    readonly id: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><circle cx=\"9\" cy=\"10\" r=\"2\"></circle><path d=\"M6 16a3 3 0 0 1 6 0\"></path><path d=\"M14 9h4\"></path><path d=\"M14 13h4\"></path><path d=\"M14 17h3\"></path>";
+    };
+    readonly 'image-plus': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><circle cx=\"8\" cy=\"10\" r=\"2\"></circle><path d=\"m21 15-4-4-5 5-2-2-4 5\"></path><path d=\"M16 6v6\"></path><path d=\"M13 9h6\"></path>";
+    };
+    readonly indent: {
+        readonly body: "<path d=\"M3 6h18\"></path><path d=\"M11 12h10\"></path><path d=\"M3 18h18\"></path><path d=\"m3 10 4 2-4 2v-4z\"></path>";
+    };
+    readonly invoice: {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h6\"></path><path d=\"M9 15h3\"></path><path d=\"M15 15h.01\"></path>";
+    };
+    readonly kanban: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M9 4v16\"></path><path d=\"M15 4v16\"></path><path d=\"M6 8h.01\"></path><path d=\"M12 12h.01\"></path><path d=\"M18 9h.01\"></path>";
+    };
+    readonly keyboard: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 9h.01\"></path><path d=\"M11 9h.01\"></path><path d=\"M15 9h.01\"></path><path d=\"M19 9h.01\"></path><path d=\"M7 13h.01\"></path><path d=\"M11 13h6\"></path><path d=\"M19 13h.01\"></path><path d=\"M8 17h8\"></path>";
+    };
+    readonly landmark: {
+        readonly body: "<path d=\"m3 10 9-6 9 6\"></path><path d=\"M4 10h16\"></path><path d=\"M6 10v8\"></path><path d=\"M10 10v8\"></path><path d=\"M14 10v8\"></path><path d=\"M18 10v8\"></path><path d=\"M3 21h18\"></path>";
+    };
+    readonly 'layout-dashboard': {
+        readonly body: "<rect x=\"3\" y=\"3\" width=\"8\" height=\"8\" rx=\"2\"></rect><rect x=\"13\" y=\"3\" width=\"8\" height=\"5\" rx=\"2\"></rect><rect x=\"13\" y=\"10\" width=\"8\" height=\"11\" rx=\"2\"></rect><rect x=\"3\" y=\"13\" width=\"8\" height=\"8\" rx=\"2\"></rect>";
+    };
+    readonly 'layout-list': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"4\" rx=\"1\"></rect><rect x=\"3\" y=\"12\" width=\"18\" height=\"4\" rx=\"1\"></rect><rect x=\"3\" y=\"19\" width=\"18\" height=\"2\" rx=\"1\"></rect>";
+    };
+    readonly 'layout-panel-left': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M9 4v16\"></path><path d=\"M13 8h4\"></path><path d=\"M13 12h5\"></path>";
+    };
+    readonly 'layout-panel-top': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M8 15h8\"></path>";
+    };
+    readonly 'life-buoy': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"m4.9 4.9 4.3 4.3\"></path><path d=\"m14.8 14.8 4.3 4.3\"></path><path d=\"m19.1 4.9-4.3 4.3\"></path><path d=\"m9.2 14.8-4.3 4.3\"></path>";
+    };
+    readonly 'list-check': {
+        readonly body: "<path d=\"M10 6h11\"></path><path d=\"M10 12h11\"></path><path d=\"M10 18h11\"></path><path d=\"m3 6 1.5 1.5L8 4\"></path><path d=\"m3 12 1.5 1.5L8 10\"></path><path d=\"m3 18 1.5 1.5L8 16\"></path>";
+    };
+    readonly 'list-filter': {
+        readonly body: "<path d=\"M4 6h16\"></path><path d=\"M7 12h10\"></path><path d=\"M10 18h4\"></path>";
+    };
+    readonly 'loader-circle': {
+        readonly body: "<path d=\"M21 12a9 9 0 1 1-6.2-8.6\"></path>";
+    };
+    readonly 'log-in': {
+        readonly body: "<path d=\"M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4\"></path><path d=\"m10 17 5-5-5-5\"></path><path d=\"M15 12H3\"></path>";
+    };
+    readonly 'log-out': {
+        readonly body: "<path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\"></path><path d=\"m16 17 5-5-5-5\"></path><path d=\"M21 12H9\"></path>";
+    };
+    readonly magnet: {
+        readonly body: "<path d=\"M6 3v8a6 6 0 0 0 12 0V3\"></path><path d=\"M6 8h4\"></path><path d=\"M14 8h4\"></path><path d=\"M6 3h4\"></path><path d=\"M14 3h4\"></path>";
+    };
+    readonly megaphone: {
+        readonly body: "<path d=\"M3 11v2a2 2 0 0 0 2 2h3l7 4V5L8 9H5a2 2 0 0 0-2 2z\"></path><path d=\"M19 8a5 5 0 0 1 0 8\"></path><path d=\"M8 15l2 6\"></path>";
+    };
+    readonly monitor: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M8 20h8\"></path><path d=\"M12 16v4\"></path>";
+    };
+    readonly 'panel-bottom': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 14h18\"></path>";
+    };
+    readonly 'panel-left': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M9 4v16\"></path>";
+    };
+    readonly 'panel-right': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M15 4v16\"></path>";
+    };
+    readonly 'panel-top': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path>";
+    };
+    readonly pencil: {
+        readonly body: "<path d=\"M12 20h9\"></path><path d=\"M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z\"></path>";
+    };
+    readonly 'phone-call': {
+        readonly body: "<path d=\"M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3 5.2 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.8l-1.3 1.3a14 14 0 0 0 5.6 5.6l1.3-1.3a2 2 0 0 1 1.8-.6l3 .5a2 2 0 0 1 1.7 1.9z\"></path><path d=\"M14 3a7 7 0 0 1 7 7\"></path><path d=\"M14 7a3 3 0 0 1 3 3\"></path>";
+    };
+    readonly 'play-circle': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"m10 8 6 4-6 4V8z\"></path>";
+    };
+    readonly 'plug-zap': {
+        readonly body: "<path d=\"M13 2 8 12h5l-2 10 5-12h-5l2-8z\"></path><path d=\"M4 14h4\"></path><path d=\"M3 18h6\"></path><path d=\"M16 6h5\"></path><path d=\"M15 10h6\"></path>";
+    };
+    readonly 'plus-circle': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 8v8\"></path><path d=\"M8 12h8\"></path>";
+    };
+    readonly 'plus-square': {
+        readonly body: "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M12 8v8\"></path><path d=\"M8 12h8\"></path>";
+    };
+    readonly power: {
+        readonly body: "<path d=\"M12 2v10\"></path><path d=\"M18.4 6.6a9 9 0 1 1-12.8 0\"></path>";
+    };
+    readonly presentation: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M12 16v5\"></path><path d=\"m8 21 4-5 4 5\"></path><path d=\"M8 9h8\"></path><path d=\"M8 12h5\"></path>";
+    };
+    readonly project: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"7\" height=\"7\" rx=\"2\"></rect><rect x=\"14\" y=\"13\" width=\"7\" height=\"7\" rx=\"2\"></rect><path d=\"M10 7h2a3 3 0 0 1 3 3v3\"></path><path d=\"M6.5 11v4A2.5 2.5 0 0 0 9 17.5h5\"></path>";
+    };
+    readonly puzzle: {
+        readonly body: "<path d=\"M8 3h4a2 2 0 0 1 2 2 2 2 0 1 0 4 0 2 2 0 0 1 2 2v4h-3a2 2 0 1 0 0 4h3v4a2 2 0 0 1-2 2h-4v-3a2 2 0 1 0-4 0v3H6a2 2 0 0 1-2-2v-4h3a2 2 0 1 0 0-4H4V7a4 4 0 0 1 4-4z\"></path>";
+    };
+    readonly repeat: {
+        readonly body: "<path d=\"M17 2l4 4-4 4\"></path><path d=\"M3 11V9a3 3 0 0 1 3-3h15\"></path><path d=\"M7 22l-4-4 4-4\"></path><path d=\"M21 13v2a3 3 0 0 1-3 3H3\"></path>";
+    };
+    readonly 'reply-all': {
+        readonly body: "<path d=\"m7 17-5-5 5-5\"></path><path d=\"m12 17-5-5 5-5\"></path><path d=\"M22 18v-2a4 4 0 0 0-4-4H7\"></path>";
+    };
+    readonly reply: {
+        readonly body: "<path d=\"m9 17-5-5 5-5\"></path><path d=\"M20 18v-2a4 4 0 0 0-4-4H4\"></path>";
+    };
+    readonly 'rotate-clockwise': {
+        readonly body: "<path d=\"M21 12a9 9 0 1 1-2.6-6.4\"></path><path d=\"M21 3v6h-6\"></path>";
+    };
+    readonly 'scale-balanced': {
+        readonly body: "<path d=\"M12 3v18\"></path><path d=\"M5 21h14\"></path><path d=\"M6 7h12\"></path><path d=\"m6 7-3 6h6L6 7z\"></path><path d=\"m18 7-3 6h6l-3-6z\"></path>";
+    };
+    readonly school: {
+        readonly body: "<path d=\"m3 10 9-6 9 6-9 6-9-6z\"></path><path d=\"M7 12v5c3 2 7 2 10 0v-5\"></path><path d=\"M21 10v6\"></path>";
+    };
+    readonly scissors: {
+        readonly body: "<circle cx=\"6\" cy=\"6\" r=\"3\"></circle><circle cx=\"6\" cy=\"18\" r=\"3\"></circle><path d=\"M20 4 8.1 15.9\"></path><path d=\"M8.1 8.1 20 20\"></path>";
+    };
+    readonly 'search-check': {
+        readonly body: "<circle cx=\"11\" cy=\"11\" r=\"7\"></circle><path d=\"m20 20-4-4\"></path><path d=\"m8 11 2 2 4-4\"></path>";
+    };
+    readonly 'search-x': {
+        readonly body: "<circle cx=\"11\" cy=\"11\" r=\"7\"></circle><path d=\"m20 20-4-4\"></path><path d=\"m8.5 8.5 5 5\"></path><path d=\"m13.5 8.5-5 5\"></path>";
+    };
+    readonly 'server-cog': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"6\" rx=\"2\"></rect><rect x=\"3\" y=\"14\" width=\"12\" height=\"6\" rx=\"2\"></rect><path d=\"M7 7h.01\"></path><path d=\"M7 17h.01\"></path><circle cx=\"19\" cy=\"17\" r=\"2\"></circle><path d=\"M19 13v1\"></path><path d=\"M19 20v1\"></path><path d=\"M16.5 14.5l.7.7\"></path><path d=\"m20.8 18.8.7.7\"></path>";
+    };
+    readonly 'shield-check': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"m9 12 2 2 4-4\"></path>";
+    };
+    readonly 'shield-lock': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><rect x=\"8.5\" y=\"11\" width=\"7\" height=\"5\" rx=\"1\"></rect><path d=\"M10 11V9a2 2 0 0 1 4 0v2\"></path>";
+    };
+    readonly 'shield-x': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"m9.5 9.5 5 5\"></path><path d=\"m14.5 9.5-5 5\"></path>";
+    };
+    readonly 'shopping-bag': {
+        readonly body: "<path d=\"M6 8h12l1 13H5L6 8z\"></path><path d=\"M9 8a3 3 0 0 1 6 0\"></path>";
+    };
+    readonly sitemap: {
+        readonly body: "<rect x=\"9\" y=\"3\" width=\"6\" height=\"5\" rx=\"1\"></rect><rect x=\"3\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"></rect><rect x=\"15\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M12 8v4\"></path><path d=\"M6 16v-4h12v4\"></path>";
+    };
+    readonly 'sliders-horizontal': {
+        readonly body: "<path d=\"M4 6h8\"></path><path d=\"M16 6h4\"></path><path d=\"M14 4v4\"></path><path d=\"M4 12h4\"></path><path d=\"M12 12h8\"></path><path d=\"M10 10v4\"></path><path d=\"M4 18h10\"></path><path d=\"M18 18h2\"></path><path d=\"M16 16v4\"></path>";
+    };
+    readonly 'sliders-vertical': {
+        readonly body: "<path d=\"M6 4v8\"></path><path d=\"M6 16v4\"></path><path d=\"M4 14h4\"></path><path d=\"M12 4v4\"></path><path d=\"M12 12v8\"></path><path d=\"M10 10h4\"></path><path d=\"M18 4v10\"></path><path d=\"M18 18v2\"></path><path d=\"M16 16h4\"></path>";
+    };
+    readonly 'sort-asc': {
+        readonly body: "<path d=\"M11 7H4\"></path><path d=\"M11 12H4\"></path><path d=\"M11 17H4\"></path><path d=\"m17 18 3-3 3 3\"></path><path d=\"M20 6v9\"></path>";
+    };
+    readonly 'sort-desc': {
+        readonly body: "<path d=\"M11 7H4\"></path><path d=\"M11 12H4\"></path><path d=\"M11 17H4\"></path><path d=\"m17 12 3 3 3-3\"></path><path d=\"M20 6v9\"></path>";
+    };
+    readonly 'square-dot': {
+        readonly body: "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>";
+    };
+    readonly 'square-stack': {
+        readonly body: "<rect x=\"7\" y=\"7\" width=\"12\" height=\"12\" rx=\"2\"></rect><path d=\"M5 17a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2\"></path>";
+    };
+    readonly stamp: {
+        readonly body: "<path d=\"M8 21h8\"></path><path d=\"M6 17h12\"></path><path d=\"M9 13h6l1-8a4 4 0 0 0-8 0l1 8z\"></path><path d=\"M5 17v4h14v-4\"></path>";
+    };
+    readonly step: {
+        readonly body: "<path d=\"M6 4h4v16H6z\"></path><path d=\"M14 4h4v16h-4z\"></path><path d=\"M10 12h4\"></path>";
+    };
+    readonly sticky: {
+        readonly body: "<path d=\"M5 3h14a2 2 0 0 1 2 2v10l-6 6H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\"></path><path d=\"M15 21v-6h6\"></path>";
+    };
+    readonly stop: {
+        readonly body: "<rect x=\"6\" y=\"6\" width=\"12\" height=\"12\" rx=\"1\"></rect>";
+    };
+    readonly 'stop-circle': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><rect x=\"9\" y=\"9\" width=\"6\" height=\"6\" rx=\"1\"></rect>";
+    };
+    readonly store: {
+        readonly body: "<path d=\"M4 10h16l-1-5H5l-1 5z\"></path><path d=\"M5 10v10h14V10\"></path><path d=\"M9 20v-6h6v6\"></path><path d=\"M4 10a2 2 0 0 0 4 0\"></path><path d=\"M8 10a2 2 0 0 0 4 0\"></path><path d=\"M12 10a2 2 0 0 0 4 0\"></path><path d=\"M16 10a2 2 0 0 0 4 0\"></path>";
+    };
+    readonly suitcase: {
+        readonly body: "<rect x=\"3\" y=\"7\" width=\"18\" height=\"13\" rx=\"2\"></rect><path d=\"M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"></path><path d=\"M3 12h18\"></path>";
+    };
+    readonly ticket: {
+        readonly body: "<path d=\"M3 9a3 3 0 0 0 0 6v3h18v-3a3 3 0 0 0 0-6V6H3v3z\"></path><path d=\"M13 6v12\"></path>";
+    };
+    readonly timer: {
+        readonly body: "<circle cx=\"12\" cy=\"13\" r=\"8\"></circle><path d=\"M12 13l3-3\"></path><path d=\"M9 2h6\"></path><path d=\"M12 2v3\"></path>";
+    };
+    readonly train: {
+        readonly body: "<rect x=\"5\" y=\"3\" width=\"14\" height=\"16\" rx=\"3\"></rect><path d=\"M9 19 7 22\"></path><path d=\"m15 19 2 3\"></path><path d=\"M8 8h8\"></path><path d=\"M8 13h.01\"></path><path d=\"M16 13h.01\"></path>";
+    };
+    readonly truck: {
+        readonly body: "<path d=\"M3 6h11v10H3z\"></path><path d=\"M14 10h4l3 3v3h-7v-6z\"></path><circle cx=\"7\" cy=\"18\" r=\"2\"></circle><circle cx=\"17\" cy=\"18\" r=\"2\"></circle>";
+    };
+    readonly 'user-check': {
+        readonly body: "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"9\" cy=\"7\" r=\"4\"></circle><path d=\"m16 11 2 2 4-4\"></path>";
+    };
+    readonly 'user-cog': {
+        readonly body: "<path d=\"M14 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"8\" cy=\"7\" r=\"4\"></circle><circle cx=\"18\" cy=\"15\" r=\"2\"></circle><path d=\"M18 11v1\"></path><path d=\"M18 18v1\"></path><path d=\"m15.2 12.2.7.7\"></path><path d=\"m20.1 17.1.7.7\"></path>";
+    };
+    readonly 'user-minus': {
+        readonly body: "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"9\" cy=\"7\" r=\"4\"></circle><path d=\"M16 11h6\"></path>";
+    };
+    readonly 'user-plus': {
+        readonly body: "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"9\" cy=\"7\" r=\"4\"></circle><path d=\"M19 8v6\"></path><path d=\"M16 11h6\"></path>";
+    };
+    readonly 'user-x': {
+        readonly body: "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"9\" cy=\"7\" r=\"4\"></circle><path d=\"m17 8 5 5\"></path><path d=\"m22 8-5 5\"></path>";
+    };
+    readonly 'users-round': {
+        readonly body: "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"9\" cy=\"7\" r=\"4\"></circle><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"></path><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"></path>";
+    };
+    readonly vault: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 8v8\"></path><path d=\"M8 12h8\"></path><path d=\"M18 9h.01\"></path><path d=\"M18 15h.01\"></path>";
+    };
+    readonly 'video-off': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><rect x=\"3\" y=\"6\" width=\"14\" height=\"12\" rx=\"2\"></rect><path d=\"m17 10 4-3v10l-4-3\"></path>";
+    };
+    readonly wand: {
+        readonly body: "<path d=\"M15 4 20 9\"></path><path d=\"M14.5 9.5 4 20\"></path><path d=\"M18 2l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z\"></path><path d=\"m5 3 .7 1.3L7 5l-1.3.7L5 7l-.7-1.3L3 5l1.3-.7L5 3z\"></path>";
+    };
+    readonly 'wifi-off': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><path d=\"M5 13a10 10 0 0 1 5.2-2.7\"></path><path d=\"M19 13a10 10 0 0 0-9.5-3\"></path><path d=\"M8.5 16.5a5 5 0 0 1 7 0\"></path><path d=\"M12 20h.01\"></path>";
+    };
+    readonly wrench: {
+        readonly body: "<path d=\"M14.7 6.3a4 4 0 0 0-5.5 5.5L3 18v3h3l6.2-6.2a4 4 0 0 0 5.5-5.5l-2.5 2.5-3-3 2.5-2.5z\"></path>";
+    };
     readonly uif: {
         readonly body: "<path d=\"M18 16 L18 38 Q18 52 32 52 Q46 52 46 38 L46 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><rect x=\"46\" y=\"12\" width=\"12\" height=\"12\" rx=\"3\" fill=\"currentColor\" stroke=\"none\"></rect>";
         readonly viewBox: "0 0 64 64";
@@ -909,6 +1368,12 @@ interface ComponentInstance {
     toggle?(): void;
     [action: string]: unknown;
 }
+interface ToastOptions {
+    type?: string;
+    duration?: number;
+    placement?: string;
+    dismissible?: boolean;
+}
 declare function initModal(el: HTMLElement): ComponentInstance;
 declare function initDrawer(el: HTMLElement): ComponentInstance;
 declare function initDropdown(el: HTMLElement): ComponentInstance;
@@ -930,10 +1395,7 @@ declare function initCombobox(el: HTMLElement): ComponentInstance;
 declare function initComponent(el: HTMLElement): void;
 declare function destroyComponent(el: HTMLElement): void;
 declare function initAll(root?: Document | HTMLElement): () => void;
-declare function showToast(message: string, options?: {
-    type?: string;
-    duration?: number;
-}): HTMLElement;
+declare function showToast(message: string, options?: ToastOptions): HTMLElement;
 declare const button: {
     name: string;
     init: typeof initButton;
@@ -1226,6 +1688,8 @@ interface TableOptions {
     pageSize?: number;
     src?: string;
     columns?: string[];
+    sort?: string;
+    direction?: SortDirection;
     exportData?: (rows: HTMLTableRowElement[]) => unknown;
     onPage?: (page: number, table: HTMLTableElement) => void | Promise<void>;
     onBulkAction?: (action: string, rows: HTMLTableRowElement[]) => void;
@@ -1234,15 +1698,35 @@ interface TableOptions {
 interface RemoteTableResponse {
     rows?: Array<Record<string, unknown>>;
     html?: string;
+    columns?: Array<{
+        key: string;
+        label?: string;
+        type?: TableColumnType;
+        sortable?: boolean;
+        filterable?: boolean;
+        priority?: number;
+    }>;
     total?: number;
     page?: number;
+    pageSize?: number;
+    totalPages?: number;
+    sort?: string;
+    direction?: SortDirection;
+    summary?: Record<string, unknown>;
+    selectedIds?: string[];
+    emptyText?: string;
 }
-declare function sortTable(table: HTMLTableElement, column: number, direction?: 'asc' | 'desc'): void;
-declare function filterTable(table: HTMLTableElement, query: string): void;
+type SortDirection = 'asc' | 'desc';
+type TableColumnType = 'text' | 'number' | 'date' | 'currency' | 'status' | 'custom';
+type FilterOperator = 'contains' | 'startsWith' | 'equals' | 'not' | 'min' | 'max' | 'between' | 'in' | 'token';
+type TableState = 'idle' | 'loading' | 'loaded' | 'error' | 'empty';
+declare function sortTable(table: HTMLTableElement, column: number | string, direction?: SortDirection): void;
+declare function filterTable(table: HTMLTableElement, query: string, column?: number | string, op?: FilterOperator): void;
 declare function selectedRows(table: HTMLTableElement): HTMLTableRowElement[];
-declare function setTableState(table: HTMLTableElement, state: 'idle' | 'loading' | 'loaded' | 'error' | 'empty'): void;
+declare function setTableState(table: HTMLTableElement, state: TableState): void;
 declare function applyResponsiveColumns(table: HTMLTableElement): void;
 declare function loadRemoteTable(table: HTMLTableElement, options?: TableOptions): Promise<RemoteTableResponse | null>;
+declare function goToPage(table: HTMLTableElement, page: number, options?: TableOptions): Promise<RemoteTableResponse | null>;
 declare function exportTable(table: HTMLTableElement, options?: TableOptions): unknown;
 declare function filterElements(targetSelector: string, query: string, mode?: 'contains' | 'startsWith' | 'token'): void;
 declare function initDeclarativeFilters(root?: Document | HTMLElement): void;
@@ -1590,6 +2074,7 @@ interface RealtimeOptions {
     interval?: number;
     reconnect?: boolean;
     backoff?: number;
+    maxBackoff?: number;
     heartbeat?: number;
 }
 interface RealtimeBindingOptions extends Omit<RealtimeOptions, 'mode'> {
@@ -1679,7 +2164,34 @@ declare const aiAction: {
     init: typeof renderAIAction;
 };
 
+interface ToolPolicyCheck {
+    label: string;
+    state: 'pass' | 'warn' | 'fail' | 'pending';
+    detail?: string;
+}
+interface ToolReviewRequest {
+    tool: string;
+    risk?: string;
+    irreversible?: boolean;
+    payload?: unknown;
+    policy?: ToolPolicyCheck[];
+    timeline?: Array<{
+        label: string;
+        state?: string;
+    }>;
+    audit?: Array<{
+        actor?: string;
+        action: string;
+        at?: string;
+    }>;
+    diff?: {
+        before: string;
+        after: string;
+    };
+    result?: unknown;
+}
 declare function renderToolApproval(el: HTMLElement): void;
+declare function renderApprovalPolicy(el: HTMLElement, checks: ToolPolicyCheck[]): void;
 declare function renderToolProgress(el: HTMLElement, message: string): void;
 declare function renderToolTimeline(el: HTMLElement, steps: Array<{
     label: string;
@@ -1692,6 +2204,7 @@ declare function renderToolAuditTrail(el: HTMLElement, entries: Array<{
 }>): void;
 declare function renderDiff(el: HTMLElement, before: string, after: string): void;
 declare function renderToolResult(el: HTMLElement, result: unknown): void;
+declare function renderToolReviewFlow(el: HTMLElement, request: ToolReviewRequest): void;
 declare const toolApproval: {
     name: string;
     init: typeof renderToolApproval;
@@ -1699,10 +2212,12 @@ declare const toolApproval: {
 
 interface BatoiUIFApp {
     root: Document | HTMLElement;
+    destroyed: boolean;
     refresh(root?: Document | HTMLElement): void;
     destroy(): void;
+    restart(): BatoiUIFApp;
 }
 declare function start(root?: Document | HTMLElement): BatoiUIFApp;
 declare function autoStart(root?: Document | HTMLElement): void;
 
-export { type ActionContext, type ActionDiagnostic, type ActionHandler, type AnimationPreset, type AnimationStep, type ArtifactStoreOptions, type BatoiUIFApp, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type ConnectorMode, type ConnectorType, type DashboardConfig, type DashboardFilter, type DashboardFilterOperator, type DashboardRenderOptions, type DashboardWidget, type DashboardWidgetType, type DataConnector, type DesktopAiMode, type DesktopAppManifest, type DesktopCapability, type DesktopNavigationItem, type DesktopOfflineMode, type DesktopPlatform, type DesktopSettingsStore, type DesktopShellOptions, type DesktopShellStatus, type DesktopSyncQueueItem, type DesktopSyncState, type DesktopSyncStatus, type DesktopValidationResult, type DesktopWorkspaceMode, type DesktopWorkspaceSession, type DrilldownOptions, type EditorCommand, type EditorCommandContext, type EditorCommandHandler, type EditorHookContext, type EditorHookHandler, type EditorHookName, type EditorImageValue, type EditorInstance, type EditorLayout, type EditorLinkValue, type EditorMode, type EditorOptions, type EditorPreviewMode, type EditorTableValue, type EffectOptions, type ExtensionManifestOptions, type ExtensionMessage, type ExtensionSurface, type FormErrors, type HTMLSwapMode, type HistogramBin, type HistogramOptions, type IconDefinition, type IconName, type IconOptions, type IconRegistry, type LocalStore, type LocalStoreOptions, type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type MicroAppStoreOptions, type MountIconsOptions, type NotificationItem, type OverlayOptions, type ParsedAction, type PresenceUser, type QueryHandler, type QueryInput, type RadResponse, type RealtimeBindingOptions, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RequestOptions, type RouterOptions, type StoreOptions, type SummaryStats, type SwapMode, type SyncQueue, type SyncQueueItem, type TableAdapterOptions, type TableOptions, type TrustedHTMLRenderOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFValue, accordion, adaptRecords, adaptTable, addNotification, aiAction, alert, animate, animateGroup, animationPresets, appendStreamingChunk, appendTextElement, applyDashboardFilters, applyPermissionNavigation, applyResponsiveColumns, autoInit, autoStart, badge, bindActions, bindChartExports, bindConnector, bindDesktopOfflineIndicator, bindDesktopSettings, bindRadActions, bindRealtime, breadcrumb, button, cacheStrategies, canUseDesktopAction, cancelAnimation, cancelRequest, card, chart, cleanEditorHtml, clearActionDiagnostics, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, connect, correlation, createAdvancedStore, createArtifactStore, createCacheStrategy, createDashboardConfig, createDesktopManifest, createDesktopShell, createDesktopSyncStatus, createEditor, createExtensionManifest, createExtensionMessage, createLocalSettingsStore, createLocalStore, createMemorySettingsStore, createMicroAppStore, createStore, createStreamSurface, createSyncQueue, createWorkspaceSession, csvToObjects, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, detectDesktopPlatform, disconnect, dispatchAction, dispatchActions, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, escapeHtml, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, formatEditor, fragment, get, getActionDiagnostics, getConnectionState, getEditorValue, getNotifications, getOverlayStack, getPresence, getPushSubscription, hasDesktopCapability, hasIcon, hide, histogramBins, htmlToMarkdown, icon, iconElement, icons, init, initAll, initAnimation, initAnimationTriggers, initChart, initComponent, initDashboard, initDeclarativeFilters, initDesktopShell, initEditor, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, isExtensionRuntime, isInitialized, linearRegression, loadConnector, loadPartial, loadRemoteTable, markNotificationsRead, markdownToHtml, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, observeMotion, offcanvas, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseActionSpec, parseCSV, parseChartData, parseDesktopManifestElement, parseMicroAppManifest, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queryEditorCommand, queueOfflineTask, ready, realtime, refreshChart, registerAction, registerAsyncRule, registerComponent, registerEditorCommand, registerEditorHook, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, rehydrate, removePresence, renderAIAction, renderAIResultCard, renderAssistantResponse, renderChart, renderDashboard, renderDashboardWidget, renderDesktopShell, renderDesktopSyncStatus, renderDiff, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolTimeline, renderWorkspaceIdentity, request, requestNotificationPermission, resolveActionTarget, resolveTarget, runEditorCommand, selectedRows, sequence, serialize, setAccent, setDensity, setDesktopStatus, setEditorPreviewLayout, setEditorValue, setTableState, setText, setTrustedHTML, setupInstallPrompt, shell, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, stagger, start, stepper, submitForm, subscribe, subscribeToPush, summarizeDashboard, summarizeDesktopQueue, summaryStats, swapContent, swapTrustedHTML, table, tabs, timeline, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterAction, unregisterEditorCommand, unregisterServiceWorker, unsubscribeFromPush, updatePresence, upload, useRequestInterceptor, useResponseInterceptor, validateDesktopManifest, validateEditor, validateField, validateForm, validateFormAsync, validateMicroAppManifest, wizard, zScores };
+export { type ActionContext, type ActionDiagnostic, type ActionHandler, type AnimationPreset, type AnimationStep, type ArtifactStoreOptions, type BatoiUIFApp, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type ConnectorMode, type ConnectorType, type DashboardConfig, type DashboardFilter, type DashboardFilterOperator, type DashboardRenderOptions, type DashboardWidget, type DashboardWidgetType, type DataConnector, type DesktopAiMode, type DesktopAppManifest, type DesktopCapability, type DesktopNavigationItem, type DesktopOfflineMode, type DesktopPlatform, type DesktopSettingsStore, type DesktopShellOptions, type DesktopShellStatus, type DesktopSyncQueueItem, type DesktopSyncState, type DesktopSyncStatus, type DesktopValidationResult, type DesktopWorkspaceMode, type DesktopWorkspaceSession, type DrilldownOptions, type EditorCommand, type EditorCommandContext, type EditorCommandHandler, type EditorHookContext, type EditorHookHandler, type EditorHookName, type EditorImageValue, type EditorInstance, type EditorLayout, type EditorLinkValue, type EditorMode, type EditorOptions, type EditorPreviewMode, type EditorTableValue, type EffectOptions, type ExtensionManifestOptions, type ExtensionMessage, type ExtensionSurface, type FormErrors, type HTMLSwapMode, type HistogramBin, type HistogramOptions, type IconDefinition, type IconName, type IconOptions, type IconRegistry, type LocalStore, type LocalStoreOptions, type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppConnectorWorkflow, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type MicroAppStoreOptions, type MountIconsOptions, type NotificationItem, type OverlayOptions, type ParsedAction, type PresenceUser, type QueryHandler, type QueryInput, type RadResponse, type RealtimeBindingOptions, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RequestOptions, type RouterOptions, type SafeHTMLRenderOptions, type StoreOptions, type SummaryStats, type SwapMode, type SyncQueue, type SyncQueueItem, type TableAdapterOptions, type TableOptions, type ToolPolicyCheck, type ToolReviewRequest, type TrustedHTMLRenderOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFValue, accordion, adaptRecords, adaptTable, addNotification, aiAction, alert, animate, animateGroup, animationPresets, appendStreamingChunk, appendTextElement, applyDashboardFilters, applyPermissionNavigation, applyResponsiveColumns, autoInit, autoStart, badge, bindActions, bindChartExports, bindConnector, bindDesktopOfflineIndicator, bindDesktopSettings, bindRadActions, bindRealtime, breadcrumb, button, cacheStrategies, canUseDesktopAction, cancelAnimation, cancelRequest, card, chart, cleanEditorHtml, clearActionDiagnostics, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, connect, correlation, createAdvancedStore, createArtifactStore, createCacheStrategy, createDashboardConfig, createDesktopManifest, createDesktopShell, createDesktopSyncStatus, createEditor, createExtensionManifest, createExtensionMessage, createLocalSettingsStore, createLocalStore, createMemorySettingsStore, createMicroAppStore, createStore, createStreamSurface, createSyncQueue, createWorkspaceSession, csvToObjects, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, detectDesktopPlatform, disconnect, dispatchAction, dispatchActions, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, escapeHtml, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, formatEditor, fragment, get, getActionDiagnostics, getConnectionState, getEditorValue, getNotifications, getOverlayStack, getPresence, getPushSubscription, goToPage, hasDesktopCapability, hasIcon, hide, histogramBins, htmlToMarkdown, icon, iconElement, icons, init, initAll, initAnimation, initAnimationTriggers, initChart, initComponent, initDashboard, initDeclarativeFilters, initDesktopShell, initEditor, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, isExtensionRuntime, isInitialized, linearRegression, listMicroAppConnectorWorkflows, loadConnector, loadPartial, loadRemoteTable, markNotificationsRead, markdownToHtml, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, observeMotion, offcanvas, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseActionSpec, parseCSV, parseChartData, parseDesktopManifestElement, parseMicroAppManifest, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queryEditorCommand, queueOfflineTask, ready, realtime, refreshChart, registerAction, registerAsyncRule, registerComponent, registerEditorCommand, registerEditorHook, registerFieldAdapter, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, registerValidationMessage, rehydrate, removePresence, renderAIAction, renderAIResultCard, renderApprovalPolicy, renderAssistantResponse, renderChart, renderDashboard, renderDashboardWidget, renderDesktopShell, renderDesktopSyncStatus, renderDiff, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolReviewFlow, renderToolTimeline, renderWorkspaceIdentity, request, requestNotificationPermission, resolveActionTarget, resolveTarget, runEditorCommand, sanitizeHTML, selectedRows, sequence, serialize, setAccent, setDensity, setDesktopStatus, setEditorPreviewLayout, setEditorValue, setSafeHTML, setTableState, setText, setTrustedHTML, setupInstallPrompt, shell, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, stagger, start, stepper, submitForm, subscribe, subscribeToPush, summarizeDashboard, summarizeDesktopQueue, summaryStats, swapContent, swapTrustedHTML, table, tabs, timeline, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterAction, unregisterEditorCommand, unregisterServiceWorker, unsubscribeFromPush, updatePresence, upload, useRequestInterceptor, useResponseInterceptor, validateDesktopManifest, validateEditor, validateField, validateForm, validateFormAsync, validateMicroAppConnectorWorkflows, validateMicroAppManifest, wizard, zScores };

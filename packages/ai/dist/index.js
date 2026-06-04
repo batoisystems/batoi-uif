@@ -27,6 +27,10 @@ function renderPromptPanel(el, history = []) {
     const button = document.createElement("button");
     button.type = "button";
     button.textContent = item;
+    button.addEventListener("click", () => {
+      textarea.value = item;
+      el.dispatchEvent(new CustomEvent("uif:ai-history-select", { detail: { prompt: item }, bubbles: true }));
+    });
     historyEl.append(button);
   });
   const submit = document.createElement("button");
@@ -55,6 +59,7 @@ function createStreamSurface(el) {
     cancel() {
       controller.abort();
       el.dataset.uifState = "cancelled";
+      el.dispatchEvent(new CustomEvent("uif:ai-stream-cancel", { detail: { el }, bubbles: true }));
     }
   };
 }

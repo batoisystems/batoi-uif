@@ -372,21 +372,33 @@
                 <pre class="artifact-code" id="manifest-code"></pre>
               </div>
             </article>
+
+            <article class="artifact-card">
+              <div class="artifact-card-head">
+                <h2>Connector Workflow</h2>
+              </div>
+              <div class="artifact-import">
+                <pre class="artifact-code" id="connector-code"></pre>
+              </div>
+            </article>
           </aside>
         </section>
       </main>
     </div>
 
     <script type="module">
-      import { bindChartExports, createLocalStore, createMicroAppStore, createSyncQueue, initChart, mountIcons, parseMicroAppManifest } from '../../dist/uif.esm.js';
+      import { bindChartExports, createLocalStore, createMicroAppStore, createSyncQueue, initChart, listMicroAppConnectorWorkflows, mountIcons, parseMicroAppManifest } from '../../dist/uif.esm.js';
 
       const manifest = parseMicroAppManifest({
         name: 'Micro App Operations Board',
         type: 'micro-app',
         storage: { mode: 'local-first', localStore: 'localstorage', namespace: 'batoi-uif-micro-app-dashboard' },
         realtime: { enabled: false },
-        connectors: [{ type: 'static', name: 'Seed tasks', mode: 'readonly' }],
-        permissions: { storage: true },
+        connectors: [
+          { type: 'static', name: 'Seed tasks', mode: 'readonly' },
+          { type: 'json', name: 'Remote task feed', mode: 'readonly', src: './tasks.json', refreshInterval: 0 },
+        ],
+        permissions: { storage: true, network: ['self'] },
       });
 
       const localStore = createLocalStore({ namespace: manifest.storage.namespace || 'batoi-uif-micro-app-dashboard' });
@@ -411,6 +423,7 @@
       const jsonState = document.querySelector('#json-state');
       const saveState = document.querySelector('#save-state');
       const manifestCode = document.querySelector('#manifest-code');
+      const connectorCode = document.querySelector('#connector-code');
 
       function tasks() {
         return store.get('tasks') || [];
@@ -452,6 +465,7 @@
         initChart(chart);
         jsonState.value = store.exportJSON();
         manifestCode.textContent = JSON.stringify(manifest, null, 2);
+        connectorCode.textContent = JSON.stringify(listMicroAppConnectorWorkflows(manifest), null, 2);
         saveState.textContent = `Manifest valid · Saved locally · ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
         mountIcons(document);
       }

@@ -45,9 +45,11 @@ function storageSet(key, value) {
 }
 function initModal(el) {
   const mode = el.dataset.uifMode ?? "dismissible";
+  const backdrop = el.dataset.uifBackdrop ?? "true";
+  const closeOnEscape = mode !== "locked" && backdrop !== "static" && el.dataset.uifKeyboard !== "false";
   const dialog = el.dataset.uifRole === "dialog" ? el : el.querySelector('[data-uif-role="dialog"]') || el;
   const open = () => {
-    void openOverlay(el, { modal: true, restoreFocus: true });
+    void openOverlay(el, { modal: true, restoreFocus: true, closeOnEscape });
     setState(el, true);
     document.body.classList.add("uif-modal-open");
     dialog.querySelector(focusableSelector)?.focus();
@@ -60,7 +62,7 @@ function initModal(el) {
   };
   const toggle = () => el.dataset.uifState === "open" ? close() : open();
   const onKey = (event) => {
-    if (event.key === "Escape") close();
+    if (event.key === "Escape" && closeOnEscape) close();
     if (event.key !== "Tab" || el.dataset.uifState !== "open") return;
     const focusable = Array.from(dialog.querySelectorAll(focusableSelector));
     if (!focusable.length) return;
@@ -78,7 +80,7 @@ function initModal(el) {
     const target = eventElement(event);
     const action = target?.closest("[data-uif-action]");
     if (action?.dataset.uifAction === "close") close();
-    if (target?.dataset.uifRole === "backdrop") close();
+    if (target?.dataset.uifRole === "backdrop" && backdrop !== "static") close();
   };
   dialog.setAttribute("role", dialog.getAttribute("role") || "dialog");
   dialog.setAttribute("aria-modal", "true");
@@ -118,6 +120,30 @@ function initDrawer(el) {
 function initDropdown(el) {
   const trigger = el.querySelector('[data-uif-role="trigger"]');
   const panel = el.querySelector('[data-uif-role="panel"]');
+  let search = "";
+  let searchTimer;
+  const menuItems = () => Array.from(panel?.querySelectorAll('[data-uif-role="item"], [role="menuitem"], button, a[href]') ?? []).filter(
+    (item) => item.dataset.uifRole !== "separator" && item.getAttribute("role") !== "separator"
+  );
+  const enabledItems = () => menuItems().filter((item) => !item.hasAttribute("disabled") && item.getAttribute("aria-disabled") !== "true");
+  const focusItem = (index) => {
+    const items = enabledItems();
+    if (!items.length) return;
+    items[(index + items.length) % items.length]?.focus();
+  };
+  const typeahead = (key) => {
+    const items = enabledItems();
+    if (!items.length) return;
+    window.clearTimeout(searchTimer);
+    search += key.toLowerCase();
+    searchTimer = window.setTimeout(() => {
+      search = "";
+    }, 700);
+    const current = items.indexOf(document.activeElement);
+    const ordered = items.slice(Math.max(0, current + 1)).concat(items.slice(0, Math.max(0, current + 1)));
+    const match = ordered.find((item) => item.textContent?.trim().toLowerCase().startsWith(search));
+    match?.focus();
+  };
   const open = () => {
     if (trigger && panel) positionOverlay(trigger, panel);
     if (panel) void show(panel);
@@ -133,22 +159,72 @@ function initDropdown(el) {
     if (target && !el.contains(target)) close();
   };
   const onKey = (event) => {
-    if (event.key === "Escape") close();
+    const items = enabledItems();
+    const current = items.indexOf(document.activeElement);
+    if (event.key === "Escape") {
+      close();
+      trigger?.focus();
+    }
+    if (event.target === trigger && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault();
+      toggle();
+    }
+    if (event.target === trigger && event.key === "ArrowDown") {
+      event.preventDefault();
+      open();
+      focusItem(0);
+    }
+    if (event.target === trigger && event.key === "ArrowUp") {
+      event.preventDefault();
+      open();
+      focusItem(items.length - 1);
+    }
+    if (!panel?.contains(event.target)) return;
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      focusItem(current + 1);
+    }
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      focusItem(current - 1);
+    }
+    if (event.key === "Home") {
+      event.preventDefault();
+      focusItem(0);
+    }
+    if (event.key === "End") {
+      event.preventDefault();
+      focusItem(items.length - 1);
+    }
+    if (event.key.length === 1 && !event.altKey && !event.ctrlKey && !event.metaKey) {
+      event.preventDefault();
+      typeahead(event.key);
+    }
   };
   const onClick = (event) => {
-    const role = eventElement(event)?.closest("[data-uif-role]")?.dataset.uifRole;
+    const action = eventElement(event)?.closest('[data-uif-role], [role="menuitem"], button, a[href]');
+    const role = action?.dataset.uifRole || action?.getAttribute("role");
     if (role === "trigger") toggle();
-    if (role === "item") close();
+    if ((role === "item" || role === "menuitem") && !action?.hasAttribute("disabled") && action?.getAttribute("aria-disabled") !== "true") close();
   };
   trigger?.setAttribute("aria-haspopup", "menu");
   trigger?.setAttribute("aria-expanded", "false");
   panel?.setAttribute("role", "menu");
   panel?.setAttribute("hidden", "");
+  panel?.querySelectorAll('[data-uif-role="separator"]').forEach((separator) => {
+    separator.setAttribute("role", "separator");
+  });
+  menuItems().forEach((item) => {
+    item.setAttribute("role", item.getAttribute("role") || "menuitem");
+    if (!item.hasAttribute("tabindex")) item.tabIndex = -1;
+    if (item.hasAttribute("disabled")) item.setAttribute("aria-disabled", "true");
+  });
   el.addEventListener("click", onClick);
   document.addEventListener("click", onDoc);
   document.addEventListener("keydown", onKey);
   return {
     destroy: () => {
+      window.clearTimeout(searchTimer);
       el.removeEventListener("click", onClick);
       document.removeEventListener("click", onDoc);
       document.removeEventListener("keydown", onKey);
@@ -161,20 +237,35 @@ function initDropdown(el) {
 function initTabs(el) {
   const tabs2 = Array.from(el.querySelectorAll('[data-uif-role="tab"]'));
   const panels = Array.from(el.querySelectorAll('[data-uif-role="tabpanel"]'));
-  const activate = (idx) => {
+  const manual = el.dataset.uifActivation === "manual";
+  const vertical = el.dataset.uifOrientation === "vertical";
+  let selectedIndex = 0;
+  let focusedIndex = 0;
+  const sync = () => {
     tabs2.forEach((tab, i) => {
       const panel = panels[i];
       if (panel && !panel.id) panel.id = `${el.id || "uif-tabs"}-panel-${i}`;
       tab.setAttribute("role", "tab");
-      tab.setAttribute("aria-selected", String(i === idx));
-      tab.setAttribute("tabindex", i === idx ? "0" : "-1");
+      tab.setAttribute("aria-selected", String(i === selectedIndex));
+      tab.setAttribute("tabindex", i === focusedIndex ? "0" : "-1");
       if (panel) tab.setAttribute("aria-controls", panel.id);
     });
     panels.forEach((panel, i) => {
       panel.setAttribute("role", "tabpanel");
-      panel.hidden = i !== idx;
+      panel.hidden = i !== selectedIndex;
     });
-    tabs2[idx]?.focus();
+  };
+  const activate = (idx) => {
+    selectedIndex = (idx + tabs2.length) % tabs2.length;
+    focusedIndex = selectedIndex;
+    sync();
+    tabs2[focusedIndex]?.focus();
+  };
+  const focusTab = (idx) => {
+    focusedIndex = (idx + tabs2.length) % tabs2.length;
+    if (!manual) selectedIndex = focusedIndex;
+    sync();
+    tabs2[focusedIndex]?.focus();
   };
   const onClick = (event) => {
     const tab = eventElement(event)?.closest('[data-uif-role="tab"]');
@@ -183,10 +274,34 @@ function initTabs(el) {
   const onKey = (event) => {
     const idx = tabs2.indexOf(event.target);
     if (idx < 0 || tabs2.length === 0) return;
-    if (event.key === "ArrowRight") activate((idx + 1) % tabs2.length);
-    if (event.key === "ArrowLeft") activate((idx - 1 + tabs2.length) % tabs2.length);
+    if (event.key === "ArrowRight" || vertical && event.key === "ArrowDown") {
+      event.preventDefault();
+      focusTab(idx + 1);
+    }
+    if (event.key === "ArrowLeft" || vertical && event.key === "ArrowUp") {
+      event.preventDefault();
+      focusTab(idx - 1);
+    }
+    if (event.key === "Home") {
+      event.preventDefault();
+      focusTab(0);
+    }
+    if (event.key === "End") {
+      event.preventDefault();
+      focusTab(tabs2.length - 1);
+    }
+    if (manual && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault();
+      activate(idx);
+    }
   };
   el.setAttribute("role", "tablist");
+  if (vertical) el.setAttribute("aria-orientation", "vertical");
+  if (!tabs2.length) {
+    return {
+      destroy: () => void 0
+    };
+  }
   el.addEventListener("click", onClick);
   el.addEventListener("keydown", onKey);
   activate(0);
@@ -200,7 +315,17 @@ function initTabs(el) {
 function initToast(el) {
   el.setAttribute("role", el.dataset.uifType === "danger" ? "alert" : "status");
   if (!el.dataset.uifState) setState(el, true);
-  return { destroy: () => void 0, close: () => el.remove() };
+  const dispose = setupToast(el, {
+    duration: Number(el.dataset.uifDuration) || void 0,
+    dismissible: el.dataset.uifDismissible !== "false"
+  });
+  return {
+    destroy: dispose,
+    close: () => {
+      dispose();
+      el.remove();
+    }
+  };
 }
 function initAccordion(el) {
   const trigger = el.querySelector('[data-uif-role="trigger"]');
@@ -413,14 +538,22 @@ function initPopover(el) {
     if (!panel) return;
     positionOverlay(trigger, panel);
     void openOverlay(panel, { restoreFocus: true });
+    panel.dataset.uifState = "open";
+    trigger.setAttribute("aria-expanded", "true");
   };
   const close = () => {
-    if (panel) void closeOverlay(panel);
+    if (!panel) return;
+    void closeOverlay(panel);
+    panel.dataset.uifState = "closed";
+    trigger.setAttribute("aria-expanded", "false");
   };
   const toggle = () => panel?.dataset.uifState === "open" ? close() : open();
   trigger.addEventListener("click", toggle);
+  trigger.setAttribute("aria-haspopup", "dialog");
+  trigger.setAttribute("aria-expanded", "false");
   panel?.setAttribute("role", panel.getAttribute("role") || "dialog");
   panel?.setAttribute("hidden", "");
+  if (panel && !panel.dataset.uifState) panel.dataset.uifState = "closed";
   return { destroy: () => trigger.removeEventListener("click", toggle), open, close, toggle };
 }
 function initProgress(el) {
@@ -526,7 +659,10 @@ function handleAction(event) {
   const action = actionEl.dataset.uifAction;
   if (action === "toast") {
     showToast(actionEl.dataset.uifMessage || actionEl.textContent?.trim() || "Notification", {
-      type: actionEl.dataset.uifType || "info"
+      type: actionEl.dataset.uifType || "info",
+      duration: Number(actionEl.dataset.uifDuration) || void 0,
+      placement: actionEl.dataset.uifPlacement,
+      dismissible: actionEl.dataset.uifDismissible !== "false"
     });
     return;
   }
@@ -593,18 +729,88 @@ function initAll(root = document) {
   actionBindings.set(root, dispose);
   return dispose;
 }
+function getToastContainer(placement = "bottom-end") {
+  const normalized = placement || "bottom-end";
+  const existing = document.querySelector(`.uif-toast-stack[data-uif-placement="${normalized}"]`);
+  if (existing) return existing;
+  const container = document.createElement("div");
+  container.className = `uif-toast-stack uif-toast-stack-${normalized}`;
+  container.dataset.uifPlacement = normalized;
+  container.setAttribute("aria-live", "polite");
+  container.setAttribute("aria-atomic", "false");
+  document.body.appendChild(container);
+  return container;
+}
+function setupToast(toastEl, options = {}) {
+  let timer;
+  let startedAt = 0;
+  let remaining = options.duration ?? 3e3;
+  const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const clear = () => {
+    window.clearTimeout(timer);
+    timer = void 0;
+  };
+  const close = () => {
+    clear();
+    toastEl.dataset.uifState = "closed";
+    toastEl.remove();
+  };
+  const schedule = (delay = remaining) => {
+    clear();
+    if (delay <= 0) return;
+    startedAt = Date.now();
+    timer = window.setTimeout(close, reduce ? 0 : delay);
+  };
+  const pause = () => {
+    if (!timer) return;
+    remaining = Math.max(0, remaining - (Date.now() - startedAt));
+    clear();
+  };
+  const resume = () => {
+    if (toastEl.isConnected) schedule();
+  };
+  const onClick = (event) => {
+    const action = eventElement(event)?.closest("[data-uif-action]");
+    if (action?.dataset.uifAction === "close") close();
+  };
+  toastEl.addEventListener("mouseenter", pause);
+  toastEl.addEventListener("mouseleave", resume);
+  toastEl.addEventListener("focusin", pause);
+  toastEl.addEventListener("focusout", resume);
+  toastEl.addEventListener("click", onClick);
+  schedule();
+  return () => {
+    clear();
+    toastEl.removeEventListener("mouseenter", pause);
+    toastEl.removeEventListener("mouseleave", resume);
+    toastEl.removeEventListener("focusin", pause);
+    toastEl.removeEventListener("focusout", resume);
+    toastEl.removeEventListener("click", onClick);
+  };
+}
 function showToast(message, options = {}) {
   const toastEl = document.createElement("div");
   toastEl.dataset.uif = "toast";
   toastEl.dataset.uifState = "open";
   toastEl.dataset.uifType = options.type ?? "info";
-  toastEl.textContent = message;
+  const messageEl = document.createElement("span");
+  messageEl.className = "uif-toast-message";
+  messageEl.textContent = message;
+  toastEl.append(messageEl);
+  if (options.dismissible !== false) {
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.className = "uif-toast-close";
+    closeButton.dataset.uifAction = "close";
+    closeButton.setAttribute("aria-label", "Close notification");
+    closeButton.textContent = "x";
+    toastEl.append(closeButton);
+  }
   toastEl.setAttribute("role", options.type === "danger" ? "alert" : "status");
   toastEl.className = `uif-toast uif-toast-${options.type ?? "info"}`;
-  document.body.appendChild(toastEl);
+  getToastContainer(options.placement).appendChild(toastEl);
   emit("uif:toast", { message, options, el: toastEl }, toastEl);
-  const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-  window.setTimeout(() => toastEl.remove(), reduce ? 0 : options.duration ?? 3e3);
+  setupToast(toastEl, options);
   return toastEl;
 }
 var button = { name: "button", init: initButton, destroy: destroyComponent };

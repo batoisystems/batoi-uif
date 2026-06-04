@@ -70,15 +70,28 @@ interface MicroAppManifestResult {
     issues: MicroAppManifestIssue[];
     valid: boolean;
 }
+interface MicroAppConnectorWorkflow {
+    name: string;
+    type: MicroAppConnectorType;
+    mode: MicroAppConnectorMode;
+    src?: string;
+    refreshInterval?: number;
+    permission: 'local' | 'allowed' | 'blocked';
+    reason?: string;
+}
 declare function validateMicroAppManifest(input: unknown): MicroAppManifestResult;
 declare function parseMicroAppManifest(input: unknown): MicroAppManifest;
+declare function listMicroAppConnectorWorkflows(manifest: MicroAppManifest): MicroAppConnectorWorkflow[];
+declare function validateMicroAppConnectorWorkflows(manifest: MicroAppManifest): MicroAppManifestIssue[];
 
 type UIFOptions = Record<string, unknown>;
 
 interface UIFApp {
     root: Document | HTMLElement;
     options: UIFOptions;
+    destroyed: boolean;
     destroy(): void;
+    restart(options?: UIFOptions): UIFApp;
 }
 interface UIFPlugin {
     name: string;
@@ -100,4 +113,4 @@ declare function setDensity(density: 'compact' | 'default' | 'roomy', target?: H
 declare function setAccent(color: string, target?: HTMLElement): void;
 declare function init(root?: Document | HTMLElement, options?: UIFOptions): UIFApp;
 
-export { type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, type UIFState, type UIFValue, emit, init, on, parseMicroAppManifest, parseOptions, registerPlugin, setAccent, setDensity, uifActions, uifAttributes, uifStates, uifValues, validateMicroAppManifest };
+export { type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppConnectorWorkflow, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, type UIFState, type UIFValue, emit, init, listMicroAppConnectorWorkflows, on, parseMicroAppManifest, parseOptions, registerPlugin, setAccent, setDensity, uifActions, uifAttributes, uifStates, uifValues, validateMicroAppConnectorWorkflows, validateMicroAppManifest };

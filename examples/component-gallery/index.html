@@ -88,16 +88,19 @@
               <div>
                 <div class="example-eyebrow">Overlay</div>
                 <h2>Modal</h2>
-                <p>Dialog role, modal state, Escape close, and focus handoff.</p>
+                <p>Dialog role, static backdrop, size classes, scroll-safe body, and focus handoff.</p>
               </div>
               <button class="component-copy" type="button" data-copy-component>Copy</button>
             </div>
             <div class="component-demo">
               <button class="uif-btn" data-uif-action="open" data-uif-target="#gallery-modal"><span data-uif-icon="maximize"></span>Open modal</button>
-              <div id="gallery-modal" data-uif="modal" hidden>
-                <div class="component-dialog" data-uif-role="dialog">
+              <div id="gallery-modal" class="uif-modal uif-modal-scrollable" data-uif="modal" data-uif-backdrop="static" hidden>
+                <div class="uif-modal-dialog uif-modal-lg" data-uif-role="dialog">
                   <h3>Review deployment</h3>
-                  <p>Approve this deployment after confirming the release window.</p>
+                  <div class="uif-modal-body" data-uif-role="modal-body">
+                    <p>Approve this deployment after confirming the release window, rollback owner, and customer notification plan.</p>
+                    <p>This example uses a static backdrop, so clicking outside the dialog or pressing Escape keeps the modal open.</p>
+                  </div>
                   <div class="uif-cluster">
                     <button class="uif-btn">Approve</button>
                     <button class="uif-btn uif-btn-secondary" data-uif-action="close">Cancel</button>
@@ -106,11 +109,61 @@
               </div>
             </div>
             <pre><code>&lt;button class="uif-btn" data-uif-action="open" data-uif-target="#modal"&gt;Open modal&lt;/button&gt;
-&lt;div id="modal" data-uif="modal" hidden&gt;
-  &lt;div data-uif-role="dialog"&gt;
+&lt;div id="modal" class="uif-modal uif-modal-scrollable" data-uif="modal" data-uif-backdrop="static" hidden&gt;
+  &lt;div class="uif-modal-dialog uif-modal-lg" data-uif-role="dialog"&gt;
+    &lt;div class="uif-modal-body" data-uif-role="modal-body"&gt;...&lt;/div&gt;
     &lt;button data-uif-action="close"&gt;Close&lt;/button&gt;
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>
+          </article>
+
+          <article class="uif-card component-card">
+            <div class="component-card-head">
+              <div>
+                <div class="example-eyebrow">Navigation</div>
+                <h2>Responsive Shell</h2>
+                <p>Desktop sidebar collapse with mobile off-canvas navigation.</p>
+              </div>
+              <button class="component-copy" type="button" data-copy-component>Copy</button>
+            </div>
+            <div class="component-demo">
+              <div id="gallery-responsive-shell" class="uif-responsive-shell" data-uif="shell" data-uif-route="dashboard">
+                <aside class="uif-sidebar uif-sidebar-desktop" data-uif-role="sidebar">
+                  <div class="uif-sidebar-brand"><span class="uif-sidebar-brand-mark">B</span><strong>Workspace</strong></div>
+                  <nav class="uif-sidebar-nav" data-uif-role="nav" aria-label="Desktop navigation">
+                    <a href="#dashboard" data-uif-route="dashboard">Dashboard</a>
+                    <a href="#reports" data-uif-route="reports">Reports</a>
+                    <a href="#settings" data-uif-route="settings">Settings</a>
+                  </nav>
+                </aside>
+                <section class="uif-shell-content">
+                  <header class="uif-navbar" data-uif="navbar">
+                    <a class="uif-navbar-brand" href="#dashboard"><span data-uif-icon="grid"></span>Workspace</a>
+                    <div class="uif-navbar-actions">
+                      <button class="uif-btn uif-btn-secondary uif-navbar-toggle" type="button" data-uif-action="open" data-uif-target="#gallery-mobile-nav"><span data-uif-icon="sidebar"></span>Menu</button>
+                      <button class="uif-btn uif-btn-secondary" type="button" data-uif-action="toggle-sidebar" data-uif-target="#gallery-responsive-shell">Collapse</button>
+                    </div>
+                  </header>
+                  <main class="uif-scroll-region" data-uif-role="main">Responsive content region.</main>
+                </section>
+              </div>
+              <aside id="gallery-mobile-nav" class="uif-offcanvas uif-offcanvas-left" data-uif="offcanvas" hidden>
+                <div class="uif-sidebar-brand" data-uif-role="header"><strong>Workspace</strong><button class="uif-btn uif-btn-secondary" type="button" data-uif-action="close">Close</button></div>
+                <nav class="uif-sidebar-nav" data-uif-role="body" aria-label="Mobile navigation">
+                  <a href="#dashboard" aria-current="page">Dashboard</a>
+                  <a href="#reports">Reports</a>
+                  <a href="#settings">Settings</a>
+                </nav>
+              </aside>
+            </div>
+            <pre><code>&lt;div class="uif-responsive-shell" data-uif="shell"&gt;
+  &lt;aside class="uif-sidebar uif-sidebar-desktop" data-uif-role="sidebar"&gt;...&lt;/aside&gt;
+  &lt;header class="uif-navbar"&gt;
+    &lt;button class="uif-navbar-toggle" data-uif-action="open" data-uif-target="#mobile-nav"&gt;Menu&lt;/button&gt;
+    &lt;button data-uif-action="toggle-sidebar" data-uif-target="#shell"&gt;Collapse&lt;/button&gt;
+  &lt;/header&gt;
+&lt;/div&gt;
+&lt;aside id="mobile-nav" class="uif-offcanvas uif-offcanvas-left" data-uif="offcanvas" hidden&gt;...&lt;/aside&gt;</code></pre>
           </article>
 
           <article class="uif-card component-card">
@@ -180,7 +233,7 @@
               <div>
                 <div class="example-eyebrow">Overlay</div>
                 <h2>Dropdown</h2>
-                <p>Toggleable menu with outside-click and Escape handling.</p>
+                <p>Keyboard menu with outside-click, Escape, typeahead, and separators.</p>
               </div>
               <button class="component-copy" type="button" data-copy-component>Copy</button>
             </div>
@@ -190,13 +243,18 @@
                 <div class="component-menu-panel" data-uif-role="panel" hidden>
                   <button>Archive</button>
                   <button>Duplicate</button>
+                  <div class="component-menu-separator" data-uif-role="separator"></div>
                   <button>Export</button>
                 </div>
               </div>
             </div>
             <pre><code>&lt;div data-uif="dropdown"&gt;
   &lt;button data-uif-role="trigger"&gt;Actions&lt;/button&gt;
-  &lt;div data-uif-role="panel" hidden&gt;...&lt;/div&gt;
+  &lt;div data-uif-role="panel" hidden&gt;
+    &lt;button&gt;Archive&lt;/button&gt;
+    &lt;div data-uif-role="separator"&gt;&lt;/div&gt;
+    &lt;button&gt;Export&lt;/button&gt;
+  &lt;/div&gt;
 &lt;/div&gt;</code></pre>
           </article>
 
@@ -225,12 +283,12 @@
               <div>
                 <div class="example-eyebrow">Navigation</div>
                 <h2>Tabs</h2>
-                <p>ARIA tab and panel states with arrow-key navigation.</p>
+                <p>ARIA tab and panel states with Home/End, vertical, and manual activation modes.</p>
               </div>
               <button class="component-copy" type="button" data-copy-component>Copy</button>
             </div>
             <div class="component-demo">
-              <div class="component-tabs" data-uif="tabs">
+              <div class="component-tabs uif-tabs uif-tabs-vertical" data-uif="tabs" data-uif-orientation="vertical" data-uif-activation="manual">
                 <button data-uif-role="tab">Overview</button>
                 <button data-uif-role="tab">Activity</button>
                 <button data-uif-role="tab">Access</button>
@@ -239,7 +297,7 @@
                 <div data-uif-role="tabpanel">4 roles configured.</div>
               </div>
             </div>
-            <pre><code>&lt;div data-uif="tabs"&gt;
+            <pre><code>&lt;div class="uif-tabs uif-tabs-vertical" data-uif="tabs" data-uif-orientation="vertical" data-uif-activation="manual"&gt;
   &lt;button data-uif-role="tab"&gt;Overview&lt;/button&gt;
   &lt;div data-uif-role="tabpanel"&gt;Panel&lt;/div&gt;
 &lt;/div&gt;</code></pre>
@@ -272,14 +330,14 @@
               <div>
                 <div class="example-eyebrow">Feedback</div>
                 <h2>Toast</h2>
-                <p>Declarative notifications for saves, errors, and workflow events.</p>
+                <p>Stacked notifications with placement, close controls, and hover/focus pause.</p>
               </div>
               <button class="component-copy" type="button" data-copy-component>Copy</button>
             </div>
             <div class="component-demo">
-              <button class="uif-btn" data-uif-action="toast" data-uif-message="Settings saved" data-uif-type="success"><span data-uif-icon="check"></span>Show toast</button>
+              <button class="uif-btn" data-uif-action="toast" data-uif-message="Settings saved" data-uif-type="success" data-uif-placement="top-end"><span data-uif-icon="check"></span>Show toast</button>
             </div>
-            <pre><code>&lt;button data-uif-action="toast" data-uif-message="Settings saved" data-uif-type="success"&gt;
+            <pre><code>&lt;button data-uif-action="toast" data-uif-message="Settings saved" data-uif-type="success" data-uif-placement="top-end"&gt;
   Show toast
 &lt;/button&gt;</code></pre>
           </article>
@@ -703,19 +761,28 @@
             <div class="component-card-head">
               <div>
                 <div class="example-eyebrow">Native Inputs</div>
-                <h2>Date and Color Pickers</h2>
-                <p>Native browser controls with consistent UIF shells.</p>
+                <h2>Form Controls</h2>
+                <p>Date, time, range, switch, segmented controls, and input groups.</p>
               </div>
               <button class="component-copy" type="button" data-copy-component>Copy</button>
             </div>
             <div class="component-demo">
               <div class="uif-picker-grid">
                 <label class="uif-field"><span class="uif-field-label">Service date</span><span class="uif-input-shell"><span class="uif-input-shell-icon" data-uif-icon="calendar"></span><input type="date" value="2026-05-24"></span></label>
+                <label class="uif-field"><span class="uif-field-label">Service time</span><span class="uif-input-shell"><span class="uif-input-shell-icon" data-uif-icon="clock"></span><input type="time" value="09:30"></span></label>
+                <label class="uif-field"><span class="uif-field-label">Capacity</span><span class="uif-range-row"><input class="uif-range" type="range" min="0" max="100" value="68"><span class="uif-range-value">68%</span></span></label>
+                <label class="uif-field"><span class="uif-field-label">Monthly budget</span><span class="uif-input-group"><span class="uif-input-group-addon">$</span><input class="uif-input" type="number" value="2400"><span class="uif-input-group-addon">USD</span></span></label>
+                <label class="uif-switch"><input type="checkbox" checked><span class="uif-switch-track"></span><span class="uif-switch-label">Auto-renew</span></label>
+                <div class="uif-field"><span class="uif-field-label">Billing mode</span><div class="uif-segmented" role="radiogroup" aria-label="Billing mode"><label><input type="radio" name="billing-mode" checked><span>Monthly</span></label><label><input type="radio" name="billing-mode"><span>Annual</span></label></div></div>
                 <label class="uif-field"><span class="uif-field-label">Accent</span><span class="uif-color-picker"><input type="color" value="#0b72bd"><span><span class="uif-color-value">#0B72BD</span><span class="uif-field-hint">Theme color</span></span></span></label>
               </div>
             </div>
             <pre><code>&lt;span class="uif-input-shell"&gt;&lt;input type="date"&gt;&lt;/span&gt;
-&lt;span class="uif-color-picker"&gt;&lt;input type="color"&gt;&lt;/span&gt;</code></pre>
+&lt;span class="uif-input-shell"&gt;&lt;input type="time"&gt;&lt;/span&gt;
+&lt;input class="uif-range" type="range"&gt;
+&lt;label class="uif-switch"&gt;&lt;input type="checkbox"&gt;&lt;span class="uif-switch-track"&gt;&lt;/span&gt;&lt;/label&gt;
+&lt;div class="uif-segmented" role="radiogroup"&gt;...&lt;/div&gt;
+&lt;span class="uif-input-group"&gt;&lt;span class="uif-input-group-addon"&gt;$&lt;/span&gt;&lt;input class="uif-input"&gt;&lt;/span&gt;</code></pre>
           </article>
 
           <article class="uif-card component-card">
@@ -892,6 +959,7 @@
                   <div class="uif-menu-label">Workflow</div>
                   <button class="uif-menu-item"><span>Assign review</span><span class="uif-text-muted">A</span></button>
                   <button class="uif-menu-item"><span>Duplicate record</span></button>
+                  <div class="uif-menu-separator" data-uif-role="separator"></div>
                   <button class="uif-menu-item uif-menu-item-danger"><span>Archive</span></button>
                 </div>
               </div>
@@ -939,12 +1007,12 @@
             <div class="component-demo">
               <div class="uif-cluster">
                 <button class="uif-btn" aria-busy="true"><span class="uif-spinner uif-spinner-sm uif-spinner-inline uif-text-white"></span>Saving</button>
-                <button class="uif-btn uif-btn-info" data-uif-action="toast" data-uif-message="Queued for sync" data-uif-type="info">Show toast</button>
+                <button class="uif-btn uif-btn-info" data-uif-action="toast" data-uif-message="Queued for sync" data-uif-type="info" data-uif-duration="5000">Show toast</button>
                 <div class="uif-loading-target" aria-busy="true"><strong>Panel loading target</strong><br><span class="uif-text-muted">Shared loading surface</span></div>
               </div>
             </div>
             <pre><code>&lt;button class="uif-btn" aria-busy="true"&gt;&lt;span class="uif-spinner uif-spinner-inline"&gt;&lt;/span&gt;Saving&lt;/button&gt;
-&lt;button data-uif-action="toast" data-uif-message="Saved"&gt;Show toast&lt;/button&gt;</code></pre>
+&lt;button data-uif-action="toast" data-uif-message="Saved" data-uif-duration="5000"&gt;Show toast&lt;/button&gt;</code></pre>
           </article>
 
           <article class="uif-card component-card">

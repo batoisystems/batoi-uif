@@ -41,7 +41,7 @@ async function unsubscribeFromPush() {
 }
 function showInAppNotification(message, options = {}) {
   addNotification({ message, type: options.type ?? "info" });
-  return showToast(message, { type: options.type ?? "info" });
+  return showToast(message, { type: options.type ?? "info", dismissible: false });
 }
 async function postSubscription(src, payload) {
   if (!src) return;

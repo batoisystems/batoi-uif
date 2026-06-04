@@ -1,5 +1,6 @@
 // src/index.ts
 import { emit } from "@batoi/uif-core";
+import { setSafeHTML, setText } from "@batoi/uif-dom";
 import { animate, hide, show, toggle } from "@batoi/uif-effects";
 var handlers = /* @__PURE__ */ new Map();
 var boundRoots = /* @__PURE__ */ new WeakMap();
@@ -273,14 +274,10 @@ registerAction("set-value", ({ target, value }) => {
   if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) target.value = value ?? "";
 });
 registerAction("set-text", ({ target, value }) => {
-  if (target) target.textContent = value ?? "";
+  setText(target, value ?? "");
 });
 registerAction("set-html-safe", ({ target, value }) => {
-  if (!target) return;
-  const template = document.createElement("template");
-  template.innerHTML = value ?? "";
-  template.content.querySelectorAll("script,style,iframe,object,embed,link,meta").forEach((el) => el.remove());
-  target.replaceChildren(template.content.cloneNode(true));
+  setSafeHTML(target, value ?? "");
 });
 registerAction("copy", async ({ target, source }) => {
   const text = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement ? target.value : target?.textContent || source.dataset.uifValue || "";

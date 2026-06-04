@@ -5,6 +5,12 @@ interface ComponentInstance {
     toggle?(): void;
     [action: string]: unknown;
 }
+interface ToastOptions {
+    type?: string;
+    duration?: number;
+    placement?: string;
+    dismissible?: boolean;
+}
 declare function initModal(el: HTMLElement): ComponentInstance;
 declare function initDrawer(el: HTMLElement): ComponentInstance;
 declare function initDropdown(el: HTMLElement): ComponentInstance;
@@ -26,10 +32,7 @@ declare function initCombobox(el: HTMLElement): ComponentInstance;
 declare function initComponent(el: HTMLElement): void;
 declare function destroyComponent(el: HTMLElement): void;
 declare function initAll(root?: Document | HTMLElement): () => void;
-declare function showToast(message: string, options?: {
-    type?: string;
-    duration?: number;
-}): HTMLElement;
+declare function showToast(message: string, options?: ToastOptions): HTMLElement;
 declare const button: {
     name: string;
     init: typeof initButton;

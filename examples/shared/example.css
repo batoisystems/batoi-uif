@@ -637,6 +637,12 @@
   color: #0b72bd;
 }
 
+.component-menu-separator {
+  height: 1px;
+  margin: 0.35rem 0.25rem;
+  background: #e5e7eb;
+}
+
 .component-tabs [data-uif-role="tab"] {
   min-height: 2rem;
   margin-right: 0.35rem;
@@ -660,6 +666,10 @@
   border: 1px solid #dfe3e8;
   border-radius: 0.65rem;
   background: #fff;
+}
+
+.component-tabs.uif-tabs-vertical [data-uif-role="tab"] {
+  margin-right: 0;
 }
 
 .component-pagination {

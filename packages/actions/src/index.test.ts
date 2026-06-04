@@ -35,6 +35,20 @@ describe('@batoi/uif-actions', () => {
     unregisterAction('direct-test');
   });
 
+  it('uses the central safe HTML renderer for set-html-safe', async () => {
+    document.body.innerHTML = '<section id="target"></section><button></button>';
+    await dispatchAction('set-html-safe', {
+      source: document.querySelector('button') as HTMLElement,
+      target: document.querySelector('#target') as HTMLElement,
+      value: '<strong onclick="alert(1)">Safe</strong><a href="javascript:alert(1)">Link</a><script>alert(1)</script>',
+    });
+    const target = document.querySelector('#target') as HTMLElement;
+    expect(target.querySelector('script')).toBeNull();
+    expect(target.querySelector('strong')?.hasAttribute('onclick')).toBe(false);
+    expect(target.querySelector('a')?.hasAttribute('href')).toBe(false);
+    expect(target.textContent).toContain('SafeLink');
+  });
+
   it('parses and dispatches action chains', async () => {
     document.body.innerHTML = '<button data-uif-event="click.prevent" data-uif-actions=\'[{"action":"chain-a"},{"action":"chain-b","value":"done"}]\'></button>';
     const calls: string[] = [];

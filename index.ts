@@ -44,8 +44,10 @@ export * from './packages/mcp/src/index.js';
 
 export interface BatoiUIFApp {
   root: Document | HTMLElement;
+  destroyed: boolean;
   refresh(root?: Document | HTMLElement): void;
   destroy(): void;
+  restart(): BatoiUIFApp;
 }
 
 const apps = new WeakMap<Document | HTMLElement, BatoiUIFApp>();
@@ -85,13 +87,21 @@ export function start(root: Document | HTMLElement = document): BatoiUIFApp {
   const disposers = new Set<() => void>();
   const app: BatoiUIFApp = {
     root,
+    destroyed: false,
     refresh(target: Document | HTMLElement = root) {
+      if (app.destroyed) return;
       hydrate(target, disposers);
     },
     destroy() {
+      if (app.destroyed) return;
       disposers.forEach((dispose) => dispose());
       disposers.clear();
+      app.destroyed = true;
       apps.delete(root);
+    },
+    restart() {
+      app.destroy();
+      return start(root);
     },
   };
   apps.set(root, app);

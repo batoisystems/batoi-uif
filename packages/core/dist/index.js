@@ -236,9 +236,70 @@ function parseMicroAppManifest(input) {
   }
   return result.manifest;
 }
+function sameOrigin(src) {
+  if (typeof window === "undefined") return false;
+  try {
+    return new URL(src, window.location.href).origin === window.location.origin;
+  } catch {
+    return false;
+  }
+}
+function sourceAllowed(src, permissions) {
+  if (!src) return false;
+  const network = permissions.network ?? [];
+  if (network.includes("*")) return true;
+  if (network.includes("self") && sameOrigin(src)) return true;
+  try {
+    const url = new URL(src, typeof window === "undefined" ? "http://localhost/" : window.location.href);
+    return network.some((entry) => entry === src || entry === url.origin || entry.endsWith("*") && src.startsWith(entry.slice(0, -1)));
+  } catch {
+    return network.includes(src);
+  }
+}
+function listMicroAppConnectorWorkflows(manifest) {
+  return manifest.connectors.map((connector, index) => {
+    const name = connector.name || `Connector ${index + 1}`;
+    if (connector.type === "static") {
+      return {
+        name,
+        type: connector.type,
+        mode: connector.mode ?? "readonly",
+        src: connector.src,
+        refreshInterval: connector.refreshInterval,
+        permission: "local"
+      };
+    }
+    if (!connector.src) {
+      return {
+        name,
+        type: connector.type,
+        mode: connector.mode ?? "readonly",
+        refreshInterval: connector.refreshInterval,
+        permission: "blocked",
+        reason: "Connector source is required."
+      };
+    }
+    const allowed = sourceAllowed(connector.src, manifest.permissions);
+    return {
+      name,
+      type: connector.type,
+      mode: connector.mode ?? "readonly",
+      src: connector.src,
+      refreshInterval: connector.refreshInterval,
+      permission: allowed ? "allowed" : "blocked",
+      reason: allowed ? void 0 : "Connector source is not listed in permissions.network."
+    };
+  });
+}
+function validateMicroAppConnectorWorkflows(manifest) {
+  return listMicroAppConnectorWorkflows(manifest).map(
+    (workflow, index) => workflow.permission === "blocked" ? { path: `connectors.${index}.src`, message: workflow.reason ?? "Connector is blocked" } : void 0
+  ).filter((issue) => Boolean(issue));
+}
 
 // src/index.ts
 var plugins = /* @__PURE__ */ new Map();
+var apps = /* @__PURE__ */ new WeakMap();
 function coerceValue(value) {
   if (value === "true") return true;
   if (value === "false") return false;
@@ -281,15 +342,26 @@ function setAccent(color, target = document.documentElement) {
   target.style.setProperty("--uif-color-primary", color);
 }
 function init(root = document, options = {}) {
+  const existing = apps.get(root);
+  if (existing && !existing.destroyed) return existing;
   emit("uif:before-init", { root, options }, root);
   const app = {
     root,
     options,
+    destroyed: false,
     destroy() {
+      if (app.destroyed) return;
       emit("uif:before-destroy", { root }, root);
+      app.destroyed = true;
+      apps.delete(root);
       emit("uif:destroy", { root }, root);
+    },
+    restart(nextOptions = options) {
+      app.destroy();
+      return init(root, nextOptions);
     }
   };
+  apps.set(root, app);
   for (const plugin of plugins.values()) {
     try {
       plugin.setup(app);
@@ -303,6 +375,7 @@ function init(root = document, options = {}) {
 export {
   emit,
   init,
+  listMicroAppConnectorWorkflows,
   on,
   parseMicroAppManifest,
   parseOptions,
@@ -313,5 +386,6 @@ export {
   uifAttributes,
   uifStates,
   uifValues,
+  validateMicroAppConnectorWorkflows,
   validateMicroAppManifest
 };

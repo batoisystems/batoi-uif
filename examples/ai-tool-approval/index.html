@@ -57,7 +57,7 @@
               <article class="app-card"><div class="app-card-head"><div><h2>AI Action</h2><p>Browser-side presentation only.</p></div><span class="uif-badge uif-badge-warning">Review</span></div><div data-uif="ai-action" data-uif-agent="rad-builder" data-uif-tool="create_app"></div></article>
               <article class="app-card"><div class="app-card-head"><div><h2>Tool Approval</h2><p>Server-mediated privileged action.</p></div><span class="uif-badge uif-badge-danger">High risk</span></div><div data-uif="tool-approval" data-uif-tool="create_database" data-uif-risk="high"></div></article>
             </section>
-            <section class="app-card"><h2>Diff Preview</h2><div class="app-code-diff"><pre>Before\nstatus: draft</pre><pre>After\nstatus: reviewed</pre></div></section>
+            <section class="app-card"><h2>Server-Mediated Review Flow</h2><div id="tool-review-flow"></div></section>
           </div>
 
           <aside class="app-builder" aria-label="Tweak and copy this example">
@@ -100,5 +100,30 @@
       </div>
     </main>
     <script type="module" src="../shared/app-showcase.js"></script>
+    <script type="module">
+      import { renderToolReviewFlow } from '../../dist/uif.esm.js';
+
+      renderToolReviewFlow(document.querySelector('#tool-review-flow'), {
+        tool: 'workspace.create_database',
+        risk: 'high',
+        irreversible: true,
+        payload: { workspace: 'demo', action: 'create_database', requested_by: 'rad-builder' },
+        policy: [
+          { label: 'Requester has workspace admin role', state: 'pass', detail: 'Verified server-side' },
+          { label: 'Risk is within auto-approval threshold', state: 'fail', detail: 'Human approval required' },
+          { label: 'Audit destination is configured', state: 'pass' },
+        ],
+        timeline: [
+          { label: 'Request received', state: 'done' },
+          { label: 'Policy check completed', state: 'done' },
+          { label: 'Waiting for approval', state: 'pending' },
+        ],
+        diff: { before: 'databases: 2', after: 'databases: 3' },
+        audit: [
+          { actor: 'rad-builder', action: 'requested workspace.create_database', at: '10:42' },
+          { actor: 'policy', action: 'escalated high-risk irreversible action', at: '10:42' },
+        ],
+      });
+    </script>
   </body>
 </html>

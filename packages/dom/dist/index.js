@@ -1,6 +1,26 @@
 // src/index.ts
 var initialized = /* @__PURE__ */ new WeakMap();
 var registry = /* @__PURE__ */ new Map();
+var blockedSafeHTMLTags = /* @__PURE__ */ new Set(["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "LINK", "META", "BASE"]);
+var defaultSafeHTMLAttributes = /* @__PURE__ */ new Set([
+  "aria-describedby",
+  "aria-label",
+  "aria-labelledby",
+  "aria-live",
+  "class",
+  "data-uif",
+  "data-uif-action",
+  "data-uif-icon",
+  "data-uif-message",
+  "data-uif-role",
+  "data-uif-target",
+  "hidden",
+  "href",
+  "id",
+  "role",
+  "title",
+  "type"
+]);
 function registerComponent(nameOrComponent, component) {
   const entry = typeof nameOrComponent === "string" ? { name: nameOrComponent, ...component } : nameOrComponent;
   registry.set(entry.name, entry);
@@ -34,6 +54,65 @@ function appendTextElement(parent, tagName, text, className) {
   parent.append(el);
   return el;
 }
+function isSafeURL(value) {
+  const normalized = value.trim().toLowerCase();
+  return normalized === "" || normalized.startsWith("#") || normalized.startsWith("/") || normalized.startsWith("http://") || normalized.startsWith("https://") || normalized.startsWith("mailto:") || normalized.startsWith("tel:");
+}
+function cleanSafeHTMLNode(node, options) {
+  if (!(node instanceof Element)) return;
+  const tagName = node.tagName.toUpperCase();
+  if (blockedSafeHTMLTags.has(tagName) || !options.allowedTags.includes(tagName.toLowerCase())) {
+    node.remove();
+    return;
+  }
+  Array.from(node.attributes).forEach((attribute) => {
+    const name = attribute.name.toLowerCase();
+    const value = attribute.value;
+    if (name.startsWith("on") || !options.allowedAttributes.includes(name)) {
+      node.removeAttribute(attribute.name);
+      return;
+    }
+    if ((name === "href" || name === "src") && !isSafeURL(value)) {
+      node.removeAttribute(attribute.name);
+    }
+  });
+  Array.from(node.childNodes).forEach((child) => cleanSafeHTMLNode(child, options));
+}
+function sanitizeHTML(html, options = {}) {
+  const template = document.createElement("template");
+  template.innerHTML = html;
+  const safeOptions = {
+    allowedTags: options.allowedTags ?? [
+      "a",
+      "abbr",
+      "b",
+      "br",
+      "code",
+      "del",
+      "div",
+      "em",
+      "i",
+      "li",
+      "mark",
+      "ol",
+      "p",
+      "pre",
+      "small",
+      "span",
+      "strong",
+      "sub",
+      "sup",
+      "ul"
+    ],
+    allowedAttributes: options.allowedAttributes ?? Array.from(defaultSafeHTMLAttributes)
+  };
+  Array.from(template.content.childNodes).forEach((node) => cleanSafeHTMLNode(node, safeOptions));
+  return template.content;
+}
+function setSafeHTML(target, html, options = {}) {
+  if (!target) return;
+  target.replaceChildren(sanitizeHTML(html, options));
+}
 function setTrustedHTML(target, html, options = {}) {
   if (!target) return;
   if (!options.trusted) {
@@ -46,14 +125,31 @@ function swapTrustedHTML(targetEl, html, mode = "inner") {
     setTrustedHTML(targetEl, html, { trusted: true, context: "swap" });
     return targetEl;
   }
-  if (mode === "append") targetEl.insertAdjacentHTML("beforeend", html);
-  if (mode === "prepend") targetEl.insertAdjacentHTML("afterbegin", html);
-  if (mode === "before") targetEl.insertAdjacentHTML("beforebegin", html);
-  if (mode === "after") targetEl.insertAdjacentHTML("afterend", html);
+  if (mode === "append") {
+    const template = document.createElement("template");
+    setTrustedHTML(template, html, { trusted: true, context: "append swap" });
+    targetEl.append(template.content);
+  }
+  if (mode === "prepend") {
+    const template = document.createElement("template");
+    setTrustedHTML(template, html, { trusted: true, context: "prepend swap" });
+    targetEl.prepend(template.content);
+  }
+  if (mode === "before") {
+    const template = document.createElement("template");
+    setTrustedHTML(template, html, { trusted: true, context: "before swap" });
+    targetEl.before(template.content);
+  }
+  if (mode === "after") {
+    const template = document.createElement("template");
+    setTrustedHTML(template, html, { trusted: true, context: "after swap" });
+    targetEl.after(template.content);
+  }
   if (mode === "outer") {
-    targetEl.insertAdjacentHTML("afterend", html);
-    const updated = targetEl.nextElementSibling;
-    targetEl.remove();
+    const template = document.createElement("template");
+    setTrustedHTML(template, html, { trusted: true, context: "outer swap" });
+    const updated = template.content.firstElementChild;
+    targetEl.replaceWith(template.content);
     return updated instanceof HTMLElement ? updated : document.body;
   }
   return targetEl;
@@ -111,6 +207,8 @@ export {
   qsa,
   registerComponent,
   resolveTarget,
+  sanitizeHTML,
+  setSafeHTML,
   setText,
   setTrustedHTML,
   swapTrustedHTML,

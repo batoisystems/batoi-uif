@@ -18,6 +18,8 @@ The shared DOM helpers make this boundary explicit:
 
 - `setText()` renders text safely.
 - `appendTextElement()` creates a text-backed element.
+- `sanitizeHTML()` parses a limited safe subset and strips blocked tags, event handlers, and unsafe URLs.
+- `setSafeHTML()` renders that limited subset for non-authoritative UI snippets.
 - `setTrustedHTML()` refuses HTML unless marked as trusted.
 - `swapTrustedHTML()` performs intentional server-rendered HTML swaps.
 

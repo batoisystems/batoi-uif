@@ -2,29 +2,124 @@
 import { setTrustedHTML } from "@batoi/uif-dom";
 var initializedTables = /* @__PURE__ */ new WeakSet();
 var initializedFilters = /* @__PURE__ */ new WeakSet();
+var tableAbortControllers = /* @__PURE__ */ new WeakMap();
+function cssEscape(value) {
+  return typeof CSS !== "undefined" && typeof CSS.escape === "function" ? CSS.escape(value) : value.replace(/["\\#.;,[\]=:]/g, "\\$&");
+}
 function rows(table) {
   return Array.from(table.tBodies[0]?.rows ?? []);
+}
+function getTableMode(table) {
+  const mode = table.dataset.uifMode;
+  if (mode === "local" || mode === "remote" || mode === "hybrid") return mode;
+  return table.dataset.uifSrc ? "remote" : "local";
+}
+function getColumns(table, options = {}) {
+  const configured = options.columns ?? table.dataset.uifColumns?.split(",").map((item) => item.trim()).filter(Boolean);
+  if (configured?.length) return configured;
+  return Array.from(table.tHead?.rows[0]?.cells ?? []).map((cell, index) => cell.dataset.uifSort || cell.dataset.uifColumn || cell.dataset.uifLabel || cell.textContent?.trim() || String(index));
+}
+function columnIndex(table, column) {
+  if (typeof column === "number") return column;
+  const headers = Array.from(table.tHead?.rows[0]?.cells ?? []);
+  const normalized = column.trim();
+  const found = headers.findIndex((header) => header.dataset.uifSort === normalized || header.dataset.uifColumn === normalized || header.dataset.uifLabel === normalized || header.textContent?.trim() === normalized);
+  const columns = table.dataset.uifColumns?.split(",").map((item) => item.trim());
+  const configured = columns?.findIndex((item) => item === normalized) ?? -1;
+  return found >= 0 ? found : configured;
+}
+function headerAt(table, column) {
+  return table.tHead?.rows[0]?.cells[column];
+}
+function cellValue(row, column) {
+  return row.cells[column]?.dataset.uifValue ?? row.cells[column]?.textContent?.trim() ?? "";
+}
+function numericValue(value) {
+  const parsed = Number(value.replace(/[^0-9.-]+/g, ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+function dateValue(value) {
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+function compareValues(a, b, type = "text") {
+  if (type === "number" || type === "currency") return numericValue(a) - numericValue(b);
+  if (type === "date") return dateValue(a) - dateValue(b);
+  return a.localeCompare(b, void 0, { numeric: true, sensitivity: "base" });
+}
+function updateSortHeaders(table, activeIndex, direction) {
+  Array.from(table.tHead?.rows[0]?.cells ?? []).forEach((header, index) => {
+    const sortable = header.matches("[data-uif-sort]");
+    if (!sortable) return;
+    const active = index === activeIndex;
+    header.setAttribute("aria-sort", active ? direction === "asc" ? "ascending" : "descending" : "none");
+    header.dataset.uifSortActive = String(active);
+    if (active) header.dataset.uifSortDirection = direction;
+    else delete header.dataset.uifSortDirection;
+  });
+}
+function activeSort(table) {
+  const headers = Array.from(table.tHead?.rows[0]?.cells ?? []);
+  const activeHeader = headers.find((header) => header.dataset.uifSortActive === "true");
+  const sort = table.dataset.uifSort || activeHeader?.dataset.uifSort;
+  if (!sort) return null;
+  const index = columnIndex(table, sort);
+  if (index < 0) return null;
+  return { column: index, key: sort, direction: table.dataset.uifDirection || activeHeader?.dataset.uifSortDirection || "asc" };
 }
 function sortTable(table, column, direction = "asc") {
   const body = table.tBodies[0];
   if (!body) return;
+  const index = columnIndex(table, column);
+  if (index < 0) return;
+  const type = headerAt(table, index)?.dataset.uifType || "text";
   rows(table).sort((a, b) => {
-    const av = a.cells[column]?.textContent?.trim() ?? "";
-    const bv = b.cells[column]?.textContent?.trim() ?? "";
-    return direction === "asc" ? av.localeCompare(bv, void 0, { numeric: true }) : bv.localeCompare(av, void 0, { numeric: true });
+    const compared = compareValues(cellValue(a, index), cellValue(b, index), type);
+    return direction === "asc" ? compared : -compared;
   }).forEach((row) => body.append(row));
+  const key = typeof column === "string" ? column : headerAt(table, index)?.dataset.uifSort || String(index);
+  table.dataset.uifSort = key;
+  table.dataset.uifDirection = direction;
+  updateSortHeaders(table, index, direction);
+  table.dispatchEvent(new CustomEvent("uif:table-sort", { detail: { table, column: key, index, direction }, bubbles: true }));
 }
-function filterTable(table, query) {
+function matchesFilter(value, query, op) {
+  const text = value.trim().toLowerCase();
   const normalized = query.trim().toLowerCase();
+  if (normalized === "") return true;
+  if (op === "startsWith") return text.startsWith(normalized);
+  if (op === "equals") return text === normalized;
+  if (op === "not") return text !== normalized;
+  if (op === "token") return text.split(/\s+/).includes(normalized);
+  if (op === "min") return numericValue(text) >= numericValue(normalized);
+  if (op === "max") return numericValue(text) <= numericValue(normalized);
+  if (op === "between") {
+    const [min, max] = normalized.split(",").map((item) => numericValue(item));
+    const valueNumber = numericValue(text);
+    return valueNumber >= min && valueNumber <= max;
+  }
+  if (op === "in") return normalized.split(",").map((item) => item.trim()).includes(text);
+  return text.includes(normalized);
+}
+function filterTable(table, query, column, op = "contains") {
+  const normalized = query.trim().toLowerCase();
+  const index = column === void 0 ? -1 : columnIndex(table, column);
   rows(table).forEach((row) => {
-    row.hidden = normalized !== "" && !row.textContent?.toLowerCase().includes(normalized);
+    const text = index >= 0 ? cellValue(row, index) : row.textContent ?? "";
+    row.hidden = normalized !== "" && !matchesFilter(text, normalized, op);
   });
+  table.dispatchEvent(new CustomEvent("uif:table-filter", { detail: { table, query, column, op }, bubbles: true }));
 }
 function selectedRows(table) {
   return rows(table).filter((row) => row.querySelector('[data-uif-role="row-select"]')?.checked);
 }
+function selectedRowIds(table) {
+  return selectedRows(table).map((row) => row.querySelector('[data-uif-role="row-select"]')?.value || row.dataset.uifRowId || "").filter(Boolean);
+}
 function setTableState(table, state) {
   table.dataset.uifState = state;
+  table.setAttribute("aria-busy", state === "loading" ? "true" : "false");
+  table.dispatchEvent(new CustomEvent("uif:table-state", { detail: { table, state }, bubbles: true }));
   const body = table.tBodies[0];
   if (!body || !["empty", "loading", "error"].includes(state)) return;
   const columns = Math.max(1, table.tHead?.rows[0]?.cells.length ?? 1);
@@ -33,29 +128,48 @@ function setTableState(table, state) {
   const cell = document.createElement("td");
   cell.colSpan = columns;
   cell.className = "uif-table-state";
-  cell.textContent = state;
+  cell.textContent = table.dataset[`uif${state.charAt(0).toUpperCase()}${state.slice(1)}Text`] || state;
   row.append(cell);
   body.replaceChildren(row);
 }
 function applyResponsiveColumns(table) {
+  const headers = Array.from(table.tHead?.rows[0]?.cells ?? []);
+  headers.forEach((header, index) => {
+    const label = header.dataset.uifLabel || header.textContent?.trim() || "";
+    const hide = header.dataset.uifHide;
+    const priority = header.dataset.uifPriority;
+    if (hide) header.classList.add(`uif-hide-${hide}`);
+    if (priority) header.classList.add(`uif-priority-${priority}`);
+    rows(table).forEach((row) => {
+      const cell = row.cells[index];
+      if (!cell) return;
+      if (label && !cell.dataset.uifLabel) cell.dataset.uifLabel = label;
+      if (hide) cell.classList.add(`uif-hide-${hide}`);
+      if (priority) cell.classList.add(`uif-priority-${priority}`);
+    });
+  });
   table.querySelectorAll("[data-uif-hide]").forEach((cell) => {
-    cell.classList.add(`uif-hide-${cell.dataset.uifHide}`);
+    if (cell.dataset.uifHide) cell.classList.add(`uif-hide-${cell.dataset.uifHide}`);
   });
 }
 function renderRemoteRows(table, data, columns) {
   const body = table.tBodies[0] || table.createTBody();
   if (data.html) {
     setTrustedHTML(body, data.html, { trusted: true, context: "remote table rows" });
+    applyResponsiveColumns(table);
     return;
   }
   const sourceRows = data.rows ?? [];
   if (!sourceRows.length) {
+    if (data.emptyText) table.dataset.uifEmptyText = data.emptyText;
     setTableState(table, "empty");
     return;
   }
   body.replaceChildren(
     ...sourceRows.map((row) => {
       const tr = document.createElement("tr");
+      const key = table.dataset.uifKey;
+      if (key && row[key] !== void 0) tr.dataset.uifRowId = String(row[key]);
       columns.forEach((column) => {
         const td = document.createElement("td");
         td.textContent = String(row[column] ?? "");
@@ -64,27 +178,88 @@ function renderRemoteRows(table, data, columns) {
       return tr;
     })
   );
+  applyResponsiveColumns(table);
+}
+function controlsForTable(table, selector) {
+  if (!selector) return [];
+  return Array.from(document.querySelectorAll(`[${selector}="#${cssEscape(table.id)}"]`));
+}
+function tableFilters(table) {
+  const controls = [...controlsForTable(table, "data-uif-table-filter")];
+  const grouped = document.querySelector(`[data-uif-table-controls="#${cssEscape(table.id)}"]`);
+  if (grouped) controls.push(...Array.from(grouped.querySelectorAll("[name]")));
+  const seen = /* @__PURE__ */ new Set();
+  return controls.filter((control) => {
+    if (seen.has(control)) return false;
+    seen.add(control);
+    return control.value.trim() !== "";
+  }).map((control) => ({
+    name: control.name || control.dataset.uifFilterColumn || "q",
+    value: control.value,
+    column: control.dataset.uifFilterColumn,
+    op: control.dataset.uifFilterOp || "contains"
+  }));
+}
+function appendTableQuery(url, table, options) {
+  const sort = options.sort || table.dataset.uifSort;
+  const direction = options.direction || table.dataset.uifDirection;
+  url.searchParams.set("page", String(options.page ?? table.dataset.uifPage ?? 1));
+  url.searchParams.set("pageSize", String(options.pageSize ?? table.dataset.uifPageSize ?? 25));
+  if (sort) url.searchParams.set("sort", sort);
+  if (direction) url.searchParams.set("direction", direction);
+  tableFilters(table).forEach((filter) => {
+    if (filter.column) {
+      url.searchParams.set(`filters[${filter.column}]`, filter.value);
+      url.searchParams.set(`filters[${filter.column}][op]`, filter.op);
+    } else {
+      url.searchParams.set(filter.name, filter.value);
+    }
+  });
 }
 async function loadRemoteTable(table, options = {}) {
   const src = options.src || table.dataset.uifSrc;
   if (!src) return null;
   const url = new URL(src, window.location.href);
-  url.searchParams.set("page", String(options.page ?? table.dataset.uifPage ?? 1));
-  url.searchParams.set("pageSize", String(options.pageSize ?? table.dataset.uifPageSize ?? 25));
+  appendTableQuery(url, table, options);
+  tableAbortControllers.get(table)?.abort();
+  const controller = new AbortController();
+  tableAbortControllers.set(table, controller);
+  table.dispatchEvent(new CustomEvent("uif:table-before-load", { detail: { table, url }, bubbles: true }));
   setTableState(table, "loading");
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { signal: controller.signal });
     const data = await response.json();
-    const columns = options.columns ?? (table.dataset.uifColumns?.split(",").map((item) => item.trim()).filter(Boolean) || []);
+    const columns = options.columns ?? data.columns?.map((column) => column.key) ?? getColumns(table);
     renderRemoteRows(table, data, columns);
     table.dataset.uifPage = String(data.page ?? options.page ?? table.dataset.uifPage ?? 1);
+    table.dataset.uifPageSize = String(data.pageSize ?? options.pageSize ?? table.dataset.uifPageSize ?? 25);
     table.dataset.uifTotal = String(data.total ?? data.rows?.length ?? rows(table).length);
+    if (data.totalPages) table.dataset.uifTotalPages = String(data.totalPages);
+    if (data.sort) table.dataset.uifSort = data.sort;
+    if (data.direction) table.dataset.uifDirection = data.direction;
+    const sort = activeSort(table);
+    if (sort) updateSortHeaders(table, sort.column, sort.direction);
+    updatePaginationControls(table);
+    updateSelectionState(table);
     if (data.rows?.length || data.html) setTableState(table, "loaded");
+    table.dispatchEvent(new CustomEvent("uif:table-loaded", { detail: { table, data }, bubbles: true }));
     return data;
   } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") return null;
     setTableState(table, "error");
+    table.dispatchEvent(new CustomEvent("uif:table-error", { detail: { table, error }, bubbles: true }));
     throw error;
+  } finally {
+    if (tableAbortControllers.get(table) === controller) tableAbortControllers.delete(table);
   }
+}
+async function goToPage(table, page, options = {}) {
+  const nextPage = Math.max(1, page);
+  table.dataset.uifPage = String(nextPage);
+  table.dispatchEvent(new CustomEvent("uif:table-page", { detail: { table, page: nextPage }, bubbles: true }));
+  await options.onPage?.(nextPage, table);
+  updatePaginationControls(table);
+  return loadRemoteTable(table, { ...options, page: nextPage });
 }
 function exportTable(table, options = {}) {
   const selected = selectedRows(table);
@@ -111,6 +286,89 @@ function initDeclarativeFilters(root = document) {
     filterInput.addEventListener("change", () => filterElements(target, filterInput.value, mode));
   });
 }
+function updateSelectionState(table) {
+  const selected = selectedRows(table);
+  const ids = selectedRowIds(table);
+  table.dataset.uifSelected = String(selected.length);
+  if (ids.length && ids.join(",").length < 2048) table.dataset.uifSelectedIds = ids.join(",");
+  else delete table.dataset.uifSelectedIds;
+  const selectors = rows(table).map((row) => row.querySelector('[data-uif-role="row-select"]')).filter(Boolean);
+  table.querySelectorAll('[data-uif-role="select-all"]').forEach((checkbox) => {
+    checkbox.checked = selectors.length > 0 && selectors.every((rowSelect) => rowSelect.checked);
+    checkbox.indeterminate = selectors.some((rowSelect) => rowSelect.checked) && !checkbox.checked;
+  });
+  const targetSelector = table.dataset.uifSelectionTarget;
+  if (targetSelector) {
+    const target = document.querySelector(targetSelector);
+    if (target) target.textContent = String(selected.length);
+  }
+  table.dispatchEvent(new CustomEvent("uif:table-selection", { detail: { table, rows: selected, ids, totalSelected: selected.length }, bubbles: true }));
+}
+function pageFromControl(control, table) {
+  const current = Number(table.dataset.uifPage || 1);
+  const totalPages = Number(table.dataset.uifTotalPages || 0);
+  const raw = control.dataset.uifTablePage || control.dataset.uifPage || "";
+  if (raw === "next") return totalPages ? Math.min(totalPages, current + 1) : current + 1;
+  if (raw === "prev" || raw === "previous") return Math.max(1, current - 1);
+  if (raw === "first") return 1;
+  if (raw === "last") return Math.max(1, totalPages || current);
+  return Math.max(1, Number(raw || current));
+}
+function updatePaginationControls(table) {
+  if (!table.id) return;
+  const current = Number(table.dataset.uifPage || 1);
+  const totalPages = Number(table.dataset.uifTotalPages || 0);
+  document.querySelectorAll(`[data-uif-table-page][data-uif-target="#${cssEscape(table.id)}"]`).forEach((control) => {
+    const page = control.dataset.uifTablePage || "";
+    const disabled = (page === "first" || page === "prev" || page === "previous") && current <= 1 ? true : (page === "next" || page === "last") && totalPages > 0 && current >= totalPages;
+    if ("disabled" in control) control.disabled = disabled;
+    control.setAttribute("aria-disabled", String(disabled));
+  });
+  document.querySelectorAll(`[data-uif-table-page-label="#${cssEscape(table.id)}"]`).forEach((label) => {
+    label.textContent = totalPages ? `Page ${current} of ${totalPages}` : `Page ${current}`;
+  });
+}
+function applyLocalFilters(table) {
+  const filters = tableFilters(table);
+  rows(table).forEach((row) => {
+    row.hidden = filters.some((filter) => {
+      const index = filter.column ? columnIndex(table, filter.column) : -1;
+      const value = index >= 0 ? cellValue(row, index) : row.textContent ?? "";
+      return !matchesFilter(value, filter.value, filter.op);
+    });
+  });
+  table.dispatchEvent(new CustomEvent("uif:table-filter", { detail: { table, filters }, bubbles: true }));
+}
+function refreshForControlChange(table, options = {}) {
+  table.dataset.uifPage = "1";
+  const mode = getTableMode(table);
+  if (mode === "remote") void loadRemoteTable(table, options);
+  else applyLocalFilters(table);
+  updatePaginationControls(table);
+}
+function resetTable(table, options = {}) {
+  if (!table.id) return;
+  [...controlsForTable(table, "data-uif-table-filter"), ...controlsForTable(table, "data-uif-table-page-size")].forEach((control) => {
+    control.value = control instanceof HTMLSelectElement ? control.querySelector("option")?.value ?? "" : "";
+  });
+  const grouped = document.querySelector(`[data-uif-table-controls="#${cssEscape(table.id)}"]`);
+  grouped?.reset();
+  table.dataset.uifPage = "1";
+  delete table.dataset.uifSort;
+  delete table.dataset.uifDirection;
+  rows(table).forEach((row) => {
+    row.hidden = false;
+    row.querySelector('[data-uif-role="row-select"]')?.removeAttribute("checked");
+  });
+  table.querySelectorAll('[data-uif-role="row-select"],[data-uif-role="select-all"]').forEach((checkbox) => {
+    checkbox.checked = false;
+    checkbox.indeterminate = false;
+  });
+  updateSortHeaders(table, -1, "asc");
+  updateSelectionState(table);
+  table.dispatchEvent(new CustomEvent("uif:table-reset", { detail: { table }, bubbles: true }));
+  if (getTableMode(table) === "remote") void loadRemoteTable(table, options);
+}
 function initTable(table, options = {}) {
   if (initializedTables.has(table)) return;
   initializedTables.add(table);
@@ -119,27 +377,60 @@ function initTable(table, options = {}) {
   table.querySelectorAll("th[data-uif-sort]").forEach((header, index) => {
     header.tabIndex = 0;
     header.setAttribute("role", "button");
-    const sort = () => {
-      const direction = header.dataset.uifSort === "desc" ? "desc" : "asc";
-      sortTable(table, index, direction);
-      header.dataset.uifSort = direction === "asc" ? "desc" : "asc";
+    header.setAttribute("aria-sort", "none");
+    const sort2 = () => {
+      const current = activeSort(table);
+      const nextDirection = current?.column === index && current.direction === "asc" ? "desc" : "asc";
+      const key = header.dataset.uifSort || String(index);
+      table.dataset.uifPage = "1";
+      if (getTableMode(table) === "remote") {
+        table.dataset.uifSort = key;
+        table.dataset.uifDirection = nextDirection;
+        updateSortHeaders(table, index, nextDirection);
+        table.dispatchEvent(new CustomEvent("uif:table-sort", { detail: { table, column: key, index, direction: nextDirection }, bubbles: true }));
+        void loadRemoteTable(table, options);
+      } else {
+        sortTable(table, key || index, nextDirection);
+      }
     };
-    header.addEventListener("click", sort);
+    header.addEventListener("click", sort2);
     header.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
-        sort();
+        sort2();
       }
     });
   });
+  const sort = activeSort(table);
+  if (sort) updateSortHeaders(table, sort.column, sort.direction);
   const filters = [
     ...options.filterInput ? [options.filterInput] : [],
-    ...Array.from(document.querySelectorAll(`[data-uif-table-filter="#${CSS.escape(table.id)}"]`))
+    ...controlsForTable(table, "data-uif-table-filter")
   ];
-  filters.forEach((filterInput) => filterInput.addEventListener("input", () => filterTable(table, filterInput.value)));
+  filters.forEach((filterInput) => {
+    const handler = () => {
+      if (filterInput.dataset.uifFilterColumn) refreshForControlChange(table, options);
+      else if (getTableMode(table) === "remote") refreshForControlChange(table, options);
+      else filterTable(table, filterInput.value, void 0, filterInput.dataset.uifFilterOp || "contains");
+    };
+    filterInput.addEventListener("input", handler);
+    filterInput.addEventListener("change", handler);
+  });
+  controlsForTable(table, "data-uif-table-page-size").forEach((control) => {
+    control.addEventListener("change", () => {
+      table.dataset.uifPageSize = control.value || "25";
+      table.dataset.uifPage = "1";
+      table.dispatchEvent(new CustomEvent("uif:table-page-size", { detail: { table, pageSize: Number(table.dataset.uifPageSize) }, bubbles: true }));
+      if (getTableMode(table) === "remote") void loadRemoteTable(table, options);
+      updatePaginationControls(table);
+    });
+  });
+  document.querySelectorAll(`[data-uif-table-reset="#${cssEscape(table.id)}"]`).forEach((resetEl) => {
+    resetEl.addEventListener("click", () => resetTable(table, options));
+  });
   table.addEventListener("keydown", (event) => {
     const cell = event.target instanceof HTMLElement ? event.target.closest("td,th") : null;
-    if (!cell || !["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"].includes(event.key)) return;
+    if (!cell || event.target instanceof HTMLInputElement || event.target instanceof HTMLButtonElement || event.target instanceof HTMLSelectElement || !["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"].includes(event.key)) return;
     const rowIndex = cell.parentElement instanceof HTMLTableRowElement ? cell.parentElement.rowIndex : 0;
     const cellIndex = cell.cellIndex;
     const nextRow = table.rows[rowIndex + (event.key === "ArrowDown" ? 1 : event.key === "ArrowUp" ? -1 : 0)];
@@ -150,17 +441,42 @@ function initTable(table, options = {}) {
       nextCell.focus();
     }
   });
-  document.querySelectorAll(`[data-uif-table-action][data-uif-target="#${CSS.escape(table.id)}"]`).forEach((actionEl) => {
+  document.querySelectorAll(`[data-uif-table-action][data-uif-target="#${cssEscape(table.id)}"]`).forEach((actionEl) => {
     actionEl.addEventListener("click", () => {
       const action = actionEl.dataset.uifTableAction || actionEl.dataset.uifAction || "";
-      options.onBulkAction?.(action, selectedRows(table));
+      const selected = selectedRows(table);
+      options.onBulkAction?.(action, selected);
+      table.dispatchEvent(new CustomEvent("uif:table-bulk-action", { detail: { table, action, rows: selected, ids: selectedRowIds(table) }, bubbles: true }));
     });
+  });
+  document.querySelectorAll(`[data-uif-table-page][data-uif-target="#${cssEscape(table.id)}"]`).forEach((pageEl) => {
+    pageEl.addEventListener("click", () => {
+      void goToPage(table, pageFromControl(pageEl, table), options);
+    });
+  });
+  table.addEventListener("change", (event) => {
+    const checkbox = event.target instanceof HTMLInputElement ? event.target : null;
+    if (!checkbox) return;
+    if (checkbox.matches('[data-uif-role="select-all"]')) {
+      rows(table).forEach((row) => {
+        const rowSelect = row.querySelector('[data-uif-role="row-select"]');
+        if (rowSelect) rowSelect.checked = checkbox.checked;
+      });
+    }
+    if (checkbox.matches('[data-uif-role="select-all"],[data-uif-role="row-select"]')) updateSelectionState(table);
   });
   table.addEventListener("click", (event) => {
     const actionEl = event.target instanceof HTMLElement ? event.target.closest("[data-uif-row-action]") : null;
     const row = actionEl?.closest("tr");
-    if (actionEl && row) options.onRowAction?.(actionEl.dataset.uifRowAction || "", row);
+    if (actionEl && row) {
+      const action = actionEl.dataset.uifRowAction || "";
+      options.onRowAction?.(action, row);
+      const id = row.dataset.uifRowId || row.querySelector('[data-uif-role="row-select"]')?.value || "";
+      table.dispatchEvent(new CustomEvent("uif:table-row-action", { detail: { table, action, row, id }, bubbles: true }));
+    }
   });
+  updateSelectionState(table);
+  updatePaginationControls(table);
   if (options.src || table.dataset.uifSrc) void loadRemoteTable(table, options);
 }
 var dataTable = { name: "table", init: (el) => initTable(el) };
@@ -170,6 +486,7 @@ export {
   exportTable,
   filterElements,
   filterTable,
+  goToPage,
   initDeclarativeFilters,
   initTable,
   loadRemoteTable,

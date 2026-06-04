@@ -1,9 +1,5 @@
-// ../core/dist/index.js
-function emit(name, detail, target = document) {
-  target.dispatchEvent(new CustomEvent(name, { detail, bubbles: true }));
-}
-
 // src/index.ts
+import { emit } from "@batoi/uif-core";
 import { swapTrustedHTML } from "@batoi/uif-dom";
 import { request } from "@batoi/uif-net";
 var ruleHandlers = {
@@ -28,13 +24,51 @@ var ruleHandlers = {
   }
 };
 var asyncRuleHandlers = /* @__PURE__ */ new Map();
+var fieldAdapters = /* @__PURE__ */ new Map();
+var validationMessages = /* @__PURE__ */ new Map();
 var initializedForms = /* @__PURE__ */ new WeakSet();
 var initializedRepeatables = /* @__PURE__ */ new WeakSet();
+var validationControllers = /* @__PURE__ */ new WeakMap();
+var submitKeys = /* @__PURE__ */ new WeakMap();
 function registerAsyncRule(name, handler) {
   asyncRuleHandlers.set(name, handler);
 }
+function registerFieldAdapter(name, adapter) {
+  fieldAdapters.set(name, adapter);
+}
+function registerValidationMessage(name, handler) {
+  validationMessages.set(name, handler);
+}
+function abortError() {
+  return new DOMException("Form validation aborted", "AbortError");
+}
+function isAbortError(error) {
+  return error instanceof DOMException && error.name === "AbortError";
+}
 function fieldName(fieldEl) {
   return fieldEl.name || fieldEl.id || "field";
+}
+function fieldAdapterName(fieldEl) {
+  return fieldEl.dataset.uifFieldAdapter || (fieldEl instanceof HTMLInputElement ? fieldEl.type : fieldEl.tagName.toLowerCase());
+}
+function fieldValue(fieldEl) {
+  const adapter = fieldAdapters.get(fieldAdapterName(fieldEl));
+  if (adapter) return adapter(fieldEl);
+  if (fieldEl instanceof HTMLInputElement) {
+    if (fieldEl.type === "checkbox") return fieldEl.checked ? fieldEl.value || "on" : "";
+    if (fieldEl.type === "radio") {
+      const checked = fieldEl.form?.querySelector(`input[type="radio"][name="${cssEscape(fieldEl.name)}"]:checked`);
+      return checked?.value ?? "";
+    }
+    if (fieldEl.type === "file") return Array.from(fieldEl.files ?? []).map((file) => file.name).join(",");
+  }
+  if (fieldEl instanceof HTMLSelectElement && fieldEl.multiple) {
+    return Array.from(fieldEl.selectedOptions).map((option) => option.value).join(",");
+  }
+  return fieldEl.value;
+}
+function validationMessage(fieldEl, rule, arg) {
+  return validationMessages.get(rule)?.(fieldEl, rule, arg) ?? `${fieldName(fieldEl)} failed ${rule}`;
 }
 function cssEscape(value) {
   return typeof CSS !== "undefined" && typeof CSS.escape === "function" ? CSS.escape(value) : value.replace(/["\\#.;,[\]=:]/g, "\\$&");
@@ -56,11 +90,12 @@ function validateField(fieldEl) {
   const form2 = fieldEl.form;
   const spec = fieldEl.dataset.uifRule;
   if (!form2 || !spec) return [];
+  const value = fieldValue(fieldEl);
   const errors = spec.split("|").flatMap((ruleSpec) => {
     const [name, ...rest] = ruleSpec.split(":");
     const arg = rest.join(":") || void 0;
-    const passed = ruleHandlers[name]?.(fieldEl.value, arg, form2) ?? true;
-    return passed ? [] : [`${fieldName(fieldEl)} failed ${name}`];
+    const passed = ruleHandlers[name]?.(value, arg, form2, fieldEl) ?? true;
+    return passed ? [] : [validationMessage(fieldEl, name, arg)];
   });
   fieldEl.setAttribute("aria-invalid", String(errors.length > 0));
   return errors;
@@ -76,7 +111,12 @@ function validateForm(formEl) {
 function clearErrors(formEl) {
   formEl.querySelectorAll(".uif-error").forEach((el) => el.remove());
   formEl.querySelectorAll(".uif-error-summary").forEach((el) => el.remove());
-  formEl.querySelectorAll('[aria-invalid="true"]').forEach((el) => el.setAttribute("aria-invalid", "false"));
+  formEl.querySelectorAll('[aria-invalid="true"]').forEach((el) => {
+    el.setAttribute("aria-invalid", "false");
+    const describedBy = (el.getAttribute("aria-describedby") || "").split(/\s+/).filter((id) => id && !id.endsWith("-error")).join(" ");
+    if (describedBy) el.setAttribute("aria-describedby", describedBy);
+    else el.removeAttribute("aria-describedby");
+  });
 }
 function showErrors(formEl, errors) {
   Object.entries(errors).forEach(([name, messages]) => {
@@ -115,18 +155,23 @@ function showErrorSummary(formEl, errors) {
   return summary;
 }
 async function validateFormAsync(formEl) {
+  validationControllers.get(formEl)?.abort();
+  const controller = new AbortController();
+  validationControllers.set(formEl, controller);
   const errors = validateForm(formEl);
-  const asyncFields = Array.from(
-    formEl.querySelectorAll("[data-uif-validate-async]")
-  );
+  const asyncFields = Array.from(formEl.querySelectorAll("[data-uif-validate-async]"));
   await Promise.all(
     asyncFields.map(async (field) => {
+      if (controller.signal.aborted) throw abortError();
       const name = fieldName(field);
       const handler = asyncRuleHandlers.get(field.dataset.uifValidateAsync || "");
-      const fieldErrors = handler ? await handler(field, formEl) : [];
+      const fieldErrors = handler ? await handler(field, formEl, controller.signal) : [];
+      if (controller.signal.aborted) throw abortError();
       if (fieldErrors.length) errors[name] = [...errors[name] ?? [], ...fieldErrors];
     })
   );
+  if (controller.signal.aborted) throw abortError();
+  validationControllers.delete(formEl);
   return errors;
 }
 function setFormState(formEl, state) {
@@ -151,16 +196,34 @@ function initForm(formEl) {
   initializedForms.add(formEl);
   formEl.dataset.uifState ||= "idle";
   formEl.querySelectorAll('[data-uif="repeatable"]').forEach(initRepeatableGroup);
-  formEl.addEventListener("input", (event) => {
+  const markDirty = (event) => {
     const field = event.target instanceof HTMLElement ? event.target.closest("input,select,textarea") : null;
-    field?.setAttribute("data-uif-touched", "true");
+    field?.setAttribute("data-uif-dirty", "true");
     formEl.dataset.uifDirty = "true";
-  });
+    emit("uif:form-dirty", { form: formEl, field }, formEl);
+  };
+  formEl.addEventListener("input", markDirty);
+  formEl.addEventListener("change", markDirty);
+  formEl.addEventListener(
+    "blur",
+    (event) => {
+      const field = event.target instanceof HTMLElement ? event.target.closest("input,select,textarea") : null;
+      field?.setAttribute("data-uif-touched", "true");
+      emit("uif:form-touched", { form: formEl, field }, formEl);
+    },
+    true
+  );
   formEl.addEventListener("submit", async (event) => {
     event.preventDefault();
     clearErrors(formEl);
     if (formEl.dataset.uifValidate !== "false") {
-      const errors = await validateFormAsync(formEl);
+      let errors;
+      try {
+        errors = await validateFormAsync(formEl);
+      } catch (error) {
+        if (isAbortError(error)) return;
+        throw error;
+      }
       if (Object.keys(errors).length) {
         showErrors(formEl, errors);
         showErrorSummary(formEl, errors);
@@ -171,10 +234,13 @@ function initForm(formEl) {
     setFormState(formEl, "submitting");
     const url = formEl.dataset.uifSrc || formEl.getAttribute("action") || window.location.href;
     const method = (formEl.dataset.uifMethod || formEl.getAttribute("method") || "POST").toUpperCase();
+    const key = submitKeys.get(formEl) || `form:${formEl.id || formEl.name || Math.random().toString(36).slice(2)}`;
+    submitKeys.set(formEl, key);
     try {
       const result = await request(url, {
         method,
-        body: new FormData(formEl)
+        body: new FormData(formEl),
+        key
       });
       const target = resolveFormTarget(formEl);
       const mode = formEl.dataset.uifSwap || "inner";
@@ -191,6 +257,7 @@ function initForm(formEl) {
       if (typeof result !== "string" && result?.focus) document.querySelector(result.focus)?.focus();
       setFormState(formEl, "success");
     } catch (error) {
+      if (isAbortError(error)) return;
       setFormState(formEl, "error");
       throw error;
     }
@@ -206,6 +273,8 @@ export {
   initForm,
   initRepeatableGroup,
   registerAsyncRule,
+  registerFieldAdapter,
+  registerValidationMessage,
   showErrorSummary,
   showErrors,
   validateField,

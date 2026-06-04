@@ -14,6 +14,13 @@ type ComponentInit = (el: HTMLElement) => ComponentInstance;
 
 const instances = new WeakMap<HTMLElement, ComponentInstance>();
 const actionBindings = new WeakMap<Document | HTMLElement, () => void>();
+
+interface ToastOptions {
+  type?: string;
+  duration?: number;
+  placement?: string;
+  dismissible?: boolean;
+}
 const focusableSelector = [
   'a[href]',
   'button:not([disabled])',
@@ -62,9 +69,11 @@ function storageSet(key: string | undefined, value: string): void {
 
 function initModal(el: HTMLElement): ComponentInstance {
   const mode = el.dataset.uifMode ?? 'dismissible';
+  const backdrop = el.dataset.uifBackdrop ?? 'true';
+  const closeOnEscape = mode !== 'locked' && backdrop !== 'static' && el.dataset.uifKeyboard !== 'false';
   const dialog = el.dataset.uifRole === 'dialog' ? el : el.querySelector<HTMLElement>('[data-uif-role="dialog"]') || el;
   const open = () => {
-    void openOverlay(el, { modal: true, restoreFocus: true });
+    void openOverlay(el, { modal: true, restoreFocus: true, closeOnEscape });
     setState(el, true);
     document.body.classList.add('uif-modal-open');
     dialog.querySelector<HTMLElement>(focusableSelector)?.focus();
@@ -77,7 +86,7 @@ function initModal(el: HTMLElement): ComponentInstance {
   };
   const toggle = () => (el.dataset.uifState === 'open' ? close() : open());
   const onKey = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') close();
+    if (event.key === 'Escape' && closeOnEscape) close();
     if (event.key !== 'Tab' || el.dataset.uifState !== 'open') return;
     const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(focusableSelector));
     if (!focusable.length) return;
@@ -95,7 +104,7 @@ function initModal(el: HTMLElement): ComponentInstance {
     const target = eventElement(event);
     const action = target?.closest<HTMLElement>('[data-uif-action]');
     if (action?.dataset.uifAction === 'close') close();
-    if (target?.dataset.uifRole === 'backdrop') close();
+    if (target?.dataset.uifRole === 'backdrop' && backdrop !== 'static') close();
   };
   dialog.setAttribute('role', dialog.getAttribute('role') || 'dialog');
   dialog.setAttribute('aria-modal', 'true');
@@ -137,6 +146,31 @@ function initDrawer(el: HTMLElement): ComponentInstance {
 function initDropdown(el: HTMLElement): ComponentInstance {
   const trigger = el.querySelector<HTMLElement>('[data-uif-role="trigger"]');
   const panel = el.querySelector<HTMLElement>('[data-uif-role="panel"]');
+  let search = '';
+  let searchTimer: number | undefined;
+  const menuItems = () =>
+    Array.from(panel?.querySelectorAll<HTMLElement>('[data-uif-role="item"], [role="menuitem"], button, a[href]') ?? []).filter(
+      (item) => item.dataset.uifRole !== 'separator' && item.getAttribute('role') !== 'separator',
+    );
+  const enabledItems = () => menuItems().filter((item) => !item.hasAttribute('disabled') && item.getAttribute('aria-disabled') !== 'true');
+  const focusItem = (index: number) => {
+    const items = enabledItems();
+    if (!items.length) return;
+    items[(index + items.length) % items.length]?.focus();
+  };
+  const typeahead = (key: string) => {
+    const items = enabledItems();
+    if (!items.length) return;
+    window.clearTimeout(searchTimer);
+    search += key.toLowerCase();
+    searchTimer = window.setTimeout(() => {
+      search = '';
+    }, 700);
+    const current = items.indexOf(document.activeElement as HTMLElement);
+    const ordered = items.slice(Math.max(0, current + 1)).concat(items.slice(0, Math.max(0, current + 1)));
+    const match = ordered.find((item) => item.textContent?.trim().toLowerCase().startsWith(search));
+    match?.focus();
+  };
   const open = () => {
     if (trigger && panel) positionOverlay(trigger, panel);
     if (panel) void show(panel);
@@ -152,22 +186,72 @@ function initDropdown(el: HTMLElement): ComponentInstance {
     if (target && !el.contains(target)) close();
   };
   const onKey = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') close();
+    const items = enabledItems();
+    const current = items.indexOf(document.activeElement as HTMLElement);
+    if (event.key === 'Escape') {
+      close();
+      trigger?.focus();
+    }
+    if (event.target === trigger && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      toggle();
+    }
+    if (event.target === trigger && event.key === 'ArrowDown') {
+      event.preventDefault();
+      open();
+      focusItem(0);
+    }
+    if (event.target === trigger && event.key === 'ArrowUp') {
+      event.preventDefault();
+      open();
+      focusItem(items.length - 1);
+    }
+    if (!panel?.contains(event.target as Node)) return;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      focusItem(current + 1);
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      focusItem(current - 1);
+    }
+    if (event.key === 'Home') {
+      event.preventDefault();
+      focusItem(0);
+    }
+    if (event.key === 'End') {
+      event.preventDefault();
+      focusItem(items.length - 1);
+    }
+    if (event.key.length === 1 && !event.altKey && !event.ctrlKey && !event.metaKey) {
+      event.preventDefault();
+      typeahead(event.key);
+    }
   };
   const onClick = (event: MouseEvent) => {
-    const role = eventElement(event)?.closest<HTMLElement>('[data-uif-role]')?.dataset.uifRole;
+    const action = eventElement(event)?.closest<HTMLElement>('[data-uif-role], [role="menuitem"], button, a[href]');
+    const role = action?.dataset.uifRole || action?.getAttribute('role');
     if (role === 'trigger') toggle();
-    if (role === 'item') close();
+    if ((role === 'item' || role === 'menuitem') && !action?.hasAttribute('disabled') && action?.getAttribute('aria-disabled') !== 'true') close();
   };
   trigger?.setAttribute('aria-haspopup', 'menu');
   trigger?.setAttribute('aria-expanded', 'false');
   panel?.setAttribute('role', 'menu');
   panel?.setAttribute('hidden', '');
+  panel?.querySelectorAll<HTMLElement>('[data-uif-role="separator"]').forEach((separator) => {
+    separator.setAttribute('role', 'separator');
+  });
+  menuItems().forEach((item) => {
+    item.setAttribute('role', item.getAttribute('role') || 'menuitem');
+    if (!item.hasAttribute('tabindex')) item.tabIndex = -1;
+    if (item.hasAttribute('disabled')) item.setAttribute('aria-disabled', 'true');
+  });
   el.addEventListener('click', onClick);
   document.addEventListener('click', onDoc);
   document.addEventListener('keydown', onKey);
   return {
     destroy: () => {
+      window.clearTimeout(searchTimer);
       el.removeEventListener('click', onClick);
       document.removeEventListener('click', onDoc);
       document.removeEventListener('keydown', onKey);
@@ -181,20 +265,35 @@ function initDropdown(el: HTMLElement): ComponentInstance {
 function initTabs(el: HTMLElement): ComponentInstance {
   const tabs = Array.from(el.querySelectorAll<HTMLElement>('[data-uif-role="tab"]'));
   const panels = Array.from(el.querySelectorAll<HTMLElement>('[data-uif-role="tabpanel"]'));
-  const activate = (idx: number) => {
+  const manual = el.dataset.uifActivation === 'manual';
+  const vertical = el.dataset.uifOrientation === 'vertical';
+  let selectedIndex = 0;
+  let focusedIndex = 0;
+  const sync = () => {
     tabs.forEach((tab, i) => {
       const panel = panels[i];
       if (panel && !panel.id) panel.id = `${el.id || 'uif-tabs'}-panel-${i}`;
       tab.setAttribute('role', 'tab');
-      tab.setAttribute('aria-selected', String(i === idx));
-      tab.setAttribute('tabindex', i === idx ? '0' : '-1');
+      tab.setAttribute('aria-selected', String(i === selectedIndex));
+      tab.setAttribute('tabindex', i === focusedIndex ? '0' : '-1');
       if (panel) tab.setAttribute('aria-controls', panel.id);
     });
     panels.forEach((panel, i) => {
       panel.setAttribute('role', 'tabpanel');
-      panel.hidden = i !== idx;
+      panel.hidden = i !== selectedIndex;
     });
-    tabs[idx]?.focus();
+  };
+  const activate = (idx: number) => {
+    selectedIndex = (idx + tabs.length) % tabs.length;
+    focusedIndex = selectedIndex;
+    sync();
+    tabs[focusedIndex]?.focus();
+  };
+  const focusTab = (idx: number) => {
+    focusedIndex = (idx + tabs.length) % tabs.length;
+    if (!manual) selectedIndex = focusedIndex;
+    sync();
+    tabs[focusedIndex]?.focus();
   };
   const onClick = (event: MouseEvent) => {
     const tab = eventElement(event)?.closest<HTMLElement>('[data-uif-role="tab"]');
@@ -203,10 +302,34 @@ function initTabs(el: HTMLElement): ComponentInstance {
   const onKey = (event: KeyboardEvent) => {
     const idx = tabs.indexOf(event.target as HTMLElement);
     if (idx < 0 || tabs.length === 0) return;
-    if (event.key === 'ArrowRight') activate((idx + 1) % tabs.length);
-    if (event.key === 'ArrowLeft') activate((idx - 1 + tabs.length) % tabs.length);
+    if (event.key === 'ArrowRight' || (vertical && event.key === 'ArrowDown')) {
+      event.preventDefault();
+      focusTab(idx + 1);
+    }
+    if (event.key === 'ArrowLeft' || (vertical && event.key === 'ArrowUp')) {
+      event.preventDefault();
+      focusTab(idx - 1);
+    }
+    if (event.key === 'Home') {
+      event.preventDefault();
+      focusTab(0);
+    }
+    if (event.key === 'End') {
+      event.preventDefault();
+      focusTab(tabs.length - 1);
+    }
+    if (manual && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      activate(idx);
+    }
   };
   el.setAttribute('role', 'tablist');
+  if (vertical) el.setAttribute('aria-orientation', 'vertical');
+  if (!tabs.length) {
+    return {
+      destroy: () => undefined,
+    };
+  }
   el.addEventListener('click', onClick);
   el.addEventListener('keydown', onKey);
   activate(0);
@@ -221,7 +344,17 @@ function initTabs(el: HTMLElement): ComponentInstance {
 function initToast(el: HTMLElement): ComponentInstance {
   el.setAttribute('role', el.dataset.uifType === 'danger' ? 'alert' : 'status');
   if (!el.dataset.uifState) setState(el, true);
-  return { destroy: () => undefined, close: () => el.remove() };
+  const dispose = setupToast(el, {
+    duration: Number(el.dataset.uifDuration) || undefined,
+    dismissible: el.dataset.uifDismissible !== 'false',
+  });
+  return {
+    destroy: dispose,
+    close: () => {
+      dispose();
+      el.remove();
+    },
+  };
 }
 
 function initAccordion(el: HTMLElement): ComponentInstance {
@@ -452,14 +585,22 @@ function initPopover(el: HTMLElement): ComponentInstance {
     if (!panel) return;
     positionOverlay(trigger, panel);
     void openOverlay(panel, { restoreFocus: true });
+    panel.dataset.uifState = 'open';
+    trigger.setAttribute('aria-expanded', 'true');
   };
   const close = () => {
-    if (panel) void closeOverlay(panel);
+    if (!panel) return;
+    void closeOverlay(panel);
+    panel.dataset.uifState = 'closed';
+    trigger.setAttribute('aria-expanded', 'false');
   };
   const toggle = () => (panel?.dataset.uifState === 'open' ? close() : open());
   trigger.addEventListener('click', toggle);
+  trigger.setAttribute('aria-haspopup', 'dialog');
+  trigger.setAttribute('aria-expanded', 'false');
   panel?.setAttribute('role', panel.getAttribute('role') || 'dialog');
   panel?.setAttribute('hidden', '');
+  if (panel && !panel.dataset.uifState) panel.dataset.uifState = 'closed';
   return { destroy: () => trigger.removeEventListener('click', toggle), open, close, toggle };
 }
 
@@ -574,6 +715,9 @@ function handleAction(event: Event): void {
   if (action === 'toast') {
     showToast(actionEl.dataset.uifMessage || actionEl.textContent?.trim() || 'Notification', {
       type: actionEl.dataset.uifType || 'info',
+      duration: Number(actionEl.dataset.uifDuration) || undefined,
+      placement: actionEl.dataset.uifPlacement,
+      dismissible: actionEl.dataset.uifDismissible !== 'false',
     });
     return;
   }
@@ -645,18 +789,90 @@ export function initAll(root: Document | HTMLElement = document): () => void {
   return dispose;
 }
 
-export function showToast(message: string, options: { type?: string; duration?: number } = {}): HTMLElement {
+function getToastContainer(placement = 'bottom-end'): HTMLElement {
+  const normalized = placement || 'bottom-end';
+  const existing = document.querySelector<HTMLElement>(`.uif-toast-stack[data-uif-placement="${normalized}"]`);
+  if (existing) return existing;
+  const container = document.createElement('div');
+  container.className = `uif-toast-stack uif-toast-stack-${normalized}`;
+  container.dataset.uifPlacement = normalized;
+  container.setAttribute('aria-live', 'polite');
+  container.setAttribute('aria-atomic', 'false');
+  document.body.appendChild(container);
+  return container;
+}
+
+function setupToast(toastEl: HTMLElement, options: ToastOptions = {}): () => void {
+  let timer: number | undefined;
+  let startedAt = 0;
+  let remaining = options.duration ?? 3000;
+  const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const clear = () => {
+    window.clearTimeout(timer);
+    timer = undefined;
+  };
+  const close = () => {
+    clear();
+    toastEl.dataset.uifState = 'closed';
+    toastEl.remove();
+  };
+  const schedule = (delay = remaining) => {
+    clear();
+    if (delay <= 0) return;
+    startedAt = Date.now();
+    timer = window.setTimeout(close, reduce ? 0 : delay);
+  };
+  const pause = () => {
+    if (!timer) return;
+    remaining = Math.max(0, remaining - (Date.now() - startedAt));
+    clear();
+  };
+  const resume = () => {
+    if (toastEl.isConnected) schedule();
+  };
+  const onClick = (event: MouseEvent) => {
+    const action = eventElement(event)?.closest<HTMLElement>('[data-uif-action]');
+    if (action?.dataset.uifAction === 'close') close();
+  };
+  toastEl.addEventListener('mouseenter', pause);
+  toastEl.addEventListener('mouseleave', resume);
+  toastEl.addEventListener('focusin', pause);
+  toastEl.addEventListener('focusout', resume);
+  toastEl.addEventListener('click', onClick);
+  schedule();
+  return () => {
+    clear();
+    toastEl.removeEventListener('mouseenter', pause);
+    toastEl.removeEventListener('mouseleave', resume);
+    toastEl.removeEventListener('focusin', pause);
+    toastEl.removeEventListener('focusout', resume);
+    toastEl.removeEventListener('click', onClick);
+  };
+}
+
+export function showToast(message: string, options: ToastOptions = {}): HTMLElement {
   const toastEl = document.createElement('div');
   toastEl.dataset.uif = 'toast';
   toastEl.dataset.uifState = 'open';
   toastEl.dataset.uifType = options.type ?? 'info';
-  toastEl.textContent = message;
+  const messageEl = document.createElement('span');
+  messageEl.className = 'uif-toast-message';
+  messageEl.textContent = message;
+  toastEl.append(messageEl);
+  if (options.dismissible !== false) {
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'uif-toast-close';
+    closeButton.dataset.uifAction = 'close';
+    closeButton.setAttribute('aria-label', 'Close notification');
+    closeButton.textContent = 'x';
+    toastEl.append(closeButton);
+  }
   toastEl.setAttribute('role', options.type === 'danger' ? 'alert' : 'status');
   toastEl.className = `uif-toast uif-toast-${options.type ?? 'info'}`;
-  document.body.appendChild(toastEl);
+  getToastContainer(options.placement).appendChild(toastEl);
   emit('uif:toast', { message, options, el: toastEl }, toastEl);
-  const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  window.setTimeout(() => toastEl.remove(), reduce ? 0 : options.duration ?? 3000);
+  setupToast(toastEl, options);
   return toastEl;
 }
 

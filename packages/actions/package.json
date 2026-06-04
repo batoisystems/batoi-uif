@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@batoi/uif-core": "0.1.0",
+    "@batoi/uif-dom": "0.1.0",
     "@batoi/uif-effects": "0.1.0"
   }
 }

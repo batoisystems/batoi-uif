@@ -146,6 +146,44 @@ describe('@batoi/uif-editor', () => {
     expect(editor.getValue()).toContain('<th>Column C</th>');
   });
 
+  it('closes WYSIWYG dialogs with Escape, cancel, and outside pointer while restoring focus', () => {
+    document.body.innerHTML = '<button id="outside">Outside</button><textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none" data-uif-toolbar="link"><p>Draft</p></textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const button = editor.element.querySelector<HTMLButtonElement>('[data-uif-editor-command="link"]') as HTMLButtonElement;
+    button.getBoundingClientRect = () =>
+      ({
+        x: 20,
+        y: 20,
+        top: 20,
+        right: 80,
+        bottom: 52,
+        left: 20,
+        width: 60,
+        height: 32,
+        toJSON: () => ({}),
+      }) as DOMRect;
+
+    button.click();
+    let dialog = document.querySelector<HTMLFormElement>('.uif-editor-dialog') as HTMLFormElement;
+    expect(dialog.getAttribute('role')).toBe('dialog');
+    expect(dialog.dataset.uifEditorDialogPlacement).toBe('popover');
+    expect(document.activeElement).toBe(dialog.querySelector('input'));
+    dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    expect(document.querySelector('.uif-editor-dialog')).toBeNull();
+    expect(document.activeElement?.closest('.uif-editor-dialog')).toBeNull();
+
+    button.click();
+    dialog = document.querySelector<HTMLFormElement>('.uif-editor-dialog') as HTMLFormElement;
+    dialog.querySelector<HTMLButtonElement>('[data-uif-editor-dialog-cancel]')?.click();
+    expect(document.querySelector('.uif-editor-dialog')).toBeNull();
+    expect(document.activeElement?.closest('.uif-editor-dialog')).toBeNull();
+
+    button.click();
+    expect(document.querySelector('.uif-editor-dialog')).not.toBeNull();
+    document.querySelector('#outside')?.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+    expect(document.querySelector('.uif-editor-dialog')).toBeNull();
+  });
+
   it('activates toolbar commands with Enter and Space keys', () => {
     document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none" data-uif-toolbar="link"></textarea>';
     const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);

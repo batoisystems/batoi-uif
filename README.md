@@ -170,6 +170,9 @@ Open `examples/index.html` for a landing page that links to every bundled exampl
 Reference docs:
 
 - `docs/data-uif-registry.md` lists the canonical declarative `data-uif-*` surface.
+- `docs/accessibility.md` documents component keyboard, ARIA, focus, overlay, and manual QA expectations.
+- `docs/micro-app-connectors.md` documents Micro App manifest connector workflows and network permission checks.
+- `docs/utility-migration-matrix.md` documents curated utilities, Bootstrap/Tailwind migration snippets, and feature coverage.
 - `docs/rad-workspace-migration.md` shows how RAD workspace shells, registers, manage forms, analytics routes, and editor routes can move to UIF without Bootstrap, jQuery, Chart.js, Bootstrap Table, or Summernote.
 - `docs/security.md` explains the trusted HTML boundary, safe text rendering, and AI/MCP server-side governance model.
 
@@ -190,7 +193,7 @@ Reference docs:
 </script>
 ```
 
-See `examples/micro-app-dashboard/` for a copy-ready static Micro App with local persistence, undo/redo, reset, JSON import/export, icons, and charts.
+See `examples/micro-app-dashboard/` for a copy-ready static Micro App with local persistence, undo/redo, reset, JSON import/export, connector workflow summaries, icons, and charts.
 
 ### Rich HTML and Markdown editor
 
