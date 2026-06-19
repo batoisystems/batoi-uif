@@ -1193,10 +1193,48 @@
 
 .component-gallery-page .component-demo .uif-responsive-shell {
   min-height: 18rem;
+  grid-template-columns: minmax(12rem, 17rem) minmax(0, 1fr);
   border: 1px solid #d7e2ed;
   border-radius: 0.5rem;
   background: #fff;
   overflow: hidden;
+}
+
+.component-gallery-page .component-demo .uif-responsive-shell.uif-shell-sidebar-collapsed {
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+}
+
+.component-gallery-page
+  .component-demo
+  .uif-responsive-shell.uif-shell-sidebar-collapsed
+  .uif-sidebar-brand {
+  justify-content: center;
+  padding-inline: 0.5rem;
+}
+
+.component-gallery-page
+  .component-demo
+  .uif-responsive-shell.uif-shell-sidebar-collapsed
+  .uif-sidebar-brand-mark {
+  margin-inline: auto;
+}
+
+.component-gallery-page .component-demo .uif-responsive-shell .uif-shell-content {
+  height: auto;
+  min-height: 18rem;
+}
+
+.component-gallery-page .component-demo .uif-responsive-shell .uif-navbar {
+  min-height: 3.25rem;
+  padding: 0.75rem 0.9rem;
+}
+
+.component-gallery-page .component-demo .uif-responsive-shell .uif-navbar-brand {
+  min-width: 0;
+}
+
+.component-gallery-page .component-demo .uif-responsive-shell .uif-scroll-region {
+  padding: 1rem;
 }
 
 @media (max-width: 72rem) {
