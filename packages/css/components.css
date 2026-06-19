@@ -806,6 +806,13 @@
   font-size: var(--uif-text-sm);
   font-weight: 500;
 }
+.uif-sidebar-nav a[data-uif-nav-item] {
+  justify-content: flex-start;
+  gap: var(--uif-space-2);
+}
+.uif-sidebar-nav a[data-uif-nav-item] [data-uif-icon] {
+  flex: 0 0 auto;
+}
 .uif-sidebar-nav a[aria-current='page'],
 .uif-sidebar-nav a.is-active {
   color: var(--uif-text);
@@ -821,26 +828,6 @@
 }
 .uif-responsive-shell.uif-shell-sidebar-collapsed {
   grid-template-columns: 4.75rem minmax(0, 1fr);
-}
-.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-brand strong,
-.uif-responsive-shell.uif-shell-sidebar-collapsed
-  .uif-sidebar-brand
-  span:not(.uif-sidebar-brand-mark),
-.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-nav a {
-  overflow: hidden;
-  white-space: nowrap;
-}
-.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-nav a {
-  justify-content: center;
-  padding-inline: var(--uif-space-2);
-}
-.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-nav a[data-uif-short-label] {
-  font-size: 0;
-}
-.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-nav a[data-uif-short-label]::before {
-  content: attr(data-uif-short-label);
-  font-size: var(--uif-text-sm);
-  font-weight: 800;
 }
 .uif-navbar {
   display: flex;
@@ -1355,6 +1342,46 @@ select.uif-input {
 .uif-sidebar-brand span {
   display: block;
   line-height: 1.2;
+}
+.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-brand {
+  justify-content: center;
+  gap: 0;
+  padding-inline: var(--uif-space-2);
+}
+.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-brand strong,
+.uif-responsive-shell.uif-shell-sidebar-collapsed
+  .uif-sidebar-brand
+  span:not(.uif-sidebar-brand-mark) {
+  display: none;
+}
+.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-nav {
+  padding-inline: var(--uif-space-2);
+}
+.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-nav a [data-uif-nav-label] {
+  display: none;
+}
+.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-nav a .uif-icon,
+.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-nav a [data-uif-icon] .uif-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-nav a[data-uif-nav-item] {
+  justify-content: center;
+  min-height: 2.35rem;
+  padding-inline: 0;
+  border-radius: 999px;
+}
+.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-nav a[data-uif-short-label] {
+  justify-content: center;
+  min-height: 2.35rem;
+  padding-inline: 0;
+  border-radius: 999px;
+  font-size: 0;
+}
+.uif-responsive-shell.uif-shell-sidebar-collapsed .uif-sidebar-nav a[data-uif-short-label]::before {
+  content: attr(data-uif-short-label);
+  font-size: var(--uif-text-sm);
+  font-weight: 800;
 }
 .uif-sidebar-section {
   margin: var(--uif-space-4) 0 var(--uif-space-2);
