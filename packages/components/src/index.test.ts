@@ -22,8 +22,12 @@ describe('components', () => {
         <div data-uif-role="tabpanel">B</div>
       </div>`;
     initAll(document);
-    expect(document.querySelector('[data-uif-role="tab"]')?.getAttribute('aria-selected')).toBe('true');
-    expect((document.querySelectorAll('[data-uif-role="tabpanel"]')[1] as HTMLElement).hidden).toBe(true);
+    expect(document.querySelector('[data-uif-role="tab"]')?.getAttribute('aria-selected')).toBe(
+      'true',
+    );
+    expect((document.querySelectorAll('[data-uif-role="tabpanel"]')[1] as HTMLElement).hidden).toBe(
+      true,
+    );
   });
 
   it('supports tabs Home/End and manual vertical activation', () => {
@@ -48,7 +52,9 @@ describe('components', () => {
     expect(root?.getAttribute('aria-orientation')).toBe('vertical');
     expect(one?.getAttribute('aria-selected')).toBe('true');
 
-    one?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
+    one?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }),
+    );
     expect(document.activeElement).toBe(two);
     expect(two?.getAttribute('tabindex')).toBe('0');
     expect(two?.getAttribute('aria-selected')).toBe('false');
@@ -60,30 +66,44 @@ describe('components', () => {
     expect(panelOne?.hidden).toBe(true);
     expect(panelTwo?.hidden).toBe(false);
 
-    two?.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }));
+    two?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }),
+    );
     expect(document.activeElement).toBe(three);
     expect(three?.getAttribute('aria-selected')).toBe('false');
 
-    three?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+    three?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
+    );
     expect(three?.getAttribute('aria-selected')).toBe('true');
 
-    three?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }));
+    three?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }),
+    );
     expect(document.activeElement).toBe(one);
     expect(one?.getAttribute('aria-selected')).toBe('false');
   });
 
   it('creates toast notifications', () => {
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    );
     const el = showToast('Saved', { type: 'success' });
     expect(el.querySelector('.uif-toast-message')?.textContent).toBe('Saved');
     expect(el.getAttribute('role')).toBe('status');
     expect(document.querySelector('.uif-toast-stack-bottom-end')?.contains(el)).toBe(true);
-    expect(el.querySelector<HTMLButtonElement>('[data-uif-action="close"]')?.getAttribute('aria-label')).toBe('Close notification');
+    expect(
+      el.querySelector<HTMLButtonElement>('[data-uif-action="close"]')?.getAttribute('aria-label'),
+    ).toBe('Close notification');
   });
 
   it('supports toast placement, close, and pause on hover or focus', () => {
     vi.useFakeTimers();
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false })));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false })),
+    );
     const el = showToast('Queued', { type: 'info', placement: 'top-start', duration: 1000 });
 
     expect(document.querySelector('.uif-toast-stack-top-start')?.contains(el)).toBe(true);
@@ -103,8 +123,12 @@ describe('components', () => {
   });
 
   it('binds root actions only once', () => {
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
-    document.body.innerHTML = '<button data-uif-action="toast" data-uif-message="Saved">Notify</button>';
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    );
+    document.body.innerHTML =
+      '<button data-uif-action="toast" data-uif-message="Saved">Notify</button>';
     initAll(document);
     initAll(document);
     document.querySelector('button')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -112,8 +136,12 @@ describe('components', () => {
   });
 
   it('creates text-safe tooltip panels from title text and cleans them up', () => {
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
-    document.body.innerHTML = '<button id="help" data-uif="tooltip" title="<script>alert(1)</script>">Help</button>';
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    );
+    document.body.innerHTML =
+      '<button id="help" data-uif="tooltip" title="<script>alert(1)</script>">Help</button>';
     initAll(document);
 
     const trigger = document.querySelector<HTMLElement>('#help');
@@ -134,7 +162,10 @@ describe('components', () => {
   });
 
   it('opens and closes drawers through delegated actions', () => {
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    );
     document.body.innerHTML = `
       <button id="open" data-uif-action="open" data-uif-target="#drawer">Open</button>
       <aside id="drawer" data-uif="drawer" hidden>
@@ -155,7 +186,10 @@ describe('components', () => {
   });
 
   it('opens modal dialogs with focus trap and Escape dismissal', () => {
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    );
     document.body.innerHTML = `
       <button id="open" data-uif-action="open" data-uif-target="#modal">Open</button>
       <div id="modal" data-uif="modal" hidden>
@@ -173,7 +207,9 @@ describe('components', () => {
     document.querySelector('#open')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(modal?.hidden).toBe(false);
     expect(modal?.dataset.uifState).toBe('open');
-    expect(document.querySelector('[data-uif-role="dialog"]')?.getAttribute('aria-modal')).toBe('true');
+    expect(document.querySelector('[data-uif-role="dialog"]')?.getAttribute('aria-modal')).toBe(
+      'true',
+    );
     expect(document.activeElement).toBe(first);
 
     last?.focus();
@@ -186,7 +222,10 @@ describe('components', () => {
   });
 
   it('keeps static-backdrop modals open on backdrop click and Escape', () => {
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    );
     document.body.innerHTML = `
       <button id="open" data-uif-action="open" data-uif-target="#modal">Open</button>
       <div id="modal" class="uif-modal" data-uif="modal" data-uif-backdrop="static" hidden>
@@ -212,7 +251,10 @@ describe('components', () => {
   });
 
   it('supports offcanvas as a drawer alias', () => {
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    );
     document.body.innerHTML = `
       <button data-uif-action="open" data-uif-target="#nav-panel">Open nav</button>
       <aside id="nav-panel" data-uif="offcanvas" hidden>
@@ -227,7 +269,10 @@ describe('components', () => {
   });
 
   it('toggles dropdown panels and closes on item selection', () => {
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    );
     document.body.innerHTML = `
       <div data-uif="dropdown">
         <button id="trigger" data-uif-role="trigger">Menu</button>
@@ -247,13 +292,18 @@ describe('components', () => {
     expect(trigger?.getAttribute('aria-expanded')).toBe('true');
     expect(panel?.hidden).toBe(false);
 
-    document.querySelector('[data-uif-role="item"]')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    document
+      .querySelector('[data-uif-role="item"]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(trigger?.getAttribute('aria-expanded')).toBe('false');
     expect(panel?.hidden).toBe(true);
   });
 
   it('supports dropdown menu keyboard navigation and disabled item skipping', () => {
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    );
     document.body.innerHTML = `
       <div data-uif="dropdown">
         <button id="trigger" data-uif-role="trigger">Actions</button>
@@ -278,33 +328,50 @@ describe('components', () => {
     expect(separator?.getAttribute('role')).toBe('separator');
     expect(disabled?.getAttribute('aria-disabled')).toBe('true');
 
-    trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
+    trigger?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }),
+    );
     expect(panel?.hidden).toBe(false);
     expect(document.activeElement).toBe(archive);
 
-    archive?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
+    archive?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }),
+    );
     expect(document.activeElement).toBe(exportButton);
 
-    exportButton?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
+    exportButton?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }),
+    );
     expect(document.activeElement).toBe(archive);
 
-    archive?.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }));
+    archive?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }),
+    );
     expect(document.activeElement).toBe(exportButton);
 
-    exportButton?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }));
+    exportButton?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }),
+    );
     expect(document.activeElement).toBe(archive);
 
-    archive?.dispatchEvent(new KeyboardEvent('keydown', { key: 'e', bubbles: true, cancelable: true }));
+    archive?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'e', bubbles: true, cancelable: true }),
+    );
     expect(document.activeElement).toBe(exportButton);
 
-    archive?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    archive?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }),
+    );
     expect(panel?.hidden).toBe(true);
     expect(trigger?.getAttribute('aria-expanded')).toBe('false');
     expect(document.activeElement).toBe(trigger);
   });
 
   it('toggles popovers through the shared overlay stack', () => {
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    );
     document.body.innerHTML = `
       <div data-uif="popover">
         <button id="trigger" data-uif-role="trigger">Details</button>
@@ -355,7 +422,9 @@ describe('components', () => {
     const main = document.querySelector<HTMLElement>('[data-uif-role="main"]');
     const skip = document.querySelector<HTMLAnchorElement>('[data-uif-role="skip-link"]');
     const active = document.querySelector<HTMLAnchorElement>('a[data-uif-route="guard"]');
-    const sectionTrigger = document.querySelector<HTMLButtonElement>('[data-uif-action="toggle-section"]');
+    const sectionTrigger = document.querySelector<HTMLButtonElement>(
+      '[data-uif-action="toggle-section"]',
+    );
     const sectionPanel = document.querySelector<HTMLElement>('[data-uif-role="section-panel"]');
 
     expect(shell?.dataset.uifSidebar).toBe('collapsed');
@@ -379,5 +448,64 @@ describe('components', () => {
     sectionTrigger?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(sectionTrigger?.getAttribute('aria-expanded')).toBe('false');
     expect(sectionPanel?.hidden).toBe(true);
+  });
+
+  it('advances carousel slides with controls and indicators', () => {
+    document.body.innerHTML = `
+      <section data-uif="carousel" tabindex="0">
+        <article id="one" data-uif-role="slide" data-uif-state="active">One</article>
+        <article id="two" data-uif-role="slide">Two</article>
+        <button id="next" data-uif-action="next">Next</button>
+        <button id="first" data-uif-slide-to="0">First</button>
+        <span id="status" data-uif-role="status"></span>
+      </section>`;
+    initAll(document);
+
+    const one = document.querySelector<HTMLElement>('#one');
+    const two = document.querySelector<HTMLElement>('#two');
+    expect(one?.hidden).toBe(false);
+    expect(two?.hidden).toBe(true);
+    expect(document.querySelector('#status')?.textContent).toBe('Slide 1 of 2');
+
+    document.querySelector('#next')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(one?.hidden).toBe(true);
+    expect(two?.hidden).toBe(false);
+
+    document.querySelector('#first')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(one?.hidden).toBe(false);
+    expect(two?.hidden).toBe(true);
+  });
+
+  it('opens lightbox items and updates image and caption', () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    );
+    document.body.innerHTML = `
+      <section data-uif="lightbox">
+        <a id="item" href="large.png" data-uif-role="item" data-uif-caption="Large preview"><img src="thumb.png" alt="Preview"></a>
+        <div id="dialog" data-uif-role="dialog" hidden>
+          <button data-uif-action="close">Close</button>
+          <img id="image" data-uif-role="image" alt="">
+          <p id="caption" data-uif-role="caption"></p>
+        </div>
+      </section>`;
+    initAll(document);
+
+    const dialog = document.querySelector<HTMLElement>('#dialog');
+    document
+      .querySelector('#item')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    expect(dialog?.hidden).toBe(false);
+    expect(dialog?.dataset.uifState).toBe('open');
+    expect(document.querySelector<HTMLImageElement>('#image')?.getAttribute('src')).toBe(
+      'large.png',
+    );
+    expect(document.querySelector('#caption')?.textContent).toBe('Large preview');
+
+    document
+      .querySelector('[data-uif-action="close"]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(dialog?.hidden).toBe(true);
   });
 });

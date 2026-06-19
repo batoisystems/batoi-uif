@@ -122,10 +122,16 @@ function initDropdown(el) {
   const panel = el.querySelector('[data-uif-role="panel"]');
   let search = "";
   let searchTimer;
-  const menuItems = () => Array.from(panel?.querySelectorAll('[data-uif-role="item"], [role="menuitem"], button, a[href]') ?? []).filter(
+  const menuItems = () => Array.from(
+    panel?.querySelectorAll(
+      '[data-uif-role="item"], [role="menuitem"], button, a[href]'
+    ) ?? []
+  ).filter(
     (item) => item.dataset.uifRole !== "separator" && item.getAttribute("role") !== "separator"
   );
-  const enabledItems = () => menuItems().filter((item) => !item.hasAttribute("disabled") && item.getAttribute("aria-disabled") !== "true");
+  const enabledItems = () => menuItems().filter(
+    (item) => !item.hasAttribute("disabled") && item.getAttribute("aria-disabled") !== "true"
+  );
   const focusItem = (index) => {
     const items = enabledItems();
     if (!items.length) return;
@@ -202,10 +208,13 @@ function initDropdown(el) {
     }
   };
   const onClick = (event) => {
-    const action = eventElement(event)?.closest('[data-uif-role], [role="menuitem"], button, a[href]');
+    const action = eventElement(event)?.closest(
+      '[data-uif-role], [role="menuitem"], button, a[href]'
+    );
     const role = action?.dataset.uifRole || action?.getAttribute("role");
     if (role === "trigger") toggle();
-    if ((role === "item" || role === "menuitem") && !action?.hasAttribute("disabled") && action?.getAttribute("aria-disabled") !== "true") close();
+    if ((role === "item" || role === "menuitem") && !action?.hasAttribute("disabled") && action?.getAttribute("aria-disabled") !== "true")
+      close();
   };
   trigger?.setAttribute("aria-haspopup", "menu");
   trigger?.setAttribute("aria-expanded", "false");
@@ -370,7 +379,9 @@ function initShell(el) {
     el.dataset.uifSidebar = collapsed2 ? "collapsed" : "expanded";
     el.classList.toggle("uif-shell-sidebar-collapsed", collapsed2);
     sidebar2?.setAttribute("aria-hidden", String(collapsed2));
-    el.querySelectorAll('[data-uif-action="toggle"][data-uif-target], [data-uif-action="toggle-sidebar"]').forEach((trigger) => {
+    el.querySelectorAll(
+      '[data-uif-action="toggle"][data-uif-target], [data-uif-action="toggle-sidebar"]'
+    ).forEach((trigger) => {
       if (trigger.dataset.uifTarget && resolveComponentTarget(trigger) !== el) return;
       trigger.setAttribute("aria-expanded", String(!collapsed2));
     });
@@ -403,7 +414,9 @@ function initShell(el) {
     nav2?.querySelectorAll("a[href]").forEach((link) => {
       const routeMatch = currentRoute && link.dataset.uifRoute === currentRoute;
       const urlMatch = !currentRoute && link.pathname === path;
-      const active = Boolean(routeMatch || urlMatch || link.getAttribute("aria-current") === "page");
+      const active = Boolean(
+        routeMatch || urlMatch || link.getAttribute("aria-current") === "page"
+      );
       link.classList.toggle("is-active", active);
       if (active) link.setAttribute("aria-current", "page");
       else if (link.getAttribute("aria-current") === "page") link.removeAttribute("aria-current");
@@ -431,7 +444,9 @@ function initShell(el) {
   };
   const onKey = (event) => {
     if (!nav2?.contains(event.target)) return;
-    const items = Array.from(nav2.querySelectorAll("a[href],button:not([disabled])")).filter((item) => !item.hidden && !item.closest("[hidden]"));
+    const items = Array.from(
+      nav2.querySelectorAll("a[href],button:not([disabled])")
+    ).filter((item) => !item.hidden && !item.closest("[hidden]"));
     const index = items.indexOf(event.target);
     if (index < 0 || items.length === 0) return;
     if (event.key === "ArrowDown" || event.key === "ArrowRight") {
@@ -454,9 +469,14 @@ function initShell(el) {
   const storedSidebar = storageGet(sidebarKey);
   const collapsed = storedSidebar ? storedSidebar === "collapsed" : el.dataset.uifSidebar === "collapsed";
   setSidebar(collapsed);
-  setDensity(storageGet(densityKey) || el.dataset.uifDensity || el.getAttribute("data-density") || "comfortable");
+  setDensity(
+    storageGet(densityKey) || el.dataset.uifDensity || el.getAttribute("data-density") || "comfortable"
+  );
   el.querySelectorAll('[data-uif-action="toggle-section"]').forEach((trigger) => {
-    setSection(trigger, trigger.dataset.uifState === "expanded" || trigger.getAttribute("aria-expanded") === "true");
+    setSection(
+      trigger,
+      trigger.dataset.uifState === "expanded" || trigger.getAttribute("aria-expanded") === "true"
+    );
   });
   applyActiveRoute();
   setupSkipTarget();
@@ -653,6 +673,150 @@ function initCombobox(el) {
     }
   };
 }
+function initCarousel(el) {
+  const slides = Array.from(el.querySelectorAll('[data-uif-role="slide"]'));
+  const indicators = Array.from(el.querySelectorAll("[data-uif-slide-to]"));
+  const live = el.querySelector('[data-uif-role="status"]');
+  let index = Math.max(
+    0,
+    slides.findIndex((slide) => slide.dataset.uifState === "active")
+  );
+  if (index < 0) index = 0;
+  const sync = () => {
+    slides.forEach((slide, i) => {
+      const active = i === index;
+      slide.dataset.uifState = active ? "active" : "inactive";
+      slide.toggleAttribute("hidden", !active);
+      slide.setAttribute("aria-hidden", String(!active));
+    });
+    indicators.forEach((indicator, i) => {
+      const active = i === index;
+      indicator.dataset.uifState = active ? "active" : "inactive";
+      indicator.setAttribute("aria-current", active ? "true" : "false");
+    });
+    if (live) live.textContent = `Slide ${index + 1} of ${slides.length}`;
+    emit("uif:carousel-change", { index, slide: slides[index], el }, el);
+  };
+  const goTo = (nextIndex) => {
+    if (!slides.length) return;
+    index = (nextIndex + slides.length) % slides.length;
+    sync();
+  };
+  const next = () => goTo(index + 1);
+  const previous = () => goTo(index - 1);
+  const onClick = (event) => {
+    const target = eventElement(event)?.closest(
+      "[data-uif-action], [data-uif-slide-to]"
+    );
+    if (!target || !el.contains(target)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (target.dataset.uifAction === "next") next();
+    if (target.dataset.uifAction === "previous") previous();
+    if (target.dataset.uifSlideTo) goTo(Number(target.dataset.uifSlideTo));
+  };
+  const onKey = (event) => {
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      next();
+    }
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      previous();
+    }
+  };
+  el.setAttribute("role", el.getAttribute("role") || "region");
+  el.setAttribute("aria-roledescription", "carousel");
+  el.addEventListener("click", onClick);
+  el.addEventListener("keydown", onKey);
+  sync();
+  return {
+    destroy: () => {
+      el.removeEventListener("click", onClick);
+      el.removeEventListener("keydown", onKey);
+    },
+    next,
+    previous,
+    goTo
+  };
+}
+function initLightbox(el) {
+  const items = Array.from(el.querySelectorAll('[data-uif-role="item"]'));
+  const dialog = el.querySelector('[data-uif-role="dialog"]');
+  const image = el.querySelector('[data-uif-role="image"]');
+  const caption = el.querySelector('[data-uif-role="caption"]');
+  let index = 0;
+  const render = () => {
+    const item = items[index];
+    const src = item?.dataset.uifSrc || item?.getAttribute("href") || item?.querySelector("img")?.src || "";
+    if (image) {
+      image.src = src;
+      image.alt = item?.dataset.uifAlt || item?.querySelector("img")?.alt || "";
+    }
+    if (caption)
+      caption.textContent = item?.dataset.uifCaption || item?.getAttribute("aria-label") || "";
+  };
+  const open = (nextIndex = index) => {
+    if (!dialog || !items.length) return;
+    index = Math.max(0, Math.min(items.length - 1, nextIndex));
+    render();
+    void openOverlay(dialog, { modal: true, restoreFocus: true, closeOnEscape: true });
+    dialog.dataset.uifState = "open";
+    dialog.querySelector(focusableSelector)?.focus();
+    emit("uif:lightbox-open", { index, el }, el);
+  };
+  const close = () => {
+    if (!dialog) return;
+    void closeOverlay(dialog);
+    dialog.dataset.uifState = "closed";
+  };
+  const next = () => {
+    index = (index + 1) % items.length;
+    render();
+  };
+  const previous = () => {
+    index = (index - 1 + items.length) % items.length;
+    render();
+  };
+  const onClick = (event) => {
+    const target = eventElement(event);
+    const item = target?.closest('[data-uif-role="item"]');
+    if (item && el.contains(item)) {
+      event.preventDefault();
+      open(items.indexOf(item));
+    }
+    const action = target?.closest("[data-uif-action]");
+    if (action) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (action?.dataset.uifAction === "close") close();
+    if (action?.dataset.uifAction === "next") next();
+    if (action?.dataset.uifAction === "previous") previous();
+  };
+  const onKey = (event) => {
+    if (dialog?.dataset.uifState !== "open") return;
+    if (event.key === "Escape") close();
+    if (event.key === "ArrowRight") next();
+    if (event.key === "ArrowLeft") previous();
+  };
+  dialog?.setAttribute("role", dialog.getAttribute("role") || "dialog");
+  dialog?.setAttribute("aria-modal", "true");
+  dialog?.setAttribute("hidden", "");
+  if (dialog && !dialog.dataset.uifState) dialog.dataset.uifState = "closed";
+  el.addEventListener("click", onClick);
+  document.addEventListener("keydown", onKey);
+  return {
+    destroy: () => {
+      el.removeEventListener("click", onClick);
+      document.removeEventListener("keydown", onKey);
+    },
+    open: () => open(),
+    close,
+    next,
+    previous
+  };
+}
 function handleAction(event) {
   const actionEl = eventElement(event)?.closest("[data-uif-action]");
   if (!actionEl) return;
@@ -700,6 +864,9 @@ var inits = {
   wizard: initPassive,
   "file-upload": initFileUpload,
   combobox: initCombobox,
+  carousel: initCarousel,
+  lightbox: initLightbox,
+  masonry: initPassive,
   button: initButton,
   card: initPassive,
   nav: initPassive,
@@ -731,7 +898,9 @@ function initAll(root = document) {
 }
 function getToastContainer(placement = "bottom-end") {
   const normalized = placement || "bottom-end";
-  const existing = document.querySelector(`.uif-toast-stack[data-uif-placement="${normalized}"]`);
+  const existing = document.querySelector(
+    `.uif-toast-stack[data-uif-placement="${normalized}"]`
+  );
   if (existing) return existing;
   const container = document.createElement("div");
   container.className = `uif-toast-stack uif-toast-stack-${normalized}`;
@@ -824,14 +993,22 @@ var accordion = { name: "accordion", init: initAccordion, destroy: destroyCompon
 var alert = { name: "alert", init: initDismissible, destroy: destroyComponent };
 var badge = { name: "badge", init: initPassive, destroy: destroyComponent };
 var breadcrumb = { name: "breadcrumb", init: initPassive, destroy: destroyComponent };
-var collapseComponent = { name: "collapse", init: initCollapse, destroy: destroyComponent };
+var collapseComponent = {
+  name: "collapse",
+  init: initCollapse,
+  destroy: destroyComponent
+};
 var tooltip = { name: "tooltip", init: initTooltip, destroy: destroyComponent };
 var popover = { name: "popover", init: initPopover, destroy: destroyComponent };
 var progress = { name: "progress", init: initProgress, destroy: destroyComponent };
 var spinner = { name: "spinner", init: initPassive, destroy: destroyComponent };
 var skeleton = { name: "skeleton", init: initPassive, destroy: destroyComponent };
 var pagination = { name: "pagination", init: initPagination, destroy: destroyComponent };
-var commandMenu = { name: "command-menu", init: initCommandMenu, destroy: destroyComponent };
+var commandMenu = {
+  name: "command-menu",
+  init: initCommandMenu,
+  destroy: destroyComponent
+};
 var navbar = { name: "navbar", init: initPassive, destroy: destroyComponent };
 var sidebar = { name: "sidebar", init: initPassive, destroy: destroyComponent };
 var shell = { name: "shell", init: initShell, destroy: destroyComponent };
@@ -839,6 +1016,9 @@ var stepper = { name: "stepper", init: initPassive, destroy: destroyComponent };
 var wizard = { name: "wizard", init: initPassive, destroy: destroyComponent };
 var fileUpload = { name: "file-upload", init: initFileUpload, destroy: destroyComponent };
 var combobox = { name: "combobox", init: initCombobox, destroy: destroyComponent };
+var carousel = { name: "carousel", init: initCarousel, destroy: destroyComponent };
+var lightbox = { name: "lightbox", init: initLightbox, destroy: destroyComponent };
+var masonry = { name: "masonry", init: initPassive, destroy: destroyComponent };
 var card = { name: "card", init: initPassive, destroy: destroyComponent };
 var nav = { name: "nav", init: initPassive, destroy: destroyComponent };
 var table = { name: "table", init: initPassive, destroy: destroyComponent };
@@ -849,6 +1029,7 @@ export {
   breadcrumb,
   button,
   card,
+  carousel,
   collapseComponent,
   combobox,
   commandMenu,
@@ -858,6 +1039,8 @@ export {
   fileUpload,
   initAll,
   initComponent,
+  lightbox,
+  masonry,
   modal,
   nav,
   navbar,

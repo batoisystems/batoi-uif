@@ -29,6 +29,8 @@ declare function initPagination(el: HTMLElement): ComponentInstance;
 declare function initCommandMenu(el: HTMLElement): ComponentInstance;
 declare function initFileUpload(el: HTMLElement): ComponentInstance;
 declare function initCombobox(el: HTMLElement): ComponentInstance;
+declare function initCarousel(el: HTMLElement): ComponentInstance;
+declare function initLightbox(el: HTMLElement): ComponentInstance;
 declare function initComponent(el: HTMLElement): void;
 declare function destroyComponent(el: HTMLElement): void;
 declare function initAll(root?: Document | HTMLElement): () => void;
@@ -163,6 +165,21 @@ declare const combobox: {
     init: typeof initCombobox;
     destroy: typeof destroyComponent;
 };
+declare const carousel: {
+    name: string;
+    init: typeof initCarousel;
+    destroy: typeof destroyComponent;
+};
+declare const lightbox: {
+    name: string;
+    init: typeof initLightbox;
+    destroy: typeof destroyComponent;
+};
+declare const masonry: {
+    name: string;
+    init: typeof initPassive;
+    destroy: typeof destroyComponent;
+};
 declare const card: {
     name: string;
     init: typeof initPassive;
@@ -179,4 +196,4 @@ declare const table: {
     destroy: typeof destroyComponent;
 };
 
-export { type ComponentInstance, accordion, alert, badge, breadcrumb, button, card, collapseComponent, combobox, commandMenu, destroyComponent, drawer, dropdown, fileUpload, initAll, initComponent, modal, nav, navbar, offcanvas, pagination, popover, progress, shell, showToast, sidebar, skeleton, spinner, stepper, table, tabs, toast, tooltip, wizard };
+export { type ComponentInstance, accordion, alert, badge, breadcrumb, button, card, carousel, collapseComponent, combobox, commandMenu, destroyComponent, drawer, dropdown, fileUpload, initAll, initComponent, lightbox, masonry, modal, nav, navbar, offcanvas, pagination, popover, progress, shell, showToast, sidebar, skeleton, spinner, stepper, table, tabs, toast, tooltip, wizard };
