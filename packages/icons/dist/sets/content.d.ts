@@ -164,6 +164,36 @@ declare const contentIcons: {
     readonly palette: {
         readonly body: "<path d=\"M12 3a9 9 0 0 0 0 18h1.5a2 2 0 0 0 1-3.7 1.5 1.5 0 0 1 1-2.8H17a4 4 0 0 0 4-4C21 6.4 17 3 12 3z\"></path><path d=\"M7.5 10h.01\"></path><path d=\"M10 7h.01\"></path><path d=\"M14 7h.01\"></path>";
     };
+    readonly 'document-import': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M12 12v7\"></path><path d=\"m9 15 3-3 3 3\"></path>";
+    };
+    readonly 'document-export': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M12 19v-7\"></path><path d=\"m9 16 3 3 3-3\"></path>";
+    };
+    readonly 'document-search': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><circle cx=\"11\" cy=\"15\" r=\"3\"></circle><path d=\"m13 17 3 3\"></path>";
+    };
+    readonly 'document-signature': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M8 17c1-4 3-4 4 0 1-3 3-3 4 0\"></path>";
+    };
+    readonly 'file-csv': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M8 14h2\"></path><path d=\"M12 14h2\"></path><path d=\"M16 14h.01\"></path><path d=\"M8 18h8\"></path>";
+    };
+    readonly 'file-pdf': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M8 17v-5h2a2 2 0 0 1 0 4H8\"></path><path d=\"M13 17v-5h1a3 3 0 0 1 0 5h-1\"></path>";
+    };
+    readonly 'file-template': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><rect x=\"8\" y=\"12\" width=\"8\" height=\"6\" rx=\"1\"></rect><path d=\"M8 15h8\"></path>";
+    };
+    readonly 'image-check': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><circle cx=\"8\" cy=\"10\" r=\"2\"></circle><path d=\"m21 15-4-4-5 5-2-2-4 5\"></path><path d=\"m14 8 2 2 4-4\"></path>";
+    };
+    readonly 'scan-document': {
+        readonly body: "<path d=\"M7 3H5a2 2 0 0 0-2 2v2\"></path><path d=\"M17 3h2a2 2 0 0 1 2 2v2\"></path><path d=\"M21 17v2a2 2 0 0 1-2 2h-2\"></path><path d=\"M7 21H5a2 2 0 0 1-2-2v-2\"></path><path d=\"M8 7h8v10H8z\"></path><path d=\"M10 11h4\"></path>";
+    };
+    readonly 'template-plus': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 10v10\"></path><path d=\"M15 14v6\"></path><path d=\"M12 17h6\"></path>";
+    };
     readonly 'video-off': {
         readonly body: "<path d=\"M2 2l20 20\"></path><rect x=\"3\" y=\"6\" width=\"14\" height=\"12\" rx=\"2\"></rect><path d=\"m17 10 4-3v10l-4-3\"></path>";
     };

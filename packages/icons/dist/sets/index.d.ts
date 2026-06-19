@@ -305,6 +305,42 @@ declare const iconSets: {
         readonly 'toggle-right': {
             readonly body: "<rect x=\"3\" y=\"7\" width=\"18\" height=\"10\" rx=\"5\"></rect><circle cx=\"16\" cy=\"12\" r=\"3\"></circle>";
         };
+        readonly checkbox: {
+            readonly body: "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"></rect>";
+        };
+        readonly 'checkbox-checked': {
+            readonly body: "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"></rect><path d=\"m8 12 3 3 5-6\"></path>";
+        };
+        readonly 'checkbox-minus': {
+            readonly body: "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"></rect><path d=\"M8 12h8\"></path>";
+        };
+        readonly 'field-required': {
+            readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 12h8\"></path><path d=\"M12 8v8\"></path><path d=\"m16.5 7.5 1 1\"></path><path d=\"m17.5 7.5-1 1\"></path>";
+        };
+        readonly input: {
+            readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M7 12h10\"></path>";
+        };
+        readonly 'input-error': {
+            readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M7 12h7\"></path><path d=\"m16 10 3 3\"></path><path d=\"m19 10-3 3\"></path>";
+        };
+        readonly 'input-password': {
+            readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"2\"></circle><path d=\"M12 14v2\"></path>";
+        };
+        readonly 'input-search': {
+            readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><circle cx=\"10\" cy=\"12\" r=\"2\"></circle><path d=\"m12 14 3 2\"></path>";
+        };
+        readonly 'radio-checked': {
+            readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><circle cx=\"12\" cy=\"12\" r=\"4\"></circle>";
+        };
+        readonly 'radio-unchecked': {
+            readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle>";
+        };
+        readonly textarea: {
+            readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 9h10\"></path><path d=\"M7 13h10\"></path><path d=\"M7 17h6\"></path>";
+        };
+        readonly 'validation-error': {
+            readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v6\"></path><path d=\"M12 17h.01\"></path>";
+        };
         readonly 'x-square': {
             readonly body: "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M15 9 9 15\"></path><path d=\"m9 9 6 6\"></path>";
         };
@@ -363,6 +399,105 @@ declare const iconSets: {
         };
         readonly 'chart-stacked': {
             readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 17V8\"></path><path d=\"M12 17V5\"></path><path d=\"M17 17v-6\"></path><path d=\"M7 12h10\"></path>";
+        };
+        readonly 'axis-x': {
+            readonly body: "<path d=\"M3 18h18\"></path><path d=\"m18 15 3 3-3 3\"></path><path d=\"M7 6v12\"></path><path d=\"M12 10v8\"></path><path d=\"M17 13v5\"></path>";
+        };
+        readonly 'axis-y': {
+            readonly body: "<path d=\"M6 21V3\"></path><path d=\"m3 6 3-3 3 3\"></path><path d=\"M6 18h12\"></path><path d=\"M6 13h8\"></path><path d=\"M6 8h5\"></path>";
+        };
+        readonly 'bubble-chart': {
+            readonly body: "<path d=\"M3 3v18h18\"></path><circle cx=\"8\" cy=\"15\" r=\"2\"></circle><circle cx=\"14\" cy=\"10\" r=\"3\"></circle><circle cx=\"18\" cy=\"17\" r=\"1.5\"></circle>";
+        };
+        readonly 'chart-combo': {
+            readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m7 15 4-4 3 3 5-7\"></path><path d=\"M7 17v-4\"></path><path d=\"M12 17v-7\"></path><path d=\"M17 17v-5\"></path>";
+        };
+        readonly 'chart-network': {
+            readonly body: "<circle cx=\"6\" cy=\"8\" r=\"3\"></circle><circle cx=\"18\" cy=\"8\" r=\"3\"></circle><circle cx=\"12\" cy=\"18\" r=\"3\"></circle><path d=\"M9 8h6\"></path><path d=\"m8 10 3 5\"></path><path d=\"m16 10-3 5\"></path>";
+        };
+        readonly 'chart-spline': {
+            readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M6 16c3-8 6 4 9-4 1-3 3-5 5-5\"></path>";
+        };
+        readonly 'chart-step': {
+            readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M6 16h4v-5h4V7h5\"></path>";
+        };
+        readonly 'conversion-funnel': {
+            readonly body: "<path d=\"M4 5h16l-6 7v5l-4 2v-7L4 5z\"></path><path d=\"M8 9h8\"></path>";
+        };
+        readonly dial: {
+            readonly body: "<path d=\"M4 15a8 8 0 1 1 16 0\"></path><path d=\"M12 15l3-5\"></path><path d=\"M7 19h10\"></path><path d=\"M7 15h.01\"></path><path d=\"M17 15h.01\"></path>";
+        };
+        readonly forecast: {
+            readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 16 4-4 3 3 5-8\"></path><path d=\"M18 7h3v3\"></path><path d=\"M7 8h.01\"></path><path d=\"M11 6h.01\"></path><path d=\"M15 5h.01\"></path>";
+        };
+        readonly 'funnel-chart': {
+            readonly body: "<path d=\"M4 5h16l-6 7v5l-4 2v-7L4 5z\"></path><path d=\"M7 9h10\"></path><path d=\"M9 13h6\"></path>";
+        };
+        readonly heatmap: {
+            readonly body: "<rect x=\"3\" y=\"3\" width=\"5\" height=\"5\"></rect><rect x=\"10\" y=\"3\" width=\"5\" height=\"5\"></rect><rect x=\"17\" y=\"3\" width=\"4\" height=\"5\"></rect><rect x=\"3\" y=\"10\" width=\"5\" height=\"5\"></rect><rect x=\"10\" y=\"10\" width=\"5\" height=\"5\"></rect><rect x=\"17\" y=\"10\" width=\"4\" height=\"5\"></rect><rect x=\"3\" y=\"17\" width=\"5\" height=\"4\"></rect><rect x=\"10\" y=\"17\" width=\"5\" height=\"4\"></rect><rect x=\"17\" y=\"17\" width=\"4\" height=\"4\"></rect>";
+        };
+        readonly 'horizontal-bar-chart': {
+            readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 8h10\"></path><path d=\"M7 12h14\"></path><path d=\"M7 16h7\"></path>";
+        };
+        readonly kpi: {
+            readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 14h3\"></path><path d=\"M12 14h5\"></path><path d=\"m7 10 3 2 3-4 4 3\"></path>";
+        };
+        readonly meter: {
+            readonly body: "<path d=\"M4 15a8 8 0 1 1 16 0\"></path><path d=\"M12 15l5-5\"></path><path d=\"M8 19h8\"></path><path d=\"M6 15h.01\"></path><path d=\"M18 15h.01\"></path>";
+        };
+        readonly 'progress-ring': {
+            readonly body: "<path d=\"M12 3a9 9 0 1 1-8.5 6\"></path><path d=\"M12 3v4\"></path><circle cx=\"12\" cy=\"12\" r=\"4\"></circle>";
+        };
+        readonly regression: {
+            readonly body: "<path d=\"M3 3v18h18\"></path><circle cx=\"7\" cy=\"15\" r=\"1.5\"></circle><circle cx=\"11\" cy=\"12\" r=\"1.5\"></circle><circle cx=\"16\" cy=\"8\" r=\"1.5\"></circle><path d=\"M6 17 19 6\"></path>";
+        };
+        readonly scorecard: {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M7 9h5\"></path><path d=\"M7 13h10\"></path><path d=\"M7 17h7\"></path><circle cx=\"17\" cy=\"9\" r=\"1\"></circle>";
+        };
+        readonly 'stacked-area-chart': {
+            readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 17 4-6 4 3 4-7v10H6z\"></path><path d=\"m6 17 4-3 4 1 4-4\"></path>";
+        };
+        readonly 'table-chart': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 4v16\"></path><path d=\"M15 4v16\"></path><path d=\"m6 17 3-3 3 2 5-5\"></path>";
+        };
+        readonly treemap: {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M12 4v16\"></path><path d=\"M3 12h9\"></path><path d=\"M12 9h9\"></path><path d=\"M16 9v11\"></path>";
+        };
+        readonly 'trend-down': {
+            readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 8 5 5 4-4 4 4\"></path><path d=\"M19 9v4h-4\"></path>";
+        };
+        readonly 'trend-up': {
+            readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 16 5-5 4 4 4-8\"></path><path d=\"M15 7h4v4\"></path>";
+        };
+        readonly 'ab-test': {
+            readonly body: "<path d=\"M4 19 8 5h2l4 14\"></path><path d=\"M6 14h6\"></path><path d=\"M15 5h3a3 3 0 0 1 0 6h-3V5z\"></path><path d=\"M15 11h4a4 4 0 0 1 0 8h-4v-8z\"></path>";
+        };
+        readonly cohort: {
+            readonly body: "<path d=\"M3 3v18h18\"></path><circle cx=\"8\" cy=\"9\" r=\"2\"></circle><circle cx=\"14\" cy=\"8\" r=\"2\"></circle><circle cx=\"17\" cy=\"15\" r=\"2\"></circle><path d=\"M8 11v6\"></path><path d=\"M14 10v7\"></path><path d=\"M17 17v1\"></path>";
+        };
+        readonly experiment: {
+            readonly body: "<path d=\"M9 2h6\"></path><path d=\"M10 2v6l-5.5 9.5A3 3 0 0 0 7.1 22h9.8a3 3 0 0 0 2.6-4.5L14 8V2\"></path><path d=\"M8 16h8\"></path><path d=\"M10 12h4\"></path>";
+        };
+        readonly 'goal-chart': {
+            readonly body: "<path d=\"M3 3v18h18\"></path><circle cx=\"15\" cy=\"9\" r=\"5\"></circle><circle cx=\"15\" cy=\"9\" r=\"2\"></circle><path d=\"m7 17 4-4 2 2 6-6\"></path>";
+        };
+        readonly 'growth-loop': {
+            readonly body: "<path d=\"M17 3h4v4\"></path><path d=\"M21 3 14 10\"></path><path d=\"M7 21H3v-4\"></path><path d=\"M3 21l7-7\"></path><path d=\"M4 9a8 8 0 0 1 13-4\"></path><path d=\"M20 15a8 8 0 0 1-13 4\"></path>";
+        };
+        readonly retention: {
+            readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 16c2-7 5-7 7 0 1.5 4 3.5 2 5-3\"></path><path d=\"M7 8h.01\"></path><path d=\"M12 8h.01\"></path><path d=\"M17 8h.01\"></path>";
+        };
+        readonly segment: {
+            readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 3v9h9\"></path><path d=\"M12 12 6 18\"></path>";
+        };
+        readonly 'target-metric': {
+            readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><circle cx=\"12\" cy=\"12\" r=\"5\"></circle><circle cx=\"12\" cy=\"12\" r=\"1\"></circle><path d=\"M17 7h4v4\"></path><path d=\"m21 7-5 5\"></path>";
+        };
+        readonly 'vertical-bar-chart': {
+            readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M8 17V9\"></path><path d=\"M12 17V6\"></path><path d=\"M16 17v-5\"></path>";
+        };
+        readonly 'waterfall-chart': {
+            readonly body: "<path d=\"M3 3v18h18\"></path><rect x=\"6\" y=\"12\" width=\"3\" height=\"5\"></rect><rect x=\"11\" y=\"8\" width=\"3\" height=\"4\"></rect><rect x=\"16\" y=\"10\" width=\"3\" height=\"7\"></rect><path d=\"M9 12h2\"></path><path d=\"M14 10h2\"></path>";
         };
     };
     readonly commerce: {
@@ -499,6 +634,69 @@ declare const iconSets: {
         };
         readonly 'phone-call': {
             readonly body: "<path d=\"M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3 5.2 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.8l-1.3 1.3a14 14 0 0 0 5.6 5.6l1.3-1.3a2 2 0 0 1 1.8-.6l3 .5a2 2 0 0 1 1.7 1.9z\"></path><path d=\"M14 3a7 7 0 0 1 7 7\"></path><path d=\"M14 7a3 3 0 0 1 3 3\"></path>";
+        };
+        readonly broadcast: {
+            readonly body: "<path d=\"M4 12a8 8 0 0 1 8-8\"></path><path d=\"M4 12a8 8 0 0 0 8 8\"></path><path d=\"M20 12a8 8 0 0 0-8-8\"></path><path d=\"M20 12a8 8 0 0 1-8 8\"></path><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>";
+        };
+        readonly 'chat-check': {
+            readonly body: "<path d=\"M21 12a8 8 0 0 1-8 8H6l-4 2 2-5a8 8 0 1 1 17-5z\"></path><path d=\"m8 12 2 2 5-5\"></path>";
+        };
+        readonly 'chat-plus': {
+            readonly body: "<path d=\"M21 12a8 8 0 0 1-8 8H6l-4 2 2-5a8 8 0 1 1 17-5z\"></path><path d=\"M12 8v8\"></path><path d=\"M8 12h8\"></path>";
+        };
+        readonly 'chat-x': {
+            readonly body: "<path d=\"M21 12a8 8 0 0 1-8 8H6l-4 2 2-5a8 8 0 1 1 17-5z\"></path><path d=\"m9 9 6 6\"></path><path d=\"m15 9-6 6\"></path>";
+        };
+        readonly 'inbox-mail': {
+            readonly body: "<path d=\"M4 4h16l-2 10h-4a2 2 0 0 1-4 0H6L4 4z\"></path><path d=\"M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5\"></path><path d=\"m7 7 5 4 5-4\"></path>";
+        };
+        readonly 'mail-check': {
+            readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m3 7 9 6 9-6\"></path><path d=\"m8 15 2 2 5-5\"></path>";
+        };
+        readonly 'mail-open': {
+            readonly body: "<path d=\"m3 9 9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z\"></path><path d=\"m3 9 9 6 9-6\"></path>";
+        };
+        readonly 'mail-plus': {
+            readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m3 7 9 6 9-6\"></path><path d=\"M12 12v6\"></path><path d=\"M9 15h6\"></path>";
+        };
+        readonly 'mail-x': {
+            readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m3 7 9 6 9-6\"></path><path d=\"m9 12 6 6\"></path><path d=\"m15 12-6 6\"></path>";
+        };
+        readonly 'message-circle': {
+            readonly body: "<path d=\"M21 12a9 9 0 0 1-9 9H7l-4 2 2-4a9 9 0 1 1 16-7z\"></path>";
+        };
+        readonly 'message-square': {
+            readonly body: "<path d=\"M4 5h16v12H7l-4 4V5z\"></path>";
+        };
+        readonly 'mic-off': {
+            readonly body: "<path d=\"M2 2l20 20\"></path><rect x=\"9\" y=\"3\" width=\"6\" height=\"11\" rx=\"3\"></rect><path d=\"M5 11a7 7 0 0 0 9.5 6.5\"></path><path d=\"M19 11a7 7 0 0 1-2.1 5\"></path><path d=\"M12 18v4\"></path><path d=\"M8 22h8\"></path>";
+        };
+        readonly 'notification-dot': {
+            readonly body: "<path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h13\"></path><path d=\"M13.7 21a2 2 0 0 1-3.4 0\"></path><circle cx=\"19\" cy=\"7\" r=\"3\"></circle>";
+        };
+        readonly 'phone-forwarded': {
+            readonly body: "<path d=\"M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3 5.2 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.8l-1.3 1.3a14 14 0 0 0 5.6 5.6l1.3-1.3a2 2 0 0 1 1.8-.6l3 .5a2 2 0 0 1 1.7 1.9z\"></path><path d=\"M15 6h6\"></path><path d=\"m18 3 3 3-3 3\"></path>";
+        };
+        readonly 'phone-incoming': {
+            readonly body: "<path d=\"M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3 5.2 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.8l-1.3 1.3a14 14 0 0 0 5.6 5.6l1.3-1.3a2 2 0 0 1 1.8-.6l3 .5a2 2 0 0 1 1.7 1.9z\"></path><path d=\"M21 3 15 9\"></path><path d=\"M15 3v6h6\"></path>";
+        };
+        readonly 'phone-missed': {
+            readonly body: "<path d=\"M6 8c4-3 8-3 12 0l2-2\"></path><path d=\"M4 6l2 2\"></path><path d=\"m15 6 6 6\"></path><path d=\"m21 6-6 6\"></path><path d=\"M8 12l-3 5\"></path><path d=\"m16 12 3 5\"></path>";
+        };
+        readonly 'phone-off': {
+            readonly body: "<path d=\"M2 2l20 20\"></path><path d=\"M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3 5.2 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.7l.3 1.8\"></path><path d=\"M15.5 14.5a2 2 0 0 1 1.8-.5l3 .5a2 2 0 0 1 1.7 2.4\"></path>";
+        };
+        readonly 'phone-outgoing': {
+            readonly body: "<path d=\"M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3 5.2 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.8l-1.3 1.3a14 14 0 0 0 5.6 5.6l1.3-1.3a2 2 0 0 1 1.8-.6l3 .5a2 2 0 0 1 1.7 1.9z\"></path><path d=\"M15 9 21 3\"></path><path d=\"M15 3h6v6\"></path>";
+        };
+        readonly 'rss-feed': {
+            readonly body: "<path d=\"M4 11a9 9 0 0 1 9 9\"></path><path d=\"M4 4a16 16 0 0 1 16 16\"></path><circle cx=\"5\" cy=\"19\" r=\"1\"></circle>";
+        };
+        readonly 'share-2': {
+            readonly body: "<circle cx=\"18\" cy=\"5\" r=\"3\"></circle><circle cx=\"6\" cy=\"12\" r=\"3\"></circle><circle cx=\"18\" cy=\"19\" r=\"3\"></circle><path d=\"m8.6 10.6 6.8-4.2\"></path><path d=\"m8.6 13.4 6.8 4.2\"></path>";
+        };
+        readonly voicemail: {
+            readonly body: "<circle cx=\"6\" cy=\"12\" r=\"4\"></circle><circle cx=\"18\" cy=\"12\" r=\"4\"></circle><path d=\"M6 16h12\"></path>";
         };
     };
     readonly content: {
@@ -667,6 +865,36 @@ declare const iconSets: {
         readonly palette: {
             readonly body: "<path d=\"M12 3a9 9 0 0 0 0 18h1.5a2 2 0 0 0 1-3.7 1.5 1.5 0 0 1 1-2.8H17a4 4 0 0 0 4-4C21 6.4 17 3 12 3z\"></path><path d=\"M7.5 10h.01\"></path><path d=\"M10 7h.01\"></path><path d=\"M14 7h.01\"></path>";
         };
+        readonly 'document-import': {
+            readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M12 12v7\"></path><path d=\"m9 15 3-3 3 3\"></path>";
+        };
+        readonly 'document-export': {
+            readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M12 19v-7\"></path><path d=\"m9 16 3 3 3-3\"></path>";
+        };
+        readonly 'document-search': {
+            readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><circle cx=\"11\" cy=\"15\" r=\"3\"></circle><path d=\"m13 17 3 3\"></path>";
+        };
+        readonly 'document-signature': {
+            readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M8 17c1-4 3-4 4 0 1-3 3-3 4 0\"></path>";
+        };
+        readonly 'file-csv': {
+            readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M8 14h2\"></path><path d=\"M12 14h2\"></path><path d=\"M16 14h.01\"></path><path d=\"M8 18h8\"></path>";
+        };
+        readonly 'file-pdf': {
+            readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M8 17v-5h2a2 2 0 0 1 0 4H8\"></path><path d=\"M13 17v-5h1a3 3 0 0 1 0 5h-1\"></path>";
+        };
+        readonly 'file-template': {
+            readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><rect x=\"8\" y=\"12\" width=\"8\" height=\"6\" rx=\"1\"></rect><path d=\"M8 15h8\"></path>";
+        };
+        readonly 'image-check': {
+            readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><circle cx=\"8\" cy=\"10\" r=\"2\"></circle><path d=\"m21 15-4-4-5 5-2-2-4 5\"></path><path d=\"m14 8 2 2 4-4\"></path>";
+        };
+        readonly 'scan-document': {
+            readonly body: "<path d=\"M7 3H5a2 2 0 0 0-2 2v2\"></path><path d=\"M17 3h2a2 2 0 0 1 2 2v2\"></path><path d=\"M21 17v2a2 2 0 0 1-2 2h-2\"></path><path d=\"M7 21H5a2 2 0 0 1-2-2v-2\"></path><path d=\"M8 7h8v10H8z\"></path><path d=\"M10 11h4\"></path>";
+        };
+        readonly 'template-plus': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 10v10\"></path><path d=\"M15 14v6\"></path><path d=\"M12 17h6\"></path>";
+        };
         readonly 'video-off': {
             readonly body: "<path d=\"M2 2l20 20\"></path><rect x=\"3\" y=\"6\" width=\"14\" height=\"12\" rx=\"2\"></rect><path d=\"m17 10 4-3v10l-4-3\"></path>";
         };
@@ -782,6 +1010,42 @@ declare const iconSets: {
         };
         readonly usb: {
             readonly body: "<path d=\"M12 3v12\"></path><path d=\"m9 6 3-3 3 3\"></path><circle cx=\"6\" cy=\"15\" r=\"2\"></circle><circle cx=\"18\" cy=\"15\" r=\"2\"></circle><path d=\"M12 15H8\"></path><path d=\"M12 15h4\"></path><path d=\"M12 15v6\"></path><circle cx=\"12\" cy=\"21\" r=\"1\"></circle>";
+        };
+        readonly 'barcode-scanner': {
+            readonly body: "<path d=\"M4 7V5a2 2 0 0 1 2-2h2\"></path><path d=\"M16 3h2a2 2 0 0 1 2 2v2\"></path><path d=\"M20 17v2a2 2 0 0 1-2 2h-2\"></path><path d=\"M8 21H6a2 2 0 0 1-2-2v-2\"></path><path d=\"M7 8v8\"></path><path d=\"M10 8v8\"></path><path d=\"M14 8v8\"></path><path d=\"M17 8v8\"></path>";
+        };
+        readonly 'battery-charging': {
+            readonly body: "<rect x=\"3\" y=\"7\" width=\"16\" height=\"10\" rx=\"2\"></rect><path d=\"M21 11v2\"></path><path d=\"m11 8-3 5h4l-2 4\"></path>";
+        };
+        readonly 'battery-full': {
+            readonly body: "<rect x=\"3\" y=\"7\" width=\"16\" height=\"10\" rx=\"2\"></rect><path d=\"M21 11v2\"></path><path d=\"M7 11v2\"></path><path d=\"M10 11v2\"></path><path d=\"M13 11v2\"></path><path d=\"M16 11v2\"></path>";
+        };
+        readonly 'battery-low': {
+            readonly body: "<rect x=\"3\" y=\"7\" width=\"16\" height=\"10\" rx=\"2\"></rect><path d=\"M21 11v2\"></path><path d=\"M7 11v2\"></path>";
+        };
+        readonly nfc: {
+            readonly body: "<path d=\"M6 8a8 8 0 0 1 0 8\"></path><path d=\"M10 6a12 12 0 0 1 0 12\"></path><path d=\"M14 4a16 16 0 0 1 0 16\"></path><path d=\"M18 7a9 9 0 0 1 0 10\"></path>";
+        };
+        readonly 'printer-check': {
+            readonly body: "<path d=\"M7 9V3h10v6\"></path><path d=\"M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4\"></path><path d=\"M7 14h10v7H7z\"></path><path d=\"m13 18 2 2 5-5\"></path>";
+        };
+        readonly 'server-check': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"6\" rx=\"2\"></rect><rect x=\"3\" y=\"14\" width=\"12\" height=\"6\" rx=\"2\"></rect><path d=\"M7 7h.01\"></path><path d=\"M7 17h.01\"></path><path d=\"m16 18 2 2 4-4\"></path>";
+        };
+        readonly 'server-lock': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"6\" rx=\"2\"></rect><rect x=\"3\" y=\"14\" width=\"12\" height=\"6\" rx=\"2\"></rect><path d=\"M7 7h.01\"></path><path d=\"M7 17h.01\"></path><rect x=\"16\" y=\"15\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M17.5 15v-2a2 2 0 0 1 3 0v2\"></path>";
+        };
+        readonly signal: {
+            readonly body: "<path d=\"M4 20h.01\"></path><path d=\"M8 20v-4\"></path><path d=\"M12 20v-8\"></path><path d=\"M16 20V8\"></path><path d=\"M20 20V4\"></path>";
+        };
+        readonly 'signal-low': {
+            readonly body: "<path d=\"M4 20h.01\"></path><path d=\"M8 20v-4\"></path><path d=\"M12 20v-8\"></path><path d=\"M16 20\"></path><path d=\"M20 20\"></path>";
+        };
+        readonly smartwatch: {
+            readonly body: "<rect x=\"7\" y=\"6\" width=\"10\" height=\"12\" rx=\"3\"></rect><path d=\"M9 6V3h6v3\"></path><path d=\"M9 18v3h6v-3\"></path><path d=\"M11 12h2\"></path>";
+        };
+        readonly watch: {
+            readonly body: "<circle cx=\"12\" cy=\"12\" r=\"5\"></circle><path d=\"M9 2h6l1 4H8l1-4z\"></path><path d=\"M8 18h8l-1 4H9l-1-4z\"></path><path d=\"M12 9v3l2 1\"></path>";
         };
         readonly wifi: {
             readonly body: "<path d=\"M5 13a10 10 0 0 1 14 0\"></path><path d=\"M8.5 16.5a5 5 0 0 1 7 0\"></path><path d=\"M12 20h.01\"></path>";
@@ -1150,6 +1414,48 @@ declare const iconSets: {
         readonly webhook: {
             readonly body: "<path d=\"M18 16.5A4 4 0 1 1 14 12\"></path><path d=\"M6 16.5A4 4 0 1 0 10 12\"></path><path d=\"M12 5a4 4 0 0 1 2 7.5\"></path><path d=\"M12 5a4 4 0 0 0-2 7.5\"></path>";
         };
+        readonly 'column-add': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M9 4v16\"></path><path d=\"M15 4v16\"></path><path d=\"M12 9v6\"></path><path d=\"M9 12h6\"></path>";
+        };
+        readonly 'column-delete': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M9 4v16\"></path><path d=\"M15 4v16\"></path><path d=\"m10 10 4 4\"></path><path d=\"m14 10-4 4\"></path>";
+        };
+        readonly 'data-join': {
+            readonly body: "<circle cx=\"7\" cy=\"8\" r=\"3\"></circle><circle cx=\"17\" cy=\"16\" r=\"3\"></circle><path d=\"M9.5 9.5 14.5 14.5\"></path><path d=\"M14 8h4\"></path><path d=\"M16 6v4\"></path>";
+        };
+        readonly 'data-split': {
+            readonly body: "<circle cx=\"6\" cy=\"12\" r=\"3\"></circle><circle cx=\"18\" cy=\"6\" r=\"3\"></circle><circle cx=\"18\" cy=\"18\" r=\"3\"></circle><path d=\"M9 12h3a3 3 0 0 0 3-3\"></path><path d=\"M9 12h3a3 3 0 0 1 3 3\"></path>";
+        };
+        readonly 'data-transform': {
+            readonly body: "<path d=\"M4 7h8\"></path><path d=\"m9 4 3 3-3 3\"></path><path d=\"M20 17h-8\"></path><path d=\"m15 14-3 3 3 3\"></path><rect x=\"4\" y=\"13\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"14\" y=\"5\" width=\"6\" height=\"6\" rx=\"2\"></rect>";
+        };
+        readonly 'filter-check': {
+            readonly body: "<path d=\"M22 3H2l8 9v7l4 2v-9l8-9z\"></path><path d=\"m8 18 2 2 5-5\"></path>";
+        };
+        readonly 'filter-x': {
+            readonly body: "<path d=\"M22 3H2l8 9v7l4 2v-9l8-9z\"></path><path d=\"m8 18 5 5\"></path><path d=\"m13 18-5 5\"></path>";
+        };
+        readonly 'row-add': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M3 16h18\"></path><path d=\"M12 7v6\"></path><path d=\"M9 10h6\"></path>";
+        };
+        readonly 'row-delete': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M3 16h18\"></path><path d=\"m10 8 4 4\"></path><path d=\"m14 8-4 4\"></path>";
+        };
+        readonly 'table-export': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 4v16\"></path><path d=\"M15 4v16\"></path><path d=\"M19 14v6\"></path><path d=\"m16 17 3 3 3-3\"></path>";
+        };
+        readonly 'table-import': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 4v16\"></path><path d=\"M15 4v16\"></path><path d=\"M19 20v-6\"></path><path d=\"m16 17 3-3 3 3\"></path>";
+        };
+        readonly 'table-search': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 4v16\"></path><path d=\"M15 4v7\"></path><circle cx=\"16\" cy=\"16\" r=\"3\"></circle><path d=\"m18 18 3 3\"></path>";
+        };
+        readonly 'table-settings': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 4v16\"></path><circle cx=\"16\" cy=\"16\" r=\"2\"></circle><path d=\"M16 12v1\"></path><path d=\"M16 19v1\"></path><path d=\"M12 16h1\"></path><path d=\"M19 16h1\"></path>";
+        };
+        readonly 'workflow-branch': {
+            readonly body: "<rect x=\"3\" y=\"4\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"15\" y=\"4\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"9\" y=\"16\" width=\"6\" height=\"6\" rx=\"2\"></rect><path d=\"M9 7h6\"></path><path d=\"M12 10v6\"></path>";
+        };
         readonly workflow: {
             readonly body: "<rect x=\"3\" y=\"4\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"15\" y=\"14\" width=\"6\" height=\"6\" rx=\"2\"></rect><path d=\"M9 7h3a3 3 0 0 1 3 3v4\"></path><path d=\"M12 17H9a3 3 0 0 1-3-3v-4\"></path>";
         };
@@ -1202,6 +1508,111 @@ declare const iconSets: {
         };
         readonly wand: {
             readonly body: "<path d=\"M15 4 20 9\"></path><path d=\"M14.5 9.5 4 20\"></path><path d=\"M18 2l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z\"></path><path d=\"m5 3 .7 1.3L7 5l-1.3.7L5 7l-.7-1.3L3 5l1.3-.7L5 3z\"></path>";
+        };
+        readonly ambulance: {
+            readonly body: "<path d=\"M3 17h2\"></path><path d=\"M19 17h2\"></path><path d=\"M5 17V7h9l4 4h3v6\"></path><path d=\"M8 11h4\"></path><path d=\"M10 9v4\"></path><circle cx=\"7\" cy=\"17\" r=\"2\"></circle><circle cx=\"17\" cy=\"17\" r=\"2\"></circle>";
+        };
+        readonly bed: {
+            readonly body: "<path d=\"M3 7v13\"></path><path d=\"M21 12v8\"></path><path d=\"M3 14h18\"></path><path d=\"M6 10h4a2 2 0 0 1 2 2v2H3v-4a3 3 0 0 1 3-3z\"></path><path d=\"M12 12h6a3 3 0 0 1 3 3v-1\"></path>";
+        };
+        readonly bus: {
+            readonly body: "<rect x=\"5\" y=\"3\" width=\"14\" height=\"16\" rx=\"3\"></rect><path d=\"M7 8h10\"></path><path d=\"M8 13h.01\"></path><path d=\"M16 13h.01\"></path><path d=\"M8 19 6 22\"></path><path d=\"m16 19 2 3\"></path>";
+        };
+        readonly car: {
+            readonly body: "<path d=\"M5 17h14v-5l-2-5H7l-2 5v5z\"></path><path d=\"M7 17v2\"></path><path d=\"M17 17v2\"></path><path d=\"M7 12h10\"></path><path d=\"M8 15h.01\"></path><path d=\"M16 15h.01\"></path>";
+        };
+        readonly clinic: {
+            readonly body: "<path d=\"M4 21V8l8-5 8 5v13\"></path><path d=\"M9 21v-6h6v6\"></path><path d=\"M12 7v5\"></path><path d=\"M9.5 9.5h5\"></path>";
+        };
+        readonly dna: {
+            readonly body: "<path d=\"M7 3c7 4 7 14 0 18\"></path><path d=\"M17 3c-7 4-7 14 0 18\"></path><path d=\"M8 7h8\"></path><path d=\"M8 12h8\"></path><path d=\"M8 17h8\"></path>";
+        };
+        readonly factory: {
+            readonly body: "<path d=\"M3 21V9l6 4V9l6 4V5h6v16H3z\"></path><path d=\"M7 17h.01\"></path><path d=\"M11 17h.01\"></path><path d=\"M15 17h.01\"></path>";
+        };
+        readonly 'flag-triangle': {
+            readonly body: "<path d=\"M5 22V4\"></path><path d=\"M5 4h14l-4 5 4 5H5\"></path>";
+        };
+        readonly 'globe-lock': {
+            readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M3 12h18\"></path><path d=\"M12 3a14 14 0 0 1 0 18\"></path><rect x=\"14\" y=\"14\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M15.5 14v-2a2 2 0 0 1 4 0v2\"></path>";
+        };
+        readonly 'graduation-cap': {
+            readonly body: "<path d=\"m3 9 9-5 9 5-9 5-9-5z\"></path><path d=\"M7 11v5c3 2 7 2 10 0v-5\"></path><path d=\"M21 9v6\"></path>";
+        };
+        readonly leaf: {
+            readonly body: "<path d=\"M5 21c0-8 6-16 16-18 0 10-8 16-16 18z\"></path><path d=\"M5 21c3-6 7-9 12-12\"></path>";
+        };
+        readonly library: {
+            readonly body: "<path d=\"m3 10 9-6 9 6\"></path><path d=\"M5 10v9\"></path><path d=\"M9 10v9\"></path><path d=\"M15 10v9\"></path><path d=\"M19 10v9\"></path><path d=\"M3 21h18\"></path>";
+        };
+        readonly 'map-pin-check': {
+            readonly body: "<path d=\"M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0z\"></path><path d=\"m9 10 2 2 4-4\"></path>";
+        };
+        readonly 'map-pin-plus': {
+            readonly body: "<path d=\"M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0z\"></path><path d=\"M12 7v6\"></path><path d=\"M9 10h6\"></path>";
+        };
+        readonly 'map-pin-x': {
+            readonly body: "<path d=\"M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0z\"></path><path d=\"m9 7 6 6\"></path><path d=\"m15 7-6 6\"></path>";
+        };
+        readonly microscope: {
+            readonly body: "<path d=\"M6 18h12\"></path><path d=\"M8 22h8\"></path><path d=\"M12 18v4\"></path><path d=\"M9 3h6v5H9z\"></path><path d=\"M12 8v4a4 4 0 0 1-4 4\"></path><path d=\"M15 8l3 3\"></path>";
+        };
+        readonly plane: {
+            readonly body: "<path d=\"M22 2 11 13\"></path><path d=\"m22 2-7 20-4-9-9-4 20-7z\"></path>";
+        };
+        readonly pill: {
+            readonly body: "<path d=\"M10 21 3 14a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7z\"></path><path d=\"m8.5 8.5 7 7\"></path>";
+        };
+        readonly recycle: {
+            readonly body: "<path d=\"m7 19-3-5 3-5\"></path><path d=\"M4 14h7\"></path><path d=\"m17 5 3 5-3 5\"></path><path d=\"M20 10h-7\"></path><path d=\"m9 5 3-3 3 3\"></path><path d=\"M12 2v7\"></path>";
+        };
+        readonly route: {
+            readonly body: "<circle cx=\"6\" cy=\"6\" r=\"3\"></circle><circle cx=\"18\" cy=\"18\" r=\"3\"></circle><path d=\"M9 6h4a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h6\"></path>";
+        };
+        readonly stethoscope: {
+            readonly body: "<path d=\"M6 4v5a4 4 0 0 0 8 0V4\"></path><path d=\"M4 4h4\"></path><path d=\"M12 4h4\"></path><path d=\"M10 13v2a5 5 0 0 0 10 0v-1\"></path><circle cx=\"20\" cy=\"12\" r=\"2\"></circle>";
+        };
+        readonly syringe: {
+            readonly body: "<path d=\"m18 2 4 4\"></path><path d=\"m17 7 2-2\"></path><path d=\"M3 21l6-6\"></path><path d=\"m9 15 6-6 4 4-6 6H9v-4z\"></path><path d=\"m12 12 4 4\"></path>";
+        };
+        readonly 'traffic-light': {
+            readonly body: "<rect x=\"8\" y=\"2\" width=\"8\" height=\"20\" rx=\"4\"></rect><circle cx=\"12\" cy=\"7\" r=\"1.5\"></circle><circle cx=\"12\" cy=\"12\" r=\"1.5\"></circle><circle cx=\"12\" cy=\"17\" r=\"1.5\"></circle>";
+        };
+        readonly wheelchair: {
+            readonly body: "<circle cx=\"10\" cy=\"5\" r=\"2\"></circle><path d=\"M10 7v6h5l3 6\"></path><path d=\"M8 11a6 6 0 1 0 5.6 8\"></path><path d=\"M10 13h4\"></path>";
+        };
+        readonly 'wind-turbine': {
+            readonly body: "<circle cx=\"12\" cy=\"8\" r=\"2\"></circle><path d=\"M12 10v11\"></path><path d=\"M12 8 5 5\"></path><path d=\"M12 8l7-3\"></path><path d=\"M12 8l2 8\"></path>";
+        };
+        readonly 'building-hospital': {
+            readonly body: "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"></rect><path d=\"M12 7v6\"></path><path d=\"M9 10h6\"></path><path d=\"M8 21v-5h8v5\"></path>";
+        };
+        readonly 'delivery-bike': {
+            readonly body: "<circle cx=\"6\" cy=\"17\" r=\"3\"></circle><circle cx=\"18\" cy=\"17\" r=\"3\"></circle><path d=\"M9 17h4l2-6h-4\"></path><path d=\"M13 11l3 6\"></path><path d=\"M8 11h3\"></path><path d=\"M5 8h4\"></path>";
+        };
+        readonly drone: {
+            readonly body: "<rect x=\"9\" y=\"9\" width=\"6\" height=\"6\" rx=\"2\"></rect><circle cx=\"4\" cy=\"4\" r=\"2\"></circle><circle cx=\"20\" cy=\"4\" r=\"2\"></circle><circle cx=\"4\" cy=\"20\" r=\"2\"></circle><circle cx=\"20\" cy=\"20\" r=\"2\"></circle><path d=\"M9 9 5.5 5.5\"></path><path d=\"m15 9 3.5-3.5\"></path><path d=\"M9 15 5.5 18.5\"></path><path d=\"m15 15 3.5 3.5\"></path>";
+        };
+        readonly 'fleet-vehicle': {
+            readonly body: "<path d=\"M5 17h14v-5l-2-5H7l-2 5v5z\"></path><circle cx=\"8\" cy=\"17\" r=\"2\"></circle><circle cx=\"16\" cy=\"17\" r=\"2\"></circle><path d=\"M7 12h10\"></path><path d=\"M3 7h2\"></path><path d=\"M19 7h2\"></path>";
+        };
+        readonly 'geo-fence': {
+            readonly body: "<path d=\"m12 3 8 5v8l-8 5-8-5V8l8-5z\"></path><path d=\"M12 8v8\"></path><path d=\"M8 12h8\"></path>";
+        };
+        readonly 'map-route': {
+            readonly body: "<path d=\"M9 18 3 21V6l6-3 6 3 6-3v15l-6 3-6-3z\"></path><path d=\"M9 3v15\"></path><path d=\"M15 6v15\"></path><path d=\"M6 9c3 4 9 1 12 5\"></path>";
+        };
+        readonly 'route-off': {
+            readonly body: "<path d=\"M2 2l20 20\"></path><circle cx=\"6\" cy=\"6\" r=\"3\"></circle><circle cx=\"18\" cy=\"18\" r=\"3\"></circle><path d=\"M9 6h4a4 4 0 0 1 4 4\"></path><path d=\"M12 20h3\"></path>";
+        };
+        readonly 'route-plus': {
+            readonly body: "<circle cx=\"6\" cy=\"6\" r=\"3\"></circle><circle cx=\"18\" cy=\"18\" r=\"3\"></circle><path d=\"M9 6h4a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h6\"></path><path d=\"M18 4v6\"></path><path d=\"M15 7h6\"></path>";
+        };
+        readonly satellite: {
+            readonly body: "<path d=\"M5 12 2 9l7-7 3 3-7 7z\"></path><path d=\"m12 5 7 7\"></path><path d=\"M14 14a4 4 0 0 1-4-4\"></path><path d=\"M18 18a8 8 0 0 1-8-8\"></path><path d=\"M21 21a11 11 0 0 1-11-11\"></path>";
+        };
+        readonly 'traffic-cone': {
+            readonly body: "<path d=\"m12 3 7 18H5l7-18z\"></path><path d=\"M9 11h6\"></path><path d=\"M7 17h10\"></path>";
         };
     };
 };

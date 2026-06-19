@@ -284,6 +284,42 @@ declare const coreUiIcons: {
     readonly 'toggle-right': {
         readonly body: "<rect x=\"3\" y=\"7\" width=\"18\" height=\"10\" rx=\"5\"></rect><circle cx=\"16\" cy=\"12\" r=\"3\"></circle>";
     };
+    readonly checkbox: {
+        readonly body: "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"></rect>";
+    };
+    readonly 'checkbox-checked': {
+        readonly body: "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"></rect><path d=\"m8 12 3 3 5-6\"></path>";
+    };
+    readonly 'checkbox-minus': {
+        readonly body: "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"></rect><path d=\"M8 12h8\"></path>";
+    };
+    readonly 'field-required': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 12h8\"></path><path d=\"M12 8v8\"></path><path d=\"m16.5 7.5 1 1\"></path><path d=\"m17.5 7.5-1 1\"></path>";
+    };
+    readonly input: {
+        readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M7 12h10\"></path>";
+    };
+    readonly 'input-error': {
+        readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M7 12h7\"></path><path d=\"m16 10 3 3\"></path><path d=\"m19 10-3 3\"></path>";
+    };
+    readonly 'input-password': {
+        readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"2\"></circle><path d=\"M12 14v2\"></path>";
+    };
+    readonly 'input-search': {
+        readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><circle cx=\"10\" cy=\"12\" r=\"2\"></circle><path d=\"m12 14 3 2\"></path>";
+    };
+    readonly 'radio-checked': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><circle cx=\"12\" cy=\"12\" r=\"4\"></circle>";
+    };
+    readonly 'radio-unchecked': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle>";
+    };
+    readonly textarea: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 9h10\"></path><path d=\"M7 13h10\"></path><path d=\"M7 17h6\"></path>";
+    };
+    readonly 'validation-error': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v6\"></path><path d=\"M12 17h.01\"></path>";
+    };
     readonly 'x-square': {
         readonly body: "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M15 9 9 15\"></path><path d=\"m9 9 6 6\"></path>";
     };

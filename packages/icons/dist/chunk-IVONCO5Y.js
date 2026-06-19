@@ -66,6 +66,20 @@ var workflowIcons = {
   "task-x": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="m9 10 6 6"></path><path d="m15 10-6 6"></path>' },
   timeline: { body: '<path d="M5 4v16"></path><circle cx="5" cy="7" r="2"></circle><circle cx="5" cy="17" r="2"></circle><path d="M9 7h12"></path><path d="M9 17h12"></path>' },
   webhook: { body: '<path d="M18 16.5A4 4 0 1 1 14 12"></path><path d="M6 16.5A4 4 0 1 0 10 12"></path><path d="M12 5a4 4 0 0 1 2 7.5"></path><path d="M12 5a4 4 0 0 0-2 7.5"></path>' },
+  "column-add": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path><path d="M15 4v16"></path><path d="M12 9v6"></path><path d="M9 12h6"></path>' },
+  "column-delete": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path><path d="M15 4v16"></path><path d="m10 10 4 4"></path><path d="m14 10-4 4"></path>' },
+  "data-join": { body: '<circle cx="7" cy="8" r="3"></circle><circle cx="17" cy="16" r="3"></circle><path d="M9.5 9.5 14.5 14.5"></path><path d="M14 8h4"></path><path d="M16 6v4"></path>' },
+  "data-split": { body: '<circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="6" r="3"></circle><circle cx="18" cy="18" r="3"></circle><path d="M9 12h3a3 3 0 0 0 3-3"></path><path d="M9 12h3a3 3 0 0 1 3 3"></path>' },
+  "data-transform": { body: '<path d="M4 7h8"></path><path d="m9 4 3 3-3 3"></path><path d="M20 17h-8"></path><path d="m15 14-3 3 3 3"></path><rect x="4" y="13" width="6" height="6" rx="2"></rect><rect x="14" y="5" width="6" height="6" rx="2"></rect>' },
+  "filter-check": { body: '<path d="M22 3H2l8 9v7l4 2v-9l8-9z"></path><path d="m8 18 2 2 5-5"></path>' },
+  "filter-x": { body: '<path d="M22 3H2l8 9v7l4 2v-9l8-9z"></path><path d="m8 18 5 5"></path><path d="m13 18-5 5"></path>' },
+  "row-add": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M3 16h18"></path><path d="M12 7v6"></path><path d="M9 10h6"></path>' },
+  "row-delete": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M3 16h18"></path><path d="m10 8 4 4"></path><path d="m14 8-4 4"></path>' },
+  "table-export": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M9 4v16"></path><path d="M15 4v16"></path><path d="M19 14v6"></path><path d="m16 17 3 3 3-3"></path>' },
+  "table-import": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M9 4v16"></path><path d="M15 4v16"></path><path d="M19 20v-6"></path><path d="m16 17 3-3 3 3"></path>' },
+  "table-search": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M9 4v16"></path><path d="M15 4v7"></path><circle cx="16" cy="16" r="3"></circle><path d="m18 18 3 3"></path>' },
+  "table-settings": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M9 4v16"></path><circle cx="16" cy="16" r="2"></circle><path d="M16 12v1"></path><path d="M16 19v1"></path><path d="M12 16h1"></path><path d="M19 16h1"></path>' },
+  "workflow-branch": { body: '<rect x="3" y="4" width="6" height="6" rx="2"></rect><rect x="15" y="4" width="6" height="6" rx="2"></rect><rect x="9" y="16" width="6" height="6" rx="2"></rect><path d="M9 7h6"></path><path d="M12 10v6"></path>' },
   workflow: { body: '<rect x="3" y="4" width="6" height="6" rx="2"></rect><rect x="15" y="14" width="6" height="6" rx="2"></rect><path d="M9 7h3a3 3 0 0 1 3 3v4"></path><path d="M12 17H9a3 3 0 0 1-3-3v-4"></path>' }
 };
 

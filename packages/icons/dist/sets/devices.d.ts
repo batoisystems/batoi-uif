@@ -107,6 +107,42 @@ declare const deviceIcons: {
     readonly usb: {
         readonly body: "<path d=\"M12 3v12\"></path><path d=\"m9 6 3-3 3 3\"></path><circle cx=\"6\" cy=\"15\" r=\"2\"></circle><circle cx=\"18\" cy=\"15\" r=\"2\"></circle><path d=\"M12 15H8\"></path><path d=\"M12 15h4\"></path><path d=\"M12 15v6\"></path><circle cx=\"12\" cy=\"21\" r=\"1\"></circle>";
     };
+    readonly 'barcode-scanner': {
+        readonly body: "<path d=\"M4 7V5a2 2 0 0 1 2-2h2\"></path><path d=\"M16 3h2a2 2 0 0 1 2 2v2\"></path><path d=\"M20 17v2a2 2 0 0 1-2 2h-2\"></path><path d=\"M8 21H6a2 2 0 0 1-2-2v-2\"></path><path d=\"M7 8v8\"></path><path d=\"M10 8v8\"></path><path d=\"M14 8v8\"></path><path d=\"M17 8v8\"></path>";
+    };
+    readonly 'battery-charging': {
+        readonly body: "<rect x=\"3\" y=\"7\" width=\"16\" height=\"10\" rx=\"2\"></rect><path d=\"M21 11v2\"></path><path d=\"m11 8-3 5h4l-2 4\"></path>";
+    };
+    readonly 'battery-full': {
+        readonly body: "<rect x=\"3\" y=\"7\" width=\"16\" height=\"10\" rx=\"2\"></rect><path d=\"M21 11v2\"></path><path d=\"M7 11v2\"></path><path d=\"M10 11v2\"></path><path d=\"M13 11v2\"></path><path d=\"M16 11v2\"></path>";
+    };
+    readonly 'battery-low': {
+        readonly body: "<rect x=\"3\" y=\"7\" width=\"16\" height=\"10\" rx=\"2\"></rect><path d=\"M21 11v2\"></path><path d=\"M7 11v2\"></path>";
+    };
+    readonly nfc: {
+        readonly body: "<path d=\"M6 8a8 8 0 0 1 0 8\"></path><path d=\"M10 6a12 12 0 0 1 0 12\"></path><path d=\"M14 4a16 16 0 0 1 0 16\"></path><path d=\"M18 7a9 9 0 0 1 0 10\"></path>";
+    };
+    readonly 'printer-check': {
+        readonly body: "<path d=\"M7 9V3h10v6\"></path><path d=\"M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4\"></path><path d=\"M7 14h10v7H7z\"></path><path d=\"m13 18 2 2 5-5\"></path>";
+    };
+    readonly 'server-check': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"6\" rx=\"2\"></rect><rect x=\"3\" y=\"14\" width=\"12\" height=\"6\" rx=\"2\"></rect><path d=\"M7 7h.01\"></path><path d=\"M7 17h.01\"></path><path d=\"m16 18 2 2 4-4\"></path>";
+    };
+    readonly 'server-lock': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"6\" rx=\"2\"></rect><rect x=\"3\" y=\"14\" width=\"12\" height=\"6\" rx=\"2\"></rect><path d=\"M7 7h.01\"></path><path d=\"M7 17h.01\"></path><rect x=\"16\" y=\"15\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M17.5 15v-2a2 2 0 0 1 3 0v2\"></path>";
+    };
+    readonly signal: {
+        readonly body: "<path d=\"M4 20h.01\"></path><path d=\"M8 20v-4\"></path><path d=\"M12 20v-8\"></path><path d=\"M16 20V8\"></path><path d=\"M20 20V4\"></path>";
+    };
+    readonly 'signal-low': {
+        readonly body: "<path d=\"M4 20h.01\"></path><path d=\"M8 20v-4\"></path><path d=\"M12 20v-8\"></path><path d=\"M16 20\"></path><path d=\"M20 20\"></path>";
+    };
+    readonly smartwatch: {
+        readonly body: "<rect x=\"7\" y=\"6\" width=\"10\" height=\"12\" rx=\"3\"></rect><path d=\"M9 6V3h6v3\"></path><path d=\"M9 18v3h6v-3\"></path><path d=\"M11 12h2\"></path>";
+    };
+    readonly watch: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"5\"></circle><path d=\"M9 2h6l1 4H8l1-4z\"></path><path d=\"M8 18h8l-1 4H9l-1-4z\"></path><path d=\"M12 9v3l2 1\"></path>";
+    };
     readonly wifi: {
         readonly body: "<path d=\"M5 13a10 10 0 0 1 14 0\"></path><path d=\"M8.5 16.5a5 5 0 0 1 7 0\"></path><path d=\"M12 20h.01\"></path>";
     };

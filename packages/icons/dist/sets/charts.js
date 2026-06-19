@@ -1,6 +1,6 @@
 import {
   chartIcons
-} from "../chunk-HD2LSIUM.js";
+} from "../chunk-323LOKVA.js";
 export {
   chartIcons
 };

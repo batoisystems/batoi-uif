@@ -47,6 +47,111 @@ declare const domainIcons: {
     readonly wand: {
         readonly body: "<path d=\"M15 4 20 9\"></path><path d=\"M14.5 9.5 4 20\"></path><path d=\"M18 2l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z\"></path><path d=\"m5 3 .7 1.3L7 5l-1.3.7L5 7l-.7-1.3L3 5l1.3-.7L5 3z\"></path>";
     };
+    readonly ambulance: {
+        readonly body: "<path d=\"M3 17h2\"></path><path d=\"M19 17h2\"></path><path d=\"M5 17V7h9l4 4h3v6\"></path><path d=\"M8 11h4\"></path><path d=\"M10 9v4\"></path><circle cx=\"7\" cy=\"17\" r=\"2\"></circle><circle cx=\"17\" cy=\"17\" r=\"2\"></circle>";
+    };
+    readonly bed: {
+        readonly body: "<path d=\"M3 7v13\"></path><path d=\"M21 12v8\"></path><path d=\"M3 14h18\"></path><path d=\"M6 10h4a2 2 0 0 1 2 2v2H3v-4a3 3 0 0 1 3-3z\"></path><path d=\"M12 12h6a3 3 0 0 1 3 3v-1\"></path>";
+    };
+    readonly bus: {
+        readonly body: "<rect x=\"5\" y=\"3\" width=\"14\" height=\"16\" rx=\"3\"></rect><path d=\"M7 8h10\"></path><path d=\"M8 13h.01\"></path><path d=\"M16 13h.01\"></path><path d=\"M8 19 6 22\"></path><path d=\"m16 19 2 3\"></path>";
+    };
+    readonly car: {
+        readonly body: "<path d=\"M5 17h14v-5l-2-5H7l-2 5v5z\"></path><path d=\"M7 17v2\"></path><path d=\"M17 17v2\"></path><path d=\"M7 12h10\"></path><path d=\"M8 15h.01\"></path><path d=\"M16 15h.01\"></path>";
+    };
+    readonly clinic: {
+        readonly body: "<path d=\"M4 21V8l8-5 8 5v13\"></path><path d=\"M9 21v-6h6v6\"></path><path d=\"M12 7v5\"></path><path d=\"M9.5 9.5h5\"></path>";
+    };
+    readonly dna: {
+        readonly body: "<path d=\"M7 3c7 4 7 14 0 18\"></path><path d=\"M17 3c-7 4-7 14 0 18\"></path><path d=\"M8 7h8\"></path><path d=\"M8 12h8\"></path><path d=\"M8 17h8\"></path>";
+    };
+    readonly factory: {
+        readonly body: "<path d=\"M3 21V9l6 4V9l6 4V5h6v16H3z\"></path><path d=\"M7 17h.01\"></path><path d=\"M11 17h.01\"></path><path d=\"M15 17h.01\"></path>";
+    };
+    readonly 'flag-triangle': {
+        readonly body: "<path d=\"M5 22V4\"></path><path d=\"M5 4h14l-4 5 4 5H5\"></path>";
+    };
+    readonly 'globe-lock': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M3 12h18\"></path><path d=\"M12 3a14 14 0 0 1 0 18\"></path><rect x=\"14\" y=\"14\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M15.5 14v-2a2 2 0 0 1 4 0v2\"></path>";
+    };
+    readonly 'graduation-cap': {
+        readonly body: "<path d=\"m3 9 9-5 9 5-9 5-9-5z\"></path><path d=\"M7 11v5c3 2 7 2 10 0v-5\"></path><path d=\"M21 9v6\"></path>";
+    };
+    readonly leaf: {
+        readonly body: "<path d=\"M5 21c0-8 6-16 16-18 0 10-8 16-16 18z\"></path><path d=\"M5 21c3-6 7-9 12-12\"></path>";
+    };
+    readonly library: {
+        readonly body: "<path d=\"m3 10 9-6 9 6\"></path><path d=\"M5 10v9\"></path><path d=\"M9 10v9\"></path><path d=\"M15 10v9\"></path><path d=\"M19 10v9\"></path><path d=\"M3 21h18\"></path>";
+    };
+    readonly 'map-pin-check': {
+        readonly body: "<path d=\"M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0z\"></path><path d=\"m9 10 2 2 4-4\"></path>";
+    };
+    readonly 'map-pin-plus': {
+        readonly body: "<path d=\"M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0z\"></path><path d=\"M12 7v6\"></path><path d=\"M9 10h6\"></path>";
+    };
+    readonly 'map-pin-x': {
+        readonly body: "<path d=\"M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0z\"></path><path d=\"m9 7 6 6\"></path><path d=\"m15 7-6 6\"></path>";
+    };
+    readonly microscope: {
+        readonly body: "<path d=\"M6 18h12\"></path><path d=\"M8 22h8\"></path><path d=\"M12 18v4\"></path><path d=\"M9 3h6v5H9z\"></path><path d=\"M12 8v4a4 4 0 0 1-4 4\"></path><path d=\"M15 8l3 3\"></path>";
+    };
+    readonly plane: {
+        readonly body: "<path d=\"M22 2 11 13\"></path><path d=\"m22 2-7 20-4-9-9-4 20-7z\"></path>";
+    };
+    readonly pill: {
+        readonly body: "<path d=\"M10 21 3 14a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7z\"></path><path d=\"m8.5 8.5 7 7\"></path>";
+    };
+    readonly recycle: {
+        readonly body: "<path d=\"m7 19-3-5 3-5\"></path><path d=\"M4 14h7\"></path><path d=\"m17 5 3 5-3 5\"></path><path d=\"M20 10h-7\"></path><path d=\"m9 5 3-3 3 3\"></path><path d=\"M12 2v7\"></path>";
+    };
+    readonly route: {
+        readonly body: "<circle cx=\"6\" cy=\"6\" r=\"3\"></circle><circle cx=\"18\" cy=\"18\" r=\"3\"></circle><path d=\"M9 6h4a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h6\"></path>";
+    };
+    readonly stethoscope: {
+        readonly body: "<path d=\"M6 4v5a4 4 0 0 0 8 0V4\"></path><path d=\"M4 4h4\"></path><path d=\"M12 4h4\"></path><path d=\"M10 13v2a5 5 0 0 0 10 0v-1\"></path><circle cx=\"20\" cy=\"12\" r=\"2\"></circle>";
+    };
+    readonly syringe: {
+        readonly body: "<path d=\"m18 2 4 4\"></path><path d=\"m17 7 2-2\"></path><path d=\"M3 21l6-6\"></path><path d=\"m9 15 6-6 4 4-6 6H9v-4z\"></path><path d=\"m12 12 4 4\"></path>";
+    };
+    readonly 'traffic-light': {
+        readonly body: "<rect x=\"8\" y=\"2\" width=\"8\" height=\"20\" rx=\"4\"></rect><circle cx=\"12\" cy=\"7\" r=\"1.5\"></circle><circle cx=\"12\" cy=\"12\" r=\"1.5\"></circle><circle cx=\"12\" cy=\"17\" r=\"1.5\"></circle>";
+    };
+    readonly wheelchair: {
+        readonly body: "<circle cx=\"10\" cy=\"5\" r=\"2\"></circle><path d=\"M10 7v6h5l3 6\"></path><path d=\"M8 11a6 6 0 1 0 5.6 8\"></path><path d=\"M10 13h4\"></path>";
+    };
+    readonly 'wind-turbine': {
+        readonly body: "<circle cx=\"12\" cy=\"8\" r=\"2\"></circle><path d=\"M12 10v11\"></path><path d=\"M12 8 5 5\"></path><path d=\"M12 8l7-3\"></path><path d=\"M12 8l2 8\"></path>";
+    };
+    readonly 'building-hospital': {
+        readonly body: "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"></rect><path d=\"M12 7v6\"></path><path d=\"M9 10h6\"></path><path d=\"M8 21v-5h8v5\"></path>";
+    };
+    readonly 'delivery-bike': {
+        readonly body: "<circle cx=\"6\" cy=\"17\" r=\"3\"></circle><circle cx=\"18\" cy=\"17\" r=\"3\"></circle><path d=\"M9 17h4l2-6h-4\"></path><path d=\"M13 11l3 6\"></path><path d=\"M8 11h3\"></path><path d=\"M5 8h4\"></path>";
+    };
+    readonly drone: {
+        readonly body: "<rect x=\"9\" y=\"9\" width=\"6\" height=\"6\" rx=\"2\"></rect><circle cx=\"4\" cy=\"4\" r=\"2\"></circle><circle cx=\"20\" cy=\"4\" r=\"2\"></circle><circle cx=\"4\" cy=\"20\" r=\"2\"></circle><circle cx=\"20\" cy=\"20\" r=\"2\"></circle><path d=\"M9 9 5.5 5.5\"></path><path d=\"m15 9 3.5-3.5\"></path><path d=\"M9 15 5.5 18.5\"></path><path d=\"m15 15 3.5 3.5\"></path>";
+    };
+    readonly 'fleet-vehicle': {
+        readonly body: "<path d=\"M5 17h14v-5l-2-5H7l-2 5v5z\"></path><circle cx=\"8\" cy=\"17\" r=\"2\"></circle><circle cx=\"16\" cy=\"17\" r=\"2\"></circle><path d=\"M7 12h10\"></path><path d=\"M3 7h2\"></path><path d=\"M19 7h2\"></path>";
+    };
+    readonly 'geo-fence': {
+        readonly body: "<path d=\"m12 3 8 5v8l-8 5-8-5V8l8-5z\"></path><path d=\"M12 8v8\"></path><path d=\"M8 12h8\"></path>";
+    };
+    readonly 'map-route': {
+        readonly body: "<path d=\"M9 18 3 21V6l6-3 6 3 6-3v15l-6 3-6-3z\"></path><path d=\"M9 3v15\"></path><path d=\"M15 6v15\"></path><path d=\"M6 9c3 4 9 1 12 5\"></path>";
+    };
+    readonly 'route-off': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><circle cx=\"6\" cy=\"6\" r=\"3\"></circle><circle cx=\"18\" cy=\"18\" r=\"3\"></circle><path d=\"M9 6h4a4 4 0 0 1 4 4\"></path><path d=\"M12 20h3\"></path>";
+    };
+    readonly 'route-plus': {
+        readonly body: "<circle cx=\"6\" cy=\"6\" r=\"3\"></circle><circle cx=\"18\" cy=\"18\" r=\"3\"></circle><path d=\"M9 6h4a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h6\"></path><path d=\"M18 4v6\"></path><path d=\"M15 7h6\"></path>";
+    };
+    readonly satellite: {
+        readonly body: "<path d=\"M5 12 2 9l7-7 3 3-7 7z\"></path><path d=\"m12 5 7 7\"></path><path d=\"M14 14a4 4 0 0 1-4-4\"></path><path d=\"M18 18a8 8 0 0 1-8-8\"></path><path d=\"M21 21a11 11 0 0 1-11-11\"></path>";
+    };
+    readonly 'traffic-cone': {
+        readonly body: "<path d=\"m12 3 7 18H5l7-18z\"></path><path d=\"M9 11h6\"></path><path d=\"M7 17h10\"></path>";
+    };
 };
 
 export { domainIcons };

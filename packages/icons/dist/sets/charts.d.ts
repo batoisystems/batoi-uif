@@ -47,6 +47,105 @@ declare const chartIcons: {
     readonly 'chart-stacked': {
         readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 17V8\"></path><path d=\"M12 17V5\"></path><path d=\"M17 17v-6\"></path><path d=\"M7 12h10\"></path>";
     };
+    readonly 'axis-x': {
+        readonly body: "<path d=\"M3 18h18\"></path><path d=\"m18 15 3 3-3 3\"></path><path d=\"M7 6v12\"></path><path d=\"M12 10v8\"></path><path d=\"M17 13v5\"></path>";
+    };
+    readonly 'axis-y': {
+        readonly body: "<path d=\"M6 21V3\"></path><path d=\"m3 6 3-3 3 3\"></path><path d=\"M6 18h12\"></path><path d=\"M6 13h8\"></path><path d=\"M6 8h5\"></path>";
+    };
+    readonly 'bubble-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><circle cx=\"8\" cy=\"15\" r=\"2\"></circle><circle cx=\"14\" cy=\"10\" r=\"3\"></circle><circle cx=\"18\" cy=\"17\" r=\"1.5\"></circle>";
+    };
+    readonly 'chart-combo': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m7 15 4-4 3 3 5-7\"></path><path d=\"M7 17v-4\"></path><path d=\"M12 17v-7\"></path><path d=\"M17 17v-5\"></path>";
+    };
+    readonly 'chart-network': {
+        readonly body: "<circle cx=\"6\" cy=\"8\" r=\"3\"></circle><circle cx=\"18\" cy=\"8\" r=\"3\"></circle><circle cx=\"12\" cy=\"18\" r=\"3\"></circle><path d=\"M9 8h6\"></path><path d=\"m8 10 3 5\"></path><path d=\"m16 10-3 5\"></path>";
+    };
+    readonly 'chart-spline': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M6 16c3-8 6 4 9-4 1-3 3-5 5-5\"></path>";
+    };
+    readonly 'chart-step': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M6 16h4v-5h4V7h5\"></path>";
+    };
+    readonly 'conversion-funnel': {
+        readonly body: "<path d=\"M4 5h16l-6 7v5l-4 2v-7L4 5z\"></path><path d=\"M8 9h8\"></path>";
+    };
+    readonly dial: {
+        readonly body: "<path d=\"M4 15a8 8 0 1 1 16 0\"></path><path d=\"M12 15l3-5\"></path><path d=\"M7 19h10\"></path><path d=\"M7 15h.01\"></path><path d=\"M17 15h.01\"></path>";
+    };
+    readonly forecast: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 16 4-4 3 3 5-8\"></path><path d=\"M18 7h3v3\"></path><path d=\"M7 8h.01\"></path><path d=\"M11 6h.01\"></path><path d=\"M15 5h.01\"></path>";
+    };
+    readonly 'funnel-chart': {
+        readonly body: "<path d=\"M4 5h16l-6 7v5l-4 2v-7L4 5z\"></path><path d=\"M7 9h10\"></path><path d=\"M9 13h6\"></path>";
+    };
+    readonly heatmap: {
+        readonly body: "<rect x=\"3\" y=\"3\" width=\"5\" height=\"5\"></rect><rect x=\"10\" y=\"3\" width=\"5\" height=\"5\"></rect><rect x=\"17\" y=\"3\" width=\"4\" height=\"5\"></rect><rect x=\"3\" y=\"10\" width=\"5\" height=\"5\"></rect><rect x=\"10\" y=\"10\" width=\"5\" height=\"5\"></rect><rect x=\"17\" y=\"10\" width=\"4\" height=\"5\"></rect><rect x=\"3\" y=\"17\" width=\"5\" height=\"4\"></rect><rect x=\"10\" y=\"17\" width=\"5\" height=\"4\"></rect><rect x=\"17\" y=\"17\" width=\"4\" height=\"4\"></rect>";
+    };
+    readonly 'horizontal-bar-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 8h10\"></path><path d=\"M7 12h14\"></path><path d=\"M7 16h7\"></path>";
+    };
+    readonly kpi: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 14h3\"></path><path d=\"M12 14h5\"></path><path d=\"m7 10 3 2 3-4 4 3\"></path>";
+    };
+    readonly meter: {
+        readonly body: "<path d=\"M4 15a8 8 0 1 1 16 0\"></path><path d=\"M12 15l5-5\"></path><path d=\"M8 19h8\"></path><path d=\"M6 15h.01\"></path><path d=\"M18 15h.01\"></path>";
+    };
+    readonly 'progress-ring': {
+        readonly body: "<path d=\"M12 3a9 9 0 1 1-8.5 6\"></path><path d=\"M12 3v4\"></path><circle cx=\"12\" cy=\"12\" r=\"4\"></circle>";
+    };
+    readonly regression: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><circle cx=\"7\" cy=\"15\" r=\"1.5\"></circle><circle cx=\"11\" cy=\"12\" r=\"1.5\"></circle><circle cx=\"16\" cy=\"8\" r=\"1.5\"></circle><path d=\"M6 17 19 6\"></path>";
+    };
+    readonly scorecard: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M7 9h5\"></path><path d=\"M7 13h10\"></path><path d=\"M7 17h7\"></path><circle cx=\"17\" cy=\"9\" r=\"1\"></circle>";
+    };
+    readonly 'stacked-area-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 17 4-6 4 3 4-7v10H6z\"></path><path d=\"m6 17 4-3 4 1 4-4\"></path>";
+    };
+    readonly 'table-chart': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 4v16\"></path><path d=\"M15 4v16\"></path><path d=\"m6 17 3-3 3 2 5-5\"></path>";
+    };
+    readonly treemap: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M12 4v16\"></path><path d=\"M3 12h9\"></path><path d=\"M12 9h9\"></path><path d=\"M16 9v11\"></path>";
+    };
+    readonly 'trend-down': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 8 5 5 4-4 4 4\"></path><path d=\"M19 9v4h-4\"></path>";
+    };
+    readonly 'trend-up': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 16 5-5 4 4 4-8\"></path><path d=\"M15 7h4v4\"></path>";
+    };
+    readonly 'ab-test': {
+        readonly body: "<path d=\"M4 19 8 5h2l4 14\"></path><path d=\"M6 14h6\"></path><path d=\"M15 5h3a3 3 0 0 1 0 6h-3V5z\"></path><path d=\"M15 11h4a4 4 0 0 1 0 8h-4v-8z\"></path>";
+    };
+    readonly cohort: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><circle cx=\"8\" cy=\"9\" r=\"2\"></circle><circle cx=\"14\" cy=\"8\" r=\"2\"></circle><circle cx=\"17\" cy=\"15\" r=\"2\"></circle><path d=\"M8 11v6\"></path><path d=\"M14 10v7\"></path><path d=\"M17 17v1\"></path>";
+    };
+    readonly experiment: {
+        readonly body: "<path d=\"M9 2h6\"></path><path d=\"M10 2v6l-5.5 9.5A3 3 0 0 0 7.1 22h9.8a3 3 0 0 0 2.6-4.5L14 8V2\"></path><path d=\"M8 16h8\"></path><path d=\"M10 12h4\"></path>";
+    };
+    readonly 'goal-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><circle cx=\"15\" cy=\"9\" r=\"5\"></circle><circle cx=\"15\" cy=\"9\" r=\"2\"></circle><path d=\"m7 17 4-4 2 2 6-6\"></path>";
+    };
+    readonly 'growth-loop': {
+        readonly body: "<path d=\"M17 3h4v4\"></path><path d=\"M21 3 14 10\"></path><path d=\"M7 21H3v-4\"></path><path d=\"M3 21l7-7\"></path><path d=\"M4 9a8 8 0 0 1 13-4\"></path><path d=\"M20 15a8 8 0 0 1-13 4\"></path>";
+    };
+    readonly retention: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 16c2-7 5-7 7 0 1.5 4 3.5 2 5-3\"></path><path d=\"M7 8h.01\"></path><path d=\"M12 8h.01\"></path><path d=\"M17 8h.01\"></path>";
+    };
+    readonly segment: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 3v9h9\"></path><path d=\"M12 12 6 18\"></path>";
+    };
+    readonly 'target-metric': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><circle cx=\"12\" cy=\"12\" r=\"5\"></circle><circle cx=\"12\" cy=\"12\" r=\"1\"></circle><path d=\"M17 7h4v4\"></path><path d=\"m21 7-5 5\"></path>";
+    };
+    readonly 'vertical-bar-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M8 17V9\"></path><path d=\"M12 17V6\"></path><path d=\"M16 17v-5\"></path>";
+    };
+    readonly 'waterfall-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><rect x=\"6\" y=\"12\" width=\"3\" height=\"5\"></rect><rect x=\"11\" y=\"8\" width=\"3\" height=\"4\"></rect><rect x=\"16\" y=\"10\" width=\"3\" height=\"7\"></rect><path d=\"M9 12h2\"></path><path d=\"M14 10h2\"></path>";
+    };
 };
 
 export { chartIcons };

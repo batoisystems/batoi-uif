@@ -1,6 +1,6 @@
 import {
   communicationIcons
-} from "../chunk-7KLRSPIE.js";
+} from "../chunk-XDZUNQVU.js";
 export {
   communicationIcons
 };
