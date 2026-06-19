@@ -135,6 +135,66 @@ declare const icons: {
     readonly 'wind-turbine': {
         readonly body: "<circle cx=\"12\" cy=\"8\" r=\"2\"></circle><path d=\"M12 10v11\"></path><path d=\"M12 8 5 5\"></path><path d=\"M12 8l7-3\"></path><path d=\"M12 8l2 8\"></path>";
     };
+    readonly 'blood-drop': {
+        readonly body: "<path d=\"M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z\"></path>";
+    };
+    readonly campus: {
+        readonly body: "<path d=\"m3 10 9-6 9 6\"></path><path d=\"M5 10v9\"></path><path d=\"M9 10v9\"></path><path d=\"M15 10v9\"></path><path d=\"M19 10v9\"></path><path d=\"M3 21h18\"></path><path d=\"M12 4v3\"></path>";
+    };
+    readonly 'cargo-ship': {
+        readonly body: "<path d=\"M4 17h16l-3 4H7l-3-4z\"></path><path d=\"M7 17V9h9l3 8\"></path><path d=\"M9 9V5h5v4\"></path><path d=\"M3 21c2-1 4-1 6 0s4 1 6 0 4-1 6 0\"></path>";
+    };
+    readonly classroom: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"11\" rx=\"2\"></rect><path d=\"M8 21l4-6 4 6\"></path><path d=\"M8 9h8\"></path><path d=\"M8 12h5\"></path>";
+    };
+    readonly container: {
+        readonly body: "<rect x=\"3\" y=\"7\" width=\"18\" height=\"10\" rx=\"2\"></rect><path d=\"M7 7v10\"></path><path d=\"M11 7v10\"></path><path d=\"M15 7v10\"></path><path d=\"M19 7v10\"></path>";
+    };
+    readonly 'currency-dollar': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 6v12\"></path><path d=\"M16 8.5c-1-.8-2.3-1.2-4-1.2-2 0-3 .8-3 2s1 1.8 3 2.2 4 1 4 3-1.4 3.2-4 3.2c-1.8 0-3.2-.5-4.2-1.4\"></path>";
+    };
+    readonly 'currency-rupee': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M9 7h7\"></path><path d=\"M9 10h7\"></path><path d=\"M14 7a3 3 0 0 1-3 5H9l6 5\"></path>";
+    };
+    readonly exam: {
+        readonly body: "<path d=\"M6 3h12v18H6z\"></path><path d=\"M9 8h6\"></path><path d=\"M9 12h6\"></path><path d=\"M9 16h3\"></path><path d=\"m14 17 1.5 1.5L19 15\"></path>";
+    };
+    readonly 'first-aid': {
+        readonly body: "<rect x=\"4\" y=\"6\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M9 6V4h6v2\"></path><path d=\"M12 10v6\"></path><path d=\"M9 13h6\"></path>";
+    };
+    readonly forklift: {
+        readonly body: "<path d=\"M5 16V7h7l3 5v4\"></path><circle cx=\"7\" cy=\"18\" r=\"2\"></circle><circle cx=\"15\" cy=\"18\" r=\"2\"></circle><path d=\"M15 12h5v8\"></path><path d=\"M20 16h2\"></path><path d=\"M8 10h4\"></path>";
+    };
+    readonly insurance: {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"M8 12h8\"></path><path d=\"M12 8v8\"></path>";
+    };
+    readonly investment: {
+        readonly body: "<path d=\"M3 21h18\"></path><path d=\"M6 17v-5\"></path><path d=\"M12 17V7\"></path><path d=\"M18 17v-8\"></path><path d=\"m6 10 6-5 6 4\"></path><path d=\"M16 5h4v4\"></path>";
+    };
+    readonly 'lab-report': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 17h8\"></path><path d=\"M10 9h4\"></path><path d=\"M11 9v5l-2 3\"></path><path d=\"M13 9v5l2 3\"></path>";
+    };
+    readonly ledger: {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M9 3v18\"></path><path d=\"M12 8h4\"></path><path d=\"M12 12h4\"></path><path d=\"M12 16h3\"></path>";
+    };
+    readonly loan: {
+        readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M8 15h4\"></path><path d=\"M15 14l2 2 4-4\"></path>";
+    };
+    readonly 'medical-chart': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 15h3l2-5 2 7 2-4h3\"></path>";
+    };
+    readonly 'parcel-location': {
+        readonly body: "<path d=\"m21 8-9-5-9 5 9 5 9-5z\"></path><path d=\"M3 8v8l9 5 4-2.2\"></path><path d=\"M12 13v8\"></path><path d=\"M20 16c0 3-4 6-4 6s-4-3-4-6a4 4 0 1 1 8 0z\"></path><circle cx=\"16\" cy=\"16\" r=\"1\"></circle>";
+    };
+    readonly patient: {
+        readonly body: "<circle cx=\"12\" cy=\"7\" r=\"4\"></circle><path d=\"M4 21a8 8 0 0 1 16 0\"></path><path d=\"M12 14v5\"></path><path d=\"M9.5 16.5h5\"></path>";
+    };
+    readonly tax: {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"m8 17 8-8\"></path><circle cx=\"9\" cy=\"10\" r=\"1\"></circle><circle cx=\"15\" cy=\"16\" r=\"1\"></circle>";
+    };
+    readonly vaccine: {
+        readonly body: "<path d=\"m18 2 4 4\"></path><path d=\"m17 7 2-2\"></path><path d=\"M4 20l5-5\"></path><path d=\"m9 15 6-6 4 4-6 6H9v-4z\"></path><path d=\"M7 18 4 21\"></path><path d=\"M12 12h4\"></path>";
+    };
     readonly 'building-hospital': {
         readonly body: "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"></rect><path d=\"M12 7v6\"></path><path d=\"M9 10h6\"></path><path d=\"M8 21v-5h8v5\"></path>";
     };
@@ -405,6 +465,42 @@ declare const icons: {
     readonly 'workflow-branch': {
         readonly body: "<rect x=\"3\" y=\"4\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"15\" y=\"4\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"9\" y=\"16\" width=\"6\" height=\"6\" rx=\"2\"></rect><path d=\"M9 7h6\"></path><path d=\"M12 10v6\"></path>";
     };
+    readonly 'approval-pending': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 10v2l1.5 1\"></path>";
+    };
+    readonly 'approval-rejected': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"m9.5 9.5 5 5\"></path><path d=\"m14.5 9.5-5 5\"></path>";
+    };
+    readonly 'approval-request': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"M9 12h6\"></path><path d=\"M12 9v6\"></path>";
+    };
+    readonly escalation: {
+        readonly body: "<path d=\"M4 18h16\"></path><path d=\"M7 18v-5\"></path><path d=\"M12 18V9\"></path><path d=\"M17 18V5\"></path><path d=\"m14 8 3-3 3 3\"></path>";
+    };
+    readonly handoff: {
+        readonly body: "<path d=\"M4 13h8\"></path><path d=\"m9 10 3 3-3 3\"></path><circle cx=\"6\" cy=\"7\" r=\"3\"></circle><circle cx=\"18\" cy=\"17\" r=\"3\"></circle><path d=\"M14 17h-2a4 4 0 0 1-4-4\"></path>";
+    };
+    readonly queue: {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"11\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"17\" width=\"16\" height=\"4\" rx=\"1\"></rect>";
+    };
+    readonly 'queue-next': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"12\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"11\" width=\"12\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"17\" width=\"12\" height=\"4\" rx=\"1\"></rect><path d=\"m17 8 4 4-4 4\"></path>";
+    };
+    readonly retry: {
+        readonly body: "<path d=\"M21 12a9 9 0 1 1-3-6.7\"></path><path d=\"M21 3v6h-6\"></path><path d=\"M12 8v4l3 2\"></path>";
+    };
+    readonly rollback: {
+        readonly body: "<path d=\"M3 7h11a6 6 0 1 1 0 12H8\"></path><path d=\"m7 3-4 4 4 4\"></path>";
+    };
+    readonly runbook: {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h6\"></path><path d=\"M9 15h3\"></path><path d=\"m14 16 2 2 4-4\"></path>";
+    };
+    readonly sla: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v5l3 2\"></path><path d=\"M7 19h10\"></path>";
+    };
+    readonly 'task-priority': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"M8 16h3\"></path><path d=\"M17 8v6\"></path><path d=\"M17 18h.01\"></path>";
+    };
     readonly workflow: {
         readonly body: "<rect x=\"3\" y=\"4\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"15\" y=\"14\" width=\"6\" height=\"6\" rx=\"2\"></rect><path d=\"M9 7h3a3 3 0 0 1 3 3v4\"></path><path d=\"M12 17H9a3 3 0 0 1-3-3v-4\"></path>";
     };
@@ -567,6 +663,42 @@ declare const icons: {
     readonly 'users-plus': {
         readonly body: "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"9\" cy=\"7\" r=\"4\"></circle><path d=\"M19 8v6\"></path><path d=\"M16 11h6\"></path>";
     };
+    readonly agent: {
+        readonly body: "<rect x=\"5\" y=\"7\" width=\"14\" height=\"12\" rx=\"4\"></rect><path d=\"M12 3v4\"></path><circle cx=\"9\" cy=\"13\" r=\"1\"></circle><circle cx=\"15\" cy=\"13\" r=\"1\"></circle><path d=\"M9 17h6\"></path>";
+    };
+    readonly 'agent-check': {
+        readonly body: "<rect x=\"4\" y=\"7\" width=\"12\" height=\"12\" rx=\"4\"></rect><path d=\"M10 3v4\"></path><circle cx=\"8\" cy=\"13\" r=\"1\"></circle><circle cx=\"12\" cy=\"13\" r=\"1\"></circle><path d=\"m15 18 2 2 5-5\"></path>";
+    };
+    readonly 'agent-x': {
+        readonly body: "<rect x=\"4\" y=\"7\" width=\"12\" height=\"12\" rx=\"4\"></rect><path d=\"M10 3v4\"></path><circle cx=\"8\" cy=\"13\" r=\"1\"></circle><circle cx=\"12\" cy=\"13\" r=\"1\"></circle><path d=\"m17 16 5 5\"></path><path d=\"m22 16-5 5\"></path>";
+    };
+    readonly 'ai-spark': {
+        readonly body: "<path d=\"M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6L12 3z\"></path><path d=\"m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z\"></path>";
+    };
+    readonly 'audit-log': {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"M8 16h4\"></path><circle cx=\"17\" cy=\"16\" r=\"3\"></circle><path d=\"M17 14.5V16l1 1\"></path>";
+    };
+    readonly consent: {
+        readonly body: "<path d=\"M7 21V8a4 4 0 0 1 8 0v5\"></path><path d=\"M15 13V6a3 3 0 0 1 6 0v8a7 7 0 0 1-7 7H7\"></path><path d=\"m5 14 2 2 4-4\"></path>";
+    };
+    readonly model: {
+        readonly body: "<path d=\"m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3z\"></path><path d=\"M12 12 4 7.5\"></path><path d=\"m12 12 8-4.5\"></path><path d=\"M12 12v9\"></path>";
+    };
+    readonly prompt: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m7 9 3 3-3 3\"></path><path d=\"M12 15h5\"></path>";
+    };
+    readonly 'prompt-lock': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m7 9 3 3-3 3\"></path><rect x=\"13\" y=\"12\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M14.5 12v-1.5a1.5 1.5 0 0 1 3 0V12\"></path>";
+    };
+    readonly 'risk-score': {
+        readonly body: "<path d=\"m12 3 10 18H2L12 3z\"></path><path d=\"M8 17h8\"></path><path d=\"m9 13 2 2 4-5\"></path>";
+    };
+    readonly 'tool-approval': {
+        readonly body: "<path d=\"M14.7 6.3a4 4 0 0 0-5.5 5.5L4 17v3h3l5.2-5.2a4 4 0 0 0 5.5-5.5l-2.5 2.5-3-3 2.5-2.5z\"></path><path d=\"m16 19 2 2 4-4\"></path>";
+    };
+    readonly 'tool-denied': {
+        readonly body: "<path d=\"M14.7 6.3a4 4 0 0 0-5.5 5.5L4 17v3h3l5.2-5.2a4 4 0 0 0 5.5-5.5l-2.5 2.5-3-3 2.5-2.5z\"></path><path d=\"m17 17 4 4\"></path><path d=\"m21 17-4 4\"></path>";
+    };
     readonly 'x-circle': {
         readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M15 9 9 15\"></path><path d=\"m9 9 6 6\"></path>";
     };
@@ -716,6 +848,42 @@ declare const icons: {
     };
     readonly wifi: {
         readonly body: "<path d=\"M5 13a10 10 0 0 1 14 0\"></path><path d=\"M8.5 16.5a5 5 0 0 1 7 0\"></path><path d=\"M12 20h.01\"></path>";
+    };
+    readonly 'app-window': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 9h18\"></path><path d=\"M7 6.5h.01\"></path><path d=\"M11 6.5h.01\"></path><path d=\"M7 13h10\"></path><path d=\"M7 17h6\"></path>";
+    };
+    readonly 'mobile-camera': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><circle cx=\"12\" cy=\"11\" r=\"3\"></circle><path d=\"M10 7h4\"></path><path d=\"M11 18h2\"></path>";
+    };
+    readonly 'mobile-check': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"m9 12 2 2 4-4\"></path><path d=\"M11 18h2\"></path>";
+    };
+    readonly 'mobile-home': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"m9 12 3-3 3 3\"></path><path d=\"M10 12v3h4v-3\"></path><path d=\"M11 18h2\"></path>";
+    };
+    readonly 'mobile-nav': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M9 16h6\"></path><path d=\"M9 12h6\"></path><path d=\"M9 8h6\"></path><path d=\"M11 18h2\"></path>";
+    };
+    readonly 'mobile-rotate': {
+        readonly body: "<rect x=\"8\" y=\"3\" width=\"8\" height=\"14\" rx=\"2\"></rect><path d=\"M4 16a8 8 0 0 0 14 4\"></path><path d=\"m18 16 1 4h-4\"></path>";
+    };
+    readonly 'mobile-scan': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M9 8h6\"></path><path d=\"M9 16h6\"></path><path d=\"M10 10v4\"></path><path d=\"M14 10v4\"></path>";
+    };
+    readonly 'mobile-tab': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M8 16h8\"></path><path d=\"M10 16v3\"></path><path d=\"M14 16v3\"></path><path d=\"M11 18h2\"></path>";
+    };
+    readonly 'mobile-vibrate': {
+        readonly body: "<path d=\"M4 8v8\"></path><path d=\"M20 8v8\"></path><rect x=\"8\" y=\"3\" width=\"8\" height=\"18\" rx=\"2\"></rect><path d=\"M11 18h2\"></path>";
+    };
+    readonly 'mobile-x': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"m9 10 6 6\"></path><path d=\"m15 10-6 6\"></path><path d=\"M11 18h2\"></path>";
+    };
+    readonly 'offline-sync': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><path d=\"M21 12a9 9 0 0 1-4.2 7.6\"></path><path d=\"M3 12a9 9 0 0 1 13.7-7.7\"></path><path d=\"M3 16v5h5\"></path><path d=\"M21 8V3h-5\"></path>";
+    };
+    readonly 'pwa-install': {
+        readonly body: "<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"2\"></rect><path d=\"M12 7v8\"></path><path d=\"m8 11 4 4 4-4\"></path><path d=\"M10 18h4\"></path>";
     };
     readonly archive: {
         readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"4\" rx=\"1\"></rect><path d=\"M5 8v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8\"></path><path d=\"M10 12h4\"></path>";
@@ -1010,6 +1178,30 @@ declare const icons: {
     };
     readonly 'share-2': {
         readonly body: "<circle cx=\"18\" cy=\"5\" r=\"3\"></circle><circle cx=\"6\" cy=\"12\" r=\"3\"></circle><circle cx=\"18\" cy=\"19\" r=\"3\"></circle><path d=\"m8.6 10.6 6.8-4.2\"></path><path d=\"m8.6 13.4 6.8 4.2\"></path>";
+    };
+    readonly announcement: {
+        readonly body: "<path d=\"M3 11v2a2 2 0 0 0 2 2h3l7 4V5L8 9H5a2 2 0 0 0-2 2z\"></path><path d=\"M19 8a5 5 0 0 1 0 8\"></path><path d=\"M8 15l2 6\"></path><path d=\"M21 4h.01\"></path>";
+    };
+    readonly 'comment-check': {
+        readonly body: "<path d=\"M21 12a8 8 0 0 1-8 8H6l-4 2 2-5a8 8 0 1 1 17-5z\"></path><path d=\"m8 12 2 2 5-5\"></path>";
+    };
+    readonly 'comment-x': {
+        readonly body: "<path d=\"M21 12a8 8 0 0 1-8 8H6l-4 2 2-5a8 8 0 1 1 17-5z\"></path><path d=\"m9 9 6 6\"></path><path d=\"m15 9-6 6\"></path>";
+    };
+    readonly feedback: {
+        readonly body: "<path d=\"M4 5h16v12H7l-4 4V5z\"></path><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><path d=\"m15 16 2 2 4-4\"></path>";
+    };
+    readonly 'inbox-alert': {
+        readonly body: "<path d=\"M4 4h16l-2 10h-4a2 2 0 0 1-4 0H6L4 4z\"></path><path d=\"M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5\"></path><path d=\"M12 7v4\"></path><path d=\"M12 14h.01\"></path>";
+    };
+    readonly mention: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M16 8v5a3 3 0 1 0 3-3\"></path><path d=\"M19.1 17A9 9 0 1 1 21 12\"></path><path d=\"M4 4 2 2\"></path><path d=\"M20 4l2-2\"></path>";
+    };
+    readonly 'message-lock': {
+        readonly body: "<path d=\"M4 5h16v12H7l-4 4V5z\"></path><rect x=\"12\" y=\"10\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M13.5 10V8.5a1.5 1.5 0 0 1 3 0V10\"></path>";
+    };
+    readonly thread: {
+        readonly body: "<path d=\"M4 5h14v8H7l-3 3V5z\"></path><path d=\"M8 16h9l3 3v-9\"></path><path d=\"M8 9h6\"></path>";
     };
     readonly voicemail: {
         readonly body: "<circle cx=\"6\" cy=\"12\" r=\"4\"></circle><circle cx=\"18\" cy=\"12\" r=\"4\"></circle><path d=\"M6 16h12\"></path>";
@@ -1625,7 +1817,7 @@ interface IconSearchOptions {
     includeDeprecated?: boolean;
 }
 
-declare const iconMetadata: Record<"batoi" | "uif" | "arrow-down" | "arrow-left" | "arrow-right" | "arrow-up" | "bot" | "check" | "check-circle" | "chevron-down" | "chevron-left" | "chevron-right" | "chevron-up" | "circle-dot" | "close" | "code" | "drag" | "external-link" | "grid" | "hash" | "home" | "maximize" | "menu" | "minus" | "moon" | "more-horizontal" | "more-vertical" | "pause" | "play" | "plus" | "redo" | "search" | "settings" | "sidebar" | "spark" | "star" | "sun" | "terminal" | "theme" | "arrow-down-left" | "arrow-down-right" | "arrow-up-left" | "arrow-up-right" | "chevrons-down" | "chevrons-left" | "chevrons-right" | "chevrons-up" | "columns" | "corner-down-left" | "corner-down-right" | "corner-up-left" | "corner-up-right" | "layout-dashboard" | "layout-list" | "layout-panel-left" | "layout-panel-top" | "panel-bottom" | "panel-left" | "panel-right" | "panel-top" | "play-circle" | "plus-circle" | "plus-square" | "power" | "rotate-clockwise" | "search-check" | "search-x" | "square-dot" | "square-stack" | "stop" | "stop-circle" | "undo" | "arrow-left-right" | "arrow-up-down" | "ban" | "check-check" | "circle" | "circle-alert" | "circle-help" | "ellipsis" | "ellipsis-vertical" | "maximize2" | "minimize" | "minimize2" | "move" | "move-horizontal" | "move-vertical" | "panel-close" | "panel-open" | "pin" | "pin-off" | "rotate-counter-clockwise" | "scan" | "scan-line" | "select" | "toggle-left" | "toggle-right" | "checkbox" | "checkbox-checked" | "checkbox-minus" | "field-required" | "input" | "input-error" | "input-password" | "input-search" | "radio-checked" | "radio-unchecked" | "textarea" | "validation-error" | "x-square" | "zoom-in" | "zoom-out" | "area-chart" | "bar-chart" | "chart" | "dashboard" | "donut-chart" | "gauge-chart" | "histogram" | "line-chart" | "pie-chart" | "radar-chart" | "scatter-chart" | "sparkline" | "chart-candlestick" | "chart-column" | "chart-no-axes" | "chart-stacked" | "axis-x" | "axis-y" | "bubble-chart" | "chart-combo" | "chart-network" | "chart-spline" | "chart-step" | "conversion-funnel" | "dial" | "forecast" | "funnel-chart" | "heatmap" | "horizontal-bar-chart" | "kpi" | "meter" | "progress-ring" | "regression" | "scorecard" | "stacked-area-chart" | "table-chart" | "treemap" | "trend-down" | "trend-up" | "ab-test" | "cohort" | "experiment" | "goal-chart" | "growth-loop" | "retention" | "segment" | "target-metric" | "vertical-bar-chart" | "waterfall-chart" | "bank" | "card" | "cart" | "cash" | "credit-card" | "receipt" | "badge-dollar" | "badge-percent" | "barcode" | "gift" | "invoice" | "landmark" | "shopping-bag" | "store" | "ticket" | "truck" | "vault" | "wallet" | "coins" | "coupon" | "dollar-sign" | "hand-coins" | "package-check" | "package-open" | "package-plus" | "package-x" | "percent" | "refund" | "scale" | "ship" | "shopping-cart-check" | "shopping-cart-plus" | "warehouse" | "at-sign" | "bell" | "mail" | "message" | "mic" | "paperclip" | "send" | "share" | "bell-off" | "megaphone" | "phone-call" | "broadcast" | "chat-check" | "chat-plus" | "chat-x" | "inbox-mail" | "mail-check" | "mail-open" | "mail-plus" | "mail-x" | "message-circle" | "message-square" | "mic-off" | "notification-dot" | "phone-forwarded" | "phone-incoming" | "phone-missed" | "phone-off" | "phone-outgoing" | "rss-feed" | "share-2" | "voicemail" | "archive" | "camera" | "copy" | "document" | "edit" | "file" | "folder" | "image" | "printer" | "save" | "align-center" | "align-left" | "align-right" | "book-open" | "bookmark" | "camera-off" | "clipboard" | "clipboard-check" | "clipboard-list" | "copy-check" | "file-check" | "file-code" | "file-down" | "file-minus" | "file-plus" | "file-text" | "file-up" | "file-x" | "folder-open" | "folder-plus" | "folder-sync" | "image-plus" | "indent" | "pencil" | "scissors" | "sticky" | "clipboard-copy" | "clipboard-x" | "crop" | "eraser" | "file-archive" | "file-audio" | "file-image" | "file-json" | "file-lock" | "file-spreadsheet" | "file-video" | "folder-check" | "folder-down" | "folder-lock" | "folder-up" | "folder-x" | "newspaper" | "paintbrush" | "palette" | "document-import" | "document-export" | "document-search" | "document-signature" | "file-csv" | "file-pdf" | "file-template" | "image-check" | "scan-document" | "template-plus" | "video-off" | "video" | "battery" | "bluetooth" | "cloud" | "cpu" | "database" | "desktop" | "laptop" | "offline" | "phone" | "server" | "chip" | "cloud-download" | "cloud-upload" | "database-backup" | "database-zap" | "device-tablet" | "hard-drive" | "headphones" | "keyboard" | "monitor" | "plug-zap" | "server-cog" | "wifi-off" | "bluetooth-connected" | "cloud-check" | "cloud-x" | "database-check" | "database-lock" | "mouse" | "network" | "monitor-smartphone" | "router" | "router-wifi" | "smartphone" | "tablet" | "usb" | "barcode-scanner" | "battery-charging" | "battery-full" | "battery-low" | "nfc" | "printer-check" | "server-check" | "server-lock" | "signal" | "signal-low" | "smartwatch" | "watch" | "wifi" | "alert" | "approval" | "audit" | "award" | "brain" | "briefcase" | "building" | "calculator" | "error" | "eye" | "eye-off" | "help" | "info" | "key" | "lock" | "policy" | "shield" | "success" | "accessibility" | "badge" | "check-square" | "fingerprint" | "id" | "life-buoy" | "scale-balanced" | "shield-check" | "shield-lock" | "shield-x" | "user-check" | "user-cog" | "user-minus" | "user-plus" | "user-x" | "users-round" | "unlock" | "user" | "users" | "warning" | "badge-alert" | "badge-check" | "certificate" | "key-round" | "keys" | "lock-keyhole" | "lock-open" | "permission" | "role" | "scan-face" | "shield-alert" | "shield-user" | "user-round" | "user-round-check" | "users-plus" | "x-circle" | "activity" | "calendar" | "clock" | "command" | "download" | "filter" | "flag" | "inbox" | "layers" | "link" | "list" | "package" | "qr-code" | "refresh" | "rocket" | "sliders" | "sync" | "table" | "tag" | "target" | "tool" | "trash" | "branch" | "bug" | "calendar-check" | "calendar-clock" | "calendar-days" | "calendar-plus" | "calendar-x" | "grab" | "history" | "kanban" | "list-check" | "list-filter" | "loader-circle" | "log-in" | "log-out" | "project" | "puzzle" | "repeat" | "reply-all" | "reply" | "sliders-horizontal" | "sliders-vertical" | "sort-asc" | "sort-desc" | "stamp" | "step" | "timer" | "wrench" | "upload" | "automation" | "backlog" | "dependency" | "git-branch" | "git-commit" | "git-merge" | "git-pull-request" | "milestone" | "route-turn" | "status-dot" | "task-check" | "task-clock" | "task-x" | "timeline" | "webhook" | "column-add" | "column-delete" | "data-join" | "data-split" | "data-transform" | "filter-check" | "filter-x" | "row-add" | "row-delete" | "table-export" | "table-import" | "table-search" | "table-settings" | "workflow-branch" | "workflow" | "box" | "compass" | "globe" | "heart" | "location" | "map" | "anchor" | "flask" | "heart-pulse" | "magnet" | "presentation" | "school" | "sitemap" | "suitcase" | "train" | "wand" | "ambulance" | "bed" | "bus" | "car" | "clinic" | "dna" | "factory" | "flag-triangle" | "globe-lock" | "graduation-cap" | "leaf" | "library" | "map-pin-check" | "map-pin-plus" | "map-pin-x" | "microscope" | "plane" | "pill" | "recycle" | "route" | "stethoscope" | "syringe" | "traffic-light" | "wheelchair" | "wind-turbine" | "building-hospital" | "delivery-bike" | "drone" | "fleet-vehicle" | "geo-fence" | "map-route" | "route-off" | "route-plus" | "satellite" | "traffic-cone", IconMetadata>;
+declare const iconMetadata: Record<"batoi" | "uif" | "arrow-down" | "arrow-left" | "arrow-right" | "arrow-up" | "bot" | "check" | "check-circle" | "chevron-down" | "chevron-left" | "chevron-right" | "chevron-up" | "circle-dot" | "close" | "code" | "drag" | "external-link" | "grid" | "hash" | "home" | "maximize" | "menu" | "minus" | "moon" | "more-horizontal" | "more-vertical" | "pause" | "play" | "plus" | "redo" | "search" | "settings" | "sidebar" | "spark" | "star" | "sun" | "terminal" | "theme" | "arrow-down-left" | "arrow-down-right" | "arrow-up-left" | "arrow-up-right" | "chevrons-down" | "chevrons-left" | "chevrons-right" | "chevrons-up" | "columns" | "corner-down-left" | "corner-down-right" | "corner-up-left" | "corner-up-right" | "layout-dashboard" | "layout-list" | "layout-panel-left" | "layout-panel-top" | "panel-bottom" | "panel-left" | "panel-right" | "panel-top" | "play-circle" | "plus-circle" | "plus-square" | "power" | "rotate-clockwise" | "search-check" | "search-x" | "square-dot" | "square-stack" | "stop" | "stop-circle" | "undo" | "arrow-left-right" | "arrow-up-down" | "ban" | "check-check" | "circle" | "circle-alert" | "circle-help" | "ellipsis" | "ellipsis-vertical" | "maximize2" | "minimize" | "minimize2" | "move" | "move-horizontal" | "move-vertical" | "panel-close" | "panel-open" | "pin" | "pin-off" | "rotate-counter-clockwise" | "scan" | "scan-line" | "select" | "toggle-left" | "toggle-right" | "checkbox" | "checkbox-checked" | "checkbox-minus" | "field-required" | "input" | "input-error" | "input-password" | "input-search" | "radio-checked" | "radio-unchecked" | "textarea" | "validation-error" | "x-square" | "zoom-in" | "zoom-out" | "area-chart" | "bar-chart" | "chart" | "dashboard" | "donut-chart" | "gauge-chart" | "histogram" | "line-chart" | "pie-chart" | "radar-chart" | "scatter-chart" | "sparkline" | "chart-candlestick" | "chart-column" | "chart-no-axes" | "chart-stacked" | "axis-x" | "axis-y" | "bubble-chart" | "chart-combo" | "chart-network" | "chart-spline" | "chart-step" | "conversion-funnel" | "dial" | "forecast" | "funnel-chart" | "heatmap" | "horizontal-bar-chart" | "kpi" | "meter" | "progress-ring" | "regression" | "scorecard" | "stacked-area-chart" | "table-chart" | "treemap" | "trend-down" | "trend-up" | "ab-test" | "cohort" | "experiment" | "goal-chart" | "growth-loop" | "retention" | "segment" | "target-metric" | "vertical-bar-chart" | "waterfall-chart" | "bank" | "card" | "cart" | "cash" | "credit-card" | "receipt" | "badge-dollar" | "badge-percent" | "barcode" | "gift" | "invoice" | "landmark" | "shopping-bag" | "store" | "ticket" | "truck" | "vault" | "wallet" | "coins" | "coupon" | "dollar-sign" | "hand-coins" | "package-check" | "package-open" | "package-plus" | "package-x" | "percent" | "refund" | "scale" | "ship" | "shopping-cart-check" | "shopping-cart-plus" | "warehouse" | "at-sign" | "bell" | "mail" | "message" | "mic" | "paperclip" | "send" | "share" | "bell-off" | "megaphone" | "phone-call" | "broadcast" | "chat-check" | "chat-plus" | "chat-x" | "inbox-mail" | "mail-check" | "mail-open" | "mail-plus" | "mail-x" | "message-circle" | "message-square" | "mic-off" | "notification-dot" | "phone-forwarded" | "phone-incoming" | "phone-missed" | "phone-off" | "phone-outgoing" | "rss-feed" | "share-2" | "announcement" | "comment-check" | "comment-x" | "feedback" | "inbox-alert" | "mention" | "message-lock" | "thread" | "voicemail" | "archive" | "camera" | "copy" | "document" | "edit" | "file" | "folder" | "image" | "printer" | "save" | "align-center" | "align-left" | "align-right" | "book-open" | "bookmark" | "camera-off" | "clipboard" | "clipboard-check" | "clipboard-list" | "copy-check" | "file-check" | "file-code" | "file-down" | "file-minus" | "file-plus" | "file-text" | "file-up" | "file-x" | "folder-open" | "folder-plus" | "folder-sync" | "image-plus" | "indent" | "pencil" | "scissors" | "sticky" | "clipboard-copy" | "clipboard-x" | "crop" | "eraser" | "file-archive" | "file-audio" | "file-image" | "file-json" | "file-lock" | "file-spreadsheet" | "file-video" | "folder-check" | "folder-down" | "folder-lock" | "folder-up" | "folder-x" | "newspaper" | "paintbrush" | "palette" | "document-import" | "document-export" | "document-search" | "document-signature" | "file-csv" | "file-pdf" | "file-template" | "image-check" | "scan-document" | "template-plus" | "video-off" | "video" | "battery" | "bluetooth" | "cloud" | "cpu" | "database" | "desktop" | "laptop" | "offline" | "phone" | "server" | "chip" | "cloud-download" | "cloud-upload" | "database-backup" | "database-zap" | "device-tablet" | "hard-drive" | "headphones" | "keyboard" | "monitor" | "plug-zap" | "server-cog" | "wifi-off" | "bluetooth-connected" | "cloud-check" | "cloud-x" | "database-check" | "database-lock" | "mouse" | "network" | "monitor-smartphone" | "router" | "router-wifi" | "smartphone" | "tablet" | "usb" | "barcode-scanner" | "battery-charging" | "battery-full" | "battery-low" | "nfc" | "printer-check" | "server-check" | "server-lock" | "signal" | "signal-low" | "smartwatch" | "watch" | "wifi" | "app-window" | "mobile-camera" | "mobile-check" | "mobile-home" | "mobile-nav" | "mobile-rotate" | "mobile-scan" | "mobile-tab" | "mobile-vibrate" | "mobile-x" | "offline-sync" | "pwa-install" | "alert" | "approval" | "audit" | "award" | "brain" | "briefcase" | "building" | "calculator" | "error" | "eye" | "eye-off" | "help" | "info" | "key" | "lock" | "policy" | "shield" | "success" | "accessibility" | "badge" | "check-square" | "fingerprint" | "id" | "life-buoy" | "scale-balanced" | "shield-check" | "shield-lock" | "shield-x" | "user-check" | "user-cog" | "user-minus" | "user-plus" | "user-x" | "users-round" | "unlock" | "user" | "users" | "warning" | "badge-alert" | "badge-check" | "certificate" | "key-round" | "keys" | "lock-keyhole" | "lock-open" | "permission" | "role" | "scan-face" | "shield-alert" | "shield-user" | "user-round" | "user-round-check" | "users-plus" | "agent" | "agent-check" | "agent-x" | "ai-spark" | "audit-log" | "consent" | "model" | "prompt" | "prompt-lock" | "risk-score" | "tool-approval" | "tool-denied" | "x-circle" | "activity" | "calendar" | "clock" | "command" | "download" | "filter" | "flag" | "inbox" | "layers" | "link" | "list" | "package" | "qr-code" | "refresh" | "rocket" | "sliders" | "sync" | "table" | "tag" | "target" | "tool" | "trash" | "branch" | "bug" | "calendar-check" | "calendar-clock" | "calendar-days" | "calendar-plus" | "calendar-x" | "grab" | "history" | "kanban" | "list-check" | "list-filter" | "loader-circle" | "log-in" | "log-out" | "project" | "puzzle" | "repeat" | "reply-all" | "reply" | "sliders-horizontal" | "sliders-vertical" | "sort-asc" | "sort-desc" | "stamp" | "step" | "timer" | "wrench" | "upload" | "automation" | "backlog" | "dependency" | "git-branch" | "git-commit" | "git-merge" | "git-pull-request" | "milestone" | "route-turn" | "status-dot" | "task-check" | "task-clock" | "task-x" | "timeline" | "webhook" | "column-add" | "column-delete" | "data-join" | "data-split" | "data-transform" | "filter-check" | "filter-x" | "row-add" | "row-delete" | "table-export" | "table-import" | "table-search" | "table-settings" | "workflow-branch" | "approval-pending" | "approval-rejected" | "approval-request" | "escalation" | "handoff" | "queue" | "queue-next" | "retry" | "rollback" | "runbook" | "sla" | "task-priority" | "workflow" | "box" | "compass" | "globe" | "heart" | "location" | "map" | "anchor" | "flask" | "heart-pulse" | "magnet" | "presentation" | "school" | "sitemap" | "suitcase" | "train" | "wand" | "ambulance" | "bed" | "bus" | "car" | "clinic" | "dna" | "factory" | "flag-triangle" | "globe-lock" | "graduation-cap" | "leaf" | "library" | "map-pin-check" | "map-pin-plus" | "map-pin-x" | "microscope" | "plane" | "pill" | "recycle" | "route" | "stethoscope" | "syringe" | "traffic-light" | "wheelchair" | "wind-turbine" | "blood-drop" | "campus" | "cargo-ship" | "classroom" | "container" | "currency-dollar" | "currency-rupee" | "exam" | "first-aid" | "forklift" | "insurance" | "investment" | "lab-report" | "ledger" | "loan" | "medical-chart" | "parcel-location" | "patient" | "tax" | "vaccine" | "building-hospital" | "delivery-bike" | "drone" | "fleet-vehicle" | "geo-fence" | "map-route" | "route-off" | "route-plus" | "satellite" | "traffic-cone", IconMetadata>;
 declare function getIconMetadata(name: IconName | string): IconMetadata | undefined;
 declare function iconsByCategory(category: IconCategory | string): IconName[];
 declare function searchIcons(query?: string, options?: IconSearchOptions): IconName[];

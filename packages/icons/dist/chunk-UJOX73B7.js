@@ -53,6 +53,18 @@ var adminSecurityIcons = {
   "user-round": { body: '<circle cx="12" cy="8" r="5"></circle><path d="M4 21a8 8 0 0 1 16 0"></path>' },
   "user-round-check": { body: '<circle cx="10" cy="8" r="5"></circle><path d="M2 21a8 8 0 0 1 13-6.3"></path><path d="m16 18 2 2 4-4"></path>' },
   "users-plus": { body: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M19 8v6"></path><path d="M16 11h6"></path>' },
+  agent: { body: '<rect x="5" y="7" width="14" height="12" rx="4"></rect><path d="M12 3v4"></path><circle cx="9" cy="13" r="1"></circle><circle cx="15" cy="13" r="1"></circle><path d="M9 17h6"></path>' },
+  "agent-check": { body: '<rect x="4" y="7" width="12" height="12" rx="4"></rect><path d="M10 3v4"></path><circle cx="8" cy="13" r="1"></circle><circle cx="12" cy="13" r="1"></circle><path d="m15 18 2 2 5-5"></path>' },
+  "agent-x": { body: '<rect x="4" y="7" width="12" height="12" rx="4"></rect><path d="M10 3v4"></path><circle cx="8" cy="13" r="1"></circle><circle cx="12" cy="13" r="1"></circle><path d="m17 16 5 5"></path><path d="m22 16-5 5"></path>' },
+  "ai-spark": { body: '<path d="M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6L12 3z"></path><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"></path>' },
+  "audit-log": { body: '<path d="M5 3h14v18H5z"></path><path d="M8 8h8"></path><path d="M8 12h5"></path><path d="M8 16h4"></path><circle cx="17" cy="16" r="3"></circle><path d="M17 14.5V16l1 1"></path>' },
+  consent: { body: '<path d="M7 21V8a4 4 0 0 1 8 0v5"></path><path d="M15 13V6a3 3 0 0 1 6 0v8a7 7 0 0 1-7 7H7"></path><path d="m5 14 2 2 4-4"></path>' },
+  model: { body: '<path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3z"></path><path d="M12 12 4 7.5"></path><path d="m12 12 8-4.5"></path><path d="M12 12v9"></path>' },
+  prompt: { body: '<rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m7 9 3 3-3 3"></path><path d="M12 15h5"></path>' },
+  "prompt-lock": { body: '<rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m7 9 3 3-3 3"></path><rect x="13" y="12" width="6" height="5" rx="1"></rect><path d="M14.5 12v-1.5a1.5 1.5 0 0 1 3 0V12"></path>' },
+  "risk-score": { body: '<path d="m12 3 10 18H2L12 3z"></path><path d="M8 17h8"></path><path d="m9 13 2 2 4-5"></path>' },
+  "tool-approval": { body: '<path d="M14.7 6.3a4 4 0 0 0-5.5 5.5L4 17v3h3l5.2-5.2a4 4 0 0 0 5.5-5.5l-2.5 2.5-3-3 2.5-2.5z"></path><path d="m16 19 2 2 4-4"></path>' },
+  "tool-denied": { body: '<path d="M14.7 6.3a4 4 0 0 0-5.5 5.5L4 17v3h3l5.2-5.2a4 4 0 0 0 5.5-5.5l-2.5 2.5-3-3 2.5-2.5z"></path><path d="m17 17 4 4"></path><path d="m21 17-4 4"></path>' },
   "x-circle": { body: '<circle cx="12" cy="12" r="9"></circle><path d="M15 9 9 15"></path><path d="m9 9 6 6"></path>' }
 };
 

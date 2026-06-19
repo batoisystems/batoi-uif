@@ -216,6 +216,7 @@
   width: 100%;
   height: auto;
   display: block;
+  overflow: visible;
 }
 .uif-chart-svg rect,
 .uif-chart-svg .uif-chart-mark {
@@ -226,6 +227,8 @@
   stroke: var(--uif-chart-1);
   stroke-width: 3;
   fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
 .uif-chart-svg .uif-chart-area,
@@ -233,6 +236,7 @@
   fill: color-mix(in srgb, var(--uif-chart-1), transparent 72%);
   stroke: var(--uif-chart-1);
   stroke-width: 2;
+  stroke-linejoin: round;
 }
 .uif-chart-grid {
   stroke: var(--uif-chart-grid);
@@ -247,6 +251,7 @@
 .uif-chart-axis-label {
   fill: var(--uif-chart-axis);
   font-size: 11px;
+  font-weight: 600;
 }
 .uif-chart-value {
   fill: none;
@@ -273,6 +278,7 @@
 .uif-chart-svg text {
   fill: var(--uif-chart-label);
   font-size: 12px;
+  font-weight: 600;
 }
 .uif-chart-metric {
   display: grid;
@@ -508,11 +514,17 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  min-height: 1.65rem;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid color-mix(in srgb, var(--uif-border), transparent 18%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--uif-surface-elevated), transparent 7%);
+  font-weight: 650;
 }
 .uif-chart-legend i {
   width: 0.7rem;
   height: 0.7rem;
-  border-radius: 0.2rem;
+  border-radius: 999px;
   display: inline-block;
 }
 .uif-chart-regression,

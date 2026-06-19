@@ -122,6 +122,66 @@ declare const domainIcons: {
     readonly 'wind-turbine': {
         readonly body: "<circle cx=\"12\" cy=\"8\" r=\"2\"></circle><path d=\"M12 10v11\"></path><path d=\"M12 8 5 5\"></path><path d=\"M12 8l7-3\"></path><path d=\"M12 8l2 8\"></path>";
     };
+    readonly 'blood-drop': {
+        readonly body: "<path d=\"M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z\"></path>";
+    };
+    readonly campus: {
+        readonly body: "<path d=\"m3 10 9-6 9 6\"></path><path d=\"M5 10v9\"></path><path d=\"M9 10v9\"></path><path d=\"M15 10v9\"></path><path d=\"M19 10v9\"></path><path d=\"M3 21h18\"></path><path d=\"M12 4v3\"></path>";
+    };
+    readonly 'cargo-ship': {
+        readonly body: "<path d=\"M4 17h16l-3 4H7l-3-4z\"></path><path d=\"M7 17V9h9l3 8\"></path><path d=\"M9 9V5h5v4\"></path><path d=\"M3 21c2-1 4-1 6 0s4 1 6 0 4-1 6 0\"></path>";
+    };
+    readonly classroom: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"11\" rx=\"2\"></rect><path d=\"M8 21l4-6 4 6\"></path><path d=\"M8 9h8\"></path><path d=\"M8 12h5\"></path>";
+    };
+    readonly container: {
+        readonly body: "<rect x=\"3\" y=\"7\" width=\"18\" height=\"10\" rx=\"2\"></rect><path d=\"M7 7v10\"></path><path d=\"M11 7v10\"></path><path d=\"M15 7v10\"></path><path d=\"M19 7v10\"></path>";
+    };
+    readonly 'currency-dollar': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 6v12\"></path><path d=\"M16 8.5c-1-.8-2.3-1.2-4-1.2-2 0-3 .8-3 2s1 1.8 3 2.2 4 1 4 3-1.4 3.2-4 3.2c-1.8 0-3.2-.5-4.2-1.4\"></path>";
+    };
+    readonly 'currency-rupee': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M9 7h7\"></path><path d=\"M9 10h7\"></path><path d=\"M14 7a3 3 0 0 1-3 5H9l6 5\"></path>";
+    };
+    readonly exam: {
+        readonly body: "<path d=\"M6 3h12v18H6z\"></path><path d=\"M9 8h6\"></path><path d=\"M9 12h6\"></path><path d=\"M9 16h3\"></path><path d=\"m14 17 1.5 1.5L19 15\"></path>";
+    };
+    readonly 'first-aid': {
+        readonly body: "<rect x=\"4\" y=\"6\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M9 6V4h6v2\"></path><path d=\"M12 10v6\"></path><path d=\"M9 13h6\"></path>";
+    };
+    readonly forklift: {
+        readonly body: "<path d=\"M5 16V7h7l3 5v4\"></path><circle cx=\"7\" cy=\"18\" r=\"2\"></circle><circle cx=\"15\" cy=\"18\" r=\"2\"></circle><path d=\"M15 12h5v8\"></path><path d=\"M20 16h2\"></path><path d=\"M8 10h4\"></path>";
+    };
+    readonly insurance: {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"M8 12h8\"></path><path d=\"M12 8v8\"></path>";
+    };
+    readonly investment: {
+        readonly body: "<path d=\"M3 21h18\"></path><path d=\"M6 17v-5\"></path><path d=\"M12 17V7\"></path><path d=\"M18 17v-8\"></path><path d=\"m6 10 6-5 6 4\"></path><path d=\"M16 5h4v4\"></path>";
+    };
+    readonly 'lab-report': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 17h8\"></path><path d=\"M10 9h4\"></path><path d=\"M11 9v5l-2 3\"></path><path d=\"M13 9v5l2 3\"></path>";
+    };
+    readonly ledger: {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M9 3v18\"></path><path d=\"M12 8h4\"></path><path d=\"M12 12h4\"></path><path d=\"M12 16h3\"></path>";
+    };
+    readonly loan: {
+        readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M8 15h4\"></path><path d=\"M15 14l2 2 4-4\"></path>";
+    };
+    readonly 'medical-chart': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 15h3l2-5 2 7 2-4h3\"></path>";
+    };
+    readonly 'parcel-location': {
+        readonly body: "<path d=\"m21 8-9-5-9 5 9 5 9-5z\"></path><path d=\"M3 8v8l9 5 4-2.2\"></path><path d=\"M12 13v8\"></path><path d=\"M20 16c0 3-4 6-4 6s-4-3-4-6a4 4 0 1 1 8 0z\"></path><circle cx=\"16\" cy=\"16\" r=\"1\"></circle>";
+    };
+    readonly patient: {
+        readonly body: "<circle cx=\"12\" cy=\"7\" r=\"4\"></circle><path d=\"M4 21a8 8 0 0 1 16 0\"></path><path d=\"M12 14v5\"></path><path d=\"M9.5 16.5h5\"></path>";
+    };
+    readonly tax: {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"m8 17 8-8\"></path><circle cx=\"9\" cy=\"10\" r=\"1\"></circle><circle cx=\"15\" cy=\"16\" r=\"1\"></circle>";
+    };
+    readonly vaccine: {
+        readonly body: "<path d=\"m18 2 4 4\"></path><path d=\"m17 7 2-2\"></path><path d=\"M4 20l5-5\"></path><path d=\"m9 15 6-6 4 4-6 6H9v-4z\"></path><path d=\"M7 18 4 21\"></path><path d=\"M12 12h4\"></path>";
+    };
     readonly 'building-hospital': {
         readonly body: "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"></rect><path d=\"M12 7v6\"></path><path d=\"M9 10h6\"></path><path d=\"M8 21v-5h8v5\"></path>";
     };

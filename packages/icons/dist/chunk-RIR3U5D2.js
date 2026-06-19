@@ -48,7 +48,19 @@ var deviceIcons = {
   "signal-low": { body: '<path d="M4 20h.01"></path><path d="M8 20v-4"></path><path d="M12 20v-8"></path><path d="M16 20"></path><path d="M20 20"></path>' },
   smartwatch: { body: '<rect x="7" y="6" width="10" height="12" rx="3"></rect><path d="M9 6V3h6v3"></path><path d="M9 18v3h6v-3"></path><path d="M11 12h2"></path>' },
   watch: { body: '<circle cx="12" cy="12" r="5"></circle><path d="M9 2h6l1 4H8l1-4z"></path><path d="M8 18h8l-1 4H9l-1-4z"></path><path d="M12 9v3l2 1"></path>' },
-  wifi: { body: '<path d="M5 13a10 10 0 0 1 14 0"></path><path d="M8.5 16.5a5 5 0 0 1 7 0"></path><path d="M12 20h.01"></path>' }
+  wifi: { body: '<path d="M5 13a10 10 0 0 1 14 0"></path><path d="M8.5 16.5a5 5 0 0 1 7 0"></path><path d="M12 20h.01"></path>' },
+  "app-window": { body: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18"></path><path d="M7 6.5h.01"></path><path d="M11 6.5h.01"></path><path d="M7 13h10"></path><path d="M7 17h6"></path>' },
+  "mobile-camera": { body: '<rect x="7" y="2" width="10" height="20" rx="2"></rect><circle cx="12" cy="11" r="3"></circle><path d="M10 7h4"></path><path d="M11 18h2"></path>' },
+  "mobile-check": { body: '<rect x="7" y="2" width="10" height="20" rx="2"></rect><path d="m9 12 2 2 4-4"></path><path d="M11 18h2"></path>' },
+  "mobile-home": { body: '<rect x="7" y="2" width="10" height="20" rx="2"></rect><path d="m9 12 3-3 3 3"></path><path d="M10 12v3h4v-3"></path><path d="M11 18h2"></path>' },
+  "mobile-nav": { body: '<rect x="7" y="2" width="10" height="20" rx="2"></rect><path d="M9 16h6"></path><path d="M9 12h6"></path><path d="M9 8h6"></path><path d="M11 18h2"></path>' },
+  "mobile-rotate": { body: '<rect x="8" y="3" width="8" height="14" rx="2"></rect><path d="M4 16a8 8 0 0 0 14 4"></path><path d="m18 16 1 4h-4"></path>' },
+  "mobile-scan": { body: '<rect x="7" y="2" width="10" height="20" rx="2"></rect><path d="M9 8h6"></path><path d="M9 16h6"></path><path d="M10 10v4"></path><path d="M14 10v4"></path>' },
+  "mobile-tab": { body: '<rect x="7" y="2" width="10" height="20" rx="2"></rect><path d="M8 16h8"></path><path d="M10 16v3"></path><path d="M14 16v3"></path><path d="M11 18h2"></path>' },
+  "mobile-vibrate": { body: '<path d="M4 8v8"></path><path d="M20 8v8"></path><rect x="8" y="3" width="8" height="18" rx="2"></rect><path d="M11 18h2"></path>' },
+  "mobile-x": { body: '<rect x="7" y="2" width="10" height="20" rx="2"></rect><path d="m9 10 6 6"></path><path d="m15 10-6 6"></path><path d="M11 18h2"></path>' },
+  "offline-sync": { body: '<path d="M2 2l20 20"></path><path d="M21 12a9 9 0 0 1-4.2 7.6"></path><path d="M3 12a9 9 0 0 1 13.7-7.7"></path><path d="M3 16v5h5"></path><path d="M21 8V3h-5"></path>' },
+  "pwa-install": { body: '<rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M12 7v8"></path><path d="m8 11 4 4 4-4"></path><path d="M10 18h4"></path>' }
 };
 
 export {
