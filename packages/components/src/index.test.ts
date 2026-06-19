@@ -413,6 +413,7 @@ describe('components', () => {
           </nav>
         </aside>
         <button id="toggle" data-uif-action="toggle" data-uif-target="#workspace-shell">Toggle sidebar</button>
+        <button id="toggle-sidebar" data-uif-action="toggle-sidebar" data-uif-target="#workspace-shell">Collapse</button>
         <button id="density" data-uif-action="set-density" data-uif-density="comfortable">Comfortable</button>
         <main data-uif-role="main">Workspace</main>
       </div>`;
@@ -440,6 +441,12 @@ describe('components', () => {
     document.querySelector('#toggle')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(shell?.dataset.uifSidebar).toBe('expanded');
     expect(window.localStorage.getItem('workspace-sidebar')).toBe('expanded');
+
+    document
+      .querySelector('#toggle-sidebar')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(shell?.dataset.uifSidebar).toBe('collapsed');
+    expect(window.localStorage.getItem('workspace-sidebar')).toBe('collapsed');
 
     document.querySelector('#density')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(shell?.dataset.uifDensity).toBe('comfortable');

@@ -666,6 +666,64 @@
   padding: 1rem;
 }
 
+.component-drawer-inner[data-uif-role='header'] {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.2rem;
+  border-bottom: 1px solid #e3eaf2;
+}
+
+.component-drawer-inner[data-uif-role='header'] p {
+  margin: 0.25rem 0 0;
+  color: #667085;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.component-drawer-inner[data-uif-role='header'] .uif-btn {
+  flex: 0 0 auto;
+}
+
+.component-drawer-inner[data-uif-role='body'] {
+  align-content: start;
+  gap: 1rem;
+  padding: 1.2rem;
+}
+
+.component-drawer-inner[data-uif-role='body'] .uif-field {
+  gap: 0.45rem;
+  color: #344054;
+  font-size: 0.88rem;
+  font-weight: 760;
+}
+
+.component-drawer-inner[data-uif-role='body'] .uif-input {
+  min-height: 2.6rem;
+  padding: 0.45rem 0.7rem;
+}
+
+.component-drawer-inner[data-uif-role='body'] > .uif-btn {
+  width: 100%;
+  min-height: 2.65rem;
+  margin-top: 0.25rem;
+}
+
+.component-drawer-inner[data-uif-role='body'] .uif-sidebar-nav {
+  gap: 0.35rem;
+  padding: 0;
+}
+
+.component-drawer-inner[data-uif-role='body'] .uif-sidebar-nav a {
+  justify-content: flex-start;
+  min-height: 2.6rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.5rem;
+  font-size: 0.92rem;
+  font-weight: 760;
+}
+
 .component-menu {
   position: relative;
   display: inline-block;

@@ -437,6 +437,11 @@ function initShell(el) {
       event.preventDefault();
       setSection(action, action.getAttribute("aria-expanded") !== "true");
     }
+    if (action.dataset.uifAction === "toggle-sidebar" || action.dataset.uifAction === "toggle" && resolveComponentTarget(action) === el) {
+      event.preventDefault();
+      event.stopPropagation();
+      setSidebar(el.dataset.uifSidebar !== "collapsed");
+    }
     if (action.dataset.uifDensity) {
       event.preventDefault();
       setDensity(action.dataset.uifDensity);
