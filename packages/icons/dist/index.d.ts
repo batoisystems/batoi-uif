@@ -225,6 +225,150 @@ declare const icons: {
     readonly 'traffic-cone': {
         readonly body: "<path d=\"m12 3 7 18H5l7-18z\"></path><path d=\"M9 11h6\"></path><path d=\"M7 17h10\"></path>";
     };
+    readonly agriculture: {
+        readonly body: "<path d=\"M5 21c0-8 6-16 16-18 0 10-8 16-16 18z\"></path><path d=\"M5 21c3-6 7-9 12-12\"></path><path d=\"M4 13c4 0 7 3 8 7\"></path>";
+    };
+    readonly 'case-management': {
+        readonly body: "<rect x=\"3\" y=\"7\" width=\"18\" height=\"13\" rx=\"2\"></rect><path d=\"M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"></path><path d=\"M8 12h8\"></path><path d=\"M8 16h5\"></path>";
+    };
+    readonly crm: {
+        readonly body: "<circle cx=\"8\" cy=\"8\" r=\"3\"></circle><path d=\"M3 21a5 5 0 0 1 10 0\"></path><path d=\"M14 7h7\"></path><path d=\"M14 11h5\"></path><path d=\"M14 15h7\"></path><path d=\"M14 19h4\"></path>";
+    };
+    readonly energy: {
+        readonly body: "<path d=\"M13 2 6 13h5l-2 9 8-12h-5l1-8z\"></path><path d=\"M4 21h16\"></path>";
+    };
+    readonly hospitality: {
+        readonly body: "<path d=\"M4 21V8a4 4 0 0 1 8 0v13\"></path><path d=\"M12 11h8v10\"></path><path d=\"M16 15h.01\"></path><path d=\"M16 18h.01\"></path><path d=\"M8 15h.01\"></path>";
+    };
+    readonly hr: {
+        readonly body: "<circle cx=\"8\" cy=\"8\" r=\"4\"></circle><path d=\"M2 21a6 6 0 0 1 12 0\"></path><path d=\"M17 7h4\"></path><path d=\"M19 5v4\"></path><path d=\"M16 14h6\"></path><path d=\"M16 18h4\"></path>";
+    };
+    readonly legal: {
+        readonly body: "<path d=\"M12 3v18\"></path><path d=\"M5 21h14\"></path><path d=\"M6 7h12\"></path><path d=\"m6 7-3 6h6L6 7z\"></path><path d=\"m18 7-3 6h6l-3-6z\"></path>";
+    };
+    readonly manufacturing: {
+        readonly body: "<path d=\"M3 21V9l6 4V9l6 4V5h6v16H3z\"></path><path d=\"M7 17h.01\"></path><path d=\"M11 17h.01\"></path><path d=\"M15 17h.01\"></path><path d=\"M18 9h3\"></path>";
+    };
+    readonly 'public-sector': {
+        readonly body: "<path d=\"m3 10 9-6 9 6\"></path><path d=\"M5 10v9\"></path><path d=\"M9 10v9\"></path><path d=\"M15 10v9\"></path><path d=\"M19 10v9\"></path><path d=\"M3 21h18\"></path><path d=\"M12 4v3\"></path>";
+    };
+    readonly 'quality-control': {
+        readonly body: "<path d=\"M4 5h16v14H4z\"></path><path d=\"M8 9h8\"></path><path d=\"m8 14 2 2 5-5\"></path><circle cx=\"18\" cy=\"16\" r=\"2\"></circle>";
+    };
+    readonly 'real-estate': {
+        readonly body: "<path d=\"m3 11 9-8 9 8\"></path><path d=\"M5 10v10h14V10\"></path><path d=\"M9 20v-6h6v6\"></path><path d=\"M16 5h3v4\"></path>";
+    };
+    readonly recruiting: {
+        readonly body: "<circle cx=\"8\" cy=\"8\" r=\"4\"></circle><path d=\"M2 21a6 6 0 0 1 12 0\"></path><circle cx=\"18\" cy=\"10\" r=\"3\"></circle><path d=\"M18 13v6\"></path><path d=\"M15 16h6\"></path>";
+    };
+    readonly 'service-desk': {
+        readonly body: "<path d=\"M4 14v-2a8 8 0 0 1 16 0v2\"></path><rect x=\"3\" y=\"14\" width=\"4\" height=\"7\" rx=\"2\"></rect><rect x=\"17\" y=\"14\" width=\"4\" height=\"7\" rx=\"2\"></rect><path d=\"M12 19h5\"></path>";
+    };
+    readonly 'support-case': {
+        readonly body: "<path d=\"M4 5h16v12H7l-4 4V5z\"></path><path d=\"M9.5 9a2.8 2.8 0 0 1 5 1.8c0 2.2-2.5 2.4-2.5 4.2\"></path><path d=\"M12 18h.01\"></path>";
+    };
+    readonly 'ticket-queue': {
+        readonly body: "<path d=\"M3 9a3 3 0 0 0 0 6v3h18v-3a3 3 0 0 0 0-6V6H3v3z\"></path><path d=\"M13 6v12\"></path><path d=\"M6 21h12\"></path>";
+    };
+    readonly tourism: {
+        readonly body: "<path d=\"M3 21h18\"></path><path d=\"M6 21 9 8h6l3 13\"></path><path d=\"M12 8V3\"></path><path d=\"M9 3h6\"></path><path d=\"M8 14h8\"></path>";
+    };
+    readonly 'asset-maintenance': {
+        readonly body: "<path d=\"m21 8-9-5-9 5 9 5 9-5z\"></path><path d=\"M3 8v8l9 5 9-5V8\"></path><path d=\"M16 15a3 3 0 1 1-4.5 2.6\"></path><path d=\"M16 12v3h-3\"></path>";
+    };
+    readonly 'care-team': {
+        readonly body: "<circle cx=\"8\" cy=\"8\" r=\"3\"></circle><circle cx=\"16\" cy=\"8\" r=\"3\"></circle><path d=\"M3 21a5 5 0 0 1 10 0\"></path><path d=\"M11 21a5 5 0 0 1 10 0\"></path><path d=\"M12 13v5\"></path><path d=\"M9.5 15.5h5\"></path>";
+    };
+    readonly dispatch: {
+        readonly body: "<path d=\"M5 17h14v-5l-2-5H7l-2 5v5z\"></path><circle cx=\"8\" cy=\"17\" r=\"2\"></circle><circle cx=\"16\" cy=\"17\" r=\"2\"></circle><path d=\"M3 7h2\"></path><path d=\"M19 7h2\"></path><path d=\"m12 3 3 3-3 3\"></path>";
+    };
+    readonly facilities: {
+        readonly body: "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"></rect><path d=\"M8 7h.01\"></path><path d=\"M12 7h.01\"></path><path d=\"M16 7h.01\"></path><path d=\"M8 11h.01\"></path><path d=\"M12 11h.01\"></path><path d=\"M16 11h.01\"></path><path d=\"M9 21v-5h6v5\"></path><path d=\"M6 3V1\"></path>";
+    };
+    readonly 'field-service': {
+        readonly body: "<path d=\"M5 17h14v-5l-2-5H7l-2 5v5z\"></path><circle cx=\"8\" cy=\"17\" r=\"2\"></circle><circle cx=\"16\" cy=\"17\" r=\"2\"></circle><path d=\"M12 4v5\"></path><path d=\"M9.5 6.5h5\"></path>";
+    };
+    readonly 'fleet-route': {
+        readonly body: "<circle cx=\"6\" cy=\"6\" r=\"3\"></circle><circle cx=\"18\" cy=\"18\" r=\"3\"></circle><path d=\"M9 6h4a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h6\"></path><path d=\"M5 14h4l1 2\"></path><path d=\"M3 16h8\"></path>";
+    };
+    readonly 'patient-portal': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><circle cx=\"10\" cy=\"11\" r=\"2\"></circle><path d=\"M7 17a3 3 0 0 1 6 0\"></path><path d=\"M16 10v5\"></path><path d=\"M13.5 12.5h5\"></path>";
+    };
+    readonly 'repair-order': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h5\"></path><path d=\"M17 14v6\"></path><path d=\"M14 17h6\"></path>";
+    };
+    readonly 'site-visit': {
+        readonly body: "<path d=\"M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0z\"></path><circle cx=\"12\" cy=\"10\" r=\"3\"></circle><path d=\"M8 21h8\"></path><path d=\"M12 18v3\"></path>";
+    };
+    readonly triage: {
+        readonly body: "<path d=\"M4 5h16v14H4z\"></path><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><path d=\"M16 13v6\"></path><path d=\"M13 16h6\"></path>";
+    };
+    readonly claims: {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 12h8\"></path><path d=\"M8 16h4\"></path><path d=\"m15 17 2 2 4-4\"></path>";
+    };
+    readonly construction: {
+        readonly body: "<path d=\"M3 21h18\"></path><path d=\"M6 21V9l6-5 6 5v12\"></path><path d=\"M9 21v-7h6v7\"></path><path d=\"M4 9h16\"></path>";
+    };
+    readonly 'hotel-room': {
+        readonly body: "<path d=\"M3 7v13\"></path><path d=\"M21 12v8\"></path><path d=\"M3 14h18\"></path><path d=\"M6 10h4a2 2 0 0 1 2 2v2H3v-4a3 3 0 0 1 3-3z\"></path><path d=\"M15 8h4v4\"></path>";
+    };
+    readonly 'insurance-policy': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"M9 9h6\"></path><path d=\"M9 13h6\"></path><path d=\"M9 17h3\"></path>";
+    };
+    readonly lab: {
+        readonly body: "<path d=\"M9 2h6\"></path><path d=\"M10 2v6l-5.5 9.5A3 3 0 0 0 7.1 22h9.8a3 3 0 0 0 2.6-4.5L14 8V2\"></path><path d=\"M8 16h8\"></path><circle cx=\"11\" cy=\"13\" r=\"1\"></circle>";
+    };
+    readonly 'meter-reading': {
+        readonly body: "<path d=\"M4 15a8 8 0 1 1 16 0\"></path><path d=\"M12 15l4-5\"></path><path d=\"M7 19h10\"></path><path d=\"M8 15h.01\"></path><path d=\"M16 15h.01\"></path>";
+    };
+    readonly mining: {
+        readonly body: "<path d=\"M3 21h18\"></path><path d=\"M6 21 12 4l6 17\"></path><path d=\"M8 15h8\"></path><path d=\"M10 10h4\"></path><path d=\"M5 6h14\"></path>";
+    };
+    readonly pharmacy: {
+        readonly body: "<rect x=\"4\" y=\"6\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M9 6V4h6v2\"></path><path d=\"M12 10v6\"></path><path d=\"M9 13h6\"></path><path d=\"M7 20h10\"></path>";
+    };
+    readonly radiology: {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"5\"></circle><path d=\"M12 7v10\"></path><path d=\"M7 12h10\"></path><path d=\"m9 9 6 6\"></path><path d=\"m15 9-6 6\"></path>";
+    };
+    readonly restaurant: {
+        readonly body: "<path d=\"M7 3v8\"></path><path d=\"M5 3v4a2 2 0 0 0 4 0V3\"></path><path d=\"M7 11v10\"></path><path d=\"M16 3v18\"></path><path d=\"M13 3h3a4 4 0 0 1 0 8h-3\"></path>";
+    };
+    readonly telemedicine: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><circle cx=\"9\" cy=\"11\" r=\"2\"></circle><path d=\"M6 17a3 3 0 0 1 6 0\"></path><path d=\"M16 10v5\"></path><path d=\"M13.5 12.5h5\"></path>";
+    };
+    readonly 'utility-pole': {
+        readonly body: "<path d=\"M12 3v18\"></path><path d=\"M5 7h14\"></path><path d=\"M7 21l5-14 5 14\"></path><path d=\"M5 11h14\"></path>";
+    };
+    readonly airport: {
+        readonly body: "<path d=\"M3 21h18\"></path><path d=\"M12 3v12\"></path><path d=\"m4 10 8 3 8-3\"></path><path d=\"m8 18 4-3 4 3\"></path>";
+    };
+    readonly 'branch-office': {
+        readonly body: "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"></rect><path d=\"M8 7h.01\"></path><path d=\"M12 7h.01\"></path><path d=\"M16 7h.01\"></path><path d=\"M8 11h.01\"></path><path d=\"M12 11h.01\"></path><path d=\"M16 11h.01\"></path><path d=\"M9 21v-5h6v5\"></path><path d=\"M4 14h16\"></path>";
+    };
+    readonly 'call-center': {
+        readonly body: "<path d=\"M4 14v-2a8 8 0 0 1 16 0v2\"></path><rect x=\"3\" y=\"14\" width=\"4\" height=\"7\" rx=\"2\"></rect><rect x=\"17\" y=\"14\" width=\"4\" height=\"7\" rx=\"2\"></rect><path d=\"M12 19h5\"></path><circle cx=\"12\" cy=\"8\" r=\"2\"></circle>";
+    };
+    readonly 'data-center': {
+        readonly body: "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"></rect><path d=\"M8 7h8\"></path><path d=\"M8 11h8\"></path><path d=\"M8 15h8\"></path><path d=\"M8 19h8\"></path><path d=\"M6 7h.01\"></path><path d=\"M6 11h.01\"></path><path d=\"M6 15h.01\"></path>";
+    };
+    readonly 'emergency-room': {
+        readonly body: "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"></rect><path d=\"M12 7v6\"></path><path d=\"M9 10h6\"></path><path d=\"M8 21v-5h8v5\"></path><path d=\"M18 5l3-3\"></path>";
+    };
+    readonly 'government-office': {
+        readonly body: "<path d=\"m3 10 9-6 9 6\"></path><path d=\"M5 10v9\"></path><path d=\"M9 10v9\"></path><path d=\"M15 10v9\"></path><path d=\"M19 10v9\"></path><path d=\"M3 21h18\"></path><path d=\"M12 4v3\"></path><path d=\"M10 14h4\"></path>";
+    };
+    readonly 'insurance-claim': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"M8 11h8\"></path><path d=\"M8 15h5\"></path><path d=\"m14 17 2 2 4-4\"></path>";
+    };
+    readonly 'inventory-site': {
+        readonly body: "<path d=\"M3 21V8l9-5 9 5v13\"></path><path d=\"M7 21v-8h10v8\"></path><path d=\"M7 13h10\"></path><path d=\"M7 17h10\"></path><path d=\"M4 8h16\"></path><path d=\"M12 3v5\"></path>";
+    };
+    readonly 'logistics-hub': {
+        readonly body: "<circle cx=\"6\" cy=\"6\" r=\"3\"></circle><circle cx=\"18\" cy=\"6\" r=\"3\"></circle><circle cx=\"12\" cy=\"18\" r=\"3\"></circle><path d=\"M9 6h6\"></path><path d=\"m8 8 3 7\"></path><path d=\"m16 8-3 7\"></path><path d=\"M12 3v3\"></path>";
+    };
+    readonly 'power-grid': {
+        readonly body: "<path d=\"M12 3v18\"></path><path d=\"M5 7h14\"></path><path d=\"M7 21l5-14 5 14\"></path><path d=\"M4 15h16\"></path><circle cx=\"12\" cy=\"7\" r=\"2\"></circle><circle cx=\"6\" cy=\"15\" r=\"2\"></circle><circle cx=\"18\" cy=\"15\" r=\"2\"></circle>";
+    };
     readonly activity: {
         readonly body: "<path d=\"M22 12h-4l-3 8L9 4l-3 8H2\"></path>";
     };
@@ -501,8 +645,140 @@ declare const icons: {
     readonly 'task-priority': {
         readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"M8 16h3\"></path><path d=\"M17 8v6\"></path><path d=\"M17 18h.01\"></path>";
     };
+    readonly 'ai-run': {
+        readonly body: "<path d=\"m12 3 1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6L12 3z\"></path><path d=\"M5 21h14\"></path><path d=\"m14 18 3 3 3-3\"></path>";
+    };
+    readonly 'event-stream': {
+        readonly body: "<path d=\"M4 6h4\"></path><path d=\"M4 12h8\"></path><path d=\"M4 18h4\"></path><path d=\"M14 6h6\"></path><path d=\"M16 12h4\"></path><path d=\"M14 18h6\"></path><path d=\"m10 6 4 6-4 6\"></path>";
+    };
+    readonly 'html-partial': {
+        readonly body: "<path d=\"m8 6-5 6 5 6\"></path><path d=\"m16 6 5 6-5 6\"></path><path d=\"M10 4h4\"></path><path d=\"M10 20h4\"></path><path d=\"M12 4v16\"></path>";
+    };
+    readonly hydrate: {
+        readonly body: "<path d=\"M4 8h8\"></path><path d=\"m9 5 3 3-3 3\"></path><path d=\"M20 16h-8\"></path><path d=\"m15 13-3 3 3 3\"></path><rect x=\"4\" y=\"13\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"14\" y=\"5\" width=\"6\" height=\"6\" rx=\"2\"></rect>";
+    };
+    readonly job: {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><path d=\"M8 17h3\"></path><circle cx=\"17\" cy=\"16\" r=\"2\"></circle>";
+    };
+    readonly 'job-failed': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h8\"></path><path d=\"m14 14 5 5\"></path><path d=\"m19 14-5 5\"></path>";
+    };
+    readonly 'job-running': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h8\"></path><path d=\"M8 13h4\"></path><path d=\"M16 14a3 3 0 1 1-2.1 5.1\"></path><path d=\"M16 12v3h-3\"></path>";
+    };
+    readonly 'mcp-call': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"8\" height=\"8\" rx=\"2\"></rect><rect x=\"13\" y=\"11\" width=\"8\" height=\"8\" rx=\"2\"></rect><path d=\"M11 9h2a4 4 0 0 1 4 4\"></path><path d=\"m15 9 2 4 4-2\"></path>";
+    };
+    readonly 'mcp-result': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"8\" height=\"8\" rx=\"2\"></rect><rect x=\"13\" y=\"11\" width=\"8\" height=\"8\" rx=\"2\"></rect><path d=\"M11 9h2a4 4 0 0 1 4 4\"></path><path d=\"m15 17 2 2 5-5\"></path>";
+    };
+    readonly orchestration: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"15\" y=\"4\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"9\" y=\"16\" width=\"6\" height=\"6\" rx=\"2\"></rect><path d=\"M9 7h6\"></path><path d=\"m8 10 3 6\"></path><path d=\"m16 10-3 6\"></path>";
+    };
+    readonly 'partial-swap': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"8\" height=\"14\" rx=\"2\"></rect><rect x=\"13\" y=\"5\" width=\"8\" height=\"14\" rx=\"2\"></rect><path d=\"m8 9 3 3-3 3\"></path><path d=\"m16 15-3-3 3-3\"></path>";
+    };
+    readonly polling: {
+        readonly body: "<path d=\"M21 12a9 9 0 0 1-15.4 6.4L3 16\"></path><path d=\"M3 21v-5h5\"></path><path d=\"M3 12A9 9 0 0 1 18.4 5.6L21 8\"></path><path d=\"M21 3v5h-5\"></path><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>";
+    };
+    readonly rehydrate: {
+        readonly body: "<path d=\"M21 12a9 9 0 0 1-15.4 6.4L3 16\"></path><path d=\"M3 21v-5h5\"></path><rect x=\"8\" y=\"8\" width=\"8\" height=\"8\" rx=\"2\"></rect><path d=\"M12 8v8\"></path><path d=\"M8 12h8\"></path>";
+    };
+    readonly revalidate: {
+        readonly body: "<path d=\"M21 12a9 9 0 0 1-15.4 6.4L3 16\"></path><path d=\"M3 21v-5h5\"></path><path d=\"m8 12 2 2 5-5\"></path>";
+    };
+    readonly sse: {
+        readonly body: "<path d=\"M4 12h4\"></path><path d=\"M12 6v12\"></path><path d=\"M16 8c2 1 3 2.3 3 4s-1 3-3 4\"></path><path d=\"M19 5c3 2 4 4.3 4 7s-1 5-4 7\"></path>";
+    };
+    readonly websocket: {
+        readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"m7 10 3 2-3 2\"></path><path d=\"m17 10-3 2 3 2\"></path><path d=\"M3 12h4\"></path><path d=\"M17 12h4\"></path>";
+    };
+    readonly appointment: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"M8 15h4\"></path><path d=\"m14 16 2 2 4-4\"></path>";
+    };
+    readonly booking: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"M12 14v5\"></path><path d=\"M9.5 16.5h5\"></path>";
+    };
+    readonly 'checklist-clock': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"m8 10 1 1 2-2\"></path><path d=\"M13 10h3\"></path><circle cx=\"14\" cy=\"16\" r=\"3\"></circle><path d=\"M14 14.5V16l1 1\"></path>";
+    };
+    readonly 'dispatch-board': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 10v10\"></path><path d=\"M13 14h5\"></path><path d=\"M13 17h3\"></path><path d=\"M6 14h.01\"></path>";
+    };
+    readonly 'incident-alert': {
+        readonly body: "<path d=\"m12 3 10 18H2L12 3z\"></path><path d=\"M12 9v4\"></path><path d=\"M12 17h.01\"></path><path d=\"M4 21h16\"></path>";
+    };
+    readonly maintenance: {
+        readonly body: "<path d=\"M14.7 6.3a4 4 0 0 0-5.5 5.5L3 18v3h3l6.2-6.2a4 4 0 0 0 5.5-5.5l-2.5 2.5-3-3 2.5-2.5z\"></path><circle cx=\"18\" cy=\"18\" r=\"3\"></circle>";
+    };
+    readonly 'process-loop': {
+        readonly body: "<path d=\"M17 2l4 4-4 4\"></path><path d=\"M3 11V9a3 3 0 0 1 3-3h15\"></path><path d=\"M7 22l-4-4 4-4\"></path><path d=\"M21 13v2a3 3 0 0 1-3 3H3\"></path><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>";
+    };
+    readonly recurrence: {
+        readonly body: "<path d=\"M17 2l4 4-4 4\"></path><path d=\"M3 11V9a3 3 0 0 1 3-3h15\"></path><path d=\"M7 22l-4-4 4-4\"></path><path d=\"M21 13v2a3 3 0 0 1-3 3H3\"></path><path d=\"M12 8v8\"></path><path d=\"M9 12h6\"></path>";
+    };
+    readonly repair: {
+        readonly body: "<path d=\"M14.7 6.3a4 4 0 0 0-5.5 5.5L3 18v3h3l6.2-6.2a4 4 0 0 0 5.5-5.5l-2.5 2.5-3-3 2.5-2.5z\"></path><path d=\"M18 15v6\"></path><path d=\"M15 18h6\"></path>";
+    };
+    readonly rota: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"M7 15h4\"></path><path d=\"M13 15h4\"></path><path d=\"M7 18h3\"></path><path d=\"M13 18h5\"></path>";
+    };
+    readonly 'service-window': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><circle cx=\"12\" cy=\"16\" r=\"3\"></circle><path d=\"M12 14.5V16l1 1\"></path>";
+    };
+    readonly shift: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v5l3 2\"></path><path d=\"M5 19h14\"></path><path d=\"M7 5l10 14\"></path>";
+    };
+    readonly 'triage-queue': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"11\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"17\" width=\"12\" height=\"4\" rx=\"1\"></rect><path d=\"M17 18v4\"></path><path d=\"M15 20h4\"></path>";
+    };
+    readonly 'work-order': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h5\"></path><path d=\"m15 15 2 2 4-4\"></path>";
+    };
     readonly workflow: {
         readonly body: "<rect x=\"3\" y=\"4\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"15\" y=\"14\" width=\"6\" height=\"6\" rx=\"2\"></rect><path d=\"M9 7h3a3 3 0 0 1 3 3v4\"></path><path d=\"M12 17H9a3 3 0 0 1-3-3v-4\"></path>";
+    };
+    readonly 'batch-job': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"11\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"17\" width=\"12\" height=\"4\" rx=\"1\"></rect><path d=\"m17 17 3 2-3 2\"></path>";
+    };
+    readonly 'blocked-task': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"5\"></circle><path d=\"M8.5 8.5 15.5 15.5\"></path>";
+    };
+    readonly 'calendar-sync': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"M16 15a4 4 0 1 1-3-3.9\"></path><path d=\"M16 12v3h-3\"></path>";
+    };
+    readonly 'change-request': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h4\"></path><path d=\"M16 15h5\"></path><path d=\"m18 12 3 3-3 3\"></path>";
+    };
+    readonly 'decision-node': {
+        readonly body: "<path d=\"m12 3 8 9-8 9-8-9 8-9z\"></path><path d=\"M12 8v4\"></path><path d=\"M12 16h.01\"></path>";
+    };
+    readonly 'event-trigger': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v5l4 2\"></path><path d=\"M19 5l3-3\"></path><path d=\"M22 2v6h-6\"></path>";
+    };
+    readonly 'form-approval': {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"m9 17 2 2 5-5\"></path>";
+    };
+    readonly 'job-queue': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"11\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"17\" width=\"16\" height=\"4\" rx=\"1\"></rect><circle cx=\"19\" cy=\"7\" r=\"2\"></circle>";
+    };
+    readonly 'manual-step': {
+        readonly body: "<path d=\"M7 11V5a2 2 0 0 1 4 0v6\"></path><path d=\"M11 11V4a2 2 0 0 1 4 0v7\"></path><path d=\"M15 12V7a2 2 0 0 1 4 0v8a7 7 0 0 1-14 0v-2\"></path>";
+    };
+    readonly 'process-map': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"6\" height=\"5\" rx=\"1\"></rect><rect x=\"15\" y=\"4\" width=\"6\" height=\"5\" rx=\"1\"></rect><rect x=\"9\" y=\"15\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M9 6.5h6\"></path><path d=\"M12 9v6\"></path>";
+    };
+    readonly release: {
+        readonly body: "<path d=\"M12 3l3 6 6 1-4.5 4.4 1 6.6L12 18l-5.5 3 1-6.6L3 10l6-1 3-6z\"></path><path d=\"M12 8v5\"></path><path d=\"M12 16h.01\"></path>";
+    };
+    readonly 'rule-engine': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h8\"></path><path d=\"M8 13h4\"></path><circle cx=\"16\" cy=\"15\" r=\"2\"></circle><path d=\"M16 11v2\"></path><path d=\"M16 17v2\"></path><path d=\"M12 15h2\"></path><path d=\"M18 15h2\"></path>";
+    };
+    readonly 'task-delegated': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M8 9h6\"></path><path d=\"M8 13h4\"></path><circle cx=\"16\" cy=\"16\" r=\"3\"></circle><path d=\"m18 14 3-3\"></path><path d=\"M21 11v4h-4\"></path>";
+    };
+    readonly 'workflow-template': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><rect x=\"6\" y=\"7\" width=\"5\" height=\"4\" rx=\"1\"></rect><rect x=\"13\" y=\"13\" width=\"5\" height=\"4\" rx=\"1\"></rect><path d=\"M11 9h3a3 3 0 0 1 3 3v1\"></path>";
     };
     readonly alert: {
         readonly body: "<path d=\"m12 3 10 18H2L12 3z\"></path><path d=\"M12 9v4\"></path><path d=\"M12 17h.01\"></path>";
@@ -699,6 +975,138 @@ declare const icons: {
     readonly 'tool-denied': {
         readonly body: "<path d=\"M14.7 6.3a4 4 0 0 0-5.5 5.5L4 17v3h3l5.2-5.2a4 4 0 0 0 5.5-5.5l-2.5 2.5-3-3 2.5-2.5z\"></path><path d=\"m17 17 4 4\"></path><path d=\"m21 17-4 4\"></path>";
     };
+    readonly 'api-key': {
+        readonly body: "<circle cx=\"7.5\" cy=\"12.5\" r=\"3.5\"></circle><path d=\"M11 12.5h10\"></path><path d=\"M17 12.5v3\"></path><path d=\"M20 12.5v2\"></path><path d=\"M4 5h16\"></path>";
+    };
+    readonly credential: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><circle cx=\"8\" cy=\"10\" r=\"2\"></circle><path d=\"M5.5 16a3 3 0 0 1 5 0\"></path><path d=\"M14 9h4\"></path><path d=\"M14 13h4\"></path><path d=\"M14 17h2\"></path>";
+    };
+    readonly organization: {
+        readonly body: "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"></rect><path d=\"M8 7h.01\"></path><path d=\"M12 7h.01\"></path><path d=\"M16 7h.01\"></path><path d=\"M8 11h.01\"></path><path d=\"M12 11h.01\"></path><path d=\"M16 11h.01\"></path><path d=\"M8 21v-5h8v5\"></path>";
+    };
+    readonly 'org-chart': {
+        readonly body: "<rect x=\"9\" y=\"3\" width=\"6\" height=\"5\" rx=\"1\"></rect><rect x=\"3\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"></rect><rect x=\"15\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M12 8v4\"></path><path d=\"M6 16v-4h12v4\"></path>";
+    };
+    readonly secret: {
+        readonly body: "<path d=\"M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z\"></path><path d=\"M9 12h6\"></path><path d=\"M12 9v6\"></path>";
+    };
+    readonly 'service-account': {
+        readonly body: "<circle cx=\"8\" cy=\"8\" r=\"4\"></circle><path d=\"M2 21a6 6 0 0 1 12 0\"></path><rect x=\"15\" y=\"5\" width=\"6\" height=\"6\" rx=\"2\"></rect><path d=\"M18 11v10\"></path><path d=\"M15 18h6\"></path>";
+    };
+    readonly session: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><circle cx=\"17\" cy=\"15\" r=\"2\"></circle>";
+    };
+    readonly 'session-expired': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h6\"></path><circle cx=\"16\" cy=\"14\" r=\"3\"></circle><path d=\"M16 12.5V14l1 1\"></path><path d=\"m19 17 2 2\"></path>";
+    };
+    readonly tenant: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"8\" height=\"16\" rx=\"2\"></rect><rect x=\"13\" y=\"4\" width=\"8\" height=\"16\" rx=\"2\"></rect><path d=\"M7 8h.01\"></path><path d=\"M17 8h.01\"></path><path d=\"M7 12h.01\"></path><path d=\"M17 12h.01\"></path><path d=\"M7 20v-4\"></path><path d=\"M17 20v-4\"></path>";
+    };
+    readonly token: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M8 12h8\"></path><path d=\"M12 8v8\"></path><path d=\"m15.5 8.5 2 2\"></path><path d=\"m17.5 8.5-2 2\"></path>";
+    };
+    readonly workspace: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 10v10\"></path><path d=\"M13 14h4\"></path><path d=\"M13 17h3\"></path>";
+    };
+    readonly 'workspace-lock': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 10v10\"></path><rect x=\"13\" y=\"14\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M14.5 14v-1.5a1.5 1.5 0 0 1 3 0V14\"></path>";
+    };
+    readonly 'access-request': {
+        readonly body: "<path d=\"M4 5h16v14H4z\"></path><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><path d=\"M16 16h6\"></path><path d=\"M19 13v6\"></path>";
+    };
+    readonly 'approval-policy': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"m8 15 2 2 5-5\"></path><path d=\"M8 9h4\"></path>";
+    };
+    readonly 'audit-trail': {
+        readonly body: "<path d=\"M5 4h14v16H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"M8 16h4\"></path><path d=\"M19 6h2\"></path><path d=\"M19 12h2\"></path><path d=\"M19 18h2\"></path>";
+    };
+    readonly 'data-residency': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M3 12h18\"></path><path d=\"M12 3a14 14 0 0 1 0 18\"></path><path d=\"M12 3a14 14 0 0 0 0 18\"></path><rect x=\"14\" y=\"14\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M15.5 14v-2a2 2 0 0 1 4 0v2\"></path>";
+    };
+    readonly governance: {
+        readonly body: "<path d=\"m3 10 9-6 9 6\"></path><path d=\"M5 10v9\"></path><path d=\"M9 10v9\"></path><path d=\"M15 10v9\"></path><path d=\"M19 10v9\"></path><path d=\"M3 21h18\"></path><path d=\"m9 15 2 2 4-4\"></path>";
+    };
+    readonly 'policy-lock': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><rect x=\"8\" y=\"14\" width=\"8\" height=\"5\" rx=\"1\"></rect><path d=\"M10 14v-2a2 2 0 0 1 4 0v2\"></path>";
+    };
+    readonly 'data-retention': {
+        readonly body: "<path d=\"M5 4h14v16H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><circle cx=\"15\" cy=\"16\" r=\"3\"></circle><path d=\"M15 14.5V16l1 1\"></path>";
+    };
+    readonly scim: {
+        readonly body: "<circle cx=\"8\" cy=\"8\" r=\"3\"></circle><circle cx=\"16\" cy=\"8\" r=\"3\"></circle><path d=\"M3 21a5 5 0 0 1 10 0\"></path><path d=\"M11 21a5 5 0 0 1 10 0\"></path><path d=\"M12 8h1\"></path><path d=\"M8 11v3\"></path><path d=\"M16 11v3\"></path>";
+    };
+    readonly sso: {
+        readonly body: "<circle cx=\"7.5\" cy=\"12.5\" r=\"3.5\"></circle><path d=\"M11 12.5h10\"></path><path d=\"M17 12.5v3\"></path><path d=\"M20 12.5v2\"></path><path d=\"M4 5h16\"></path><path d=\"M4 19h16\"></path>";
+    };
+    readonly 'trust-center': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"M8 12h8\"></path><path d=\"M12 8v8\"></path><circle cx=\"18\" cy=\"6\" r=\"2\"></circle>";
+    };
+    readonly 'user-invite': {
+        readonly body: "<path d=\"M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"8.5\" cy=\"7\" r=\"4\"></circle><path d=\"M18 8v6\"></path><path d=\"M15 11h6\"></path><path d=\"m17 17 2 2 4-4\"></path>";
+    };
+    readonly 'user-provision': {
+        readonly body: "<path d=\"M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"8.5\" cy=\"7\" r=\"4\"></circle><path d=\"M18 7v8\"></path><path d=\"m15 12 3 3 3-3\"></path><path d=\"M15 7h6\"></path>";
+    };
+    readonly aria: {
+        readonly body: "<circle cx=\"12\" cy=\"4\" r=\"2\"></circle><path d=\"M4 8h16\"></path><path d=\"M12 6v7\"></path><path d=\"M8 22l4-9 4 9\"></path><path d=\"M6 13h12\"></path>";
+    };
+    readonly 'assistive-mode': {
+        readonly body: "<circle cx=\"12\" cy=\"4\" r=\"2\"></circle><path d=\"M4 8h16\"></path><path d=\"M12 6v7\"></path><path d=\"M8 22l4-9 4 9\"></path><circle cx=\"19\" cy=\"18\" r=\"3\"></circle><path d=\"m18 18 1 1 2-2\"></path>";
+    };
+    readonly 'compliance-evidence': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h4\"></path><path d=\"m14 17 2 2 4-4\"></path>";
+    };
+    readonly 'consent-record': {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"m8 17 2 2 5-5\"></path><path d=\"M17 14h3\"></path>";
+    };
+    readonly 'incident-response': {
+        readonly body: "<path d=\"m12 3 10 18H2L12 3z\"></path><path d=\"M12 9v4\"></path><path d=\"M12 17h.01\"></path><path d=\"M18 15a4 4 0 0 1-6.8 2.8L10 16\"></path><path d=\"M10 19v-3h3\"></path>";
+    };
+    readonly 'keyboard-access': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 9h.01\"></path><path d=\"M11 9h.01\"></path><path d=\"M15 9h.01\"></path><path d=\"M19 9h.01\"></path><path d=\"M8 17h8\"></path><path d=\"m16 14 2 2 4-4\"></path>";
+    };
+    readonly 'permission-review': {
+        readonly body: "<path d=\"M4 5h16v14H4z\"></path><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><circle cx=\"16\" cy=\"16\" r=\"3\"></circle><path d=\"m18 18 3 3\"></path>";
+    };
+    readonly privacy: {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"M2 2l20 20\"></path><path d=\"M9.9 9.9A3 3 0 0 0 14.1 14.1\"></path>";
+    };
+    readonly 'screen-reader': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M8 20h8\"></path><path d=\"M12 16v4\"></path><path d=\"M7 9h10\"></path><path d=\"M7 12h6\"></path><path d=\"M18 18c2-2 2-4 0-6\"></path>";
+    };
+    readonly 'voice-access': {
+        readonly body: "<rect x=\"9\" y=\"3\" width=\"6\" height=\"11\" rx=\"3\"></rect><path d=\"M5 11a7 7 0 0 0 14 0\"></path><path d=\"M12 18v4\"></path><path d=\"M8 22h8\"></path><path d=\"m16 5 2-2\"></path><path d=\"m18 8 3-1\"></path>";
+    };
+    readonly 'access-expiry': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 10v2l1.5 1\"></path><path d=\"m17 17 3 3\"></path>";
+    };
+    readonly 'audit-event': {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><circle cx=\"16\" cy=\"16\" r=\"3\"></circle><path d=\"M16 14.5V16l1 1\"></path><path d=\"M20 5h2\"></path>";
+    };
+    readonly 'data-classification': {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h6\"></path><path d=\"M8 16h4\"></path><path d=\"M16 14l3 3\"></path><path d=\"M19 14l-3 3\"></path>";
+    };
+    readonly 'device-policy': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path><path d=\"M12 7v5\"></path><path d=\"M9.5 9.5h5\"></path><path d=\"m9 15 2 2 4-4\"></path>";
+    };
+    readonly 'encryption-key': {
+        readonly body: "<circle cx=\"7.5\" cy=\"12.5\" r=\"3.5\"></circle><path d=\"M11 12.5h10\"></path><path d=\"M17 12.5v3\"></path><path d=\"M20 12.5v2\"></path><rect x=\"13\" y=\"4\" width=\"7\" height=\"5\" rx=\"1\"></rect><path d=\"M14.5 4V2.5a2 2 0 0 1 4 0V4\"></path>";
+    };
+    readonly 'identity-provider': {
+        readonly body: "<circle cx=\"8\" cy=\"8\" r=\"4\"></circle><path d=\"M2 21a6 6 0 0 1 12 0\"></path><rect x=\"15\" y=\"6\" width=\"6\" height=\"6\" rx=\"2\"></rect><path d=\"M18 12v7\"></path><path d=\"M15 16h6\"></path>";
+    };
+    readonly 'ip-allowlist': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M3 12h18\"></path><path d=\"M12 3a14 14 0 0 1 0 18\"></path><path d=\"M12 3a14 14 0 0 0 0 18\"></path><path d=\"m8 12 2 2 5-5\"></path>";
+    };
+    readonly 'legal-hold': {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"M8 16h4\"></path><path d=\"M17 13v8\"></path><path d=\"M14 16h6\"></path>";
+    };
+    readonly 'tls-certificate': {
+        readonly body: "<path d=\"M6 3h12v12H6z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h4\"></path><path d=\"M9 15v6l3-2 3 2v-6\"></path><path d=\"m15 5 2 2 4-4\"></path>";
+    };
+    readonly 'zero-trust': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M2 2l20 20\"></path>";
+    };
     readonly 'x-circle': {
         readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M15 9 9 15\"></path><path d=\"m9 9 6 6\"></path>";
     };
@@ -884,6 +1292,123 @@ declare const icons: {
     };
     readonly 'pwa-install': {
         readonly body: "<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"2\"></rect><path d=\"M12 7v8\"></path><path d=\"m8 11 4 4 4-4\"></path><path d=\"M10 18h4\"></path>";
+    };
+    readonly browser: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 9h18\"></path><path d=\"M7 6.5h.01\"></path><path d=\"M11 6.5h.01\"></path><path d=\"M7 13h10\"></path>";
+    };
+    readonly cache: {
+        readonly body: "<ellipse cx=\"12\" cy=\"5\" rx=\"8\" ry=\"3\"></ellipse><path d=\"M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5\"></path><path d=\"M4 11v6c0 1.7 3.6 3 8 3\"></path><path d=\"M17 15a4 4 0 1 1-3 6.7\"></path><path d=\"M17 13v4h-4\"></path>";
+    };
+    readonly 'desktop-app': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M8 20h8\"></path><path d=\"M12 16v4\"></path><path d=\"M7 8h4\"></path><path d=\"M7 11h8\"></path>";
+    };
+    readonly 'edge-device': {
+        readonly body: "<rect x=\"6\" y=\"6\" width=\"12\" height=\"12\" rx=\"2\"></rect><path d=\"M9 2v4\"></path><path d=\"M15 2v4\"></path><path d=\"M9 18v4\"></path><path d=\"M15 18v4\"></path><path d=\"M2 9h4\"></path><path d=\"M18 9h4\"></path><path d=\"M2 15h4\"></path><path d=\"M18 15h4\"></path><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>";
+    };
+    readonly kiosk: {
+        readonly body: "<rect x=\"6\" y=\"3\" width=\"12\" height=\"16\" rx=\"2\"></rect><path d=\"M9 22h6\"></path><path d=\"M12 19v3\"></path><path d=\"M9 8h6\"></path><path d=\"M9 12h6\"></path>";
+    };
+    readonly 'local-storage': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M4 10h16\"></path><path d=\"M8 15h.01\"></path><path d=\"M12 15h4\"></path>";
+    };
+    readonly 'platform-desktop': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M8 20h8\"></path><path d=\"M12 16v4\"></path><path d=\"M7 8h10\"></path>";
+    };
+    readonly 'platform-mobile': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M10 7h4\"></path><path d=\"M10 11h4\"></path><path d=\"M11 18h2\"></path>";
+    };
+    readonly 'platform-web': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M3 12h18\"></path><path d=\"M12 3a14 14 0 0 1 0 18\"></path><path d=\"M12 3a14 14 0 0 0 0 18\"></path><path d=\"M8 8h8\"></path>";
+    };
+    readonly 'push-device': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path><path d=\"M18 6a3 3 0 0 0-6 0c0 3-1.5 3-1.5 3h9S18 9 18 6\"></path>";
+    };
+    readonly 'push-subscription': {
+        readonly body: "<rect x=\"5\" y=\"4\" width=\"14\" height=\"16\" rx=\"2\"></rect><path d=\"M9 8h6\"></path><path d=\"M9 12h4\"></path><path d=\"M15 15a3 3 0 0 0-6 0c0 3-1.5 3-1.5 3h9S15 18 15 15\"></path>";
+    };
+    readonly 'service-worker': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"2\"></circle><path d=\"M12 7v2\"></path><path d=\"M12 15v2\"></path><path d=\"M7 12h2\"></path><path d=\"M15 12h2\"></path><path d=\"m8.5 8.5 1.4 1.4\"></path><path d=\"m14.1 14.1 1.4 1.4\"></path>";
+    };
+    readonly storage: {
+        readonly body: "<ellipse cx=\"12\" cy=\"5\" rx=\"8\" ry=\"3\"></ellipse><path d=\"M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5\"></path><path d=\"M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6\"></path><path d=\"M8 17h.01\"></path><path d=\"M12 17h.01\"></path>";
+    };
+    readonly biometric: {
+        readonly body: "<path d=\"M3 11a9 9 0 0 1 18 0\"></path><path d=\"M6 19a12 12 0 0 0 2-7 4 4 0 0 1 8 0c0 2.8-.7 5.5-2 7.8\"></path><path d=\"M9 22a15 15 0 0 0 3-10\"></path><path d=\"M12 2a9 9 0 0 1 9 9c0 1.5-.2 3-.6 4.4\"></path>";
+    };
+    readonly 'camera-capture': {
+        readonly body: "<path d=\"M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5z\"></path><circle cx=\"12\" cy=\"13\" r=\"3\"></circle><path d=\"M12 10v6\"></path><path d=\"M9 13h6\"></path>";
+    };
+    readonly geolocation: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M12 2v4\"></path><path d=\"M12 18v4\"></path><path d=\"M2 12h4\"></path><path d=\"M18 12h4\"></path>";
+    };
+    readonly 'mobile-bottom-sheet': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M8 15h8\"></path><path d=\"M9 18h6\"></path><path d=\"M11 5h2\"></path>";
+    };
+    readonly 'mobile-drawer': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M7 8h7\"></path><path d=\"M7 12h7\"></path><path d=\"M7 16h7\"></path><path d=\"m15 10 2 2-2 2\"></path>";
+    };
+    readonly 'mobile-gesture': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path><path d=\"M10 13c2-5 5-5 7 0\"></path><path d=\"M10 13l2 2\"></path>";
+    };
+    readonly 'mobile-offline': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path><path d=\"M9 8h6\"></path>";
+    };
+    readonly 'mobile-permission': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path><path d=\"M12 7v5\"></path><path d=\"M9.5 9.5h5\"></path><path d=\"M9 15h6\"></path>";
+    };
+    readonly 'mobile-sheet': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><rect x=\"8\" y=\"10\" width=\"8\" height=\"8\" rx=\"2\"></rect><path d=\"M10 13h4\"></path><path d=\"M11 5h2\"></path>";
+    };
+    readonly 'orientation-lock': {
+        readonly body: "<rect x=\"8\" y=\"3\" width=\"8\" height=\"14\" rx=\"2\"></rect><path d=\"M4 16a8 8 0 0 0 14 4\"></path><path d=\"m18 16 1 4h-4\"></path><rect x=\"9\" y=\"9\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M10.5 9V7.5a1.5 1.5 0 0 1 3 0V9\"></path>";
+    };
+    readonly passkey: {
+        readonly body: "<circle cx=\"7.5\" cy=\"12.5\" r=\"3.5\"></circle><path d=\"M11 12.5h10\"></path><path d=\"M17 12.5v3\"></path><path d=\"M20 12.5v2\"></path><path d=\"M12 4a4 4 0 0 1 6 0\"></path>";
+    };
+    readonly 'sensor-alert': {
+        readonly body: "<rect x=\"6\" y=\"6\" width=\"12\" height=\"12\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"2\"></circle><path d=\"M12 2v4\"></path><path d=\"M12 18v4\"></path><path d=\"M2 12h4\"></path><path d=\"M18 12h4\"></path><path d=\"M19 3v4\"></path><path d=\"M19 10h.01\"></path>";
+    };
+    readonly 'vibration-off': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><path d=\"M4 8v8\"></path><path d=\"M20 8v8\"></path><rect x=\"8\" y=\"3\" width=\"8\" height=\"18\" rx=\"2\"></rect><path d=\"M11 18h2\"></path>";
+    };
+    readonly wearable: {
+        readonly body: "<rect x=\"7\" y=\"6\" width=\"10\" height=\"12\" rx=\"3\"></rect><path d=\"M9 6V3h6v3\"></path><path d=\"M9 18v3h6v-3\"></path><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>";
+    };
+    readonly airplay: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"m12 15 5 6H7l5-6z\"></path>";
+    };
+    readonly beacon: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"2\"></circle><path d=\"M8 8a6 6 0 0 0 0 8\"></path><path d=\"M16 8a6 6 0 0 1 0 8\"></path><path d=\"M5 5a10 10 0 0 0 0 14\"></path><path d=\"M19 5a10 10 0 0 1 0 14\"></path>";
+    };
+    readonly 'bluetooth-off': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><path d=\"m7 7 10 10-5 4V3l5 4-5 5\"></path><path d=\"M7 17l4-4\"></path>";
+    };
+    readonly 'camera-switch': {
+        readonly body: "<path d=\"M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5z\"></path><circle cx=\"12\" cy=\"13\" r=\"3\"></circle><path d=\"M7 13h3\"></path><path d=\"m8 11-2 2 2 2\"></path><path d=\"M17 13h-3\"></path><path d=\"m16 15 2-2-2-2\"></path>";
+    };
+    readonly 'device-hub': {
+        readonly body: "<rect x=\"9\" y=\"3\" width=\"6\" height=\"6\" rx=\"1\"></rect><rect x=\"3\" y=\"15\" width=\"6\" height=\"6\" rx=\"1\"></rect><rect x=\"15\" y=\"15\" width=\"6\" height=\"6\" rx=\"1\"></rect><path d=\"M12 9v3\"></path><path d=\"M6 15v-3h12v3\"></path>";
+    };
+    readonly 'display-check': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M8 20h8\"></path><path d=\"M12 16v4\"></path><path d=\"m8 10 2 2 5-5\"></path>";
+    };
+    readonly firmware: {
+        readonly body: "<rect x=\"5\" y=\"4\" width=\"14\" height=\"16\" rx=\"2\"></rect><path d=\"M9 8h6\"></path><path d=\"M9 12h6\"></path><path d=\"M9 16h3\"></path><path d=\"M16 14v6\"></path><path d=\"M13 17h6\"></path>";
+    };
+    readonly gpu: {
+        readonly body: "<rect x=\"5\" y=\"6\" width=\"14\" height=\"12\" rx=\"2\"></rect><path d=\"M9 2v4\"></path><path d=\"M15 2v4\"></path><path d=\"M9 18v4\"></path><path d=\"M15 18v4\"></path><path d=\"M2 10h3\"></path><path d=\"M19 10h3\"></path><path d=\"M9 10h6v4H9z\"></path>";
+    };
+    readonly 'iot-device': {
+        readonly body: "<rect x=\"7\" y=\"7\" width=\"10\" height=\"10\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"2\"></circle><path d=\"M12 2v5\"></path><path d=\"M12 17v5\"></path><path d=\"M2 12h5\"></path><path d=\"M17 12h5\"></path>";
+    };
+    readonly 'mobile-hotspot': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path><path d=\"M10 8a4 4 0 0 1 4 0\"></path><path d=\"M8 6a7 7 0 0 1 8 0\"></path><path d=\"M12 11h.01\"></path>";
+    };
+    readonly 'printer-error': {
+        readonly body: "<path d=\"M7 9V3h10v6\"></path><path d=\"M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4\"></path><path d=\"M7 14h10v7H7z\"></path><path d=\"M18 17v3\"></path><path d=\"M18 23h.01\"></path>";
+    };
+    readonly 'qr-scanner': {
+        readonly body: "<path d=\"M7 3H5a2 2 0 0 0-2 2v2\"></path><path d=\"M17 3h2a2 2 0 0 1 2 2v2\"></path><path d=\"M21 17v2a2 2 0 0 1-2 2h-2\"></path><path d=\"M7 21H5a2 2 0 0 1-2-2v-2\"></path><rect x=\"7\" y=\"7\" width=\"3\" height=\"3\"></rect><rect x=\"14\" y=\"7\" width=\"3\" height=\"3\"></rect><rect x=\"7\" y=\"14\" width=\"3\" height=\"3\"></rect><path d=\"M14 14h3v3\"></path>";
     };
     readonly archive: {
         readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"4\" rx=\"1\"></rect><path d=\"M5 8v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8\"></path><path d=\"M10 12h4\"></path>";
@@ -1080,11 +1605,134 @@ declare const icons: {
     readonly 'template-plus': {
         readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 10v10\"></path><path d=\"M15 14v6\"></path><path d=\"M12 17h6\"></path>";
     };
+    readonly asset: {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><circle cx=\"9\" cy=\"10\" r=\"2\"></circle><path d=\"m20 15-4-4-5 5-2-2-4 5\"></path>";
+    };
+    readonly 'asset-library': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"7\" height=\"6\" rx=\"1\"></rect><rect x=\"14\" y=\"5\" width=\"7\" height=\"6\" rx=\"1\"></rect><rect x=\"3\" y=\"15\" width=\"7\" height=\"6\" rx=\"1\"></rect><rect x=\"14\" y=\"15\" width=\"7\" height=\"6\" rx=\"1\"></rect>";
+    };
+    readonly collection: {
+        readonly body: "<rect x=\"7\" y=\"7\" width=\"12\" height=\"12\" rx=\"2\"></rect><path d=\"M5 17a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2\"></path><path d=\"M11 12h4\"></path><path d=\"M13 10v4\"></path>";
+    };
+    readonly 'content-calendar': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"M8 15h5\"></path><path d=\"M8 18h8\"></path>";
+    };
+    readonly draft: {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 16h8\"></path><path d=\"M8 12h5\"></path><path d=\"M15 11l3 3\"></path>";
+    };
+    readonly 'empty-file': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M8 15h8\"></path>";
+    };
+    readonly 'empty-folder': {
+        readonly body: "<path d=\"M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z\"></path><path d=\"M8 14h8\"></path>";
+    };
+    readonly 'file-diff': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h3\"></path><path d=\"M14 17h2\"></path>";
+    };
+    readonly 'file-history': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><circle cx=\"12\" cy=\"15\" r=\"4\"></circle><path d=\"M12 13v2l1.5 1\"></path>";
+    };
+    readonly 'knowledge-base': {
+        readonly body: "<path d=\"M4 5a6 6 0 0 1 6-2l2 1v17l-2-1a6 6 0 0 0-6 2V5z\"></path><path d=\"M20 5a6 6 0 0 0-6-2l-2 1v17l2-1a6 6 0 0 1 6 2V5z\"></path><path d=\"M8 9h2\"></path><path d=\"M14 9h2\"></path>";
+    };
+    readonly 'media-library': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><circle cx=\"8\" cy=\"10\" r=\"2\"></circle><path d=\"m21 15-4-4-5 5-2-2-4 5\"></path><path d=\"M7 3h10\"></path><path d=\"M7 21h10\"></path>";
+    };
+    readonly version: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v5l3 2\"></path><path d=\"M7 7h3V4\"></path><path d=\"M7 7a7 7 0 0 1 10 0\"></path>";
+    };
+    readonly citation: {
+        readonly body: "<path d=\"M6 5h12v16H6z\"></path><path d=\"M9 9h6\"></path><path d=\"M9 13h6\"></path><path d=\"M9 17h3\"></path><path d=\"M4 3h4\"></path><path d=\"M16 3h4\"></path>";
+    };
+    readonly 'code-block': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m8 10-3 2 3 2\"></path><path d=\"m16 10 3 2-3 2\"></path><path d=\"M10 16h4\"></path>";
+    };
+    readonly glossary: {
+        readonly body: "<path d=\"M4 5a6 6 0 0 1 6-2l2 1v17l-2-1a6 6 0 0 0-6 2V5z\"></path><path d=\"M20 5a6 6 0 0 0-6-2l-2 1v17l2-1a6 6 0 0 1 6 2V5z\"></path><path d=\"M8 9h2\"></path><path d=\"M14 9h2\"></path><path d=\"M8 13h2\"></path>";
+    };
+    readonly markdown: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 15V9l3 4 3-4v6\"></path><path d=\"M17 9v6\"></path><path d=\"m15 13 2 2 2-2\"></path>";
+    };
+    readonly publish: {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M12 18v-7\"></path><path d=\"m9 14 3-3 3 3\"></path>";
+    };
+    readonly redact: {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h8\"></path><path d=\"M7 13h10\"></path>";
+    };
+    readonly 'review-changes': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"m8 15 2 2 5-5\"></path><path d=\"M8 10h5\"></path><path d=\"M16 15h4\"></path>";
+    };
+    readonly 'rich-text': {
+        readonly body: "<path d=\"M5 6h14\"></path><path d=\"M8 6v12\"></path><path d=\"M16 6v12\"></path><path d=\"M6 18h12\"></path><path d=\"M10 12h4\"></path>";
+    };
+    readonly translation: {
+        readonly body: "<path d=\"M4 5h9\"></path><path d=\"M8 5v12\"></path><path d=\"M3 17c4-3 7-7 8-12\"></path><path d=\"M13 19l3-8 3 8\"></path><path d=\"M14 16h4\"></path>";
+    };
+    readonly 'web-page': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 9h18\"></path><path d=\"M7 6.5h.01\"></path><path d=\"M7 13h10\"></path><path d=\"M7 17h6\"></path>";
+    };
     readonly 'video-off': {
         readonly body: "<path d=\"M2 2l20 20\"></path><rect x=\"3\" y=\"6\" width=\"14\" height=\"12\" rx=\"2\"></rect><path d=\"m17 10 4-3v10l-4-3\"></path>";
     };
     readonly video: {
         readonly body: "<rect x=\"3\" y=\"6\" width=\"14\" height=\"12\" rx=\"2\"></rect><path d=\"m17 10 4-3v10l-4-3\"></path>";
+    };
+    readonly annotation: {
+        readonly body: "<path d=\"M4 5h16v11H8l-4 4V5z\"></path><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><circle cx=\"17\" cy=\"16\" r=\"2\"></circle>";
+    };
+    readonly 'approval-document': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 12h8\"></path><path d=\"m8 17 2 2 5-5\"></path>";
+    };
+    readonly 'content-block': {
+        readonly body: "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"></rect><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><rect x=\"8\" y=\"15\" width=\"8\" height=\"2\"></rect>";
+    };
+    readonly 'document-merge': {
+        readonly body: "<path d=\"M5 3h6v7H5z\"></path><path d=\"M13 14h6v7h-6z\"></path><path d=\"M8 10v3a4 4 0 0 0 4 4h1\"></path><path d=\"m10 15 2 2-2 2\"></path>";
+    };
+    readonly 'document-split': {
+        readonly body: "<path d=\"M5 3h14v6H5z\"></path><path d=\"M5 15h6v6H5z\"></path><path d=\"M13 15h6v6h-6z\"></path><path d=\"M12 9v3\"></path><path d=\"M8 15v-3h8v3\"></path>";
+    };
+    readonly 'file-xml': {
+        readonly body: "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"m10 13-2 2 2 2\"></path><path d=\"m14 13 2 2-2 2\"></path><path d=\"M12 12l-1 6\"></path>";
+    };
+    readonly 'folder-shared': {
+        readonly body: "<path d=\"M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z\"></path><circle cx=\"10\" cy=\"14\" r=\"2\"></circle><path d=\"M14 18a4 4 0 0 0-8 0\"></path><circle cx=\"17\" cy=\"13\" r=\"1.5\"></circle>";
+    };
+    readonly 'image-crop': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M8 3v13a2 2 0 0 0 2 2h11\"></path><path d=\"M16 21V8a2 2 0 0 0-2-2H3\"></path>";
+    };
+    readonly 'image-edit': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><circle cx=\"8\" cy=\"10\" r=\"2\"></circle><path d=\"m21 15-4-4-5 5-2-2-4 5\"></path><path d=\"m15 7 3-3 2 2-3 3h-2V7z\"></path>";
+    };
+    readonly 'media-playlist': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 9h8\"></path><path d=\"M7 13h6\"></path><path d=\"M7 17h4\"></path><path d=\"m15 14 4 2-4 2v-4z\"></path>";
+    };
+    readonly 'page-break': {
+        readonly body: "<path d=\"M6 3h12v7H6z\"></path><path d=\"M6 14h12v7H6z\"></path><path d=\"M3 12h2\"></path><path d=\"M8 12h2\"></path><path d=\"M14 12h2\"></path><path d=\"M19 12h2\"></path>";
+    };
+    readonly seo: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 10h10\"></path><path d=\"M7 14h5\"></path><circle cx=\"16\" cy=\"15\" r=\"2\"></circle><path d=\"m18 17 2 2\"></path>";
+    };
+    readonly snippet: {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"m9 10-3 2 3 2\"></path><path d=\"m15 10 3 2-3 2\"></path><path d=\"M10 17h4\"></path>";
+    };
+    readonly 'style-guide': {
+        readonly body: "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"></rect><path d=\"M8 8h8\"></path><path d=\"M8 12h4\"></path><circle cx=\"9\" cy=\"16\" r=\"1\"></circle><circle cx=\"13\" cy=\"16\" r=\"1\"></circle><circle cx=\"17\" cy=\"16\" r=\"1\"></circle>";
+    };
+    readonly 'alt-text': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><circle cx=\"8\" cy=\"10\" r=\"2\"></circle><path d=\"m21 15-4-4-5 5-2-2-4 5\"></path><path d=\"M7 21h10\"></path><path d=\"M9 21v-4\"></path><path d=\"M15 21v-4\"></path>";
+    };
+    readonly 'content-approval': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 12h8\"></path><path d=\"M8 16h4\"></path><path d=\"m14 17 2 2 4-4\"></path>";
+    };
+    readonly 'form-template': {
+        readonly body: "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"></rect><path d=\"M8 8h8\"></path><rect x=\"8\" y=\"11\" width=\"8\" height=\"3\"></rect><path d=\"M8 17h4\"></path><path d=\"M14 17h2\"></path>";
+    };
+    readonly 'media-caption': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m10 10 5 3-5 3v-6z\"></path><path d=\"M7 18h10\"></path><path d=\"M9 21h6\"></path>";
+    };
+    readonly 'version-compare': {
+        readonly body: "<path d=\"M5 4h6v16H5z\"></path><path d=\"M13 4h6v16h-6z\"></path><path d=\"M8 8h.01\"></path><path d=\"M8 12h.01\"></path><path d=\"M16 8h.01\"></path><path d=\"M16 12h.01\"></path><path d=\"M8 17h8\"></path>";
     };
     readonly 'at-sign': {
         readonly body: "<circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M16 8v5a3 3 0 1 0 3-3\"></path><path d=\"M19.1 17A9 9 0 1 1 21 12\"></path>";
@@ -1203,8 +1851,158 @@ declare const icons: {
     readonly thread: {
         readonly body: "<path d=\"M4 5h14v8H7l-3 3V5z\"></path><path d=\"M8 16h9l3 3v-9\"></path><path d=\"M8 9h6\"></path>";
     };
+    readonly channel: {
+        readonly body: "<path d=\"M5 5h14v10H8l-3 3V5z\"></path><path d=\"M9 9h6\"></path><path d=\"M9 12h4\"></path>";
+    };
+    readonly 'channel-lock': {
+        readonly body: "<path d=\"M5 5h14v10H8l-3 3V5z\"></path><rect x=\"12\" y=\"9\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M13.5 9V7.5a1.5 1.5 0 0 1 3 0V9\"></path>";
+    };
+    readonly 'channel-plus': {
+        readonly body: "<path d=\"M5 5h14v10H8l-3 3V5z\"></path><path d=\"M12 8v6\"></path><path d=\"M9 11h6\"></path>";
+    };
+    readonly collaboration: {
+        readonly body: "<circle cx=\"8\" cy=\"9\" r=\"3\"></circle><circle cx=\"16\" cy=\"9\" r=\"3\"></circle><path d=\"M3 21a5 5 0 0 1 10 0\"></path><path d=\"M11 21a5 5 0 0 1 10 0\"></path><path d=\"M11 9h2\"></path>";
+    };
+    readonly conversation: {
+        readonly body: "<path d=\"M4 5h13v8H7l-3 3V5z\"></path><path d=\"M9 16h8l3 3v-8\"></path><path d=\"M8 9h5\"></path><path d=\"M13 14h3\"></path>";
+    };
+    readonly meeting: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M8 13a3 3 0 0 1 6 0\"></path><circle cx=\"11\" cy=\"9\" r=\"2\"></circle><path d=\"M16 10h3\"></path><path d=\"M16 14h3\"></path>";
+    };
+    readonly moderation: {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"M8 12h8\"></path>";
+    };
+    readonly 'notification-check': {
+        readonly body: "<path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h13\"></path><path d=\"M13.7 21a2 2 0 0 1-3.4 0\"></path><path d=\"m16 18 2 2 4-4\"></path>";
+    };
+    readonly 'notification-snooze': {
+        readonly body: "<path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h12\"></path><path d=\"M13.7 21a2 2 0 0 1-3.4 0\"></path><path d=\"M16 16h5l-5 5h5\"></path>";
+    };
+    readonly 'presence-away': {
+        readonly body: "<circle cx=\"12\" cy=\"8\" r=\"4\"></circle><path d=\"M4 21a8 8 0 0 1 16 0\"></path><circle cx=\"18\" cy=\"6\" r=\"3\"></circle><path d=\"M18 4.5V6l1 1\"></path>";
+    };
+    readonly 'presence-busy': {
+        readonly body: "<circle cx=\"12\" cy=\"8\" r=\"4\"></circle><path d=\"M4 21a8 8 0 0 1 16 0\"></path><circle cx=\"18\" cy=\"6\" r=\"3\"></circle><path d=\"M16.5 6h3\"></path>";
+    };
+    readonly 'presence-online': {
+        readonly body: "<circle cx=\"12\" cy=\"8\" r=\"4\"></circle><path d=\"M4 21a8 8 0 0 1 16 0\"></path><circle cx=\"18\" cy=\"6\" r=\"3\"></circle><path d=\"m16.5 6 1 1 2-2\"></path>";
+    };
+    readonly reaction: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M8 10h.01\"></path><path d=\"M16 10h.01\"></path><path d=\"M8 15a5 5 0 0 0 8 0\"></path><path d=\"M20 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z\"></path>";
+    };
+    readonly 'thread-resolved': {
+        readonly body: "<path d=\"M4 5h14v8H7l-3 3V5z\"></path><path d=\"M8 16h9l3 3v-9\"></path><path d=\"m13 17 2 2 5-5\"></path>";
+    };
+    readonly 'call-muted': {
+        readonly body: "<path d=\"M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3 5.2 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.8l-1.3 1.3a14 14 0 0 0 5.6 5.6l1.3-1.3a2 2 0 0 1 1.8-.6l3 .5a2 2 0 0 1 1.7 1.9z\"></path><path d=\"M2 2l20 20\"></path>";
+    };
+    readonly 'call-transfer': {
+        readonly body: "<path d=\"M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3 5.2 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.8l-1.3 1.3a14 14 0 0 0 5.6 5.6l1.3-1.3a2 2 0 0 1 1.8-.6l3 .5a2 2 0 0 1 1.7 1.9z\"></path><path d=\"M14 5h7\"></path><path d=\"m18 2 3 3-3 3\"></path>";
+    };
+    readonly 'comment-thread': {
+        readonly body: "<path d=\"M4 5h14v8H7l-3 3V5z\"></path><path d=\"M8 16h9l3 3v-9\"></path><path d=\"M8 9h6\"></path><path d=\"M12 13h4\"></path>";
+    };
+    readonly 'conversation-star': {
+        readonly body: "<path d=\"M4 5h16v12H7l-4 4V5z\"></path><path d=\"m16 8 1 2 2 .3-1.5 1.5.4 2.2-1.9-1-1.9 1 .4-2.2L13 10.3l2-.3 1-2z\"></path>";
+    };
+    readonly 'escalation-message': {
+        readonly body: "<path d=\"M4 5h16v12H7l-4 4V5z\"></path><path d=\"M12 14V8\"></path><path d=\"m9 11 3-3 3 3\"></path>";
+    };
+    readonly 'meeting-cancelled': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M8 13a3 3 0 0 1 6 0\"></path><circle cx=\"11\" cy=\"9\" r=\"2\"></circle><path d=\"m16 10 4 4\"></path><path d=\"m20 10-4 4\"></path>";
+    };
+    readonly 'meeting-check': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M8 13a3 3 0 0 1 6 0\"></path><circle cx=\"11\" cy=\"9\" r=\"2\"></circle><path d=\"m15 15 2 2 4-4\"></path>";
+    };
+    readonly 'mention-alert': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M16 8v5a3 3 0 1 0 3-3\"></path><path d=\"M19.1 17A9 9 0 1 1 21 12\"></path><path d=\"M21 3v4\"></path><path d=\"M21 10h.01\"></path>";
+    };
+    readonly 'notification-priority': {
+        readonly body: "<path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h15\"></path><path d=\"M13.7 21a2 2 0 0 1-3.4 0\"></path><path d=\"M19 5v6\"></path><path d=\"M19 15h.01\"></path>";
+    };
+    readonly 'presence-offline': {
+        readonly body: "<circle cx=\"12\" cy=\"8\" r=\"4\"></circle><path d=\"M4 21a8 8 0 0 1 16 0\"></path><circle cx=\"18\" cy=\"6\" r=\"3\"></circle><path d=\"m16.5 4.5 3 3\"></path><path d=\"m19.5 4.5-3 3\"></path>";
+    };
+    readonly 'support-inbox': {
+        readonly body: "<path d=\"M4 4h16l-2 10h-4a2 2 0 0 1-4 0H6L4 4z\"></path><path d=\"M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5\"></path><path d=\"M12 8v4\"></path><path d=\"M10 10h4\"></path>";
+    };
+    readonly survey: {
+        readonly body: "<path d=\"M5 4h14v16H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"M8 16h3\"></path><path d=\"m14 17 2 2 4-4\"></path>";
+    };
+    readonly 'targeted-broadcast': {
+        readonly body: "<path d=\"M3 11v2a2 2 0 0 0 2 2h3l7 4V5L8 9H5a2 2 0 0 0-2 2z\"></path><circle cx=\"19\" cy=\"12\" r=\"3\"></circle><path d=\"M19 9v6\"></path><path d=\"M16 12h6\"></path>";
+    };
+    readonly transcript: {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h8\"></path><path d=\"M8 16h5\"></path><path d=\"M16 16h.01\"></path>";
+    };
     readonly voicemail: {
         readonly body: "<circle cx=\"6\" cy=\"12\" r=\"4\"></circle><circle cx=\"18\" cy=\"12\" r=\"4\"></circle><path d=\"M6 16h12\"></path>";
+    };
+    readonly 'call-incoming': {
+        readonly body: "<path d=\"M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3 5.2 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.8l-1.3 1.3a14 14 0 0 0 5.6 5.6l1.3-1.3a2 2 0 0 1 1.8-.6l3 .5a2 2 0 0 1 1.7 1.9z\"></path><path d=\"M20 4h-6\"></path><path d=\"m17 1-3 3 3 3\"></path>";
+    };
+    readonly 'call-recording': {
+        readonly body: "<path d=\"M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3 5.2 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.8l-1.3 1.3a14 14 0 0 0 5.6 5.6l1.3-1.3a2 2 0 0 1 1.8-.6l3 .5a2 2 0 0 1 1.7 1.9z\"></path><circle cx=\"18\" cy=\"6\" r=\"3\"></circle>";
+    };
+    readonly 'chat-bot': {
+        readonly body: "<path d=\"M4 8h16v10H7l-3 3V8z\"></path><path d=\"M12 8V4\"></path><circle cx=\"9\" cy=\"13\" r=\"1\"></circle><circle cx=\"15\" cy=\"13\" r=\"1\"></circle><path d=\"M10 16h4\"></path>";
+    };
+    readonly 'chat-error': {
+        readonly body: "<path d=\"M21 12a8 8 0 0 1-8 8H6l-4 2 2-5a8 8 0 1 1 17-5z\"></path><path d=\"M12 8v5\"></path><path d=\"M12 16h.01\"></path>";
+    };
+    readonly 'chat-resolved': {
+        readonly body: "<path d=\"M4 5h14v8H7l-3 3V5z\"></path><path d=\"M8 16h9l3 3v-9\"></path><path d=\"m13 17 2 2 5-5\"></path>";
+    };
+    readonly 'contact-card': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><circle cx=\"9\" cy=\"11\" r=\"2\"></circle><path d=\"M6 17a3 3 0 0 1 6 0\"></path><path d=\"M14 10h4\"></path><path d=\"M14 14h4\"></path>";
+    };
+    readonly 'email-bounce': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m3 7 9 6 9-6\"></path><path d=\"M12 15v3\"></path><path d=\"M12 21h.01\"></path>";
+    };
+    readonly 'email-template': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m3 7 9 6 9-6\"></path><path d=\"M7 15h10\"></path><path d=\"M7 18h6\"></path>";
+    };
+    readonly 'notification-digest': {
+        readonly body: "<path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7\"></path><path d=\"M13.7 21a2 2 0 0 1-3.4 0\"></path><path d=\"M8 12h8\"></path><path d=\"M8 15h6\"></path>";
+    };
+    readonly 'webhook-event': {
+        readonly body: "<circle cx=\"6\" cy=\"8\" r=\"3\"></circle><circle cx=\"18\" cy=\"8\" r=\"3\"></circle><circle cx=\"12\" cy=\"18\" r=\"3\"></circle><path d=\"M9 8h6\"></path><path d=\"m8 10 3 5\"></path><path d=\"m16 10-3 5\"></path><path d=\"M12 3v2\"></path>";
+    };
+    readonly 'auto-reply': {
+        readonly body: "<path d=\"M4 5h16v12H7l-4 4V5z\"></path><path d=\"M8 9h8\"></path><path d=\"M8 13h4\"></path><path d=\"M16 13a3 3 0 1 1-2.1 5.1\"></path><path d=\"M16 11v3h-3\"></path>";
+    };
+    readonly 'call-queue': {
+        readonly body: "<path d=\"M4 14v-2a8 8 0 0 1 16 0v2\"></path><rect x=\"3\" y=\"14\" width=\"4\" height=\"7\" rx=\"2\"></rect><rect x=\"17\" y=\"14\" width=\"4\" height=\"7\" rx=\"2\"></rect><path d=\"M9 19h6\"></path><path d=\"M9 22h4\"></path>";
+    };
+    readonly campaign: {
+        readonly body: "<path d=\"M3 11v2a2 2 0 0 0 2 2h3l7 4V5L8 9H5a2 2 0 0 0-2 2z\"></path><path d=\"M19 8a5 5 0 0 1 0 8\"></path><circle cx=\"20\" cy=\"5\" r=\"2\"></circle>";
+    };
+    readonly 'chat-typing': {
+        readonly body: "<path d=\"M21 12a8 8 0 0 1-8 8H6l-4 2 2-5a8 8 0 1 1 17-5z\"></path><path d=\"M8 12h.01\"></path><path d=\"M12 12h.01\"></path><path d=\"M16 12h.01\"></path>";
+    };
+    readonly 'email-opened': {
+        readonly body: "<path d=\"m3 9 9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z\"></path><path d=\"m3 9 9 6 9-6\"></path><path d=\"M8 17h8\"></path>";
+    };
+    readonly 'email-sent': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m3 7 9 6 9-6\"></path><path d=\"M16 15h6\"></path><path d=\"m19 12 3 3-3 3\"></path>";
+    };
+    readonly 'inbox-priority': {
+        readonly body: "<path d=\"M4 4h16l-2 10h-4a2 2 0 0 1-4 0H6L4 4z\"></path><path d=\"M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5\"></path><path d=\"M12 7v4\"></path><path d=\"M12 14h.01\"></path>";
+    };
+    readonly 'live-chat': {
+        readonly body: "<path d=\"M4 5h16v12H7l-4 4V5z\"></path><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><circle cx=\"18\" cy=\"7\" r=\"2\"></circle>";
+    };
+    readonly 'message-draft': {
+        readonly body: "<path d=\"M4 5h16v12H7l-4 4V5z\"></path><path d=\"M8 9h8\"></path><path d=\"M8 13h4\"></path><path d=\"m15 14 3-3 2 2-3 3h-2v-2z\"></path>";
+    };
+    readonly 'notification-muted': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><path d=\"M6.2 6.2A6 6 0 0 0 6 8c0 7-3 7-3 7h12\"></path><path d=\"M18 14.8c-.7-1-1-2.7-1-6.8a5.9 5.9 0 0 0-8.8-5.1\"></path><path d=\"M13.7 21a2 2 0 0 1-3.4 0\"></path>";
+    };
+    readonly sms: {
+        readonly body: "<path d=\"M4 5h16v12H7l-4 4V5z\"></path><path d=\"M8 10h.01\"></path><path d=\"M12 10h.01\"></path><path d=\"M16 10h.01\"></path><path d=\"M8 14h8\"></path>";
+    };
+    readonly 'support-agent': {
+        readonly body: "<path d=\"M4 14v-2a8 8 0 0 1 16 0v2\"></path><rect x=\"3\" y=\"14\" width=\"4\" height=\"7\" rx=\"2\"></rect><rect x=\"17\" y=\"14\" width=\"4\" height=\"7\" rx=\"2\"></rect><path d=\"M12 19h5\"></path><circle cx=\"12\" cy=\"8\" r=\"3\"></circle><path d=\"M7 21a5 5 0 0 1 10 0\"></path>";
     };
     readonly bank: {
         readonly body: "<path d=\"m3 10 9-6 9 6\"></path><path d=\"M4 10h16\"></path><path d=\"M6 10v8\"></path><path d=\"M10 10v8\"></path><path d=\"M14 10v8\"></path><path d=\"M18 10v8\"></path><path d=\"M4 18h16\"></path>";
@@ -1304,6 +2102,171 @@ declare const icons: {
     };
     readonly warehouse: {
         readonly body: "<path d=\"M3 21V8l9-5 9 5v13\"></path><path d=\"M7 21v-8h10v8\"></path><path d=\"M7 13h10\"></path><path d=\"M7 17h10\"></path>";
+    };
+    readonly billable: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v10\"></path><path d=\"M15 9.5A3 3 0 0 0 12 8c-1.7 0-3 1-3 2.3 0 3.2 6 1.4 6 4.6 0 1.2-1.3 2.1-3 2.1a4 4 0 0 1-3.5-1.8\"></path><path d=\"M18 18l3 3\"></path>";
+    };
+    readonly billing: {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h6\"></path><path d=\"M9 15h3\"></path><circle cx=\"17\" cy=\"16\" r=\"2\"></circle>";
+    };
+    readonly checkout: {
+        readonly body: "<circle cx=\"9\" cy=\"20\" r=\"1\"></circle><circle cx=\"17\" cy=\"20\" r=\"1\"></circle><path d=\"M3 4h2l2.5 11h10L20 7H6\"></path><path d=\"m9 11 2 2 5-5\"></path><path d=\"M4 22h16\"></path>";
+    };
+    readonly dispute: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M12 13v2\"></path><path d=\"M12 17h.01\"></path><path d=\"m16 14 3 3\"></path><path d=\"m19 14-3 3\"></path>";
+    };
+    readonly dunning: {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h4\"></path><path d=\"M15 14v3\"></path><path d=\"M15 20h.01\"></path>";
+    };
+    readonly estimate: {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h5\"></path><path d=\"M8 9h4\"></path>";
+    };
+    readonly 'payment-failed': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"m9 13 6 4\"></path><path d=\"m15 13-6 4\"></path>";
+    };
+    readonly 'payment-link': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M7 15h4\"></path><path d=\"M13 15a3 3 0 0 0 4.2 0l1-1a3 3 0 0 0-4.2-4.2l-.6.6\"></path>";
+    };
+    readonly 'payment-method': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M7 15h3\"></path><path d=\"M14 15h4\"></path><circle cx=\"18\" cy=\"7\" r=\"2\"></circle>";
+    };
+    readonly payout: {
+        readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M18 9h3v3\"></path><path d=\"m21 9-5 5\"></path>";
+    };
+    readonly 'price-tag': {
+        readonly body: "<path d=\"M20 12 12 20 3 11V3h8l9 9z\"></path><path d=\"M7 7h.01\"></path><path d=\"M12 8h4\"></path>";
+    };
+    readonly quote: {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 15h8\"></path><path d=\"M8 11h5\"></path><path d=\"m16 17 2 2 4-4\"></path>";
+    };
+    readonly subscription: {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><path d=\"M8 17h3\"></path><path d=\"M16 15a3 3 0 1 0 2.8 4\"></path><path d=\"M19 15v3h-3\"></path>";
+    };
+    readonly 'tax-receipt': {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><path d=\"m9 17 6-6\"></path><circle cx=\"10\" cy=\"12\" r=\"1\"></circle><circle cx=\"14\" cy=\"16\" r=\"1\"></circle>";
+    };
+    readonly usage: {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 16V9\"></path><path d=\"M12 16v-4\"></path><path d=\"M16 16v-7\"></path><path d=\"M7 19h10\"></path>";
+    };
+    readonly 'cart-abandoned': {
+        readonly body: "<circle cx=\"9\" cy=\"20\" r=\"1\"></circle><circle cx=\"17\" cy=\"20\" r=\"1\"></circle><path d=\"M3 4h2l2.5 11h10L20 7H6\"></path><path d=\"M12 9v4\"></path><path d=\"M12 16h.01\"></path>";
+    };
+    readonly 'discount-code': {
+        readonly body: "<path d=\"M3 9a3 3 0 0 0 0 6v3h18v-3a3 3 0 0 0 0-6V6H3v3z\"></path><path d=\"M8 9h.01\"></path><path d=\"M16 15h.01\"></path><path d=\"m9 16 6-8\"></path><path d=\"M13 6v12\"></path>";
+    };
+    readonly fulfillment: {
+        readonly body: "<path d=\"m21 8-9-5-9 5 9 5 9-5z\"></path><path d=\"M3 8v8l9 5 9-5V8\"></path><path d=\"m8 15 2 2 5-5\"></path><path d=\"M17 15h4\"></path>";
+    };
+    readonly inventory: {
+        readonly body: "<path d=\"M3 21V8l9-5 9 5v13\"></path><path d=\"M7 21v-8h10v8\"></path><path d=\"M7 13h10\"></path><path d=\"M7 17h10\"></path><path d=\"M10 8h4\"></path>";
+    };
+    readonly 'inventory-alert': {
+        readonly body: "<path d=\"M3 21V8l9-5 9 5v13\"></path><path d=\"M7 21v-8h10v8\"></path><path d=\"M7 13h10\"></path><path d=\"M12 7v5\"></path><path d=\"M12 16h.01\"></path>";
+    };
+    readonly 'order-cancelled': {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><path d=\"m9 12 6 6\"></path><path d=\"m15 12-6 6\"></path>";
+    };
+    readonly 'order-check': {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h4\"></path><path d=\"m10 16 2 2 5-5\"></path>";
+    };
+    readonly 'order-pending': {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><circle cx=\"12\" cy=\"15\" r=\"3\"></circle><path d=\"M12 13.5V15l1 1\"></path>";
+    };
+    readonly 'pos-terminal': {
+        readonly body: "<rect x=\"6\" y=\"3\" width=\"12\" height=\"18\" rx=\"2\"></rect><path d=\"M9 7h6\"></path><path d=\"M9 11h6\"></path><path d=\"M9 15h2\"></path><path d=\"M14 15h1\"></path>";
+    };
+    readonly procurement: {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><path d=\"M8 17h3\"></path><path d=\"m15 17 2 2 4-4\"></path>";
+    };
+    readonly 'purchase-order': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 12h8\"></path><path d=\"M8 16h5\"></path><path d=\"M8 8h3\"></path>";
+    };
+    readonly return: {
+        readonly body: "<path d=\"M9 7H4v5\"></path><path d=\"M4 12a8 8 0 1 0 2.3-5.7\"></path><path d=\"m21 8-6-4-6 4 6 4 6-4z\"></path><path d=\"M9 8v6l6 4 6-4V8\"></path>";
+    };
+    readonly 'shipment-track': {
+        readonly body: "<path d=\"M3 6h11v10H3z\"></path><path d=\"M14 10h4l3 3v3h-7v-6z\"></path><circle cx=\"7\" cy=\"18\" r=\"2\"></circle><circle cx=\"17\" cy=\"18\" r=\"2\"></circle><path d=\"M10 3h8\"></path><path d=\"m15 1 3 2-3 2\"></path>";
+    };
+    readonly 'shipping-label': {
+        readonly body: "<path d=\"M6 3h12v18H6z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h6\"></path><path d=\"M9 15h3\"></path><path d=\"M15 15h.01\"></path><path d=\"M6 3l12 18\"></path>";
+    };
+    readonly 'account-payable': {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h4\"></path><path d=\"M15 15h5\"></path><path d=\"m17 13 3 2-3 2\"></path>";
+    };
+    readonly 'account-receivable': {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h4\"></path><path d=\"M20 15h-5\"></path><path d=\"m18 13-3 2 3 2\"></path>";
+    };
+    readonly 'bill-pay': {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h6\"></path><path d=\"M9 15h3\"></path><path d=\"m14 17 2 2 5-5\"></path>";
+    };
+    readonly 'card-terminal': {
+        readonly body: "<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"2\"></rect><path d=\"M8 7h8\"></path><path d=\"M8 11h8\"></path><path d=\"M8 15h2\"></path><path d=\"M13 15h3\"></path><path d=\"M9 19h6\"></path>";
+    };
+    readonly 'cash-register': {
+        readonly body: "<rect x=\"4\" y=\"10\" width=\"16\" height=\"10\" rx=\"2\"></rect><path d=\"M8 10V5h8v5\"></path><path d=\"M9 14h.01\"></path><path d=\"M13 14h.01\"></path><path d=\"M17 14h.01\"></path><path d=\"M8 18h8\"></path>";
+    };
+    readonly chargeback: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 16H6v-3\"></path><path d=\"M6 13a5 5 0 0 0 8 4\"></path><path d=\"M15 13h3v3\"></path><path d=\"M18 16a5 5 0 0 0-8-4\"></path>";
+    };
+    readonly 'credit-note': {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h6\"></path><path d=\"M9 15h4\"></path><path d=\"M16 14v6\"></path><path d=\"M13 17h6\"></path>";
+    };
+    readonly 'debit-note': {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h6\"></path><path d=\"M9 15h4\"></path><path d=\"M13 17h6\"></path>";
+    };
+    readonly 'delivery-note': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 12h8\"></path><path d=\"M8 16h4\"></path><path d=\"M15 16h5\"></path><path d=\"m18 14 2 2-2 2\"></path>";
+    };
+    readonly 'payment-scheduled': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><circle cx=\"12\" cy=\"15\" r=\"3\"></circle><path d=\"M12 13.5V15l1 1\"></path>";
+    };
+    readonly 'pricing-table': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 5v14\"></path><path d=\"M15 5v14\"></path><path d=\"M6 15h.01\"></path><path d=\"M12 15h.01\"></path><path d=\"M18 15h.01\"></path>";
+    };
+    readonly 'revenue-recognition': {
+        readonly body: "<path d=\"M3 21h18\"></path><path d=\"M6 17V9\"></path><path d=\"M12 17V5\"></path><path d=\"M18 17v-6\"></path><path d=\"M8 5h8\"></path><path d=\"M12 3v4\"></path>";
+    };
+    readonly 'sales-order': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 12h8\"></path><path d=\"M8 16h5\"></path><path d=\"m15 17 2 2 4-4\"></path>";
+    };
+    readonly vendor: {
+        readonly body: "<path d=\"M4 10h16l-1-5H5l-1 5z\"></path><path d=\"M5 10v10h14V10\"></path><path d=\"M9 20v-6h6v6\"></path><circle cx=\"17\" cy=\"7\" r=\"2\"></circle>";
+    };
+    readonly 'billing-cycle': {
+        readonly body: "<path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2V2z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h5\"></path><path d=\"M16 15a3 3 0 1 1-2.1 5.1\"></path><path d=\"M16 13v3h-3\"></path>";
+    };
+    readonly 'collection-case': {
+        readonly body: "<rect x=\"3\" y=\"7\" width=\"18\" height=\"13\" rx=\"2\"></rect><path d=\"M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"></path><path d=\"M8 12h8\"></path><path d=\"M8 16h4\"></path><path d=\"M16 14v5\"></path><path d=\"M16 22h.01\"></path>";
+    };
+    readonly 'contract-value': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 12h8\"></path><path d=\"M8 16h4\"></path><path d=\"M16 13v6\"></path><path d=\"M18 15a2 2 0 0 0-2-1.5c-1 0-2 .5-2 1.5 0 2 4 .8 4 3 0 .9-1 1.5-2 1.5a3 3 0 0 1-2.5-1\"></path>";
+    };
+    readonly 'payment-gateway': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M7 15h4\"></path><circle cx=\"17\" cy=\"15\" r=\"2\"></circle><path d=\"M17 11v2\"></path><path d=\"M17 17v2\"></path><path d=\"M13 15h2\"></path><path d=\"M19 15h2\"></path>";
+    };
+    readonly remittance: {
+        readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M18 9h3v3\"></path><path d=\"m21 9-5 5\"></path><path d=\"M6 15H3v-3\"></path><path d=\"m3 15 5-5\"></path>";
+    };
+    readonly 'revenue-ledger': {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M9 3v18\"></path><path d=\"M12 8h4\"></path><path d=\"M12 12h4\"></path><path d=\"M12 16h3\"></path><path d=\"M16 6v12\"></path>";
+    };
+    readonly sku: {
+        readonly body: "<path d=\"m21 8-9-5-9 5 9 5 9-5z\"></path><path d=\"M3 8v8l9 5 9-5V8\"></path><path d=\"M8 15h8\"></path><path d=\"M9 18h6\"></path>";
+    };
+    readonly supplier: {
+        readonly body: "<path d=\"M3 21V8l9-5 9 5v13\"></path><path d=\"M7 21v-8h10v8\"></path><path d=\"M7 13h10\"></path><circle cx=\"18\" cy=\"8\" r=\"2\"></circle><path d=\"M16 4h4\"></path>";
+    };
+    readonly 'tax-id': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"m8 17 8-8\"></path><circle cx=\"9\" cy=\"10\" r=\"1\"></circle><circle cx=\"15\" cy=\"16\" r=\"1\"></circle><path d=\"M8 7h4\"></path>";
+    };
+    readonly till: {
+        readonly body: "<rect x=\"4\" y=\"10\" width=\"16\" height=\"10\" rx=\"2\"></rect><path d=\"M8 10V5h8v5\"></path><path d=\"M8 14h.01\"></path><path d=\"M12 14h.01\"></path><path d=\"M16 14h.01\"></path><path d=\"M7 18h10\"></path>";
+    };
+    readonly trial: {
+        readonly body: "<path d=\"M9 2h6\"></path><path d=\"M10 2v6l-5.5 9.5A3 3 0 0 0 7.1 22h9.8a3 3 0 0 0 2.6-4.5L14 8V2\"></path><path d=\"M8 16h8\"></path><path d=\"M12 11v5\"></path><path d=\"M9.5 13.5h5\"></path>";
+    };
+    readonly wholesale: {
+        readonly body: "<path d=\"M3 21V8l9-5 9 5v13\"></path><path d=\"M7 21v-8h10v8\"></path><path d=\"M7 13h10\"></path><path d=\"M7 17h10\"></path><path d=\"M4 8h16\"></path><path d=\"M9 5h6\"></path>";
     };
     readonly 'area-chart': {
         readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m7 15 4-5 3 3 5-7v12H7z\"></path>";
@@ -1446,11 +2409,134 @@ declare const icons: {
     readonly 'target-metric': {
         readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><circle cx=\"12\" cy=\"12\" r=\"5\"></circle><circle cx=\"12\" cy=\"12\" r=\"1\"></circle><path d=\"M17 7h4v4\"></path><path d=\"m21 7-5 5\"></path>";
     };
+    readonly activation: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 17V9\"></path><path d=\"M12 17v-5\"></path><path d=\"M17 17V6\"></path><path d=\"m14 9 3-3 3 3\"></path>";
+    };
+    readonly benchmark: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M6 16h12\"></path><path d=\"M6 12h8\"></path><path d=\"M6 8h4\"></path><path d=\"M18 5v14\"></path>";
+    };
+    readonly churn: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 8 5 5 4-4 4 6\"></path><path d=\"M19 11v4h-4\"></path>";
+    };
+    readonly 'expansion-revenue': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 17V9\"></path><path d=\"M12 17V7\"></path><path d=\"M17 17V5\"></path><path d=\"m15 7 2-2 2 2\"></path>";
+    };
+    readonly 'forecast-band': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 17 4-6 4 3 4-7\"></path><path d=\"m6 13 4-4 4 2 4-5\"></path><path d=\"m6 20 4-5 4 4 4-8\"></path>";
+    };
+    readonly ltv: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 16 4-4 3 3 5-8\"></path><path d=\"M6 8h3\"></path><path d=\"M6 11h5\"></path><path d=\"M17 7h4v4\"></path>";
+    };
+    readonly mrr: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M6 17V9l3 4 3-4v8\"></path><path d=\"M15 17V9h3a2 2 0 0 1 0 4h-3\"></path><path d=\"m18 13 3 4\"></path>";
+    };
+    readonly nps: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 15a5 5 0 0 1 10 0\"></path><path d=\"M7 9h.01\"></path><path d=\"M17 9h.01\"></path><path d=\"M10 18h4\"></path>";
+    };
+    readonly 'revenue-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 16 4-4 3 3 5-8\"></path><path d=\"M12 7v10\"></path><path d=\"M15 9.5A3 3 0 0 0 12 8c-1.7 0-3 1-3 2.3 0 3.2 6 1.4 6 4.6 0 1.2-1.3 2.1-3 2.1a4 4 0 0 1-3.5-1.8\"></path>";
+    };
+    readonly roi: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m7 16 4-4 3 3 4-7\"></path><path d=\"m16 8 2-2 2 2\"></path><path d=\"M8 8h.01\"></path><path d=\"M12 8h.01\"></path>";
+    };
+    readonly 'session-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 17V9\"></path><path d=\"M12 17v-4\"></path><path d=\"M17 17V6\"></path><circle cx=\"17\" cy=\"6\" r=\"2\"></circle>";
+    };
+    readonly 'win-rate': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m7 15 3 3 7-10\"></path><path d=\"M7 8h4\"></path><path d=\"M7 12h3\"></path><path d=\"M17 8h4v4\"></path>";
+    };
+    readonly 'adoption-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 17V9\"></path><path d=\"M12 17v-6\"></path><path d=\"M17 17V7\"></path><path d=\"m14 10 3-3 3 3\"></path>";
+    };
+    readonly 'capacity-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><rect x=\"6\" y=\"8\" width=\"3\" height=\"9\"></rect><rect x=\"11\" y=\"6\" width=\"3\" height=\"11\"></rect><rect x=\"16\" y=\"11\" width=\"3\" height=\"6\"></rect><path d=\"M6 5h13\"></path>";
+    };
+    readonly 'cohort-grid': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><rect x=\"6\" y=\"6\" width=\"3\" height=\"3\"></rect><rect x=\"11\" y=\"6\" width=\"3\" height=\"3\"></rect><rect x=\"16\" y=\"6\" width=\"3\" height=\"3\"></rect><rect x=\"6\" y=\"11\" width=\"3\" height=\"3\"></rect><rect x=\"11\" y=\"11\" width=\"3\" height=\"3\"></rect><rect x=\"16\" y=\"16\" width=\"3\" height=\"3\"></rect>";
+    };
+    readonly 'contribution-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 17V8\"></path><path d=\"M12 17v-5\"></path><path d=\"M17 17v-8\"></path><path d=\"M7 8h10\"></path><path d=\"M12 12h5\"></path>";
+    };
+    readonly 'dependency-chart': {
+        readonly body: "<circle cx=\"6\" cy=\"8\" r=\"3\"></circle><circle cx=\"18\" cy=\"8\" r=\"3\"></circle><circle cx=\"12\" cy=\"18\" r=\"3\"></circle><path d=\"M9 8h6\"></path><path d=\"m8 10 3 5\"></path><path d=\"m16 10-3 5\"></path><path d=\"M3 21h18\"></path>";
+    };
+    readonly 'error-rate': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 16 4-5 3 4 5-8\"></path><path d=\"M16 14l4 4\"></path><path d=\"m20 14-4 4\"></path>";
+    };
+    readonly latency: {
+        readonly body: "<path d=\"M4 15a8 8 0 1 1 16 0\"></path><path d=\"M12 15l5-5\"></path><path d=\"M7 19h10\"></path><path d=\"M12 3v3\"></path><path d=\"M4 15h3\"></path><path d=\"M17 15h3\"></path>";
+    };
+    readonly percentile: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 17 4-7 4 3 4-8\"></path><path d=\"M6 12h12\"></path><path d=\"M6 8h8\"></path>";
+    };
+    readonly saturation: {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 17V8\"></path><path d=\"M12 17V5\"></path><path d=\"M17 17v-3\"></path><path d=\"M5 7h14\"></path><path d=\"M5 13h14\"></path>";
+    };
+    readonly 'throughput-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M6 16h4v-4h4V8h5\"></path><path d=\"m16 5 3 3-3 3\"></path>";
+    };
     readonly 'vertical-bar-chart': {
         readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M8 17V9\"></path><path d=\"M12 17V6\"></path><path d=\"M16 17v-5\"></path>";
     };
     readonly 'waterfall-chart': {
         readonly body: "<path d=\"M3 3v18h18\"></path><rect x=\"6\" y=\"12\" width=\"3\" height=\"5\"></rect><rect x=\"11\" y=\"8\" width=\"3\" height=\"4\"></rect><rect x=\"16\" y=\"10\" width=\"3\" height=\"7\"></rect><path d=\"M9 12h2\"></path><path d=\"M14 10h2\"></path>";
+    };
+    readonly 'anomaly-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 16 4-4 3 3 5-8\"></path><circle cx=\"18\" cy=\"7\" r=\"2\"></circle><path d=\"M18 4v1\"></path><path d=\"M18 9v1\"></path>";
+    };
+    readonly 'baseline-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M6 12h13\"></path><path d=\"m6 16 4-5 4 3 5-7\"></path>";
+    };
+    readonly 'box-plot': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M8 7v10\"></path><rect x=\"6\" y=\"10\" width=\"4\" height=\"4\"></rect><path d=\"M16 5v14\"></path><rect x=\"14\" y=\"8\" width=\"4\" height=\"7\"></rect>";
+    };
+    readonly 'burndown-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 7 4 4 3 2 5 4\"></path><path d=\"M6 17h12\"></path>";
+    };
+    readonly 'burnup-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"m6 17 4-4 3-2 5-4\"></path><path d=\"M6 7h12\"></path>";
+    };
+    readonly 'control-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M6 8h13\"></path><path d=\"M6 16h13\"></path><path d=\"m6 12 4-2 4 4 5-2\"></path>";
+    };
+    readonly 'distribution-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M6 17c2-8 4-8 6 0 2-8 4-8 6 0\"></path><path d=\"M6 17h12\"></path>";
+    };
+    readonly 'gantt-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 7h7\"></path><path d=\"M10 12h8\"></path><path d=\"M6 17h10\"></path><path d=\"M7 5v14\"></path>";
+    };
+    readonly 'health-score': {
+        readonly body: "<path d=\"M4 15a8 8 0 1 1 16 0\"></path><path d=\"M12 15l4-5\"></path><path d=\"M7 19h10\"></path><path d=\"M8 9h2l2 5 2-8 2 3h2\"></path>";
+    };
+    readonly 'leaderboard-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><rect x=\"6\" y=\"11\" width=\"3\" height=\"6\"></rect><rect x=\"11\" y=\"7\" width=\"3\" height=\"10\"></rect><rect x=\"16\" y=\"13\" width=\"3\" height=\"4\"></rect><path d=\"M12 4h1\"></path>";
+    };
+    readonly 'map-chart': {
+        readonly body: "<path d=\"M9 18 3 21V6l6-3 6 3 6-3v15l-6 3-6-3z\"></path><path d=\"M9 3v15\"></path><path d=\"M15 6v15\"></path><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>";
+    };
+    readonly 'matrix-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><rect x=\"6\" y=\"6\" width=\"5\" height=\"5\"></rect><rect x=\"13\" y=\"6\" width=\"5\" height=\"5\"></rect><rect x=\"6\" y=\"13\" width=\"5\" height=\"5\"></rect><rect x=\"13\" y=\"13\" width=\"5\" height=\"5\"></rect>";
+    };
+    readonly 'pareto-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 17V9\"></path><path d=\"M12 17v-5\"></path><path d=\"M17 17v-8\"></path><path d=\"m6 8 4 3 4-1 5-5\"></path>";
+    };
+    readonly 'sankey-chart': {
+        readonly body: "<path d=\"M4 7h5\"></path><path d=\"M4 17h5\"></path><path d=\"M15 12h5\"></path><path d=\"M9 7c4 0 2 5 6 5\"></path><path d=\"M9 17c4 0 2-5 6-5\"></path><rect x=\"3\" y=\"5\" width=\"2\" height=\"4\"></rect><rect x=\"19\" y=\"10\" width=\"2\" height=\"4\"></rect>";
+    };
+    readonly 'bullet-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><rect x=\"6\" y=\"9\" width=\"12\" height=\"6\"></rect><path d=\"M6 12h9\"></path><path d=\"M16 7v10\"></path>";
+    };
+    readonly 'funnel-stage': {
+        readonly body: "<path d=\"M4 5h16l-6 7v5l-4 2v-7L4 5z\"></path><path d=\"M7 9h10\"></path><path d=\"M9 13h6\"></path><circle cx=\"18\" cy=\"18\" r=\"2\"></circle>";
+    };
+    readonly 'metric-card': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 10h5\"></path><path d=\"M7 14h10\"></path><path d=\"m14 10 2-2 3 3\"></path><path d=\"M16 8v6\"></path>";
+    };
+    readonly 'pivot-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><rect x=\"6\" y=\"6\" width=\"5\" height=\"5\"></rect><rect x=\"13\" y=\"6\" width=\"5\" height=\"5\"></rect><rect x=\"6\" y=\"13\" width=\"5\" height=\"5\"></rect><path d=\"M13 15h5\"></path><path d=\"m16 12 2 3-2 3\"></path>";
+    };
+    readonly 'variance-chart': {
+        readonly body: "<path d=\"M3 3v18h18\"></path><path d=\"M7 17V8\"></path><path d=\"M12 17V5\"></path><path d=\"M17 17v-6\"></path><path d=\"M6 12h13\"></path><path d=\"m17 8 2 2 2-2\"></path>";
     };
     readonly 'arrow-down': {
         readonly body: "<path d=\"M12 5v14\"></path><path d=\"m19 12-7 7-7-7\"></path>";
@@ -1773,6 +2859,144 @@ declare const icons: {
     readonly 'validation-error': {
         readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v6\"></path><path d=\"M12 17h.01\"></path>";
     };
+    readonly breadcrumb: {
+        readonly body: "<path d=\"M3 12h4\"></path><path d=\"m7 8 4 4-4 4\"></path><path d=\"M11 12h4\"></path><path d=\"m15 8 4 4-4 4\"></path><path d=\"M19 12h2\"></path>";
+    };
+    readonly 'command-palette': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 9h10\"></path><path d=\"m7 13 3 2-3 2\"></path><path d=\"M12 17h5\"></path>";
+    };
+    readonly 'density-comfortable': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"11\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"17\" width=\"16\" height=\"4\" rx=\"1\"></rect>";
+    };
+    readonly 'density-compact': {
+        readonly body: "<rect x=\"4\" y=\"6\" width=\"16\" height=\"3\" rx=\"1\"></rect><rect x=\"4\" y=\"11\" width=\"16\" height=\"3\" rx=\"1\"></rect><rect x=\"4\" y=\"16\" width=\"16\" height=\"3\" rx=\"1\"></rect>";
+    };
+    readonly 'empty-box': {
+        readonly body: "<path d=\"m21 8-9-5-9 5 9 5 9-5z\"></path><path d=\"M3 8v8l9 5 9-5V8\"></path><path d=\"M8 15h8\"></path>";
+    };
+    readonly 'empty-search': {
+        readonly body: "<circle cx=\"11\" cy=\"11\" r=\"7\"></circle><path d=\"m20 20-4-4\"></path><path d=\"M8 11h6\"></path>";
+    };
+    readonly 'empty-state': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 10h8\"></path><path d=\"M9 14h6\"></path><path d=\"M12 17h.01\"></path>";
+    };
+    readonly 'focus-mode': {
+        readonly body: "<path d=\"M8 3H5a2 2 0 0 0-2 2v3\"></path><path d=\"M16 3h3a2 2 0 0 1 2 2v3\"></path><path d=\"M21 16v3a2 2 0 0 1-2 2h-3\"></path><path d=\"M8 21H5a2 2 0 0 1-2-2v-3\"></path><circle cx=\"12\" cy=\"12\" r=\"3\"></circle>";
+    };
+    readonly loading: {
+        readonly body: "<path d=\"M21 12a9 9 0 1 1-6.2-8.6\"></path><path d=\"M21 12h-4\"></path>";
+    };
+    readonly 'nav-back': {
+        readonly body: "<path d=\"M15 6 9 12l6 6\"></path><path d=\"M9 12h12\"></path><path d=\"M3 5v14\"></path>";
+    };
+    readonly 'nav-forward': {
+        readonly body: "<path d=\"m9 6 6 6-6 6\"></path><path d=\"M3 12h12\"></path><path d=\"M21 5v14\"></path>";
+    };
+    readonly 'quick-action': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M13 3 7 14h5l-1 7 6-11h-5l1-7z\"></path>";
+    };
+    readonly 'sidebar-collapse': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M9 4v16\"></path><path d=\"m15 9-3 3 3 3\"></path><path d=\"m19 9-3 3 3 3\"></path>";
+    };
+    readonly 'sidebar-expand': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M9 4v16\"></path><path d=\"m12 9 3 3-3 3\"></path><path d=\"m16 9 3 3-3 3\"></path>";
+    };
+    readonly shortcut: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 9h.01\"></path><path d=\"M11 9h.01\"></path><path d=\"M15 9h.01\"></path><path d=\"M7 13h6\"></path><path d=\"M15 13h2\"></path><path d=\"M8 17h8\"></path>";
+    };
+    readonly skeleton: {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"4\" rx=\"2\"></rect><rect x=\"4\" y=\"11\" width=\"12\" height=\"3\" rx=\"1.5\"></rect><rect x=\"4\" y=\"16\" width=\"14\" height=\"3\" rx=\"1.5\"></rect>";
+    };
+    readonly 'split-view': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M12 4v16\"></path><path d=\"M7 9h2\"></path><path d=\"M15 9h2\"></path><path d=\"M7 14h2\"></path><path d=\"M15 14h2\"></path>";
+    };
+    readonly spotlight: {
+        readonly body: "<circle cx=\"11\" cy=\"11\" r=\"7\"></circle><path d=\"m20 20-4-4\"></path><path d=\"m11 6 1.2 3.3 3.3 1.2-3.3 1.2L11 15l-1.2-3.3L6.5 10.5l3.3-1.2L11 6z\"></path>";
+    };
+    readonly 'state-error': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v6\"></path><path d=\"M12 17h.01\"></path>";
+    };
+    readonly 'state-success': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"m8 12 3 3 5-6\"></path>";
+    };
+    readonly 'state-warning': {
+        readonly body: "<path d=\"m12 3 10 18H2L12 3z\"></path><path d=\"M12 9v4\"></path><path d=\"M12 17h.01\"></path>";
+    };
+    readonly tour: {
+        readonly body: "<path d=\"M5 4h14v10H5z\"></path><path d=\"M8 18h8\"></path><path d=\"M12 14v4\"></path><path d=\"M9 8h6\"></path><path d=\"M9 11h4\"></path><path d=\"m18 17 3 3\"></path>";
+    };
+    readonly 'app-launcher': {
+        readonly body: "<rect x=\"4\" y=\"4\" width=\"5\" height=\"5\" rx=\"1\"></rect><rect x=\"15\" y=\"4\" width=\"5\" height=\"5\" rx=\"1\"></rect><rect x=\"4\" y=\"15\" width=\"5\" height=\"5\" rx=\"1\"></rect><rect x=\"15\" y=\"15\" width=\"5\" height=\"5\" rx=\"1\"></rect>";
+    };
+    readonly 'app-shell': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 9h18\"></path><path d=\"M8 9v11\"></path><path d=\"M12 13h5\"></path><path d=\"M12 17h4\"></path>";
+    };
+    readonly 'bottom-sheet': {
+        readonly body: "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"></rect><path d=\"M4 13h16\"></path><path d=\"M9 16h6\"></path><path d=\"M10 10h4\"></path>";
+    };
+    readonly 'command-key': {
+        readonly body: "<path d=\"M9 9H5.5a2.5 2.5 0 1 1 2.5-2.5V18a2.5 2.5 0 1 1-2.5-2.5H18a2.5 2.5 0 1 1-2.5 2.5V6.5A2.5 2.5 0 1 1 18 9H9z\"></path>";
+    };
+    readonly dock: {
+        readonly body: "<rect x=\"4\" y=\"16\" width=\"16\" height=\"4\" rx=\"2\"></rect><rect x=\"6\" y=\"6\" width=\"3\" height=\"7\" rx=\"1\"></rect><rect x=\"11\" y=\"4\" width=\"3\" height=\"9\" rx=\"1\"></rect><rect x=\"16\" y=\"8\" width=\"3\" height=\"5\" rx=\"1\"></rect>";
+    };
+    readonly 'floating-action': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 8v8\"></path><path d=\"M8 12h8\"></path><path d=\"M18 18l3 3\"></path>";
+    };
+    readonly gesture: {
+        readonly body: "<path d=\"M7 14c2-6 5-8 8-6 2 1 3 4 2 7\"></path><path d=\"M7 14l3 3\"></path><path d=\"M7 14l-3 3\"></path><path d=\"M12 21c3-1 5-3 6-6\"></path>";
+    };
+    readonly inspector: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M14 4v16\"></path><path d=\"M17 8h2\"></path><path d=\"M17 12h2\"></path><path d=\"M17 16h1\"></path><circle cx=\"8\" cy=\"12\" r=\"3\"></circle>";
+    };
+    readonly launcher: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"m12 6 2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z\"></path>";
+    };
+    readonly navigator: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"m15.5 8.5-2 5-5 2 2-5 5-2z\"></path><path d=\"M12 3v3\"></path><path d=\"M12 18v3\"></path><path d=\"M3 12h3\"></path><path d=\"M18 12h3\"></path>";
+    };
+    readonly onboarding: {
+        readonly body: "<path d=\"M5 4h14v10H5z\"></path><path d=\"M8 18h8\"></path><path d=\"M12 14v4\"></path><path d=\"m9 9 2 2 4-4\"></path><path d=\"M19 17l2 2\"></path>";
+    };
+    readonly resizer: {
+        readonly body: "<path d=\"M4 14v6h6\"></path><path d=\"M20 10V4h-6\"></path><path d=\"m14 4 6 6\"></path><path d=\"m4 14 6 6\"></path><path d=\"M8 16l8-8\"></path>";
+    };
+    readonly 'shell-command': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m7 10 3 2-3 2\"></path><path d=\"M12 15h5\"></path><path d=\"M3 9h18\"></path>";
+    };
+    readonly stepper: {
+        readonly body: "<circle cx=\"6\" cy=\"12\" r=\"3\"></circle><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><circle cx=\"18\" cy=\"12\" r=\"3\"></circle><path d=\"M9 12h.01\"></path><path d=\"M15 12h.01\"></path>";
+    };
+    readonly 'status-bar': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 16h18\"></path><path d=\"M7 18h.01\"></path><path d=\"M11 18h4\"></path><path d=\"M17 18h.01\"></path>";
+    };
+    readonly 'touch-target': {
+        readonly body: "<rect x=\"5\" y=\"5\" width=\"14\" height=\"14\" rx=\"3\"></rect><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 2v3\"></path><path d=\"M12 19v3\"></path><path d=\"M2 12h3\"></path><path d=\"M19 12h3\"></path>";
+    };
+    readonly wizard: {
+        readonly body: "<path d=\"M15 4 20 9\"></path><path d=\"M14.5 9.5 4 20\"></path><path d=\"M18 2l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z\"></path><path d=\"M7 5h4\"></path><path d=\"M7 9h2\"></path>";
+    };
+    readonly 'workspace-switcher': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"7\" height=\"7\" rx=\"2\"></rect><rect x=\"13\" y=\"12\" width=\"7\" height=\"7\" rx=\"2\"></rect><path d=\"M11 8h3a3 3 0 0 1 3 3v1\"></path><path d=\"M13 16h-3a3 3 0 0 1-3-3v-1\"></path>";
+    };
+    readonly 'action-bar': {
+        readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M7 12h.01\"></path><path d=\"M11 12h.01\"></path><path d=\"M15 12h.01\"></path><path d=\"M19 12h.01\"></path>";
+    };
+    readonly 'context-panel': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M13 4v16\"></path><path d=\"M16 8h2\"></path><path d=\"M16 12h2\"></path><path d=\"M16 16h1\"></path>";
+    };
+    readonly 'filter-chip': {
+        readonly body: "<rect x=\"4\" y=\"7\" width=\"16\" height=\"10\" rx=\"5\"></rect><path d=\"M8 12h6\"></path><path d=\"m16 10 2 2-2 2\"></path>";
+    };
+    readonly 'keyboard-shortcut': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 9h.01\"></path><path d=\"M11 9h.01\"></path><path d=\"M15 9h.01\"></path><path d=\"M7 13h3\"></path><path d=\"M12 13h5\"></path><path d=\"M8 17h8\"></path>";
+    };
+    readonly 'side-panel': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M15 4v16\"></path><path d=\"M7 8h4\"></path><path d=\"M7 12h4\"></path><path d=\"M7 16h3\"></path>";
+    };
+    readonly 'top-bar': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 9h18\"></path><path d=\"M7 6.5h.01\"></path><path d=\"M11 6.5h6\"></path>";
+    };
     readonly 'x-square': {
         readonly body: "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M15 9 9 15\"></path><path d=\"m9 9 6 6\"></path>";
     };
@@ -1817,7 +3041,7 @@ interface IconSearchOptions {
     includeDeprecated?: boolean;
 }
 
-declare const iconMetadata: Record<"batoi" | "uif" | "arrow-down" | "arrow-left" | "arrow-right" | "arrow-up" | "bot" | "check" | "check-circle" | "chevron-down" | "chevron-left" | "chevron-right" | "chevron-up" | "circle-dot" | "close" | "code" | "drag" | "external-link" | "grid" | "hash" | "home" | "maximize" | "menu" | "minus" | "moon" | "more-horizontal" | "more-vertical" | "pause" | "play" | "plus" | "redo" | "search" | "settings" | "sidebar" | "spark" | "star" | "sun" | "terminal" | "theme" | "arrow-down-left" | "arrow-down-right" | "arrow-up-left" | "arrow-up-right" | "chevrons-down" | "chevrons-left" | "chevrons-right" | "chevrons-up" | "columns" | "corner-down-left" | "corner-down-right" | "corner-up-left" | "corner-up-right" | "layout-dashboard" | "layout-list" | "layout-panel-left" | "layout-panel-top" | "panel-bottom" | "panel-left" | "panel-right" | "panel-top" | "play-circle" | "plus-circle" | "plus-square" | "power" | "rotate-clockwise" | "search-check" | "search-x" | "square-dot" | "square-stack" | "stop" | "stop-circle" | "undo" | "arrow-left-right" | "arrow-up-down" | "ban" | "check-check" | "circle" | "circle-alert" | "circle-help" | "ellipsis" | "ellipsis-vertical" | "maximize2" | "minimize" | "minimize2" | "move" | "move-horizontal" | "move-vertical" | "panel-close" | "panel-open" | "pin" | "pin-off" | "rotate-counter-clockwise" | "scan" | "scan-line" | "select" | "toggle-left" | "toggle-right" | "checkbox" | "checkbox-checked" | "checkbox-minus" | "field-required" | "input" | "input-error" | "input-password" | "input-search" | "radio-checked" | "radio-unchecked" | "textarea" | "validation-error" | "x-square" | "zoom-in" | "zoom-out" | "area-chart" | "bar-chart" | "chart" | "dashboard" | "donut-chart" | "gauge-chart" | "histogram" | "line-chart" | "pie-chart" | "radar-chart" | "scatter-chart" | "sparkline" | "chart-candlestick" | "chart-column" | "chart-no-axes" | "chart-stacked" | "axis-x" | "axis-y" | "bubble-chart" | "chart-combo" | "chart-network" | "chart-spline" | "chart-step" | "conversion-funnel" | "dial" | "forecast" | "funnel-chart" | "heatmap" | "horizontal-bar-chart" | "kpi" | "meter" | "progress-ring" | "regression" | "scorecard" | "stacked-area-chart" | "table-chart" | "treemap" | "trend-down" | "trend-up" | "ab-test" | "cohort" | "experiment" | "goal-chart" | "growth-loop" | "retention" | "segment" | "target-metric" | "vertical-bar-chart" | "waterfall-chart" | "bank" | "card" | "cart" | "cash" | "credit-card" | "receipt" | "badge-dollar" | "badge-percent" | "barcode" | "gift" | "invoice" | "landmark" | "shopping-bag" | "store" | "ticket" | "truck" | "vault" | "wallet" | "coins" | "coupon" | "dollar-sign" | "hand-coins" | "package-check" | "package-open" | "package-plus" | "package-x" | "percent" | "refund" | "scale" | "ship" | "shopping-cart-check" | "shopping-cart-plus" | "warehouse" | "at-sign" | "bell" | "mail" | "message" | "mic" | "paperclip" | "send" | "share" | "bell-off" | "megaphone" | "phone-call" | "broadcast" | "chat-check" | "chat-plus" | "chat-x" | "inbox-mail" | "mail-check" | "mail-open" | "mail-plus" | "mail-x" | "message-circle" | "message-square" | "mic-off" | "notification-dot" | "phone-forwarded" | "phone-incoming" | "phone-missed" | "phone-off" | "phone-outgoing" | "rss-feed" | "share-2" | "announcement" | "comment-check" | "comment-x" | "feedback" | "inbox-alert" | "mention" | "message-lock" | "thread" | "voicemail" | "archive" | "camera" | "copy" | "document" | "edit" | "file" | "folder" | "image" | "printer" | "save" | "align-center" | "align-left" | "align-right" | "book-open" | "bookmark" | "camera-off" | "clipboard" | "clipboard-check" | "clipboard-list" | "copy-check" | "file-check" | "file-code" | "file-down" | "file-minus" | "file-plus" | "file-text" | "file-up" | "file-x" | "folder-open" | "folder-plus" | "folder-sync" | "image-plus" | "indent" | "pencil" | "scissors" | "sticky" | "clipboard-copy" | "clipboard-x" | "crop" | "eraser" | "file-archive" | "file-audio" | "file-image" | "file-json" | "file-lock" | "file-spreadsheet" | "file-video" | "folder-check" | "folder-down" | "folder-lock" | "folder-up" | "folder-x" | "newspaper" | "paintbrush" | "palette" | "document-import" | "document-export" | "document-search" | "document-signature" | "file-csv" | "file-pdf" | "file-template" | "image-check" | "scan-document" | "template-plus" | "video-off" | "video" | "battery" | "bluetooth" | "cloud" | "cpu" | "database" | "desktop" | "laptop" | "offline" | "phone" | "server" | "chip" | "cloud-download" | "cloud-upload" | "database-backup" | "database-zap" | "device-tablet" | "hard-drive" | "headphones" | "keyboard" | "monitor" | "plug-zap" | "server-cog" | "wifi-off" | "bluetooth-connected" | "cloud-check" | "cloud-x" | "database-check" | "database-lock" | "mouse" | "network" | "monitor-smartphone" | "router" | "router-wifi" | "smartphone" | "tablet" | "usb" | "barcode-scanner" | "battery-charging" | "battery-full" | "battery-low" | "nfc" | "printer-check" | "server-check" | "server-lock" | "signal" | "signal-low" | "smartwatch" | "watch" | "wifi" | "app-window" | "mobile-camera" | "mobile-check" | "mobile-home" | "mobile-nav" | "mobile-rotate" | "mobile-scan" | "mobile-tab" | "mobile-vibrate" | "mobile-x" | "offline-sync" | "pwa-install" | "alert" | "approval" | "audit" | "award" | "brain" | "briefcase" | "building" | "calculator" | "error" | "eye" | "eye-off" | "help" | "info" | "key" | "lock" | "policy" | "shield" | "success" | "accessibility" | "badge" | "check-square" | "fingerprint" | "id" | "life-buoy" | "scale-balanced" | "shield-check" | "shield-lock" | "shield-x" | "user-check" | "user-cog" | "user-minus" | "user-plus" | "user-x" | "users-round" | "unlock" | "user" | "users" | "warning" | "badge-alert" | "badge-check" | "certificate" | "key-round" | "keys" | "lock-keyhole" | "lock-open" | "permission" | "role" | "scan-face" | "shield-alert" | "shield-user" | "user-round" | "user-round-check" | "users-plus" | "agent" | "agent-check" | "agent-x" | "ai-spark" | "audit-log" | "consent" | "model" | "prompt" | "prompt-lock" | "risk-score" | "tool-approval" | "tool-denied" | "x-circle" | "activity" | "calendar" | "clock" | "command" | "download" | "filter" | "flag" | "inbox" | "layers" | "link" | "list" | "package" | "qr-code" | "refresh" | "rocket" | "sliders" | "sync" | "table" | "tag" | "target" | "tool" | "trash" | "branch" | "bug" | "calendar-check" | "calendar-clock" | "calendar-days" | "calendar-plus" | "calendar-x" | "grab" | "history" | "kanban" | "list-check" | "list-filter" | "loader-circle" | "log-in" | "log-out" | "project" | "puzzle" | "repeat" | "reply-all" | "reply" | "sliders-horizontal" | "sliders-vertical" | "sort-asc" | "sort-desc" | "stamp" | "step" | "timer" | "wrench" | "upload" | "automation" | "backlog" | "dependency" | "git-branch" | "git-commit" | "git-merge" | "git-pull-request" | "milestone" | "route-turn" | "status-dot" | "task-check" | "task-clock" | "task-x" | "timeline" | "webhook" | "column-add" | "column-delete" | "data-join" | "data-split" | "data-transform" | "filter-check" | "filter-x" | "row-add" | "row-delete" | "table-export" | "table-import" | "table-search" | "table-settings" | "workflow-branch" | "approval-pending" | "approval-rejected" | "approval-request" | "escalation" | "handoff" | "queue" | "queue-next" | "retry" | "rollback" | "runbook" | "sla" | "task-priority" | "workflow" | "box" | "compass" | "globe" | "heart" | "location" | "map" | "anchor" | "flask" | "heart-pulse" | "magnet" | "presentation" | "school" | "sitemap" | "suitcase" | "train" | "wand" | "ambulance" | "bed" | "bus" | "car" | "clinic" | "dna" | "factory" | "flag-triangle" | "globe-lock" | "graduation-cap" | "leaf" | "library" | "map-pin-check" | "map-pin-plus" | "map-pin-x" | "microscope" | "plane" | "pill" | "recycle" | "route" | "stethoscope" | "syringe" | "traffic-light" | "wheelchair" | "wind-turbine" | "blood-drop" | "campus" | "cargo-ship" | "classroom" | "container" | "currency-dollar" | "currency-rupee" | "exam" | "first-aid" | "forklift" | "insurance" | "investment" | "lab-report" | "ledger" | "loan" | "medical-chart" | "parcel-location" | "patient" | "tax" | "vaccine" | "building-hospital" | "delivery-bike" | "drone" | "fleet-vehicle" | "geo-fence" | "map-route" | "route-off" | "route-plus" | "satellite" | "traffic-cone", IconMetadata>;
+declare const iconMetadata: Record<"draft" | "batoi" | "uif" | "arrow-down" | "arrow-left" | "arrow-right" | "arrow-up" | "bot" | "check" | "check-circle" | "chevron-down" | "chevron-left" | "chevron-right" | "chevron-up" | "circle-dot" | "close" | "code" | "drag" | "external-link" | "grid" | "hash" | "home" | "maximize" | "menu" | "minus" | "moon" | "more-horizontal" | "more-vertical" | "pause" | "play" | "plus" | "redo" | "search" | "settings" | "sidebar" | "spark" | "star" | "sun" | "terminal" | "theme" | "arrow-down-left" | "arrow-down-right" | "arrow-up-left" | "arrow-up-right" | "chevrons-down" | "chevrons-left" | "chevrons-right" | "chevrons-up" | "columns" | "corner-down-left" | "corner-down-right" | "corner-up-left" | "corner-up-right" | "layout-dashboard" | "layout-list" | "layout-panel-left" | "layout-panel-top" | "panel-bottom" | "panel-left" | "panel-right" | "panel-top" | "play-circle" | "plus-circle" | "plus-square" | "power" | "rotate-clockwise" | "search-check" | "search-x" | "square-dot" | "square-stack" | "stop" | "stop-circle" | "undo" | "arrow-left-right" | "arrow-up-down" | "ban" | "check-check" | "circle" | "circle-alert" | "circle-help" | "ellipsis" | "ellipsis-vertical" | "maximize2" | "minimize" | "minimize2" | "move" | "move-horizontal" | "move-vertical" | "panel-close" | "panel-open" | "pin" | "pin-off" | "rotate-counter-clockwise" | "scan" | "scan-line" | "select" | "toggle-left" | "toggle-right" | "checkbox" | "checkbox-checked" | "checkbox-minus" | "field-required" | "input" | "input-error" | "input-password" | "input-search" | "radio-checked" | "radio-unchecked" | "textarea" | "validation-error" | "breadcrumb" | "command-palette" | "density-comfortable" | "density-compact" | "empty-box" | "empty-search" | "empty-state" | "focus-mode" | "loading" | "nav-back" | "nav-forward" | "quick-action" | "sidebar-collapse" | "sidebar-expand" | "shortcut" | "skeleton" | "split-view" | "spotlight" | "state-error" | "state-success" | "state-warning" | "tour" | "app-launcher" | "app-shell" | "bottom-sheet" | "command-key" | "dock" | "floating-action" | "gesture" | "inspector" | "launcher" | "navigator" | "onboarding" | "resizer" | "shell-command" | "stepper" | "status-bar" | "touch-target" | "wizard" | "workspace-switcher" | "action-bar" | "context-panel" | "filter-chip" | "keyboard-shortcut" | "side-panel" | "top-bar" | "x-square" | "zoom-in" | "zoom-out" | "area-chart" | "bar-chart" | "chart" | "dashboard" | "donut-chart" | "gauge-chart" | "histogram" | "line-chart" | "pie-chart" | "radar-chart" | "scatter-chart" | "sparkline" | "chart-candlestick" | "chart-column" | "chart-no-axes" | "chart-stacked" | "axis-x" | "axis-y" | "bubble-chart" | "chart-combo" | "chart-network" | "chart-spline" | "chart-step" | "conversion-funnel" | "dial" | "forecast" | "funnel-chart" | "heatmap" | "horizontal-bar-chart" | "kpi" | "meter" | "progress-ring" | "regression" | "scorecard" | "stacked-area-chart" | "table-chart" | "treemap" | "trend-down" | "trend-up" | "ab-test" | "cohort" | "experiment" | "goal-chart" | "growth-loop" | "retention" | "segment" | "target-metric" | "activation" | "benchmark" | "churn" | "expansion-revenue" | "forecast-band" | "ltv" | "mrr" | "nps" | "revenue-chart" | "roi" | "session-chart" | "win-rate" | "adoption-chart" | "capacity-chart" | "cohort-grid" | "contribution-chart" | "dependency-chart" | "error-rate" | "latency" | "percentile" | "saturation" | "throughput-chart" | "vertical-bar-chart" | "waterfall-chart" | "anomaly-chart" | "baseline-chart" | "box-plot" | "burndown-chart" | "burnup-chart" | "control-chart" | "distribution-chart" | "gantt-chart" | "health-score" | "leaderboard-chart" | "map-chart" | "matrix-chart" | "pareto-chart" | "sankey-chart" | "bullet-chart" | "funnel-stage" | "metric-card" | "pivot-chart" | "variance-chart" | "bank" | "card" | "cart" | "cash" | "credit-card" | "receipt" | "badge-dollar" | "badge-percent" | "barcode" | "gift" | "invoice" | "landmark" | "shopping-bag" | "store" | "ticket" | "truck" | "vault" | "wallet" | "coins" | "coupon" | "dollar-sign" | "hand-coins" | "package-check" | "package-open" | "package-plus" | "package-x" | "percent" | "refund" | "scale" | "ship" | "shopping-cart-check" | "shopping-cart-plus" | "warehouse" | "billable" | "billing" | "checkout" | "dispute" | "dunning" | "estimate" | "payment-failed" | "payment-link" | "payment-method" | "payout" | "price-tag" | "quote" | "subscription" | "tax-receipt" | "usage" | "cart-abandoned" | "discount-code" | "fulfillment" | "inventory" | "inventory-alert" | "order-cancelled" | "order-check" | "order-pending" | "pos-terminal" | "procurement" | "purchase-order" | "return" | "shipment-track" | "shipping-label" | "account-payable" | "account-receivable" | "bill-pay" | "card-terminal" | "cash-register" | "chargeback" | "credit-note" | "debit-note" | "delivery-note" | "payment-scheduled" | "pricing-table" | "revenue-recognition" | "sales-order" | "vendor" | "billing-cycle" | "collection-case" | "contract-value" | "payment-gateway" | "remittance" | "revenue-ledger" | "sku" | "supplier" | "tax-id" | "till" | "trial" | "wholesale" | "at-sign" | "bell" | "mail" | "message" | "mic" | "paperclip" | "send" | "share" | "bell-off" | "megaphone" | "phone-call" | "broadcast" | "chat-check" | "chat-plus" | "chat-x" | "inbox-mail" | "mail-check" | "mail-open" | "mail-plus" | "mail-x" | "message-circle" | "message-square" | "mic-off" | "notification-dot" | "phone-forwarded" | "phone-incoming" | "phone-missed" | "phone-off" | "phone-outgoing" | "rss-feed" | "share-2" | "announcement" | "comment-check" | "comment-x" | "feedback" | "inbox-alert" | "mention" | "message-lock" | "thread" | "channel" | "channel-lock" | "channel-plus" | "collaboration" | "conversation" | "meeting" | "moderation" | "notification-check" | "notification-snooze" | "presence-away" | "presence-busy" | "presence-online" | "reaction" | "thread-resolved" | "call-muted" | "call-transfer" | "comment-thread" | "conversation-star" | "escalation-message" | "meeting-cancelled" | "meeting-check" | "mention-alert" | "notification-priority" | "presence-offline" | "support-inbox" | "survey" | "targeted-broadcast" | "transcript" | "voicemail" | "call-incoming" | "call-recording" | "chat-bot" | "chat-error" | "chat-resolved" | "contact-card" | "email-bounce" | "email-template" | "notification-digest" | "webhook-event" | "auto-reply" | "call-queue" | "campaign" | "chat-typing" | "email-opened" | "email-sent" | "inbox-priority" | "live-chat" | "message-draft" | "notification-muted" | "sms" | "support-agent" | "archive" | "camera" | "copy" | "document" | "edit" | "file" | "folder" | "image" | "printer" | "save" | "align-center" | "align-left" | "align-right" | "book-open" | "bookmark" | "camera-off" | "clipboard" | "clipboard-check" | "clipboard-list" | "copy-check" | "file-check" | "file-code" | "file-down" | "file-minus" | "file-plus" | "file-text" | "file-up" | "file-x" | "folder-open" | "folder-plus" | "folder-sync" | "image-plus" | "indent" | "pencil" | "scissors" | "sticky" | "clipboard-copy" | "clipboard-x" | "crop" | "eraser" | "file-archive" | "file-audio" | "file-image" | "file-json" | "file-lock" | "file-spreadsheet" | "file-video" | "folder-check" | "folder-down" | "folder-lock" | "folder-up" | "folder-x" | "newspaper" | "paintbrush" | "palette" | "document-import" | "document-export" | "document-search" | "document-signature" | "file-csv" | "file-pdf" | "file-template" | "image-check" | "scan-document" | "template-plus" | "asset" | "asset-library" | "collection" | "content-calendar" | "empty-file" | "empty-folder" | "file-diff" | "file-history" | "knowledge-base" | "media-library" | "version" | "citation" | "code-block" | "glossary" | "markdown" | "publish" | "redact" | "review-changes" | "rich-text" | "translation" | "web-page" | "video-off" | "video" | "annotation" | "approval-document" | "content-block" | "document-merge" | "document-split" | "file-xml" | "folder-shared" | "image-crop" | "image-edit" | "media-playlist" | "page-break" | "seo" | "snippet" | "style-guide" | "alt-text" | "content-approval" | "form-template" | "media-caption" | "version-compare" | "battery" | "bluetooth" | "cloud" | "cpu" | "database" | "desktop" | "laptop" | "offline" | "phone" | "server" | "chip" | "cloud-download" | "cloud-upload" | "database-backup" | "database-zap" | "device-tablet" | "hard-drive" | "headphones" | "keyboard" | "monitor" | "plug-zap" | "server-cog" | "wifi-off" | "bluetooth-connected" | "cloud-check" | "cloud-x" | "database-check" | "database-lock" | "mouse" | "network" | "monitor-smartphone" | "router" | "router-wifi" | "smartphone" | "tablet" | "usb" | "barcode-scanner" | "battery-charging" | "battery-full" | "battery-low" | "nfc" | "printer-check" | "server-check" | "server-lock" | "signal" | "signal-low" | "smartwatch" | "watch" | "wifi" | "app-window" | "mobile-camera" | "mobile-check" | "mobile-home" | "mobile-nav" | "mobile-rotate" | "mobile-scan" | "mobile-tab" | "mobile-vibrate" | "mobile-x" | "offline-sync" | "pwa-install" | "browser" | "cache" | "desktop-app" | "edge-device" | "kiosk" | "local-storage" | "platform-desktop" | "platform-mobile" | "platform-web" | "push-device" | "push-subscription" | "service-worker" | "storage" | "biometric" | "camera-capture" | "geolocation" | "mobile-bottom-sheet" | "mobile-drawer" | "mobile-gesture" | "mobile-offline" | "mobile-permission" | "mobile-sheet" | "orientation-lock" | "passkey" | "sensor-alert" | "vibration-off" | "wearable" | "airplay" | "beacon" | "bluetooth-off" | "camera-switch" | "device-hub" | "display-check" | "firmware" | "gpu" | "iot-device" | "mobile-hotspot" | "printer-error" | "qr-scanner" | "alert" | "approval" | "audit" | "award" | "brain" | "briefcase" | "building" | "calculator" | "error" | "eye" | "eye-off" | "help" | "info" | "key" | "lock" | "policy" | "shield" | "success" | "accessibility" | "badge" | "check-square" | "fingerprint" | "id" | "life-buoy" | "scale-balanced" | "shield-check" | "shield-lock" | "shield-x" | "user-check" | "user-cog" | "user-minus" | "user-plus" | "user-x" | "users-round" | "unlock" | "user" | "users" | "warning" | "badge-alert" | "badge-check" | "certificate" | "key-round" | "keys" | "lock-keyhole" | "lock-open" | "permission" | "role" | "scan-face" | "shield-alert" | "shield-user" | "user-round" | "user-round-check" | "users-plus" | "agent" | "agent-check" | "agent-x" | "ai-spark" | "audit-log" | "consent" | "model" | "prompt" | "prompt-lock" | "risk-score" | "tool-approval" | "tool-denied" | "api-key" | "credential" | "organization" | "org-chart" | "secret" | "service-account" | "session" | "session-expired" | "tenant" | "token" | "workspace" | "workspace-lock" | "access-request" | "approval-policy" | "audit-trail" | "data-residency" | "governance" | "policy-lock" | "data-retention" | "scim" | "sso" | "trust-center" | "user-invite" | "user-provision" | "aria" | "assistive-mode" | "compliance-evidence" | "consent-record" | "incident-response" | "keyboard-access" | "permission-review" | "privacy" | "screen-reader" | "voice-access" | "access-expiry" | "audit-event" | "data-classification" | "device-policy" | "encryption-key" | "identity-provider" | "ip-allowlist" | "legal-hold" | "tls-certificate" | "zero-trust" | "x-circle" | "activity" | "calendar" | "clock" | "command" | "download" | "filter" | "flag" | "inbox" | "layers" | "link" | "list" | "package" | "qr-code" | "refresh" | "rocket" | "sliders" | "sync" | "table" | "tag" | "target" | "tool" | "trash" | "branch" | "bug" | "calendar-check" | "calendar-clock" | "calendar-days" | "calendar-plus" | "calendar-x" | "grab" | "history" | "kanban" | "list-check" | "list-filter" | "loader-circle" | "log-in" | "log-out" | "project" | "puzzle" | "repeat" | "reply-all" | "reply" | "sliders-horizontal" | "sliders-vertical" | "sort-asc" | "sort-desc" | "stamp" | "step" | "timer" | "wrench" | "upload" | "automation" | "backlog" | "dependency" | "git-branch" | "git-commit" | "git-merge" | "git-pull-request" | "milestone" | "route-turn" | "status-dot" | "task-check" | "task-clock" | "task-x" | "timeline" | "webhook" | "column-add" | "column-delete" | "data-join" | "data-split" | "data-transform" | "filter-check" | "filter-x" | "row-add" | "row-delete" | "table-export" | "table-import" | "table-search" | "table-settings" | "workflow-branch" | "approval-pending" | "approval-rejected" | "approval-request" | "escalation" | "handoff" | "queue" | "queue-next" | "retry" | "rollback" | "runbook" | "sla" | "task-priority" | "ai-run" | "event-stream" | "html-partial" | "hydrate" | "job" | "job-failed" | "job-running" | "mcp-call" | "mcp-result" | "orchestration" | "partial-swap" | "polling" | "rehydrate" | "revalidate" | "sse" | "websocket" | "appointment" | "booking" | "checklist-clock" | "dispatch-board" | "incident-alert" | "maintenance" | "process-loop" | "recurrence" | "repair" | "rota" | "service-window" | "shift" | "triage-queue" | "work-order" | "workflow" | "batch-job" | "blocked-task" | "calendar-sync" | "change-request" | "decision-node" | "event-trigger" | "form-approval" | "job-queue" | "manual-step" | "process-map" | "release" | "rule-engine" | "task-delegated" | "workflow-template" | "box" | "compass" | "globe" | "heart" | "location" | "map" | "anchor" | "flask" | "heart-pulse" | "magnet" | "presentation" | "school" | "sitemap" | "suitcase" | "train" | "wand" | "ambulance" | "bed" | "bus" | "car" | "clinic" | "dna" | "factory" | "flag-triangle" | "globe-lock" | "graduation-cap" | "leaf" | "library" | "map-pin-check" | "map-pin-plus" | "map-pin-x" | "microscope" | "plane" | "pill" | "recycle" | "route" | "stethoscope" | "syringe" | "traffic-light" | "wheelchair" | "wind-turbine" | "blood-drop" | "campus" | "cargo-ship" | "classroom" | "container" | "currency-dollar" | "currency-rupee" | "exam" | "first-aid" | "forklift" | "insurance" | "investment" | "lab-report" | "ledger" | "loan" | "medical-chart" | "parcel-location" | "patient" | "tax" | "vaccine" | "building-hospital" | "delivery-bike" | "drone" | "fleet-vehicle" | "geo-fence" | "map-route" | "route-off" | "route-plus" | "satellite" | "traffic-cone" | "agriculture" | "case-management" | "crm" | "energy" | "hospitality" | "hr" | "legal" | "manufacturing" | "public-sector" | "quality-control" | "real-estate" | "recruiting" | "service-desk" | "support-case" | "ticket-queue" | "tourism" | "asset-maintenance" | "care-team" | "dispatch" | "facilities" | "field-service" | "fleet-route" | "patient-portal" | "repair-order" | "site-visit" | "triage" | "claims" | "construction" | "hotel-room" | "insurance-policy" | "lab" | "meter-reading" | "mining" | "pharmacy" | "radiology" | "restaurant" | "telemedicine" | "utility-pole" | "airport" | "branch-office" | "call-center" | "data-center" | "emergency-room" | "government-office" | "insurance-claim" | "inventory-site" | "logistics-hub" | "power-grid", IconMetadata>;
 declare function getIconMetadata(name: IconName | string): IconMetadata | undefined;
 declare function iconsByCategory(category: IconCategory | string): IconName[];
 declare function searchIcons(query?: string, options?: IconSearchOptions): IconName[];

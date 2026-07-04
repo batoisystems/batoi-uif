@@ -59,7 +59,7 @@
             </p>
           </div>
           <div class="example-meta" aria-label="Gallery summary">
-            <span class="example-pill">26 chart types</span>
+            <span class="example-pill">35 chart types</span>
             <span class="example-pill">0 runtime dependencies</span>
             <span class="example-pill">SVG-first</span>
           </div>
@@ -70,6 +70,10 @@
           <a href="#compact">Compact</a>
           <a href="#operational">Operational</a>
           <a href="#statistical">Statistical</a>
+          <a href="#business">Business</a>
+          <a href="#finance">Finance</a>
+          <a href="#advanced">Advanced</a>
+          <a href="#flint">Flint</a>
         </nav>
 
         <section class="chart-workbench" aria-label="Chart builder">
@@ -382,6 +386,114 @@
               data-uif-data='[{"label":"Login","value":42},{"label":"Billing","value":26},{"label":"Search","value":17},{"label":"Export","value":8}]'
             ></div>
           </article>
+          <article id="business" class="uif-card example-chart-card is-business">
+            <h2>Funnel</h2>
+            <div
+              data-uif="chart"
+              data-uif-chart="funnel"
+              data-uif-options='{"focusable":true,"table":"sr-only"}'
+              data-uif-data='[{"label":"Lead","value":1200},{"label":"Qualified","value":760},{"label":"Proposal","value":410},{"label":"Won","value":180}]'
+            ></div>
+          </article>
+          <article class="uif-card example-chart-card is-business">
+            <h2>Waterfall</h2>
+            <div
+              data-uif="chart"
+              data-uif-chart="waterfall"
+              data-uif-options='{"grid":true,"focusable":true}'
+              data-uif-data='[{"label":"Start","value":1000,"role":"start"},{"label":"Expansion","value":240},{"label":"New","value":180},{"label":"Churn","value":-90},{"label":"End","value":1330,"role":"end"}]'
+            ></div>
+          </article>
+          <article class="uif-card example-chart-card is-business">
+            <h2>Bubble</h2>
+            <div
+              data-uif="chart"
+              data-uif-chart="bubble"
+              data-uif-x="risk"
+              data-uif-y="revenue"
+              data-uif-options='{"grid":true,"focusable":true,"legend":true}'
+              data-uif-data='[{"label":"Enterprise","risk":72,"revenue":420,"size":120,"group":"Strategic"},{"label":"Midmarket","risk":44,"revenue":220,"size":80,"group":"Growth"},{"label":"SMB","risk":28,"revenue":95,"size":46,"group":"Volume"},{"label":"Public","risk":58,"revenue":310,"size":64,"group":"Strategic"}]'
+            ></div>
+          </article>
+          <article class="uif-card example-chart-card is-business">
+            <h2>Treemap</h2>
+            <div
+              data-uif="chart"
+              data-uif-chart="treemap"
+              data-uif-options='{"legend":true,"focusable":true}'
+              data-uif-data='[{"label":"Compute","value":420,"group":"Infrastructure"},{"label":"Storage","value":180,"group":"Infrastructure"},{"label":"Support","value":120,"group":"Operations"},{"label":"Marketing","value":95,"group":"Growth"},{"label":"Security","value":80,"group":"Operations"}]'
+            ></div>
+          </article>
+          <article class="uif-card example-chart-card is-business">
+            <h2>Calendar Heatmap</h2>
+            <div
+              data-uif="chart"
+              data-uif-chart="calendar-heatmap"
+              data-uif-options='{"focusable":true}'
+              data-uif-data='[{"date":"2026-07-01","value":12},{"date":"2026-07-02","value":18},{"date":"2026-07-04","value":8},{"date":"2026-07-06","value":22},{"date":"2026-07-09","value":15},{"date":"2026-07-12","value":6},{"date":"2026-07-14","value":19}]'
+            ></div>
+          </article>
+          <article id="finance" class="uif-card example-chart-card is-finance">
+            <h2>Candlestick</h2>
+            <div
+              data-uif="chart"
+              data-uif-chart="candlestick"
+              data-uif-options='{"grid":true,"focusable":true}'
+              data-uif-data='[{"label":"Jul 1","open":100,"high":112,"low":96,"close":108},{"label":"Jul 2","open":108,"high":111,"low":92,"close":98},{"label":"Jul 3","open":98,"high":106,"low":94,"close":104},{"label":"Jul 4","open":104,"high":118,"low":101,"close":116}]'
+            ></div>
+          </article>
+          <article class="uif-card example-chart-card is-finance">
+            <h2>OHLC</h2>
+            <div
+              data-uif="chart"
+              data-uif-chart="ohlc"
+              data-uif-options='{"grid":true,"focusable":true}'
+              data-uif-data='[{"label":"Jul 1","open":100,"high":112,"low":96,"close":108},{"label":"Jul 2","open":108,"high":111,"low":92,"close":98},{"label":"Jul 3","open":98,"high":106,"low":94,"close":104},{"label":"Jul 4","open":104,"high":118,"low":101,"close":116}]'
+            ></div>
+          </article>
+          <article class="uif-card example-chart-card is-finance">
+            <h2>Rose</h2>
+            <div
+              data-uif="chart"
+              data-uif-chart="rose"
+              data-uif-options='{"legend":true,"focusable":true}'
+              data-uif-data='[{"label":"North","value":42},{"label":"East","value":58},{"label":"South","value":35},{"label":"West","value":51}]'
+            ></div>
+          </article>
+          <article class="uif-card example-chart-card is-finance">
+            <h2>Polar Area</h2>
+            <div
+              data-uif="chart"
+              data-uif-chart="polar-area"
+              data-uif-options='{"legend":true,"focusable":true}'
+              data-uif-data='[{"label":"Direct","value":35},{"label":"Partner","value":25},{"label":"Self Serve","value":40},{"label":"Field","value":30}]'
+            ></div>
+          </article>
+          <article id="flint" class="uif-card example-chart-card is-operational is-flint">
+            <h2>Flint-Compatible Spec</h2>
+            <div
+              data-uif="chart"
+              data-uif-chart-format="flint"
+              data-uif-options='{"grid":true,"focusable":true}'
+              data-uif-semantics='{"quarter":"Temporal","revenue":"Price","segment":"Category"}'
+              data-uif-chart-spec='{"chartType":"Grouped Bar Chart","title":"Revenue by Segment","encodings":{"x":{"field":"quarter"},"y":{"field":"revenue"},"color":{"field":"segment"}},"canvasSize":{"width":420,"height":260}}'
+              data-uif-data='[{"quarter":"Q1","segment":"New","revenue":120},{"quarter":"Q1","segment":"Renewal","revenue":88},{"quarter":"Q2","segment":"New","revenue":148},{"quarter":"Q2","segment":"Renewal","revenue":112},{"quarter":"Q3","segment":"New","revenue":166},{"quarter":"Q3","segment":"Renewal","revenue":128}]'
+            ></div>
+          </article>
+          <article id="advanced" class="uif-card">
+            <div class="chart-card-head">
+              <div>
+                <div class="chart-card-kicker">Advanced</div>
+                <h2>Deferred Advanced Charts</h2>
+                <p>
+                  Sankey, alluvial, sunburst, network, and Gantt are intentionally outside
+                  dependency-free chart core until a specific product workflow justifies a dedicated
+                  layout engine, optional package, or server-rendered SVG.
+                </p>
+              </div>
+              <span>deferred</span>
+            </div>
+          </article>
         </div>
       </div>
     </main>
@@ -391,7 +503,7 @@
         downloadChartSvg,
         initChart,
         mountIcons,
-      } from '../../dist/uif.esm.js?v=20260524-chart-drilldown';
+      } from '../../dist/uif.esm.js?v=20260704-chart-phase3';
 
       function titleForType(type) {
         return type
@@ -415,7 +527,8 @@
         const options = optionsOverride ?? JSON.parse(el.dataset.uifOptions || '{}');
         const attrs = [
           'data-uif="chart"',
-          `data-uif-chart="${el.dataset.uifChart}"`,
+          el.dataset.uifChart ? `data-uif-chart="${el.dataset.uifChart}"` : '',
+          el.dataset.uifChartFormat ? `data-uif-chart-format="${el.dataset.uifChartFormat}"` : '',
           el.dataset.uifX ? `data-uif-x="${el.dataset.uifX}"` : '',
           el.dataset.uifY ? `data-uif-y="${el.dataset.uifY}"` : '',
           el.dataset.uifDrilldown ? `data-uif-drilldown="${el.dataset.uifDrilldown}"` : '',
@@ -427,6 +540,12 @@
             : '',
           el.dataset.uifPalette ? `data-uif-palette="${el.dataset.uifPalette}"` : '',
           el.dataset.uifChartTable ? `data-uif-chart-table="${el.dataset.uifChartTable}"` : '',
+          el.dataset.uifSemantics
+            ? `data-uif-semantics='${escapeAttribute(el.dataset.uifSemantics)}'`
+            : '',
+          el.dataset.uifChartSpec
+            ? `data-uif-chart-spec='${escapeAttribute(el.dataset.uifChartSpec)}'`
+            : '',
           Object.keys(options).length
             ? `data-uif-options='${escapeAttribute(JSON.stringify(options))}'`
             : '',
@@ -498,12 +617,22 @@
           'control-chart': 'Process variation against control thresholds.',
           distribution: 'Frequency distribution with automatic bins.',
           pareto: 'Ranked drivers with cumulative impact.',
+          funnel: 'Stage conversion and volume across business workflows.',
+          waterfall: 'Cumulative bridge for revenue, cost, or variance movement.',
+          bubble: 'Scatter relationship with size encoding for portfolio analysis.',
+          treemap: 'Dense part-to-whole composition for grouped business data.',
+          'calendar-heatmap': 'Daily activity intensity across a calendar grid.',
+          candlestick: 'Open, high, low, and close periods for finance dashboards.',
+          ohlc: 'Compact OHLC ticks for market and commodity summaries.',
+          rose: 'Radius-encoded cyclical category comparison.',
+          'polar-area': 'Part-to-whole comparison with radial area encoding.',
+          flint: 'AI-friendly chart specification mapped into the UIF SVG renderer.',
         };
         document.querySelectorAll('.example-chart-card').forEach((card) => {
           const chart = card.querySelector('[data-uif="chart"]');
           if (!chart) return;
           const title = card.querySelector('h2');
-          const type = chart.dataset.uifChart || '';
+          const type = chart.dataset.uifChart || chart.dataset.uifChartFormat || '';
           if (title && !card.querySelector('.chart-card-head')) {
             const head = document.createElement('div');
             head.className = 'chart-card-head';
@@ -512,11 +641,15 @@
               ? 'Statistical'
               : card.classList.contains('is-operational')
                 ? 'Operational'
-                : card.classList.contains('is-compact')
-                  ? 'Compact'
-                  : card.classList.contains('is-categorical')
-                    ? 'Categorical'
-                    : 'Standard';
+                : card.classList.contains('is-business')
+                  ? 'Business'
+                  : card.classList.contains('is-finance')
+                    ? 'Finance'
+                    : card.classList.contains('is-compact')
+                      ? 'Compact'
+                      : card.classList.contains('is-categorical')
+                        ? 'Categorical'
+                        : 'Standard';
             head.innerHTML = `<div><div class="chart-card-kicker">${category}</div><h2>${escapeHtml(title.textContent || titleForType(type))}</h2><p>${escapeHtml(copy)}</p></div><span>${escapeHtml(type)}</span>`;
             title.replaceWith(head);
           }
@@ -536,7 +669,7 @@
       function setupWorkbench() {
         const sourceCharts = [
           ...document.querySelectorAll('.example-chart-card [data-uif="chart"]'),
-        ];
+        ].filter((el) => el.dataset.uifChart);
         const byType = new Map(sourceCharts.map((el) => [el.dataset.uifChart, el]));
         const typeSelect = document.querySelector('#chart-type');
         const form = document.querySelector('#chart-options');

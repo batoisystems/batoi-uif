@@ -182,6 +182,123 @@ declare const deviceIcons: {
     readonly 'pwa-install': {
         readonly body: "<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"2\"></rect><path d=\"M12 7v8\"></path><path d=\"m8 11 4 4 4-4\"></path><path d=\"M10 18h4\"></path>";
     };
+    readonly browser: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 9h18\"></path><path d=\"M7 6.5h.01\"></path><path d=\"M11 6.5h.01\"></path><path d=\"M7 13h10\"></path>";
+    };
+    readonly cache: {
+        readonly body: "<ellipse cx=\"12\" cy=\"5\" rx=\"8\" ry=\"3\"></ellipse><path d=\"M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5\"></path><path d=\"M4 11v6c0 1.7 3.6 3 8 3\"></path><path d=\"M17 15a4 4 0 1 1-3 6.7\"></path><path d=\"M17 13v4h-4\"></path>";
+    };
+    readonly 'desktop-app': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M8 20h8\"></path><path d=\"M12 16v4\"></path><path d=\"M7 8h4\"></path><path d=\"M7 11h8\"></path>";
+    };
+    readonly 'edge-device': {
+        readonly body: "<rect x=\"6\" y=\"6\" width=\"12\" height=\"12\" rx=\"2\"></rect><path d=\"M9 2v4\"></path><path d=\"M15 2v4\"></path><path d=\"M9 18v4\"></path><path d=\"M15 18v4\"></path><path d=\"M2 9h4\"></path><path d=\"M18 9h4\"></path><path d=\"M2 15h4\"></path><path d=\"M18 15h4\"></path><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>";
+    };
+    readonly kiosk: {
+        readonly body: "<rect x=\"6\" y=\"3\" width=\"12\" height=\"16\" rx=\"2\"></rect><path d=\"M9 22h6\"></path><path d=\"M12 19v3\"></path><path d=\"M9 8h6\"></path><path d=\"M9 12h6\"></path>";
+    };
+    readonly 'local-storage': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M4 10h16\"></path><path d=\"M8 15h.01\"></path><path d=\"M12 15h4\"></path>";
+    };
+    readonly 'platform-desktop': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M8 20h8\"></path><path d=\"M12 16v4\"></path><path d=\"M7 8h10\"></path>";
+    };
+    readonly 'platform-mobile': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M10 7h4\"></path><path d=\"M10 11h4\"></path><path d=\"M11 18h2\"></path>";
+    };
+    readonly 'platform-web': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M3 12h18\"></path><path d=\"M12 3a14 14 0 0 1 0 18\"></path><path d=\"M12 3a14 14 0 0 0 0 18\"></path><path d=\"M8 8h8\"></path>";
+    };
+    readonly 'push-device': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path><path d=\"M18 6a3 3 0 0 0-6 0c0 3-1.5 3-1.5 3h9S18 9 18 6\"></path>";
+    };
+    readonly 'push-subscription': {
+        readonly body: "<rect x=\"5\" y=\"4\" width=\"14\" height=\"16\" rx=\"2\"></rect><path d=\"M9 8h6\"></path><path d=\"M9 12h4\"></path><path d=\"M15 15a3 3 0 0 0-6 0c0 3-1.5 3-1.5 3h9S15 18 15 15\"></path>";
+    };
+    readonly 'service-worker': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"2\"></circle><path d=\"M12 7v2\"></path><path d=\"M12 15v2\"></path><path d=\"M7 12h2\"></path><path d=\"M15 12h2\"></path><path d=\"m8.5 8.5 1.4 1.4\"></path><path d=\"m14.1 14.1 1.4 1.4\"></path>";
+    };
+    readonly storage: {
+        readonly body: "<ellipse cx=\"12\" cy=\"5\" rx=\"8\" ry=\"3\"></ellipse><path d=\"M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5\"></path><path d=\"M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6\"></path><path d=\"M8 17h.01\"></path><path d=\"M12 17h.01\"></path>";
+    };
+    readonly biometric: {
+        readonly body: "<path d=\"M3 11a9 9 0 0 1 18 0\"></path><path d=\"M6 19a12 12 0 0 0 2-7 4 4 0 0 1 8 0c0 2.8-.7 5.5-2 7.8\"></path><path d=\"M9 22a15 15 0 0 0 3-10\"></path><path d=\"M12 2a9 9 0 0 1 9 9c0 1.5-.2 3-.6 4.4\"></path>";
+    };
+    readonly 'camera-capture': {
+        readonly body: "<path d=\"M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5z\"></path><circle cx=\"12\" cy=\"13\" r=\"3\"></circle><path d=\"M12 10v6\"></path><path d=\"M9 13h6\"></path>";
+    };
+    readonly geolocation: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M12 2v4\"></path><path d=\"M12 18v4\"></path><path d=\"M2 12h4\"></path><path d=\"M18 12h4\"></path>";
+    };
+    readonly 'mobile-bottom-sheet': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M8 15h8\"></path><path d=\"M9 18h6\"></path><path d=\"M11 5h2\"></path>";
+    };
+    readonly 'mobile-drawer': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M7 8h7\"></path><path d=\"M7 12h7\"></path><path d=\"M7 16h7\"></path><path d=\"m15 10 2 2-2 2\"></path>";
+    };
+    readonly 'mobile-gesture': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path><path d=\"M10 13c2-5 5-5 7 0\"></path><path d=\"M10 13l2 2\"></path>";
+    };
+    readonly 'mobile-offline': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path><path d=\"M9 8h6\"></path>";
+    };
+    readonly 'mobile-permission': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path><path d=\"M12 7v5\"></path><path d=\"M9.5 9.5h5\"></path><path d=\"M9 15h6\"></path>";
+    };
+    readonly 'mobile-sheet': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><rect x=\"8\" y=\"10\" width=\"8\" height=\"8\" rx=\"2\"></rect><path d=\"M10 13h4\"></path><path d=\"M11 5h2\"></path>";
+    };
+    readonly 'orientation-lock': {
+        readonly body: "<rect x=\"8\" y=\"3\" width=\"8\" height=\"14\" rx=\"2\"></rect><path d=\"M4 16a8 8 0 0 0 14 4\"></path><path d=\"m18 16 1 4h-4\"></path><rect x=\"9\" y=\"9\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M10.5 9V7.5a1.5 1.5 0 0 1 3 0V9\"></path>";
+    };
+    readonly passkey: {
+        readonly body: "<circle cx=\"7.5\" cy=\"12.5\" r=\"3.5\"></circle><path d=\"M11 12.5h10\"></path><path d=\"M17 12.5v3\"></path><path d=\"M20 12.5v2\"></path><path d=\"M12 4a4 4 0 0 1 6 0\"></path>";
+    };
+    readonly 'sensor-alert': {
+        readonly body: "<rect x=\"6\" y=\"6\" width=\"12\" height=\"12\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"2\"></circle><path d=\"M12 2v4\"></path><path d=\"M12 18v4\"></path><path d=\"M2 12h4\"></path><path d=\"M18 12h4\"></path><path d=\"M19 3v4\"></path><path d=\"M19 10h.01\"></path>";
+    };
+    readonly 'vibration-off': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><path d=\"M4 8v8\"></path><path d=\"M20 8v8\"></path><rect x=\"8\" y=\"3\" width=\"8\" height=\"18\" rx=\"2\"></rect><path d=\"M11 18h2\"></path>";
+    };
+    readonly wearable: {
+        readonly body: "<rect x=\"7\" y=\"6\" width=\"10\" height=\"12\" rx=\"3\"></rect><path d=\"M9 6V3h6v3\"></path><path d=\"M9 18v3h6v-3\"></path><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>";
+    };
+    readonly airplay: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"m12 15 5 6H7l5-6z\"></path>";
+    };
+    readonly beacon: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"2\"></circle><path d=\"M8 8a6 6 0 0 0 0 8\"></path><path d=\"M16 8a6 6 0 0 1 0 8\"></path><path d=\"M5 5a10 10 0 0 0 0 14\"></path><path d=\"M19 5a10 10 0 0 1 0 14\"></path>";
+    };
+    readonly 'bluetooth-off': {
+        readonly body: "<path d=\"M2 2l20 20\"></path><path d=\"m7 7 10 10-5 4V3l5 4-5 5\"></path><path d=\"M7 17l4-4\"></path>";
+    };
+    readonly 'camera-switch': {
+        readonly body: "<path d=\"M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5z\"></path><circle cx=\"12\" cy=\"13\" r=\"3\"></circle><path d=\"M7 13h3\"></path><path d=\"m8 11-2 2 2 2\"></path><path d=\"M17 13h-3\"></path><path d=\"m16 15 2-2-2-2\"></path>";
+    };
+    readonly 'device-hub': {
+        readonly body: "<rect x=\"9\" y=\"3\" width=\"6\" height=\"6\" rx=\"1\"></rect><rect x=\"3\" y=\"15\" width=\"6\" height=\"6\" rx=\"1\"></rect><rect x=\"15\" y=\"15\" width=\"6\" height=\"6\" rx=\"1\"></rect><path d=\"M12 9v3\"></path><path d=\"M6 15v-3h12v3\"></path>";
+    };
+    readonly 'display-check': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M8 20h8\"></path><path d=\"M12 16v4\"></path><path d=\"m8 10 2 2 5-5\"></path>";
+    };
+    readonly firmware: {
+        readonly body: "<rect x=\"5\" y=\"4\" width=\"14\" height=\"16\" rx=\"2\"></rect><path d=\"M9 8h6\"></path><path d=\"M9 12h6\"></path><path d=\"M9 16h3\"></path><path d=\"M16 14v6\"></path><path d=\"M13 17h6\"></path>";
+    };
+    readonly gpu: {
+        readonly body: "<rect x=\"5\" y=\"6\" width=\"14\" height=\"12\" rx=\"2\"></rect><path d=\"M9 2v4\"></path><path d=\"M15 2v4\"></path><path d=\"M9 18v4\"></path><path d=\"M15 18v4\"></path><path d=\"M2 10h3\"></path><path d=\"M19 10h3\"></path><path d=\"M9 10h6v4H9z\"></path>";
+    };
+    readonly 'iot-device': {
+        readonly body: "<rect x=\"7\" y=\"7\" width=\"10\" height=\"10\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"2\"></circle><path d=\"M12 2v5\"></path><path d=\"M12 17v5\"></path><path d=\"M2 12h5\"></path><path d=\"M17 12h5\"></path>";
+    };
+    readonly 'mobile-hotspot': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path><path d=\"M10 8a4 4 0 0 1 4 0\"></path><path d=\"M8 6a7 7 0 0 1 8 0\"></path><path d=\"M12 11h.01\"></path>";
+    };
+    readonly 'printer-error': {
+        readonly body: "<path d=\"M7 9V3h10v6\"></path><path d=\"M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4\"></path><path d=\"M7 14h10v7H7z\"></path><path d=\"M18 17v3\"></path><path d=\"M18 23h.01\"></path>";
+    };
+    readonly 'qr-scanner': {
+        readonly body: "<path d=\"M7 3H5a2 2 0 0 0-2 2v2\"></path><path d=\"M17 3h2a2 2 0 0 1 2 2v2\"></path><path d=\"M21 17v2a2 2 0 0 1-2 2h-2\"></path><path d=\"M7 21H5a2 2 0 0 1-2-2v-2\"></path><rect x=\"7\" y=\"7\" width=\"3\" height=\"3\"></rect><rect x=\"14\" y=\"7\" width=\"3\" height=\"3\"></rect><rect x=\"7\" y=\"14\" width=\"3\" height=\"3\"></rect><path d=\"M14 14h3v3\"></path>";
+    };
 };
 
 export { deviceIcons };

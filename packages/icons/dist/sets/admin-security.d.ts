@@ -194,6 +194,138 @@ declare const adminSecurityIcons: {
     readonly 'tool-denied': {
         readonly body: "<path d=\"M14.7 6.3a4 4 0 0 0-5.5 5.5L4 17v3h3l5.2-5.2a4 4 0 0 0 5.5-5.5l-2.5 2.5-3-3 2.5-2.5z\"></path><path d=\"m17 17 4 4\"></path><path d=\"m21 17-4 4\"></path>";
     };
+    readonly 'api-key': {
+        readonly body: "<circle cx=\"7.5\" cy=\"12.5\" r=\"3.5\"></circle><path d=\"M11 12.5h10\"></path><path d=\"M17 12.5v3\"></path><path d=\"M20 12.5v2\"></path><path d=\"M4 5h16\"></path>";
+    };
+    readonly credential: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><circle cx=\"8\" cy=\"10\" r=\"2\"></circle><path d=\"M5.5 16a3 3 0 0 1 5 0\"></path><path d=\"M14 9h4\"></path><path d=\"M14 13h4\"></path><path d=\"M14 17h2\"></path>";
+    };
+    readonly organization: {
+        readonly body: "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"></rect><path d=\"M8 7h.01\"></path><path d=\"M12 7h.01\"></path><path d=\"M16 7h.01\"></path><path d=\"M8 11h.01\"></path><path d=\"M12 11h.01\"></path><path d=\"M16 11h.01\"></path><path d=\"M8 21v-5h8v5\"></path>";
+    };
+    readonly 'org-chart': {
+        readonly body: "<rect x=\"9\" y=\"3\" width=\"6\" height=\"5\" rx=\"1\"></rect><rect x=\"3\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"></rect><rect x=\"15\" y=\"16\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M12 8v4\"></path><path d=\"M6 16v-4h12v4\"></path>";
+    };
+    readonly secret: {
+        readonly body: "<path d=\"M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z\"></path><path d=\"M9 12h6\"></path><path d=\"M12 9v6\"></path>";
+    };
+    readonly 'service-account': {
+        readonly body: "<circle cx=\"8\" cy=\"8\" r=\"4\"></circle><path d=\"M2 21a6 6 0 0 1 12 0\"></path><rect x=\"15\" y=\"5\" width=\"6\" height=\"6\" rx=\"2\"></rect><path d=\"M18 11v10\"></path><path d=\"M15 18h6\"></path>";
+    };
+    readonly session: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><circle cx=\"17\" cy=\"15\" r=\"2\"></circle>";
+    };
+    readonly 'session-expired': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h6\"></path><circle cx=\"16\" cy=\"14\" r=\"3\"></circle><path d=\"M16 12.5V14l1 1\"></path><path d=\"m19 17 2 2\"></path>";
+    };
+    readonly tenant: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"8\" height=\"16\" rx=\"2\"></rect><rect x=\"13\" y=\"4\" width=\"8\" height=\"16\" rx=\"2\"></rect><path d=\"M7 8h.01\"></path><path d=\"M17 8h.01\"></path><path d=\"M7 12h.01\"></path><path d=\"M17 12h.01\"></path><path d=\"M7 20v-4\"></path><path d=\"M17 20v-4\"></path>";
+    };
+    readonly token: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M8 12h8\"></path><path d=\"M12 8v8\"></path><path d=\"m15.5 8.5 2 2\"></path><path d=\"m17.5 8.5-2 2\"></path>";
+    };
+    readonly workspace: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 10v10\"></path><path d=\"M13 14h4\"></path><path d=\"M13 17h3\"></path>";
+    };
+    readonly 'workspace-lock': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 10v10\"></path><rect x=\"13\" y=\"14\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M14.5 14v-1.5a1.5 1.5 0 0 1 3 0V14\"></path>";
+    };
+    readonly 'access-request': {
+        readonly body: "<path d=\"M4 5h16v14H4z\"></path><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><path d=\"M16 16h6\"></path><path d=\"M19 13v6\"></path>";
+    };
+    readonly 'approval-policy': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"m8 15 2 2 5-5\"></path><path d=\"M8 9h4\"></path>";
+    };
+    readonly 'audit-trail': {
+        readonly body: "<path d=\"M5 4h14v16H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"M8 16h4\"></path><path d=\"M19 6h2\"></path><path d=\"M19 12h2\"></path><path d=\"M19 18h2\"></path>";
+    };
+    readonly 'data-residency': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M3 12h18\"></path><path d=\"M12 3a14 14 0 0 1 0 18\"></path><path d=\"M12 3a14 14 0 0 0 0 18\"></path><rect x=\"14\" y=\"14\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M15.5 14v-2a2 2 0 0 1 4 0v2\"></path>";
+    };
+    readonly governance: {
+        readonly body: "<path d=\"m3 10 9-6 9 6\"></path><path d=\"M5 10v9\"></path><path d=\"M9 10v9\"></path><path d=\"M15 10v9\"></path><path d=\"M19 10v9\"></path><path d=\"M3 21h18\"></path><path d=\"m9 15 2 2 4-4\"></path>";
+    };
+    readonly 'policy-lock': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><rect x=\"8\" y=\"14\" width=\"8\" height=\"5\" rx=\"1\"></rect><path d=\"M10 14v-2a2 2 0 0 1 4 0v2\"></path>";
+    };
+    readonly 'data-retention': {
+        readonly body: "<path d=\"M5 4h14v16H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><circle cx=\"15\" cy=\"16\" r=\"3\"></circle><path d=\"M15 14.5V16l1 1\"></path>";
+    };
+    readonly scim: {
+        readonly body: "<circle cx=\"8\" cy=\"8\" r=\"3\"></circle><circle cx=\"16\" cy=\"8\" r=\"3\"></circle><path d=\"M3 21a5 5 0 0 1 10 0\"></path><path d=\"M11 21a5 5 0 0 1 10 0\"></path><path d=\"M12 8h1\"></path><path d=\"M8 11v3\"></path><path d=\"M16 11v3\"></path>";
+    };
+    readonly sso: {
+        readonly body: "<circle cx=\"7.5\" cy=\"12.5\" r=\"3.5\"></circle><path d=\"M11 12.5h10\"></path><path d=\"M17 12.5v3\"></path><path d=\"M20 12.5v2\"></path><path d=\"M4 5h16\"></path><path d=\"M4 19h16\"></path>";
+    };
+    readonly 'trust-center': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"M8 12h8\"></path><path d=\"M12 8v8\"></path><circle cx=\"18\" cy=\"6\" r=\"2\"></circle>";
+    };
+    readonly 'user-invite': {
+        readonly body: "<path d=\"M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"8.5\" cy=\"7\" r=\"4\"></circle><path d=\"M18 8v6\"></path><path d=\"M15 11h6\"></path><path d=\"m17 17 2 2 4-4\"></path>";
+    };
+    readonly 'user-provision': {
+        readonly body: "<path d=\"M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"8.5\" cy=\"7\" r=\"4\"></circle><path d=\"M18 7v8\"></path><path d=\"m15 12 3 3 3-3\"></path><path d=\"M15 7h6\"></path>";
+    };
+    readonly aria: {
+        readonly body: "<circle cx=\"12\" cy=\"4\" r=\"2\"></circle><path d=\"M4 8h16\"></path><path d=\"M12 6v7\"></path><path d=\"M8 22l4-9 4 9\"></path><path d=\"M6 13h12\"></path>";
+    };
+    readonly 'assistive-mode': {
+        readonly body: "<circle cx=\"12\" cy=\"4\" r=\"2\"></circle><path d=\"M4 8h16\"></path><path d=\"M12 6v7\"></path><path d=\"M8 22l4-9 4 9\"></path><circle cx=\"19\" cy=\"18\" r=\"3\"></circle><path d=\"m18 18 1 1 2-2\"></path>";
+    };
+    readonly 'compliance-evidence': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h4\"></path><path d=\"m14 17 2 2 4-4\"></path>";
+    };
+    readonly 'consent-record': {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"m8 17 2 2 5-5\"></path><path d=\"M17 14h3\"></path>";
+    };
+    readonly 'incident-response': {
+        readonly body: "<path d=\"m12 3 10 18H2L12 3z\"></path><path d=\"M12 9v4\"></path><path d=\"M12 17h.01\"></path><path d=\"M18 15a4 4 0 0 1-6.8 2.8L10 16\"></path><path d=\"M10 19v-3h3\"></path>";
+    };
+    readonly 'keyboard-access': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 9h.01\"></path><path d=\"M11 9h.01\"></path><path d=\"M15 9h.01\"></path><path d=\"M19 9h.01\"></path><path d=\"M8 17h8\"></path><path d=\"m16 14 2 2 4-4\"></path>";
+    };
+    readonly 'permission-review': {
+        readonly body: "<path d=\"M4 5h16v14H4z\"></path><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><circle cx=\"16\" cy=\"16\" r=\"3\"></circle><path d=\"m18 18 3 3\"></path>";
+    };
+    readonly privacy: {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><path d=\"M2 2l20 20\"></path><path d=\"M9.9 9.9A3 3 0 0 0 14.1 14.1\"></path>";
+    };
+    readonly 'screen-reader': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M8 20h8\"></path><path d=\"M12 16v4\"></path><path d=\"M7 9h10\"></path><path d=\"M7 12h6\"></path><path d=\"M18 18c2-2 2-4 0-6\"></path>";
+    };
+    readonly 'voice-access': {
+        readonly body: "<rect x=\"9\" y=\"3\" width=\"6\" height=\"11\" rx=\"3\"></rect><path d=\"M5 11a7 7 0 0 0 14 0\"></path><path d=\"M12 18v4\"></path><path d=\"M8 22h8\"></path><path d=\"m16 5 2-2\"></path><path d=\"m18 8 3-1\"></path>";
+    };
+    readonly 'access-expiry': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 10v2l1.5 1\"></path><path d=\"m17 17 3 3\"></path>";
+    };
+    readonly 'audit-event': {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><circle cx=\"16\" cy=\"16\" r=\"3\"></circle><path d=\"M16 14.5V16l1 1\"></path><path d=\"M20 5h2\"></path>";
+    };
+    readonly 'data-classification': {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h6\"></path><path d=\"M8 16h4\"></path><path d=\"M16 14l3 3\"></path><path d=\"M19 14l-3 3\"></path>";
+    };
+    readonly 'device-policy': {
+        readonly body: "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"></rect><path d=\"M11 18h2\"></path><path d=\"M12 7v5\"></path><path d=\"M9.5 9.5h5\"></path><path d=\"m9 15 2 2 4-4\"></path>";
+    };
+    readonly 'encryption-key': {
+        readonly body: "<circle cx=\"7.5\" cy=\"12.5\" r=\"3.5\"></circle><path d=\"M11 12.5h10\"></path><path d=\"M17 12.5v3\"></path><path d=\"M20 12.5v2\"></path><rect x=\"13\" y=\"4\" width=\"7\" height=\"5\" rx=\"1\"></rect><path d=\"M14.5 4V2.5a2 2 0 0 1 4 0V4\"></path>";
+    };
+    readonly 'identity-provider': {
+        readonly body: "<circle cx=\"8\" cy=\"8\" r=\"4\"></circle><path d=\"M2 21a6 6 0 0 1 12 0\"></path><rect x=\"15\" y=\"6\" width=\"6\" height=\"6\" rx=\"2\"></rect><path d=\"M18 12v7\"></path><path d=\"M15 16h6\"></path>";
+    };
+    readonly 'ip-allowlist': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M3 12h18\"></path><path d=\"M12 3a14 14 0 0 1 0 18\"></path><path d=\"M12 3a14 14 0 0 0 0 18\"></path><path d=\"m8 12 2 2 5-5\"></path>";
+    };
+    readonly 'legal-hold': {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"M8 16h4\"></path><path d=\"M17 13v8\"></path><path d=\"M14 16h6\"></path>";
+    };
+    readonly 'tls-certificate': {
+        readonly body: "<path d=\"M6 3h12v12H6z\"></path><path d=\"M9 7h6\"></path><path d=\"M9 11h4\"></path><path d=\"M9 15v6l3-2 3 2v-6\"></path><path d=\"m15 5 2 2 4-4\"></path>";
+    };
+    readonly 'zero-trust': {
+        readonly body: "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"></path><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M2 2l20 20\"></path>";
+    };
     readonly 'x-circle': {
         readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M15 9 9 15\"></path><path d=\"m9 9 6 6\"></path>";
     };

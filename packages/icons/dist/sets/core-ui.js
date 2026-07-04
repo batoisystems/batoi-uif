@@ -1,6 +1,6 @@
 import {
   coreUiIcons
-} from "../chunk-CXOFIWUO.js";
+} from "../chunk-Y7W2JUIA.js";
 export {
   coreUiIcons
 };

@@ -1,6 +1,6 @@
 import {
   domainIcons
-} from "../chunk-HJE2XSBJ.js";
+} from "../chunk-YD3ZWAX6.js";
 export {
   domainIcons
 };

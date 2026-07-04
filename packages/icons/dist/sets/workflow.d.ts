@@ -275,8 +275,140 @@ declare const workflowIcons: {
     readonly 'task-priority': {
         readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"M8 16h3\"></path><path d=\"M17 8v6\"></path><path d=\"M17 18h.01\"></path>";
     };
+    readonly 'ai-run': {
+        readonly body: "<path d=\"m12 3 1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6L12 3z\"></path><path d=\"M5 21h14\"></path><path d=\"m14 18 3 3 3-3\"></path>";
+    };
+    readonly 'event-stream': {
+        readonly body: "<path d=\"M4 6h4\"></path><path d=\"M4 12h8\"></path><path d=\"M4 18h4\"></path><path d=\"M14 6h6\"></path><path d=\"M16 12h4\"></path><path d=\"M14 18h6\"></path><path d=\"m10 6 4 6-4 6\"></path>";
+    };
+    readonly 'html-partial': {
+        readonly body: "<path d=\"m8 6-5 6 5 6\"></path><path d=\"m16 6 5 6-5 6\"></path><path d=\"M10 4h4\"></path><path d=\"M10 20h4\"></path><path d=\"M12 4v16\"></path>";
+    };
+    readonly hydrate: {
+        readonly body: "<path d=\"M4 8h8\"></path><path d=\"m9 5 3 3-3 3\"></path><path d=\"M20 16h-8\"></path><path d=\"m15 13-3 3 3 3\"></path><rect x=\"4\" y=\"13\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"14\" y=\"5\" width=\"6\" height=\"6\" rx=\"2\"></rect>";
+    };
+    readonly job: {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h8\"></path><path d=\"M8 13h5\"></path><path d=\"M8 17h3\"></path><circle cx=\"17\" cy=\"16\" r=\"2\"></circle>";
+    };
+    readonly 'job-failed': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h8\"></path><path d=\"m14 14 5 5\"></path><path d=\"m19 14-5 5\"></path>";
+    };
+    readonly 'job-running': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h8\"></path><path d=\"M8 13h4\"></path><path d=\"M16 14a3 3 0 1 1-2.1 5.1\"></path><path d=\"M16 12v3h-3\"></path>";
+    };
+    readonly 'mcp-call': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"8\" height=\"8\" rx=\"2\"></rect><rect x=\"13\" y=\"11\" width=\"8\" height=\"8\" rx=\"2\"></rect><path d=\"M11 9h2a4 4 0 0 1 4 4\"></path><path d=\"m15 9 2 4 4-2\"></path>";
+    };
+    readonly 'mcp-result': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"8\" height=\"8\" rx=\"2\"></rect><rect x=\"13\" y=\"11\" width=\"8\" height=\"8\" rx=\"2\"></rect><path d=\"M11 9h2a4 4 0 0 1 4 4\"></path><path d=\"m15 17 2 2 5-5\"></path>";
+    };
+    readonly orchestration: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"15\" y=\"4\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"9\" y=\"16\" width=\"6\" height=\"6\" rx=\"2\"></rect><path d=\"M9 7h6\"></path><path d=\"m8 10 3 6\"></path><path d=\"m16 10-3 6\"></path>";
+    };
+    readonly 'partial-swap': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"8\" height=\"14\" rx=\"2\"></rect><rect x=\"13\" y=\"5\" width=\"8\" height=\"14\" rx=\"2\"></rect><path d=\"m8 9 3 3-3 3\"></path><path d=\"m16 15-3-3 3-3\"></path>";
+    };
+    readonly polling: {
+        readonly body: "<path d=\"M21 12a9 9 0 0 1-15.4 6.4L3 16\"></path><path d=\"M3 21v-5h5\"></path><path d=\"M3 12A9 9 0 0 1 18.4 5.6L21 8\"></path><path d=\"M21 3v5h-5\"></path><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>";
+    };
+    readonly rehydrate: {
+        readonly body: "<path d=\"M21 12a9 9 0 0 1-15.4 6.4L3 16\"></path><path d=\"M3 21v-5h5\"></path><rect x=\"8\" y=\"8\" width=\"8\" height=\"8\" rx=\"2\"></rect><path d=\"M12 8v8\"></path><path d=\"M8 12h8\"></path>";
+    };
+    readonly revalidate: {
+        readonly body: "<path d=\"M21 12a9 9 0 0 1-15.4 6.4L3 16\"></path><path d=\"M3 21v-5h5\"></path><path d=\"m8 12 2 2 5-5\"></path>";
+    };
+    readonly sse: {
+        readonly body: "<path d=\"M4 12h4\"></path><path d=\"M12 6v12\"></path><path d=\"M16 8c2 1 3 2.3 3 4s-1 3-3 4\"></path><path d=\"M19 5c3 2 4 4.3 4 7s-1 5-4 7\"></path>";
+    };
+    readonly websocket: {
+        readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"m7 10 3 2-3 2\"></path><path d=\"m17 10-3 2 3 2\"></path><path d=\"M3 12h4\"></path><path d=\"M17 12h4\"></path>";
+    };
+    readonly appointment: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"M8 15h4\"></path><path d=\"m14 16 2 2 4-4\"></path>";
+    };
+    readonly booking: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"M12 14v5\"></path><path d=\"M9.5 16.5h5\"></path>";
+    };
+    readonly 'checklist-clock': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"m8 10 1 1 2-2\"></path><path d=\"M13 10h3\"></path><circle cx=\"14\" cy=\"16\" r=\"3\"></circle><path d=\"M14 14.5V16l1 1\"></path>";
+    };
+    readonly 'dispatch-board': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 10h18\"></path><path d=\"M9 10v10\"></path><path d=\"M13 14h5\"></path><path d=\"M13 17h3\"></path><path d=\"M6 14h.01\"></path>";
+    };
+    readonly 'incident-alert': {
+        readonly body: "<path d=\"m12 3 10 18H2L12 3z\"></path><path d=\"M12 9v4\"></path><path d=\"M12 17h.01\"></path><path d=\"M4 21h16\"></path>";
+    };
+    readonly maintenance: {
+        readonly body: "<path d=\"M14.7 6.3a4 4 0 0 0-5.5 5.5L3 18v3h3l6.2-6.2a4 4 0 0 0 5.5-5.5l-2.5 2.5-3-3 2.5-2.5z\"></path><circle cx=\"18\" cy=\"18\" r=\"3\"></circle>";
+    };
+    readonly 'process-loop': {
+        readonly body: "<path d=\"M17 2l4 4-4 4\"></path><path d=\"M3 11V9a3 3 0 0 1 3-3h15\"></path><path d=\"M7 22l-4-4 4-4\"></path><path d=\"M21 13v2a3 3 0 0 1-3 3H3\"></path><circle cx=\"12\" cy=\"12\" r=\"2\"></circle>";
+    };
+    readonly recurrence: {
+        readonly body: "<path d=\"M17 2l4 4-4 4\"></path><path d=\"M3 11V9a3 3 0 0 1 3-3h15\"></path><path d=\"M7 22l-4-4 4-4\"></path><path d=\"M21 13v2a3 3 0 0 1-3 3H3\"></path><path d=\"M12 8v8\"></path><path d=\"M9 12h6\"></path>";
+    };
+    readonly repair: {
+        readonly body: "<path d=\"M14.7 6.3a4 4 0 0 0-5.5 5.5L3 18v3h3l6.2-6.2a4 4 0 0 0 5.5-5.5l-2.5 2.5-3-3 2.5-2.5z\"></path><path d=\"M18 15v6\"></path><path d=\"M15 18h6\"></path>";
+    };
+    readonly rota: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"M7 15h4\"></path><path d=\"M13 15h4\"></path><path d=\"M7 18h3\"></path><path d=\"M13 18h5\"></path>";
+    };
+    readonly 'service-window': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><circle cx=\"12\" cy=\"16\" r=\"3\"></circle><path d=\"M12 14.5V16l1 1\"></path>";
+    };
+    readonly shift: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v5l3 2\"></path><path d=\"M5 19h14\"></path><path d=\"M7 5l10 14\"></path>";
+    };
+    readonly 'triage-queue': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"11\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"17\" width=\"12\" height=\"4\" rx=\"1\"></rect><path d=\"M17 18v4\"></path><path d=\"M15 20h4\"></path>";
+    };
+    readonly 'work-order': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h5\"></path><path d=\"m15 15 2 2 4-4\"></path>";
+    };
     readonly workflow: {
         readonly body: "<rect x=\"3\" y=\"4\" width=\"6\" height=\"6\" rx=\"2\"></rect><rect x=\"15\" y=\"14\" width=\"6\" height=\"6\" rx=\"2\"></rect><path d=\"M9 7h3a3 3 0 0 1 3 3v4\"></path><path d=\"M12 17H9a3 3 0 0 1-3-3v-4\"></path>";
+    };
+    readonly 'batch-job': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"11\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"17\" width=\"12\" height=\"4\" rx=\"1\"></rect><path d=\"m17 17 3 2-3 2\"></path>";
+    };
+    readonly 'blocked-task': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><circle cx=\"12\" cy=\"12\" r=\"5\"></circle><path d=\"M8.5 8.5 15.5 15.5\"></path>";
+    };
+    readonly 'calendar-sync': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M16 2v4\"></path><path d=\"M8 2v4\"></path><path d=\"M3 10h18\"></path><path d=\"M16 15a4 4 0 1 1-3-3.9\"></path><path d=\"M16 12v3h-3\"></path>";
+    };
+    readonly 'change-request': {
+        readonly body: "<path d=\"M7 3h10l3 4v14H4V3h3z\"></path><path d=\"M14 3v5h5\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h4\"></path><path d=\"M16 15h5\"></path><path d=\"m18 12 3 3-3 3\"></path>";
+    };
+    readonly 'decision-node': {
+        readonly body: "<path d=\"m12 3 8 9-8 9-8-9 8-9z\"></path><path d=\"M12 8v4\"></path><path d=\"M12 16h.01\"></path>";
+    };
+    readonly 'event-trigger': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v5l4 2\"></path><path d=\"M19 5l3-3\"></path><path d=\"M22 2v6h-6\"></path>";
+    };
+    readonly 'form-approval': {
+        readonly body: "<path d=\"M5 3h14v18H5z\"></path><path d=\"M8 8h8\"></path><path d=\"M8 12h5\"></path><path d=\"m9 17 2 2 5-5\"></path>";
+    };
+    readonly 'job-queue': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"11\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"17\" width=\"16\" height=\"4\" rx=\"1\"></rect><circle cx=\"19\" cy=\"7\" r=\"2\"></circle>";
+    };
+    readonly 'manual-step': {
+        readonly body: "<path d=\"M7 11V5a2 2 0 0 1 4 0v6\"></path><path d=\"M11 11V4a2 2 0 0 1 4 0v7\"></path><path d=\"M15 12V7a2 2 0 0 1 4 0v8a7 7 0 0 1-14 0v-2\"></path>";
+    };
+    readonly 'process-map': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"6\" height=\"5\" rx=\"1\"></rect><rect x=\"15\" y=\"4\" width=\"6\" height=\"5\" rx=\"1\"></rect><rect x=\"9\" y=\"15\" width=\"6\" height=\"5\" rx=\"1\"></rect><path d=\"M9 6.5h6\"></path><path d=\"M12 9v6\"></path>";
+    };
+    readonly release: {
+        readonly body: "<path d=\"M12 3l3 6 6 1-4.5 4.4 1 6.6L12 18l-5.5 3 1-6.6L3 10l6-1 3-6z\"></path><path d=\"M12 8v5\"></path><path d=\"M12 16h.01\"></path>";
+    };
+    readonly 'rule-engine': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 9h8\"></path><path d=\"M8 13h4\"></path><circle cx=\"16\" cy=\"15\" r=\"2\"></circle><path d=\"M16 11v2\"></path><path d=\"M16 17v2\"></path><path d=\"M12 15h2\"></path><path d=\"M18 15h2\"></path>";
+    };
+    readonly 'task-delegated': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M8 9h6\"></path><path d=\"M8 13h4\"></path><circle cx=\"16\" cy=\"16\" r=\"3\"></circle><path d=\"m18 14 3-3\"></path><path d=\"M21 11v4h-4\"></path>";
+    };
+    readonly 'workflow-template': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><rect x=\"6\" y=\"7\" width=\"5\" height=\"4\" rx=\"1\"></rect><rect x=\"13\" y=\"13\" width=\"5\" height=\"4\" rx=\"1\"></rect><path d=\"M11 9h3a3 3 0 0 1 3 3v1\"></path>";
     };
 };
 

@@ -1,6 +1,6 @@
 import {
   adminSecurityIcons
-} from "../chunk-UJOX73B7.js";
+} from "../chunk-5GJBKAVV.js";
 export {
   adminSecurityIcons
 };

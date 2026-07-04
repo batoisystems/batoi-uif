@@ -176,14 +176,26 @@ Planned application capability packages:
 ></div>
 ```
 
-Supported core chart types include `line`, `area`, `bar`, `horizontal-bar`, `grouped-bar`, `stacked-bar`, `pie`, `donut`, `doughnut`, `radar`, and `sparkline`. Compact app charts include `metric`, `progress`, `ring`, `gauge`, `timeline`, `heatmap`, and `bullet`. Statistical visualizations include `histogram`, `box-plot`, `scatter`, `regression`, `control-chart`, `distribution`, and `pareto`, backed by dependency-free helpers such as `summaryStats()`, `histogramBins()`, `movingAverage()`, `linearRegression()`, and `correlation()`.
+Supported core chart types include `line`, `area`, `bar`, `horizontal-bar`, `grouped-bar`, `stacked-bar`, `pie`, `donut`, `doughnut`, `radar`, and `sparkline`. Compact app charts include `metric`, `progress`, `ring`, `gauge`, `timeline`, `heatmap`, and `bullet`. Business visualizations include `funnel`, `waterfall`, `bubble`, `treemap`, and `calendar-heatmap`. Finance and cyclical visualizations include `candlestick`, `ohlc`, `rose`, and `polar-area`. Statistical visualizations include `histogram`, `box-plot`, `scatter`, `regression`, `control-chart`, `distribution`, and `pareto`, backed by dependency-free helpers such as `summaryStats()`, `histogramBins()`, `movingAverage()`, `linearRegression()`, and `correlation()`.
 
-Open `examples/index.html` for a landing page that links to every bundled example. See `examples/component-gallery/` for live component examples with copy-ready markup, including carousel sliders, lightboxes, masonry card/image layouts, grid and navbar patterns, and professional app patterns such as button matrices, toolbars, form sections, skeletons, metric rows, hero banners, summaries, inspectors, stat cards, empty states, filter builders, command palettes, notification panels, and native picker wrappers. See `examples/chart-gallery/` for one declarative example of every supported chart type. See `examples/rich-editor/`, `examples/markdown-editor/`, `examples/animation-gallery/`, and `examples/event-actions/` for builder-style examples where users can tune options, preview behavior, and copy generated code. See `docs/layout-and-components.md` for grid, navbar, carousel, lightbox, and masonry usage guidance. See `examples/professional-showcase/` for a richer product-grade app surface with a fixed shell, KPI dashboard, CRM pipeline, governed AI approval desk, mobile field console, RAD admin table, and statistical analytics using the same lean JS/CSS library.
+Charts can also accept a Flint-compatible input shape at the specification boundary. UIF maps common Flint `chart_spec` values and encodings into its own dependency-free SVG renderer; it does not bundle Flint, Vega-Lite, ECharts, Chart.js, or any renderer dependency:
+
+```html
+<div
+  data-uif="chart"
+  data-uif-chart-format="flint"
+  data-uif-data='[{"quarter":"Q1","revenue":120},{"quarter":"Q2","revenue":180}]'
+  data-uif-chart-spec='{"chartType":"Line Chart","title":"Revenue","encodings":{"x":{"field":"quarter"},"y":{"field":"revenue"}}}'
+></div>
+```
+
+Open `examples/index.html` for a landing page that links to every bundled example. See `examples/component-gallery/` for live component examples with copy-ready markup, including carousel sliders, lightboxes, masonry card/image layouts, grid and navbar patterns, and professional app patterns such as button matrices, toolbars, form sections, skeletons, metric rows, hero banners, summaries, inspectors, stat cards, empty states, filter builders, command palettes, notification panels, and native picker wrappers. See `examples/chart-gallery/` for one declarative example of every supported chart type, Flint-compatible examples, copy/export controls, and deferred advanced-chart guidance. See `examples/rich-editor/`, `examples/markdown-editor/`, `examples/animation-gallery/`, and `examples/event-actions/` for builder-style examples where users can tune options, preview behavior, and copy generated code. See `docs/layout-and-components.md` for grid, navbar, carousel, lightbox, and masonry usage guidance. See `examples/professional-showcase/` for a richer product-grade app surface with a fixed shell, KPI dashboard, CRM pipeline, governed AI approval desk, mobile field console, RAD admin table, and statistical analytics using the same lean JS/CSS library.
 
 Reference docs:
 
 - `docs/data-uif-registry.md` lists the canonical declarative `data-uif-*` surface.
 - `docs/accessibility.md` documents component keyboard, ARIA, focus, overlay, and manual QA expectations.
+- `docs/chart-compatibility.md` documents native chart support, Flint-compatible mappings, unsupported chart behavior, and chart QA/release checks.
 - `docs/micro-app-connectors.md` documents Micro App manifest connector workflows and network permission checks.
 - `docs/utility-migration-matrix.md` documents curated utilities, Bootstrap/Tailwind migration snippets, and feature coverage.
 - `docs/rad-workspace-migration.md` shows how RAD workspace shells, registers, manage forms, analytics routes, and editor routes can move to UIF without Bootstrap, jQuery, Chart.js, Bootstrap Table, or Summernote.

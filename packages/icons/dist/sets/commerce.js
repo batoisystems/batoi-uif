@@ -1,6 +1,6 @@
 import {
   commerceIcons
-} from "../chunk-5KTLOXMI.js";
+} from "../chunk-JHI3QEZH.js";
 export {
   commerceIcons
 };

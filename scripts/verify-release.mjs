@@ -39,7 +39,7 @@ for (const file of ['dist/uif.esm.js', 'dist/uif.iife.js', 'dist/uif.css']) {
     const bytes = statSync(url).size;
     const gzip = gzipSync(readFileSync(url)).length;
     assert(bytes > 0 && gzip > 0, `${file} is empty`);
-    assert(gzip < 80_000, `${file} gzip size exceeds 80 KB`);
+    assert(gzip < 120_000, `${file} gzip size exceeds 120 KB`);
   }
 }
 

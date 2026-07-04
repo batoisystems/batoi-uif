@@ -1,4 +1,36 @@
-type ChartType = 'line' | 'area' | 'bar' | 'horizontal-bar' | 'stacked-bar' | 'grouped-bar' | 'pie' | 'donut' | 'doughnut' | 'radar' | 'sparkline' | 'metric' | 'progress' | 'ring' | 'gauge' | 'timeline' | 'heatmap' | 'status-heatmap' | 'bullet' | 'histogram' | 'box-plot' | 'scatter' | 'regression' | 'control-chart' | 'distribution' | 'pareto';
+interface FlintChartEncoding {
+    field?: string;
+    type?: string;
+    aggregate?: string;
+    title?: string;
+    [key: string]: unknown;
+}
+interface FlintChartSpec {
+    chartType?: string;
+    encodings?: Record<string, FlintChartEncoding | string | undefined>;
+    baseSize?: Partial<Pick<ChartOptions, 'width' | 'height'>>;
+    canvasSize?: Partial<Pick<ChartOptions, 'width' | 'height'>>;
+    title?: string;
+    description?: string;
+    [key: string]: unknown;
+}
+interface FlintChartInput {
+    data?: Array<Record<string, unknown>> | {
+        values?: Array<Record<string, unknown>>;
+        rows?: Array<Record<string, unknown>>;
+    };
+    semantic_types?: Record<string, string>;
+    chart_spec?: FlintChartSpec;
+    [key: string]: unknown;
+}
+interface FlintChartAdapterResult {
+    data: ChartDatum[];
+    options: ChartOptions;
+    warnings: string[];
+}
+declare function adaptFlintChart(input: FlintChartInput, overrides?: ChartOptions): FlintChartAdapterResult;
+
+type ChartType = 'line' | 'area' | 'bar' | 'horizontal-bar' | 'stacked-bar' | 'grouped-bar' | 'pie' | 'donut' | 'doughnut' | 'radar' | 'sparkline' | 'metric' | 'progress' | 'ring' | 'gauge' | 'timeline' | 'heatmap' | 'status-heatmap' | 'bullet' | 'histogram' | 'box-plot' | 'scatter' | 'regression' | 'control-chart' | 'distribution' | 'pareto' | 'funnel' | 'waterfall' | 'bubble' | 'treemap' | 'calendar-heatmap' | 'candlestick' | 'ohlc' | 'rose' | 'polar-area';
 interface ChartDatum {
     label?: string;
     value?: number;
@@ -8,6 +40,7 @@ interface ChartDatum {
     max?: number;
     group?: string;
     color?: string;
+    size?: number;
     [key: string]: unknown;
 }
 interface ChartMargin {
@@ -142,6 +175,7 @@ declare function zScores(values: number[]): number[];
 declare function histogramBins(values: number[], options?: HistogramOptions): HistogramBin[];
 declare function correlation(pointsOrX: RegressionPoint[] | number[], yValues?: number[]): number;
 declare function linearRegression(points: RegressionPoint[]): RegressionResult;
+declare function renderFlintChart(input: FlintChartInput, overrides?: ChartOptions): string;
 declare function renderChart(data: Array<ChartDatum | number>, options?: ChartOptions): string;
 declare function parseChartData(el: HTMLElement): ChartDatum[];
 declare function adaptTable(table: HTMLTableElement, options?: TableAdapterOptions): ChartDatum[];
@@ -161,4 +195,4 @@ declare const chart: {
     destroy: typeof destroyChart;
 };
 
-export { type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type DrilldownOptions, type HistogramBin, type HistogramOptions, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type SummaryStats, type TableAdapterOptions, adaptRecords, adaptTable, bindChartExports, chart, correlation, cumulativeSum, destroyChart, downloadChartPng, downloadChartSvg, exportChartData, exportChartPng, exportChartSvg, histogramBins, initChart, linearRegression, movingAverage, parseChartData, percentChange, quantile, refreshChart, renderChart, summaryStats, zScores };
+export { type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type DrilldownOptions, type FlintChartAdapterResult, type FlintChartEncoding, type FlintChartInput, type FlintChartSpec, type HistogramBin, type HistogramOptions, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type SummaryStats, type TableAdapterOptions, adaptFlintChart, adaptRecords, adaptTable, bindChartExports, chart, correlation, cumulativeSum, destroyChart, downloadChartPng, downloadChartSvg, exportChartData, exportChartPng, exportChartSvg, histogramBins, initChart, linearRegression, movingAverage, parseChartData, percentChange, quantile, refreshChart, renderChart, renderFlintChart, summaryStats, zScores };

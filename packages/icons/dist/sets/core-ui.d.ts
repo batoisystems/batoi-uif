@@ -320,6 +320,144 @@ declare const coreUiIcons: {
     readonly 'validation-error': {
         readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v6\"></path><path d=\"M12 17h.01\"></path>";
     };
+    readonly breadcrumb: {
+        readonly body: "<path d=\"M3 12h4\"></path><path d=\"m7 8 4 4-4 4\"></path><path d=\"M11 12h4\"></path><path d=\"m15 8 4 4-4 4\"></path><path d=\"M19 12h2\"></path>";
+    };
+    readonly 'command-palette': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 9h10\"></path><path d=\"m7 13 3 2-3 2\"></path><path d=\"M12 17h5\"></path>";
+    };
+    readonly 'density-comfortable': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"11\" width=\"16\" height=\"4\" rx=\"1\"></rect><rect x=\"4\" y=\"17\" width=\"16\" height=\"4\" rx=\"1\"></rect>";
+    };
+    readonly 'density-compact': {
+        readonly body: "<rect x=\"4\" y=\"6\" width=\"16\" height=\"3\" rx=\"1\"></rect><rect x=\"4\" y=\"11\" width=\"16\" height=\"3\" rx=\"1\"></rect><rect x=\"4\" y=\"16\" width=\"16\" height=\"3\" rx=\"1\"></rect>";
+    };
+    readonly 'empty-box': {
+        readonly body: "<path d=\"m21 8-9-5-9 5 9 5 9-5z\"></path><path d=\"M3 8v8l9 5 9-5V8\"></path><path d=\"M8 15h8\"></path>";
+    };
+    readonly 'empty-search': {
+        readonly body: "<circle cx=\"11\" cy=\"11\" r=\"7\"></circle><path d=\"m20 20-4-4\"></path><path d=\"M8 11h6\"></path>";
+    };
+    readonly 'empty-state': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"2\"></rect><path d=\"M8 10h8\"></path><path d=\"M9 14h6\"></path><path d=\"M12 17h.01\"></path>";
+    };
+    readonly 'focus-mode': {
+        readonly body: "<path d=\"M8 3H5a2 2 0 0 0-2 2v3\"></path><path d=\"M16 3h3a2 2 0 0 1 2 2v3\"></path><path d=\"M21 16v3a2 2 0 0 1-2 2h-3\"></path><path d=\"M8 21H5a2 2 0 0 1-2-2v-3\"></path><circle cx=\"12\" cy=\"12\" r=\"3\"></circle>";
+    };
+    readonly loading: {
+        readonly body: "<path d=\"M21 12a9 9 0 1 1-6.2-8.6\"></path><path d=\"M21 12h-4\"></path>";
+    };
+    readonly 'nav-back': {
+        readonly body: "<path d=\"M15 6 9 12l6 6\"></path><path d=\"M9 12h12\"></path><path d=\"M3 5v14\"></path>";
+    };
+    readonly 'nav-forward': {
+        readonly body: "<path d=\"m9 6 6 6-6 6\"></path><path d=\"M3 12h12\"></path><path d=\"M21 5v14\"></path>";
+    };
+    readonly 'quick-action': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M13 3 7 14h5l-1 7 6-11h-5l1-7z\"></path>";
+    };
+    readonly 'sidebar-collapse': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M9 4v16\"></path><path d=\"m15 9-3 3 3 3\"></path><path d=\"m19 9-3 3 3 3\"></path>";
+    };
+    readonly 'sidebar-expand': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M9 4v16\"></path><path d=\"m12 9 3 3-3 3\"></path><path d=\"m16 9 3 3-3 3\"></path>";
+    };
+    readonly shortcut: {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 9h.01\"></path><path d=\"M11 9h.01\"></path><path d=\"M15 9h.01\"></path><path d=\"M7 13h6\"></path><path d=\"M15 13h2\"></path><path d=\"M8 17h8\"></path>";
+    };
+    readonly skeleton: {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"16\" height=\"4\" rx=\"2\"></rect><rect x=\"4\" y=\"11\" width=\"12\" height=\"3\" rx=\"1.5\"></rect><rect x=\"4\" y=\"16\" width=\"14\" height=\"3\" rx=\"1.5\"></rect>";
+    };
+    readonly 'split-view': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M12 4v16\"></path><path d=\"M7 9h2\"></path><path d=\"M15 9h2\"></path><path d=\"M7 14h2\"></path><path d=\"M15 14h2\"></path>";
+    };
+    readonly spotlight: {
+        readonly body: "<circle cx=\"11\" cy=\"11\" r=\"7\"></circle><path d=\"m20 20-4-4\"></path><path d=\"m11 6 1.2 3.3 3.3 1.2-3.3 1.2L11 15l-1.2-3.3L6.5 10.5l3.3-1.2L11 6z\"></path>";
+    };
+    readonly 'state-error': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 7v6\"></path><path d=\"M12 17h.01\"></path>";
+    };
+    readonly 'state-success': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"m8 12 3 3 5-6\"></path>";
+    };
+    readonly 'state-warning': {
+        readonly body: "<path d=\"m12 3 10 18H2L12 3z\"></path><path d=\"M12 9v4\"></path><path d=\"M12 17h.01\"></path>";
+    };
+    readonly tour: {
+        readonly body: "<path d=\"M5 4h14v10H5z\"></path><path d=\"M8 18h8\"></path><path d=\"M12 14v4\"></path><path d=\"M9 8h6\"></path><path d=\"M9 11h4\"></path><path d=\"m18 17 3 3\"></path>";
+    };
+    readonly 'app-launcher': {
+        readonly body: "<rect x=\"4\" y=\"4\" width=\"5\" height=\"5\" rx=\"1\"></rect><rect x=\"15\" y=\"4\" width=\"5\" height=\"5\" rx=\"1\"></rect><rect x=\"4\" y=\"15\" width=\"5\" height=\"5\" rx=\"1\"></rect><rect x=\"15\" y=\"15\" width=\"5\" height=\"5\" rx=\"1\"></rect>";
+    };
+    readonly 'app-shell': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 9h18\"></path><path d=\"M8 9v11\"></path><path d=\"M12 13h5\"></path><path d=\"M12 17h4\"></path>";
+    };
+    readonly 'bottom-sheet': {
+        readonly body: "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"></rect><path d=\"M4 13h16\"></path><path d=\"M9 16h6\"></path><path d=\"M10 10h4\"></path>";
+    };
+    readonly 'command-key': {
+        readonly body: "<path d=\"M9 9H5.5a2.5 2.5 0 1 1 2.5-2.5V18a2.5 2.5 0 1 1-2.5-2.5H18a2.5 2.5 0 1 1-2.5 2.5V6.5A2.5 2.5 0 1 1 18 9H9z\"></path>";
+    };
+    readonly dock: {
+        readonly body: "<rect x=\"4\" y=\"16\" width=\"16\" height=\"4\" rx=\"2\"></rect><rect x=\"6\" y=\"6\" width=\"3\" height=\"7\" rx=\"1\"></rect><rect x=\"11\" y=\"4\" width=\"3\" height=\"9\" rx=\"1\"></rect><rect x=\"16\" y=\"8\" width=\"3\" height=\"5\" rx=\"1\"></rect>";
+    };
+    readonly 'floating-action': {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"M12 8v8\"></path><path d=\"M8 12h8\"></path><path d=\"M18 18l3 3\"></path>";
+    };
+    readonly gesture: {
+        readonly body: "<path d=\"M7 14c2-6 5-8 8-6 2 1 3 4 2 7\"></path><path d=\"M7 14l3 3\"></path><path d=\"M7 14l-3 3\"></path><path d=\"M12 21c3-1 5-3 6-6\"></path>";
+    };
+    readonly inspector: {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M14 4v16\"></path><path d=\"M17 8h2\"></path><path d=\"M17 12h2\"></path><path d=\"M17 16h1\"></path><circle cx=\"8\" cy=\"12\" r=\"3\"></circle>";
+    };
+    readonly launcher: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"m12 6 2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z\"></path>";
+    };
+    readonly navigator: {
+        readonly body: "<circle cx=\"12\" cy=\"12\" r=\"9\"></circle><path d=\"m15.5 8.5-2 5-5 2 2-5 5-2z\"></path><path d=\"M12 3v3\"></path><path d=\"M12 18v3\"></path><path d=\"M3 12h3\"></path><path d=\"M18 12h3\"></path>";
+    };
+    readonly onboarding: {
+        readonly body: "<path d=\"M5 4h14v10H5z\"></path><path d=\"M8 18h8\"></path><path d=\"M12 14v4\"></path><path d=\"m9 9 2 2 4-4\"></path><path d=\"M19 17l2 2\"></path>";
+    };
+    readonly resizer: {
+        readonly body: "<path d=\"M4 14v6h6\"></path><path d=\"M20 10V4h-6\"></path><path d=\"m14 4 6 6\"></path><path d=\"m4 14 6 6\"></path><path d=\"M8 16l8-8\"></path>";
+    };
+    readonly 'shell-command': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m7 10 3 2-3 2\"></path><path d=\"M12 15h5\"></path><path d=\"M3 9h18\"></path>";
+    };
+    readonly stepper: {
+        readonly body: "<circle cx=\"6\" cy=\"12\" r=\"3\"></circle><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><circle cx=\"18\" cy=\"12\" r=\"3\"></circle><path d=\"M9 12h.01\"></path><path d=\"M15 12h.01\"></path>";
+    };
+    readonly 'status-bar': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 16h18\"></path><path d=\"M7 18h.01\"></path><path d=\"M11 18h4\"></path><path d=\"M17 18h.01\"></path>";
+    };
+    readonly 'touch-target': {
+        readonly body: "<rect x=\"5\" y=\"5\" width=\"14\" height=\"14\" rx=\"3\"></rect><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 2v3\"></path><path d=\"M12 19v3\"></path><path d=\"M2 12h3\"></path><path d=\"M19 12h3\"></path>";
+    };
+    readonly wizard: {
+        readonly body: "<path d=\"M15 4 20 9\"></path><path d=\"M14.5 9.5 4 20\"></path><path d=\"M18 2l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z\"></path><path d=\"M7 5h4\"></path><path d=\"M7 9h2\"></path>";
+    };
+    readonly 'workspace-switcher': {
+        readonly body: "<rect x=\"4\" y=\"5\" width=\"7\" height=\"7\" rx=\"2\"></rect><rect x=\"13\" y=\"12\" width=\"7\" height=\"7\" rx=\"2\"></rect><path d=\"M11 8h3a3 3 0 0 1 3 3v1\"></path><path d=\"M13 16h-3a3 3 0 0 1-3-3v-1\"></path>";
+    };
+    readonly 'action-bar': {
+        readonly body: "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"2\"></rect><path d=\"M7 12h.01\"></path><path d=\"M11 12h.01\"></path><path d=\"M15 12h.01\"></path><path d=\"M19 12h.01\"></path>";
+    };
+    readonly 'context-panel': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M13 4v16\"></path><path d=\"M16 8h2\"></path><path d=\"M16 12h2\"></path><path d=\"M16 16h1\"></path>";
+    };
+    readonly 'filter-chip': {
+        readonly body: "<rect x=\"4\" y=\"7\" width=\"16\" height=\"10\" rx=\"5\"></rect><path d=\"M8 12h6\"></path><path d=\"m16 10 2 2-2 2\"></path>";
+    };
+    readonly 'keyboard-shortcut': {
+        readonly body: "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"M7 9h.01\"></path><path d=\"M11 9h.01\"></path><path d=\"M15 9h.01\"></path><path d=\"M7 13h3\"></path><path d=\"M12 13h5\"></path><path d=\"M8 17h8\"></path>";
+    };
+    readonly 'side-panel': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M15 4v16\"></path><path d=\"M7 8h4\"></path><path d=\"M7 12h4\"></path><path d=\"M7 16h3\"></path>";
+    };
+    readonly 'top-bar': {
+        readonly body: "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"></rect><path d=\"M3 9h18\"></path><path d=\"M7 6.5h.01\"></path><path d=\"M11 6.5h6\"></path>";
+    };
     readonly 'x-square': {
         readonly body: "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"></rect><path d=\"M15 9 9 15\"></path><path d=\"m9 9 6 6\"></path>";
     };
