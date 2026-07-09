@@ -98,6 +98,44 @@ describe('@batoi/uif-editor', () => {
     expect(source.value).toContain('<strong>Draft</strong>');
   });
 
+  it('keeps HTML source edits and programmatic values in sync when toggling back to rich mode', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none" data-uif-toolbar="source"><p>Draft</p></textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const sourceButton = editor.element.querySelector<HTMLButtonElement>('[data-uif-editor-command="source"]') as HTMLButtonElement;
+    sourceButton.click();
+    const source = editor.surface as HTMLTextAreaElement;
+
+    source.value = '<h2>Edited</h2><p>Body</p>';
+    source.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(editor.getValue()).toBe('<h2>Edited</h2><p>Body</p>');
+
+    editor.setValue('<p>External update</p>');
+    expect((editor.surface as HTMLTextAreaElement).value).toBe('<p>External update</p>');
+
+    sourceButton.click();
+    expect(editor.surface instanceof HTMLTextAreaElement).toBe(false);
+    expect(editor.surface.innerHTML).toBe('<p>External update</p>');
+  });
+
+  it('runs paste hooks and keyboard shortcuts against the active HTML source surface', async () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none" data-uif-toolbar="source"><p>Draft</p></textarea>';
+    const afterPasteValues: string[] = [];
+    const unregister = registerEditorHook('afterPaste', ({ value }) => afterPasteValues.push(value));
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    editor.element.querySelector<HTMLButtonElement>('[data-uif-editor-command="source"]')?.click();
+    const source = editor.surface as HTMLTextAreaElement;
+
+    source.value = '<p>Paste</p>';
+    source.dispatchEvent(new Event('paste', { bubbles: true }));
+    await new Promise((resolve) => setTimeout(resolve, 1));
+    expect(afterPasteValues).toContain('<p>Paste</p>');
+
+    source.setSelectionRange(3, 8);
+    source.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', ctrlKey: true, bubbles: true, cancelable: true }));
+    expect(editor.getValue()).toContain('<strong>Paste</strong>');
+    unregister();
+  });
+
   it('inserts robust HTML toolbar content without native insertion commands', () => {
     document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none" data-uif-toolbar="link image table task"><p>Draft</p></textarea>';
     const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);

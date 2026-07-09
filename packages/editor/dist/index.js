@@ -1212,7 +1212,7 @@ function createEditor(el, options = {}) {
       const previous = input.value;
       if (previous !== next) pushHistory(instance, next);
       input.value = next;
-      if (surface instanceof HTMLTextAreaElement && surface.value !== next) surface.value = next;
+      if (instance.surface instanceof HTMLTextAreaElement && instance.surface.value !== next) instance.surface.value = next;
       if (!(surface instanceof HTMLTextAreaElement) && surface.innerHTML !== next) surface.innerHTML = config.mode === "html" ? cleanEditorHtml(next) : escapeHtml(next);
       instance.dirty = next !== editorInitialValue.get(instance);
       syncPreview(instance);
@@ -1222,7 +1222,7 @@ function createEditor(el, options = {}) {
       if (config.autosave && instance.dirty) scheduleAutosave(instance, config.autosaveDelay, config.autosaveUrl || void 0);
     },
     focus() {
-      surface.focus();
+      instance.surface.focus();
     },
     destroy() {
       wrapper.remove();
@@ -1254,8 +1254,9 @@ function createEditor(el, options = {}) {
     selection?.addRange(savedRange);
   };
   const syncFromSurface = () => {
-    if (!(surface instanceof HTMLTextAreaElement)) syncRichControlAttributes(surface);
-    const value = surface instanceof HTMLTextAreaElement ? surface.value : cleanEditorHtml(surface.innerHTML);
+    const activeSurface = instance.surface;
+    if (!(activeSurface instanceof HTMLTextAreaElement)) syncRichControlAttributes(activeSurface);
+    const value = activeSurface instanceof HTMLTextAreaElement ? activeSurface.value : cleanEditorHtml(activeSurface.innerHTML);
     void runEditorHooks("beforeInput", { editor: instance, value });
     instance.setValue(value);
     void runEditorHooks("afterInput", { editor: instance, value });
@@ -1266,12 +1267,64 @@ function createEditor(el, options = {}) {
   };
   const updateTableTools = (target) => {
     if (config.mode !== "html") return;
+    if (instance.surface instanceof HTMLTextAreaElement) {
+      tableTools.hidden = true;
+      return;
+    }
     updateActiveTableCell(target ?? null);
     const cell = currentTableCell() ?? editorActiveTableCell.get(instance) ?? null;
     tableTools.hidden = !cell?.closest("table");
   };
-  surface.addEventListener("input", syncFromSurface);
-  surface.addEventListener("change", syncFromSurface);
+  const handleEditorKeydown = (event) => {
+    const activeSurface = instance.surface;
+    if (activeSurface instanceof HTMLTextAreaElement && instance.mode === "markdown" && handleMarkdownTaskKey(activeSurface, event)) {
+      syncFromSurface();
+      return;
+    }
+    if (!(activeSurface instanceof HTMLTextAreaElement) && handleRichTaskKey(instance, event)) {
+      syncFromSurface();
+      return;
+    }
+    const key = event.key.toLowerCase();
+    if (!(event.metaKey || event.ctrlKey)) return;
+    if (key === "b") {
+      event.preventDefault();
+      formatEditor(instance, "bold");
+    }
+    if (key === "i") {
+      event.preventDefault();
+      formatEditor(instance, "italic");
+    }
+    if (key === "k") {
+      event.preventDefault();
+      formatEditor(instance, "link");
+    }
+    if (key === "z" && event.shiftKey) {
+      event.preventDefault();
+      formatEditor(instance, "redo");
+    } else if (key === "z") {
+      event.preventDefault();
+      formatEditor(instance, "undo");
+    }
+  };
+  const handleEditorPaste = () => {
+    void runEditorHooks("beforePaste", { editor: instance, value: instance.getValue() });
+    window.setTimeout(() => {
+      syncFromSurface();
+      void runEditorHooks("afterPaste", { editor: instance, value: instance.getValue() });
+    });
+  };
+  const bindCurrentSurfaceEvents = (current) => {
+    current.addEventListener("input", syncFromSurface);
+    current.addEventListener("change", syncFromSurface);
+    current.addEventListener("keydown", (event) => {
+      if (event instanceof KeyboardEvent) handleEditorKeydown(event);
+    });
+    current.addEventListener("paste", handleEditorPaste);
+    current.addEventListener("focus", () => emit("uif:editor-focus", { editor: instance }, wrapper));
+    current.addEventListener("blur", () => emit("uif:editor-blur", { editor: instance }, wrapper));
+  };
+  bindCurrentSurfaceEvents(surface);
   surface.addEventListener("keyup", (event) => {
     saveRichSelection();
     updateTableTools(event.target);
@@ -1280,8 +1333,6 @@ function createEditor(el, options = {}) {
     saveRichSelection();
     updateTableTools(event.target);
   });
-  surface.addEventListener("focus", () => emit("uif:editor-focus", { editor: instance }, wrapper));
-  surface.addEventListener("blur", () => emit("uif:editor-blur", { editor: instance }, wrapper));
   toolbar.addEventListener("mousedown", (event) => {
     if (event.target instanceof Element && event.target.closest("[data-uif-editor-command]")) event.preventDefault();
   });
@@ -1321,12 +1372,18 @@ function createEditor(el, options = {}) {
         source.value = instance.getValue();
         body.replaceChild(source, surface);
         instance.surface = source;
-        source.addEventListener("input", () => instance.setValue(source.value));
+        bindCurrentSurfaceEvents(source);
+        savedRange = null;
+        editorActiveTableCell.delete(instance);
+        updateTableTools();
         source.focus();
       } else {
         body.replaceChild(surface, instance.surface);
         instance.surface = surface;
         surface.innerHTML = cleanEditorHtml(instance.getValue());
+        savedRange = null;
+        editorActiveTableCell.delete(instance);
+        updateTableTools();
         surface.focus();
       }
       emit("uif:editor-mode-change", { editor: instance, source: instance.sourceMode }, wrapper);
@@ -1373,45 +1430,6 @@ function createEditor(el, options = {}) {
   });
   tableTools.addEventListener("mousedown", (event) => {
     if (event.target instanceof Element && event.target.closest("[data-uif-editor-command]")) event.preventDefault();
-  });
-  surface.addEventListener("keydown", (event) => {
-    if (!(event instanceof KeyboardEvent)) return;
-    if (surface instanceof HTMLTextAreaElement && handleMarkdownTaskKey(surface, event)) {
-      syncFromSurface();
-      return;
-    }
-    if (!(surface instanceof HTMLTextAreaElement) && handleRichTaskKey(instance, event)) {
-      syncFromSurface();
-      return;
-    }
-    const key = event.key.toLowerCase();
-    if (!(event.metaKey || event.ctrlKey)) return;
-    if (key === "b") {
-      event.preventDefault();
-      formatEditor(instance, "bold");
-    }
-    if (key === "i") {
-      event.preventDefault();
-      formatEditor(instance, "italic");
-    }
-    if (key === "k") {
-      event.preventDefault();
-      formatEditor(instance, "link");
-    }
-    if (key === "z" && event.shiftKey) {
-      event.preventDefault();
-      formatEditor(instance, "redo");
-    } else if (key === "z") {
-      event.preventDefault();
-      formatEditor(instance, "undo");
-    }
-  });
-  surface.addEventListener("paste", () => {
-    void runEditorHooks("beforePaste", { editor: instance, value: instance.getValue() });
-    window.setTimeout(() => {
-      syncFromSurface();
-      void runEditorHooks("afterPaste", { editor: instance, value: instance.getValue() });
-    });
   });
   editors.set(el, instance);
   instance.setValue(input.value);
