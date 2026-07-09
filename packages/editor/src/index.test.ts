@@ -146,6 +146,61 @@ describe('@batoi/uif-editor', () => {
     expect(editor.getValue()).toContain('<th>Column C</th>');
   });
 
+  it('uses placeholders instead of sample values for new link and image dialogs', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none" data-uif-toolbar="link image"><p>Draft</p></textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+
+    editor.element.querySelector<HTMLButtonElement>('[data-uif-editor-command="link"]')?.click();
+    let dialog = document.querySelector<HTMLFormElement>('.uif-editor-dialog') as HTMLFormElement;
+    const text = dialog.elements.namedItem('text') as HTMLInputElement;
+    const href = dialog.elements.namedItem('href') as HTMLInputElement;
+    expect(text.value).toBe('');
+    expect(text.placeholder).toBe('Link text');
+    expect(href.value).toBe('');
+    expect(href.placeholder).toBe('https://example.com');
+    dialog.remove();
+
+    editor.element.querySelector<HTMLButtonElement>('[data-uif-editor-command="image"]')?.click();
+    dialog = document.querySelector<HTMLFormElement>('.uif-editor-dialog') as HTMLFormElement;
+    const src = dialog.elements.namedItem('src') as HTMLInputElement;
+    const alt = dialog.elements.namedItem('alt') as HTMLInputElement;
+    expect(src.value).toBe('');
+    expect(src.placeholder).toBe('/image.png');
+    expect(alt.value).toBe('');
+    expect(alt.placeholder).toBe('Image description');
+  });
+
+  it('prefills link and image dialogs when editing existing rich content', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none" data-uif-toolbar="link image"><p><a href="/docs" title="Docs">Docs</a></p><figure><img src="/shot.png" alt="Screenshot"><figcaption>Dashboard</figcaption></figure></textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const link = editor.surface.querySelector('a') as HTMLAnchorElement;
+    const linkRange = document.createRange();
+    linkRange.selectNodeContents(link);
+    document.getSelection()?.removeAllRanges();
+    document.getSelection()?.addRange(linkRange);
+    editor.surface.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+
+    editor.element.querySelector<HTMLButtonElement>('[data-uif-editor-command="link"]')?.click();
+    let dialog = document.querySelector<HTMLFormElement>('.uif-editor-dialog') as HTMLFormElement;
+    expect((dialog.elements.namedItem('text') as HTMLInputElement).value).toBe('Docs');
+    expect((dialog.elements.namedItem('href') as HTMLInputElement).value).toBe('/docs');
+    expect((dialog.elements.namedItem('title') as HTMLInputElement).value).toBe('Docs');
+    dialog.remove();
+
+    const image = editor.surface.querySelector('img') as HTMLImageElement;
+    const imageRange = document.createRange();
+    imageRange.selectNode(image);
+    document.getSelection()?.removeAllRanges();
+    document.getSelection()?.addRange(imageRange);
+    editor.surface.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+
+    editor.element.querySelector<HTMLButtonElement>('[data-uif-editor-command="image"]')?.click();
+    dialog = document.querySelector<HTMLFormElement>('.uif-editor-dialog') as HTMLFormElement;
+    expect((dialog.elements.namedItem('src') as HTMLInputElement).value).toBe('/shot.png');
+    expect((dialog.elements.namedItem('alt') as HTMLInputElement).value).toBe('Screenshot');
+    expect((dialog.elements.namedItem('caption') as HTMLInputElement).value).toBe('Dashboard');
+  });
+
   it('closes WYSIWYG dialogs with Escape, cancel, and outside pointer while restoring focus', () => {
     document.body.innerHTML = '<button id="outside">Outside</button><textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none" data-uif-toolbar="link"><p>Draft</p></textarea>';
     const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
@@ -363,6 +418,66 @@ describe('@batoi/uif-editor', () => {
     runEditorCommand(editor, 'bold');
     expect(editor.getValue()).toContain('**Draft**');
     expect(editor.status?.textContent).toContain('Unsaved changes');
+  });
+
+  it('turns selected Markdown lines into unordered, ordered, and task lists', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="markdown">Alpha\nBeta</textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const surface = editor.surface as HTMLTextAreaElement;
+    surface.setSelectionRange(0, surface.value.length);
+
+    runEditorCommand(editor, 'ul');
+    expect(editor.getValue()).toBe('- Alpha\n- Beta');
+
+    surface.setSelectionRange(0, surface.value.length);
+    runEditorCommand(editor, 'ol');
+    expect(editor.getValue()).toBe('1. Alpha\n2. Beta');
+
+    surface.setSelectionRange(0, surface.value.length);
+    runEditorCommand(editor, 'task');
+    expect(editor.getValue()).toBe('- [ ] Alpha\n- [ ] Beta');
+  });
+
+  it('toggles Markdown list commands off when the selected lines already match', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="markdown">- Alpha\n- Beta</textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const surface = editor.surface as HTMLTextAreaElement;
+    surface.setSelectionRange(0, surface.value.length);
+
+    runEditorCommand(editor, 'ul');
+
+    expect(editor.getValue()).toBe('Alpha\nBeta');
+  });
+
+  it('creates one rich list item for each selected text line', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none"><p>Alpha<br>Beta</p></textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const paragraph = editor.surface.querySelector('p') as HTMLParagraphElement;
+    const range = document.createRange();
+    range.selectNodeContents(paragraph);
+    document.getSelection()?.removeAllRanges();
+    document.getSelection()?.addRange(range);
+
+    runEditorCommand(editor, 'ol');
+
+    expect(editor.getValue()).toContain('<ol><li>Alpha</li><li>Beta</li></ol>');
+  });
+
+  it('toggles and switches existing rich lists without nesting a new list', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none"><ul><li>Alpha</li><li>Beta</li></ul></textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const item = editor.surface.querySelector('li') as HTMLLIElement;
+    const range = document.createRange();
+    range.selectNodeContents(item);
+    document.getSelection()?.removeAllRanges();
+    document.getSelection()?.addRange(range);
+
+    runEditorCommand(editor, 'ol');
+    expect(editor.getValue()).toContain('<ol><li>Alpha</li><li>Beta</li></ol>');
+    expect(editor.getValue()).not.toContain('<ul><li><ol>');
+
+    runEditorCommand(editor, 'ol');
+    expect(editor.getValue()).toContain('<p>Alpha</p><p>Beta</p>');
   });
 
   it('uses structured Markdown link, image, and table command values', () => {

@@ -299,6 +299,43 @@ function insertAtSelection(surface, value) {
   surface.setSelectionRange(start + value.length, start + value.length);
   return next;
 }
+function selectedTextareaLineRange(surface) {
+  const value = surface.value;
+  const selectionStart = surface.selectionStart;
+  let selectionEnd = surface.selectionEnd;
+  if (selectionEnd > selectionStart && value[selectionEnd - 1] === "\n") selectionEnd -= 1;
+  const start = value.lastIndexOf("\n", Math.max(0, selectionStart - 1)) + 1;
+  const nextBreak = value.indexOf("\n", selectionEnd);
+  const end = nextBreak === -1 ? value.length : nextBreak;
+  return { start, end, lines: value.slice(start, end).split("\n") };
+}
+function markdownListMatch(line, kind) {
+  if (kind === "task") return /^(\s*)[-*+]\s+\[[ xX]\]\s*(.*)$/.exec(line);
+  if (kind === "ol") return /^(\s*)\d+\.\s+(.*)$/.exec(line);
+  return /^(\s*)[-*+]\s+(?!\[[ xX]\]\s*)(.*)$/.exec(line);
+}
+function stripMarkdownListMarker(line) {
+  const match = /^(\s*)(?:[-*+]\s+(?:\[[ xX]\]\s*)?|\d+\.\s+)(.*)$/.exec(line);
+  return match ? { indent: match[1], text: match[2] } : { indent: line.match(/^\s*/)?.[0] ?? "", text: line.trimStart() };
+}
+function applyMarkdownListCommand(surface, kind) {
+  const { start, end, lines } = selectedTextareaLineRange(surface);
+  const targets = lines.length ? lines : [""];
+  const nonEmpty = targets.filter((line) => line.trim());
+  const sameList = nonEmpty.length > 0 && nonEmpty.every((line) => markdownListMatch(line, kind));
+  let orderedIndex = 1;
+  const replacement = targets.map((line) => {
+    if (!line.trim()) return sameList ? "" : kind === "ol" ? `${orderedIndex++}. Item` : kind === "task" ? "- [ ] Task" : "- Item";
+    const { indent, text } = stripMarkdownListMarker(line);
+    if (sameList) return `${indent}${text}`;
+    if (kind === "ol") return `${indent}${orderedIndex++}. ${text || "Item"}`;
+    if (kind === "task") return `${indent}- [ ] ${text || "Task"}`;
+    return `${indent}- ${text || "Item"}`;
+  }).join("\n");
+  surface.value = `${surface.value.slice(0, start)}${replacement}${surface.value.slice(end)}`;
+  surface.setSelectionRange(start, start + replacement.length);
+  return surface.value;
+}
 function currentTextareaLine(surface) {
   const before = surface.value.slice(0, surface.selectionStart);
   const after = surface.value.slice(surface.selectionStart);
@@ -385,6 +422,29 @@ function selectedRichText(editor, fallback) {
   const range = richRange(editor);
   return range && !range.collapsed ? range.toString() : fallback;
 }
+function selectedRichLines(editor, fallback) {
+  const range = richRange(editor);
+  if (!range || range.collapsed) return [fallback];
+  const textParts = [];
+  const appendBreak = () => {
+    if (textParts.at(-1) !== "\n") textParts.push("\n");
+  };
+  const visit = (node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      textParts.push(node.textContent ?? "");
+      return;
+    }
+    if (node instanceof HTMLBRElement) {
+      appendBreak();
+      return;
+    }
+    node.childNodes.forEach(visit);
+    if (node instanceof HTMLElement && /^(P|DIV|LI|H[1-6]|BLOCKQUOTE|PRE)$/i.test(node.tagName)) appendBreak();
+  };
+  range.cloneContents().childNodes.forEach(visit);
+  const lines = textParts.join("").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  return lines.length ? lines : [fallback];
+}
 function currentRichElement(editor, selector) {
   const surface = richSurface(editor);
   if (!surface) return null;
@@ -410,6 +470,31 @@ function currentImage(editor) {
 }
 function currentTaskItem(editor) {
   return currentRichElement(editor, ".uif-task-list li");
+}
+function currentRichList(editor) {
+  const list = currentRichElement(editor, "ul,ol");
+  return list?.classList.contains("uif-task-list") ? null : list;
+}
+function replaceRichList(list, tagName) {
+  const next = document.createElement(tagName);
+  [...list.children].forEach((child) => {
+    if (child instanceof HTMLLIElement) next.append(child.cloneNode(true));
+  });
+  list.replaceWith(next);
+  setCaretInside(next);
+  return next;
+}
+function unwrapRichList(list) {
+  const fragment = document.createDocumentFragment();
+  [...list.children].forEach((child) => {
+    if (!(child instanceof HTMLLIElement)) return;
+    const paragraph = document.createElement("p");
+    paragraph.innerHTML = child.innerHTML;
+    fragment.append(paragraph);
+  });
+  const last = fragment.lastChild;
+  list.replaceWith(fragment);
+  if (last instanceof HTMLElement) setCaretInside(last);
 }
 function setCaretInside(element) {
   const range = document.createRange();
@@ -618,9 +703,20 @@ function applyRichHtmlCommand(editor, command, value) {
   else if (command === "paragraph") insertRichHtml(editor, `<p>${escapeHtml(selectedRichText(editor, "Paragraph text"))}</p>`);
   else if (command === "quote") insertRichHtml(editor, `<blockquote>${escapeHtml(selectedRichText(editor, "Quote"))}</blockquote>`);
   else if (command === "code") insertRichHtml(editor, `<pre><code>${escapeHtml(selectedRichText(editor, "code"))}</code></pre>`);
-  else if (command === "ul") insertRichHtml(editor, `<ul><li>${escapeHtml(selectedRichText(editor, "Item"))}</li></ul>`);
-  else if (command === "ol") insertRichHtml(editor, `<ol><li>${escapeHtml(selectedRichText(editor, "Item"))}</li></ol>`);
-  else if (command === "task") insertRichHtml(editor, '<ul class="uif-task-list"><li><label><input type="checkbox"> Task</label></li></ul>');
+  else if (command === "ul" || command === "ol") {
+    const tag = command;
+    const existingList = currentRichList(editor);
+    if (existingList?.tagName.toLowerCase() === tag) {
+      unwrapRichList(existingList);
+      return;
+    }
+    if (existingList) {
+      replaceRichList(existingList, tag);
+      return;
+    }
+    const items = selectedRichLines(editor, "Item").map((line) => `<li>${escapeHtml(line)}</li>`).join("");
+    insertRichHtml(editor, `<${tag}>${items}</${tag}>`);
+  } else if (command === "task") insertRichHtml(editor, '<ul class="uif-task-list"><li><label><input type="checkbox"> Task</label></li></ul>');
   else if (command === "hr") insertRichHtml(editor, "<hr>");
   else if (command === "link" || command === "link-edit") {
     const link = linkValue(value, selectedRichText(editor, "Link text"));
@@ -729,9 +825,9 @@ function applyMarkdownCommand(editor, command, value) {
   if (command === "quote") return insertAtSelection(surface, "\n> Quote\n");
   if (command === "code") return insertAtSelection(surface, "\n```\ncode\n```\n");
   if (command === "hr") return insertAtSelection(surface, "\n---\n");
-  if (command === "ul") return insertAtSelection(surface, "\n- Item\n");
-  if (command === "ol") return insertAtSelection(surface, "\n1. Item\n");
-  if (command === "task") return insertAtSelection(surface, "\n- [ ] Task\n");
+  if (command === "ul") return applyMarkdownListCommand(surface, "ul");
+  if (command === "ol") return applyMarkdownListCommand(surface, "ol");
+  if (command === "task") return applyMarkdownListCommand(surface, "task");
   if (command === "link" || command === "link-edit") {
     const link = linkValue(value, "link");
     if (surface.selectionStart === surface.selectionEnd) return insertAtSelection(surface, `[${link.text}](${link.href})`);
@@ -935,14 +1031,15 @@ function setEditorPreviewLayout(editor, layout) {
   }
   emit("uif:editor-layout-change", { editor, layout }, editor.element);
 }
-function formField(name, label, value = "", type = "text") {
-  return `<label class="uif-editor-dialog-field"><span>${escapeHtml(label)}</span><input class="uif-input" type="${type}" name="${escapeAttr(name)}" value="${escapeAttr(value)}"></label>`;
+function formField(name, label, value = "", type = "text", placeholder = "") {
+  return `<label class="uif-editor-dialog-field"><span>${escapeHtml(label)}</span><input class="uif-input" type="${type}" name="${escapeAttr(name)}" value="${escapeAttr(value)}"${placeholder ? ` placeholder="${escapeAttr(placeholder)}"` : ""}></label>`;
 }
 function currentLinkValue(editor) {
   const link = currentLink(editor);
+  const selectedText = link ? "" : selectedRichText(editor, "");
   return {
-    text: link?.textContent || selectedRichText(editor, "Link text"),
-    href: link?.getAttribute("href") || "https://example.com",
+    text: link?.textContent || selectedText,
+    href: link?.getAttribute("href") || "",
     title: link?.getAttribute("title") || "",
     target: link?.getAttribute("target") === "_blank" ? "_blank" : "_self"
   };
@@ -951,8 +1048,8 @@ function currentImageValue(editor) {
   const image = currentImage(editor);
   const figure = image?.closest("figure");
   return {
-    src: image?.getAttribute("src") || "/favicon.ico",
-    alt: image?.getAttribute("alt") || "Image",
+    src: image?.getAttribute("src") || "",
+    alt: image?.getAttribute("alt") || "",
     caption: figure?.querySelector("figcaption")?.textContent || ""
   };
 }
@@ -991,11 +1088,11 @@ function openEditorCommandDialog(editor, command, apply, anchor) {
   dialog.setAttribute("role", "dialog");
   dialog.setAttribute("aria-label", editorCommandLabel(command));
   if (command === "link") {
-    const link = editor.mode === "html" ? currentLinkValue(editor) : { text: "link", href: "https://example.com", title: "", target: "_self" };
-    dialog.innerHTML = `<div class="uif-editor-dialog-grid">${formField("text", "Text", link.text)}${formField("href", "URL", link.href)}${formField("title", "Title", link.title)}<label class="uif-editor-dialog-check"><input type="checkbox" name="blank"${link.target === "_blank" ? " checked" : ""}> Open in new tab</label></div>`;
+    const link = editor.mode === "html" ? currentLinkValue(editor) : { text: "", href: "", title: "", target: "_self" };
+    dialog.innerHTML = `<div class="uif-editor-dialog-grid">${formField("text", "Text", link.text, "text", "Link text")}${formField("href", "URL", link.href, "text", "https://example.com")}${formField("title", "Title", link.title, "text", "Optional title")}<label class="uif-editor-dialog-check"><input type="checkbox" name="blank"${link.target === "_blank" ? " checked" : ""}> Open in new tab</label></div>`;
   } else if (command === "image") {
-    const image = editor.mode === "html" ? currentImageValue(editor) : { src: "/favicon.ico", alt: "Image", caption: "" };
-    dialog.innerHTML = `<div class="uif-editor-dialog-grid">${formField("src", "Image URL", image.src)}${formField("alt", "Alt text", image.alt)}${formField("caption", "Caption", image.caption)}</div>`;
+    const image = editor.mode === "html" ? currentImageValue(editor) : { src: "", alt: "", caption: "" };
+    dialog.innerHTML = `<div class="uif-editor-dialog-grid">${formField("src", "Image URL", image.src, "text", "/image.png")}${formField("alt", "Alt text", image.alt, "text", "Image description")}${formField("caption", "Caption", image.caption, "text", "Optional caption")}</div>`;
   } else if (command === "table") {
     dialog.innerHTML = `<div class="uif-editor-dialog-grid">${formField("rows", "Rows", "2", "number")}${formField("columns", "Columns", "2", "number")}<label class="uif-editor-dialog-check"><input type="checkbox" name="header" checked> Header row</label></div>`;
   }
@@ -1269,8 +1366,13 @@ function createEditor(el, options = {}) {
     const button = event.target instanceof Element ? event.target.closest("[data-uif-editor-command]") : null;
     const command = button?.dataset.uifEditorCommand;
     if (!command) return;
+    restoreRichSelection();
     formatEditor(instance, command);
+    saveRichSelection();
     updateTableTools();
+  });
+  tableTools.addEventListener("mousedown", (event) => {
+    if (event.target instanceof Element && event.target.closest("[data-uif-editor-command]")) event.preventDefault();
   });
   surface.addEventListener("keydown", (event) => {
     if (!(event instanceof KeyboardEvent)) return;
