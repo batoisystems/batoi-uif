@@ -587,6 +587,80 @@ function wrapRichSelection(editor: EditorInstance, tagName: string, fallback: st
   setRichCaretAfter(node);
 }
 
+function unwrapElement(element: Element): void {
+  const children = [...element.childNodes];
+  const last = children.at(-1) ?? null;
+  element.replaceWith(...children);
+  if (last) setRichCaretAfter(last);
+}
+
+function unwrapMatchingElements(root: ParentNode, selector: string): void {
+  [...root.querySelectorAll(selector)].forEach((element) => {
+    element.replaceWith(...element.childNodes);
+  });
+}
+
+function hasMatchingElement(root: ParentNode, selector: string): boolean {
+  return root.querySelector(selector) !== null;
+}
+
+function closestRichInlineForRange(editor: EditorInstance, range: Range, selector: string): Element | null {
+  const surface = richSurface(editor);
+  if (!surface) return null;
+  const startElement = range.startContainer instanceof Element ? range.startContainer : range.startContainer.parentElement;
+  const endElement = range.endContainer instanceof Element ? range.endContainer : range.endContainer.parentElement;
+  const startMatch = startElement?.closest(selector);
+  const endMatch = endElement?.closest(selector);
+  if (startMatch && startMatch === endMatch && surface.contains(startMatch)) return startMatch;
+  return null;
+}
+
+function hasContent(node: Node): boolean {
+  return node.textContent?.length ? true : node.childNodes.length > 0;
+}
+
+function unwrapSelectedRichInline(inline: Element, range: Range): void {
+  const fragment = range.extractContents();
+  unwrapMatchingElements(fragment, inline.tagName.toLowerCase());
+  const marker = document.createTextNode('');
+  range.insertNode(marker);
+  const after = inline.cloneNode(false) as Element;
+  while (marker.nextSibling) after.append(marker.nextSibling);
+  const last = fragment.lastChild;
+  inline.after(fragment);
+  if (hasContent(after)) {
+    if (last) last.after(after);
+    else inline.after(after);
+  }
+  marker.remove();
+  if (!hasContent(inline)) inline.remove();
+  if (last) setRichCaretAfter(last);
+}
+
+function toggleRichInline(editor: EditorInstance, tagName: string, fallback: string, selector = tagName): void {
+  const range = richRange(editor);
+  if (!range) return;
+  const activeInline = closestRichInlineForRange(editor, range, selector);
+  if (activeInline && range.collapsed) {
+    unwrapElement(activeInline);
+    return;
+  }
+  if (activeInline) {
+    unwrapSelectedRichInline(activeInline, range);
+    return;
+  }
+  const fragment = range.cloneContents();
+  if (!range.collapsed && hasMatchingElement(fragment, selector)) {
+    const replacement = range.extractContents();
+    unwrapMatchingElements(replacement, selector);
+    const last = replacement.lastChild;
+    range.insertNode(replacement);
+    if (last) setRichCaretAfter(last);
+    return;
+  }
+  wrapRichSelection(editor, tagName, fallback);
+}
+
 function selectedRichText(editor: EditorInstance, fallback: string): string {
   const range = richRange(editor);
   return range && !range.collapsed ? range.toString() : fallback;
@@ -888,10 +962,10 @@ function applyTableCommand(editor: EditorInstance, command: EditorCommand): bool
 }
 
 function applyRichHtmlCommand(editor: EditorInstance, command: EditorCommand, value?: unknown): void {
-  if (command === 'bold') wrapRichSelection(editor, 'strong', 'bold text');
-  else if (command === 'italic') wrapRichSelection(editor, 'em', 'italic text');
-  else if (command === 'underline') wrapRichSelection(editor, 'u', 'underlined text');
-  else if (command === 'strike') wrapRichSelection(editor, 's', 'deleted text');
+  if (command === 'bold') toggleRichInline(editor, 'strong', 'bold text', 'strong,b');
+  else if (command === 'italic') toggleRichInline(editor, 'em', 'italic text', 'em,i');
+  else if (command === 'underline') toggleRichInline(editor, 'u', 'underlined text');
+  else if (command === 'strike') toggleRichInline(editor, 's', 'deleted text', 's,del');
   else if (command === 'heading') insertRichHtml(editor, `<h2>${escapeHtml(selectedRichText(editor, 'Heading'))}</h2>`);
   else if (command === 'paragraph') insertRichHtml(editor, `<p>${escapeHtml(selectedRichText(editor, 'Paragraph text'))}</p>`);
   else if (command === 'quote') insertRichHtml(editor, `<blockquote>${escapeHtml(selectedRichText(editor, 'Quote'))}</blockquote>`);

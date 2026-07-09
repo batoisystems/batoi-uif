@@ -84,6 +84,48 @@ describe('@batoi/uif-editor', () => {
     expect(editor.getValue()).toContain('Alpha <strong>Beta</strong>');
   });
 
+  it('toggles existing rich inline formatting off for selected text', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none"><p><strong>Bold</strong> <em>Italic</em> <u>Underline</u> <s>Strike</s></p></textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const selectContents = (selector: string) => {
+      const element = editor.surface.querySelector(selector) as HTMLElement;
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      document.getSelection()?.removeAllRanges();
+      document.getSelection()?.addRange(range);
+    };
+
+    selectContents('strong');
+    runEditorCommand(editor, 'bold');
+    expect(editor.getValue()).toContain('<p>Bold <em>Italic</em> <u>Underline</u> <s>Strike</s></p>');
+
+    selectContents('em');
+    runEditorCommand(editor, 'italic');
+    expect(editor.getValue()).toContain('Bold Italic <u>Underline</u> <s>Strike</s>');
+
+    selectContents('u');
+    runEditorCommand(editor, 'underline');
+    expect(editor.getValue()).toContain('Bold Italic Underline <s>Strike</s>');
+
+    selectContents('s');
+    runEditorCommand(editor, 'strike');
+    expect(editor.getValue()).toContain('<p>Bold Italic Underline Strike</p>');
+  });
+
+  it('removes rich inline formatting inside a mixed selection', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none"><p>Alpha <strong>Beta</strong> Gamma</p></textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const paragraph = editor.surface.querySelector('p') as HTMLParagraphElement;
+    const range = document.createRange();
+    range.selectNodeContents(paragraph);
+    document.getSelection()?.removeAllRanges();
+    document.getSelection()?.addRange(range);
+
+    runEditorCommand(editor, 'bold');
+
+    expect(editor.getValue()).toBe('<p>Alpha Beta Gamma</p>');
+  });
+
   it('runs HTML source mode toolbar commands against the source textarea', () => {
     document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none" data-uif-toolbar="source bold"><p>Draft</p></textarea>';
     const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
