@@ -3080,6 +3080,13 @@ select.uif-input {
 .uif-editor[data-uif-editor-layout='drawer'] .uif-editor-preview {
   display: none;
 }
+.uif-editor[data-uif-mode='markdown'] .uif-editor-source:not([hidden]),
+.uif-editor[data-uif-mode='markdown'] .uif-editor-preview:not([hidden]) {
+  display: block;
+}
+.uif-editor[data-uif-mode='markdown'] .uif-editor-preview:not([hidden]) {
+  border-top: 0;
+}
 .uif-editor-preview-backdrop {
   position: fixed;
   inset: 0;

@@ -443,20 +443,64 @@ describe('@batoi/uif-editor', () => {
     document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="markdown" data-uif-preview="manual" data-uif-toolbar="source"># Draft</textarea>';
     const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
     const button = editor.element.querySelector<HTMLButtonElement>('[data-uif-editor-command="source"]') as HTMLButtonElement;
-    expect(editor.sourceMode).toBe(true);
-    expect(editor.surface.hidden).toBe(false);
-    expect(editor.preview?.hidden).toBe(true);
-    expect(button.getAttribute('aria-pressed')).toBe('true');
-    button.click();
     expect(editor.sourceMode).toBe(false);
     expect(editor.surface.hidden).toBe(true);
     expect(editor.preview?.hidden).toBe(false);
     expect(editor.preview?.innerHTML).toContain('<h1>Draft</h1>');
     expect(button.getAttribute('aria-pressed')).toBe('false');
+
     button.click();
     expect(editor.sourceMode).toBe(true);
     expect(editor.surface.hidden).toBe(false);
     expect(editor.preview?.hidden).toBe(true);
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+
+    const surface = editor.surface as HTMLTextAreaElement;
+    surface.value = '# Edited';
+    surface.dispatchEvent(new Event('input', { bubbles: true }));
+    button.click();
+    expect(editor.sourceMode).toBe(false);
+    expect(editor.surface.hidden).toBe(true);
+    expect(editor.preview?.hidden).toBe(false);
+    expect(editor.preview?.innerHTML).toContain('<h1>Edited</h1>');
+  });
+
+  it('can still start Markdown editors explicitly in source layout', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="markdown" data-uif-preview="manual" data-uif-editor-layout="source" data-uif-toolbar="source"># Draft</textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    expect(editor.sourceMode).toBe(true);
+    expect(editor.surface.hidden).toBe(false);
+    expect(editor.preview?.hidden).toBe(true);
+    expect(editor.element.querySelector<HTMLButtonElement>('[data-uif-editor-command="source"]')?.getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('uses Preview to return a single-box Markdown editor to rendered mode', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="markdown" data-uif-preview="manual" data-uif-toolbar="preview source"># Draft</textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const previewButton = editor.element.querySelector<HTMLButtonElement>('[data-uif-editor-command="preview"]') as HTMLButtonElement;
+    const sourceButton = editor.element.querySelector<HTMLButtonElement>('[data-uif-editor-command="source"]') as HTMLButtonElement;
+
+    sourceButton.click();
+    expect(editor.sourceMode).toBe(true);
+    previewButton.click();
+
+    expect(editor.sourceMode).toBe(false);
+    expect(editor.surface.hidden).toBe(true);
+    expect(editor.preview?.hidden).toBe(false);
+    expect(editor.preview?.innerHTML).toContain('<h1>Draft</h1>');
+    expect(sourceButton.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('switches Markdown toolbar edits into source mode from rendered mode', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="markdown" data-uif-preview="manual" data-uif-toolbar="bold source">Draft</textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+
+    runEditorCommand(editor, 'bold');
+
+    expect(editor.sourceMode).toBe(true);
+    expect(editor.surface.hidden).toBe(false);
+    expect(editor.preview?.hidden).toBe(true);
+    expect(editor.getValue()).toContain('**bold text**');
   });
 
   it('supports Markdown preview layout changes', () => {

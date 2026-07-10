@@ -266,12 +266,13 @@ function asInput(el) {
 function parseOptions(el, options = {}) {
   const configuredMaxLength = Number(el.dataset.uifMaxlength || "");
   const inputMaxLength = el instanceof HTMLTextAreaElement || el instanceof HTMLInputElement ? el.maxLength > 0 ? el.maxLength : 0 : 0;
+  const mode = options.mode ?? el.dataset.uifMode ?? "html";
   return {
-    mode: options.mode ?? el.dataset.uifMode ?? "html",
+    mode,
     toolbar: options.toolbar ?? el.dataset.uifToolbar?.split(/\s+/).filter(Boolean) ?? defaultToolbar,
     preview: options.preview ?? el.dataset.uifPreview ?? "manual",
     height: options.height ?? el.dataset.uifEditorHeight ?? "14rem",
-    layout: options.layout ?? el.dataset.uifEditorLayout ?? "source",
+    layout: options.layout ?? el.dataset.uifEditorLayout ?? (mode === "markdown" ? "preview" : "source"),
     status: options.status ?? el.dataset.uifEditorStatus !== "false",
     placeholder: options.placeholder ?? el.dataset.uifPlaceholder ?? "",
     autosave: options.autosave ?? el.dataset.uifAutosave === "true",
@@ -1036,7 +1037,15 @@ function runEditorCommand(editor, command, value) {
   }
   if (command === "undo") restoreHistory(editor, "undo");
   else if (command === "redo") restoreHistory(editor, "redo");
-  else editor.setValue(applyMarkdownCommand(editor, command, value));
+  else {
+    if (editor.mode === "markdown" && !editor.sourceMode && command !== "preview" && command !== "source" && command !== "fullscreen") {
+      editor.sourceMode = true;
+      editor.surface.hidden = false;
+      if (editor.preview) editor.preview.hidden = true;
+      editor.element.querySelector('[data-uif-editor-command="source"]')?.setAttribute("aria-pressed", "true");
+    }
+    editor.setValue(applyMarkdownCommand(editor, command, value));
+  }
   void runEditorHooks("afterCommand", { editor, value: editor.getValue(), command });
 }
 function formatEditor(editor, command, value) {
@@ -1084,17 +1093,24 @@ function setEditorPreviewLayout(editor, layout) {
   body?.classList.toggle("uif-editor-body-tabs", layout === "tabs");
   if (editor.mode === "markdown" && editor.preview) {
     syncPreview(editor);
-    editor.surface.hidden = layout === "preview";
-    editor.preview.hidden = layout === "source" || layout === "modal" || layout === "drawer";
+    const sourceButton = editor.element.querySelector('[data-uif-editor-command="source"]');
+    editor.surface.hidden = false;
+    editor.preview.hidden = true;
     if (layout === "split") {
-      editor.surface.hidden = false;
       editor.preview.hidden = false;
-    }
-    if (layout === "tabs") {
+      editor.sourceMode = true;
+    } else if (layout === "tabs") {
       editor.surface.hidden = !editor.sourceMode;
       editor.preview.hidden = editor.sourceMode;
+    } else if (layout === "preview") {
+      editor.surface.hidden = true;
+      editor.preview.hidden = false;
+      editor.sourceMode = false;
+    } else {
+      editor.sourceMode = true;
     }
-    editor.sourceMode = !editor.surface.hidden;
+    if (!editor.preview.hidden) editor.preview.tabIndex = 0;
+    sourceButton?.setAttribute("aria-pressed", String(editor.sourceMode));
   }
   emit("uif:editor-layout-change", { editor, layout }, editor.element);
 }
@@ -1230,6 +1246,7 @@ function createEditor(el, options = {}) {
   const status = document.createElement("div");
   status.className = "uif-editor-status";
   status.setAttribute("role", "status");
+  const initialSourceMode = config.mode === "html" ? false : config.mode === "markdown" ? config.layout !== "preview" : true;
   config.toolbar.forEach((command) => {
     const button = document.createElement("button");
     button.type = "button";
@@ -1239,7 +1256,7 @@ function createEditor(el, options = {}) {
     button.setAttribute("aria-label", label);
     button.title = label;
     button.innerHTML = `${editorCommandIcon(command)}<span class="uif-sr-only">${escapeHtml(label)}</span>`;
-    if (command === "source") button.setAttribute("aria-pressed", String(config.mode !== "html"));
+    if (command === "source") button.setAttribute("aria-pressed", String(initialSourceMode));
     if (command === "preview") button.setAttribute("aria-pressed", String(!preview.hidden));
     toolbar.append(button);
   });
@@ -1271,7 +1288,7 @@ function createEditor(el, options = {}) {
     preview,
     status: config.status ? status : void 0,
     dirty: false,
-    sourceMode: config.mode !== "html",
+    sourceMode: initialSourceMode,
     getValue() {
       return input.value;
     },
@@ -1391,6 +1408,18 @@ function createEditor(el, options = {}) {
     current.addEventListener("focus", () => emit("uif:editor-focus", { editor: instance }, wrapper));
     current.addEventListener("blur", () => emit("uif:editor-blur", { editor: instance }, wrapper));
   };
+  const setMarkdownSourceMode = (sourceVisible, focus = true) => {
+    instance.sourceMode = sourceVisible;
+    surface.hidden = !sourceVisible;
+    preview.hidden = sourceVisible;
+    if (!sourceVisible) {
+      syncPreview(instance);
+      preview.tabIndex = 0;
+    }
+    const sourceButton = wrapper.querySelector('[data-uif-editor-command="source"]');
+    sourceButton?.setAttribute("aria-pressed", String(instance.sourceMode));
+    if (focus) (sourceVisible ? surface : preview).focus();
+  };
   bindCurrentSurfaceEvents(surface);
   surface.addEventListener("keyup", (event) => {
     saveRichSelection();
@@ -1422,9 +1451,21 @@ function createEditor(el, options = {}) {
         return;
       }
       void runEditorHooks("beforePreview", { editor: instance, value: instance.getValue(), command });
-      preview.hidden = !preview.hidden;
+      if (config.mode === "markdown") {
+        if (layout === "split") {
+          syncPreview(instance);
+          surface.hidden = false;
+          preview.hidden = false;
+          instance.sourceMode = true;
+          wrapper.querySelector('[data-uif-editor-command="source"]')?.setAttribute("aria-pressed", "true");
+        } else {
+          setMarkdownSourceMode(false);
+        }
+      } else {
+        preview.hidden = !preview.hidden;
+        syncPreview(instance);
+      }
       button.setAttribute("aria-pressed", String(!preview.hidden));
-      syncPreview(instance);
       emit("uif:editor-preview", { editor: instance, visible: !preview.hidden }, wrapper);
       void runEditorHooks("afterPreview", { editor: instance, value: instance.getValue(), command });
       return;
@@ -1457,16 +1498,17 @@ function createEditor(el, options = {}) {
       return;
     }
     if (command === "source" && config.mode === "markdown") {
-      instance.sourceMode = !instance.sourceMode;
-      button.setAttribute("aria-pressed", String(instance.sourceMode));
-      surface.hidden = !instance.sourceMode;
-      preview.hidden = instance.sourceMode;
-      if (instance.sourceMode) {
+      const layout = instance.element.dataset.uifEditorLayout ?? config.layout;
+      if (layout === "split") {
+        instance.sourceMode = true;
+        surface.hidden = false;
+        preview.hidden = false;
+        button.setAttribute("aria-pressed", "true");
         surface.focus();
+      } else if (layout === "modal" || layout === "drawer") {
+        setMarkdownSourceMode(true);
       } else {
-        syncPreview(instance);
-        preview.tabIndex = 0;
-        preview.focus();
+        setMarkdownSourceMode(!instance.sourceMode);
       }
       emit("uif:editor-mode-change", { editor: instance, source: instance.sourceMode }, wrapper);
       return;
@@ -1482,6 +1524,7 @@ function createEditor(el, options = {}) {
       }, button);
       return;
     }
+    if (config.mode === "markdown" && !instance.sourceMode) setMarkdownSourceMode(true);
     formatEditor(instance, command);
     saveRichSelection();
     updateTableTools();
