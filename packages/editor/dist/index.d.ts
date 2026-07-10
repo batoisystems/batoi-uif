@@ -1,7 +1,7 @@
 type EditorMode = 'html' | 'markdown' | 'plain';
 type EditorPreviewMode = 'none' | 'manual' | 'live';
 type EditorLayout = 'source' | 'preview' | 'split' | 'tabs' | 'modal' | 'drawer';
-type EditorCommand = 'bold' | 'italic' | 'underline' | 'strike' | 'heading' | 'paragraph' | 'quote' | 'code' | 'hr' | 'ul' | 'ol' | 'task' | 'link' | 'link-edit' | 'link-remove' | 'image' | 'image-edit' | 'image-remove' | 'table' | 'table-row-before' | 'table-row-after' | 'table-row-delete' | 'table-col-before' | 'table-col-after' | 'table-col-delete' | 'table-delete' | 'table-header-toggle' | 'undo' | 'redo' | 'preview' | 'source' | 'fullscreen' | 'clear';
+type EditorCommand = 'bold' | 'italic' | 'underline' | 'strike' | 'heading' | 'h1' | 'h2' | 'h3' | 'paragraph' | 'quote' | 'code' | 'code-inline' | 'code-block' | 'hr' | 'ul' | 'ol' | 'task' | 'link' | 'link-edit' | 'link-remove' | 'image' | 'image-edit' | 'image-remove' | 'table' | 'table-row-before' | 'table-row-after' | 'table-row-delete' | 'table-col-before' | 'table-col-after' | 'table-col-delete' | 'table-delete' | 'table-header-toggle' | 'undo' | 'redo' | 'preview' | 'source' | 'fullscreen' | 'clear';
 interface EditorOptions {
     mode?: EditorMode;
     toolbar?: string[];

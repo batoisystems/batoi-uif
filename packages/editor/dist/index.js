@@ -15,9 +15,14 @@ var commandLabels = {
   underline: "Underline",
   strike: "Strikethrough",
   heading: "Heading",
+  h1: "Heading 1",
+  h2: "Heading 2",
+  h3: "Heading 3",
   paragraph: "Paragraph",
   quote: "Quote",
   code: "Code",
+  "code-inline": "Inline code",
+  "code-block": "Code block",
   hr: "Horizontal rule",
   ul: "Bulleted list",
   ol: "Numbered list",
@@ -50,9 +55,14 @@ var commandIcons = {
   underline: '<path d="M7 5v6a5 5 0 0 0 10 0V5"></path><path d="M5 21h14"></path>',
   strike: '<path d="M5 12h14"></path><path d="M16 6.5A4.5 4.5 0 0 0 12 5c-2.5 0-4 1.2-4 3"></path><path d="M8 17c.8 1.3 2.2 2 4 2 2.5 0 4-1.2 4-3"></path>',
   heading: '<path d="M6 5v14"></path><path d="M18 5v14"></path><path d="M6 12h12"></path>',
+  h1: '<path d="M5 5v14"></path><path d="M13 5v14"></path><path d="M5 12h8"></path><path d="M18 10v9"></path><path d="m16 12 2-2 2 2"></path>',
+  h2: '<path d="M4 5v14"></path><path d="M12 5v14"></path><path d="M4 12h8"></path><path d="M16 12a2 2 0 1 1 4 0c0 2-4 3-4 7h4"></path>',
+  h3: '<path d="M4 5v14"></path><path d="M12 5v14"></path><path d="M4 12h8"></path><path d="M17 10h4l-3 4a3 3 0 1 1-2 5"></path>',
   paragraph: '<path d="M13 20V5"></path><path d="M17 20V5"></path><path d="M17 5H9a4 4 0 0 0 0 8h4"></path>',
   quote: '<path d="M9 7H5v6h4v4l3-4V7z"></path><path d="M19 7h-4v6h4v4l3-4V7z"></path>',
   code: '<path d="m8 9-4 3 4 3"></path><path d="m16 9 4 3-4 3"></path><path d="m14 5-4 14"></path>',
+  "code-inline": '<path d="m9 10-3 2 3 2"></path><path d="m15 10 3 2-3 2"></path>',
+  "code-block": '<path d="m8 9-4 3 4 3"></path><path d="m16 9 4 3-4 3"></path><path d="m14 5-4 14"></path>',
   hr: '<path d="M5 12h14"></path>',
   ul: '<path d="M8 6h13"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M3 6h.01"></path><path d="M3 12h.01"></path><path d="M3 18h.01"></path>',
   ol: '<path d="M10 6h11"></path><path d="M10 12h11"></path><path d="M10 18h11"></path><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M4 14h2l-2 4h2"></path>',
@@ -318,6 +328,49 @@ function markdownListMatch(line, kind) {
 function stripMarkdownListMarker(line) {
   const match = /^(\s*)(?:[-*+]\s+(?:\[[ xX]\]\s*)?|\d+\.\s+)(.*)$/.exec(line);
   return match ? { indent: match[1], text: match[2] } : { indent: line.match(/^\s*/)?.[0] ?? "", text: line.trimStart() };
+}
+function stripMarkdownBlockMarker(line) {
+  const list = stripMarkdownListMarker(line);
+  const heading = /^(\s*)#{1,6}\s+(.*)$/.exec(list.text);
+  if (heading) return { indent: `${list.indent}${heading[1]}`, text: heading[2] };
+  const quote = /^(\s*)>\s?(.*)$/.exec(list.text);
+  if (quote) return { indent: `${list.indent}${quote[1]}`, text: quote[2] };
+  return list;
+}
+function applyMarkdownLineTransform(surface, transform) {
+  const { start, end, lines } = selectedTextareaLineRange(surface);
+  const targets = lines.length ? lines : [""];
+  const replacement = targets.map(transform).join("\n");
+  surface.value = `${surface.value.slice(0, start)}${replacement}${surface.value.slice(end)}`;
+  surface.setSelectionRange(start, start + replacement.length);
+  return surface.value;
+}
+function applyMarkdownHeadingCommand(surface, level) {
+  return applyMarkdownLineTransform(surface, (line) => {
+    const { indent, text } = stripMarkdownBlockMarker(line);
+    return `${indent}${"#".repeat(level)} ${text || "Heading"}`;
+  });
+}
+function applyMarkdownParagraphCommand(surface) {
+  return applyMarkdownLineTransform(surface, (line) => {
+    const { indent, text } = stripMarkdownBlockMarker(line);
+    return `${indent}${text || "Paragraph text"}`;
+  });
+}
+function applyMarkdownQuoteCommand(surface) {
+  return applyMarkdownLineTransform(surface, (line) => {
+    const { indent, text } = stripMarkdownBlockMarker(line);
+    return `${indent}> ${text || "Quote"}`;
+  });
+}
+function stripMarkdownInlineFormatting(value) {
+  return value.replace(/!\[([^\]]*)\]\(([^)]*)\)/g, "$1").replace(/\[([^\]]+)\]\(([^)]*)\)/g, "$1").replace(/(\*\*|__)(.*?)\1/g, "$2").replace(/(\*|_)(.*?)\1/g, "$2").replace(/~~(.*?)~~/g, "$1").replace(/`([^`]*)`/g, "$1");
+}
+function applyMarkdownClearCommand(surface) {
+  return applyMarkdownLineTransform(surface, (line) => {
+    const { indent, text } = stripMarkdownBlockMarker(line);
+    return `${indent}${stripMarkdownInlineFormatting(text)}`;
+  });
 }
 function applyMarkdownListCommand(surface, kind) {
   const { start, end, lines } = selectedTextareaLineRange(surface);
@@ -768,9 +821,11 @@ function applyRichHtmlCommand(editor, command, value) {
   else if (command === "underline") toggleRichInline(editor, "u", "underlined text");
   else if (command === "strike") toggleRichInline(editor, "s", "deleted text", "s,del");
   else if (command === "heading") insertRichHtml(editor, `<h2>${escapeHtml(selectedRichText(editor, "Heading"))}</h2>`);
+  else if (command === "h1" || command === "h2" || command === "h3") insertRichHtml(editor, `<${command}>${escapeHtml(selectedRichText(editor, "Heading"))}</${command}>`);
   else if (command === "paragraph") insertRichHtml(editor, `<p>${escapeHtml(selectedRichText(editor, "Paragraph text"))}</p>`);
   else if (command === "quote") insertRichHtml(editor, `<blockquote>${escapeHtml(selectedRichText(editor, "Quote"))}</blockquote>`);
-  else if (command === "code") insertRichHtml(editor, `<pre><code>${escapeHtml(selectedRichText(editor, "code"))}</code></pre>`);
+  else if (command === "code-inline") wrapRichSelection(editor, "code", "code");
+  else if (command === "code" || command === "code-block") insertRichHtml(editor, `<pre><code>${escapeHtml(selectedRichText(editor, "code"))}</code></pre>`);
   else if (command === "ul" || command === "ol") {
     const tag = command;
     const existingList = currentRichList(editor);
@@ -849,9 +904,11 @@ function applyHtmlSourceCommand(editor, command, value) {
   if (command === "underline") return wrapSelection(surface, "<u>", "</u>", "underlined text");
   if (command === "strike") return wrapSelection(surface, "<s>", "</s>", "deleted text");
   if (command === "heading") return wrapSelection(surface, `<${value || "h2"}>`, `</${value || "h2"}>`, "Heading");
+  if (command === "h1" || command === "h2" || command === "h3") return wrapSelection(surface, `<${command}>`, `</${command}>`, "Heading");
   if (command === "paragraph") return wrapSelection(surface, "<p>", "</p>", "Paragraph text");
   if (command === "quote") return wrapSelection(surface, "<blockquote>", "</blockquote>", "Quote");
-  if (command === "code") return wrapSelection(surface, "<pre><code>", "</code></pre>", "code");
+  if (command === "code-inline") return wrapSelection(surface, "<code>", "</code>", "code");
+  if (command === "code" || command === "code-block") return wrapSelection(surface, "<pre><code>", "</code></pre>", "code");
   if (command === "hr") return insertAtSelection(surface, "\n<hr>\n");
   if (command === "ul") return insertAtSelection(surface, "\n<ul><li>Item</li></ul>\n");
   if (command === "ol") return insertAtSelection(surface, "\n<ol><li>Item</li></ol>\n");
@@ -888,10 +945,13 @@ function applyMarkdownCommand(editor, command, value) {
   if (command === "bold") return wrapSelection(surface, "**", "**", "bold text");
   if (command === "italic") return wrapSelection(surface, "*", "*", "italic text");
   if (command === "strike") return wrapSelection(surface, "~~", "~~", "deleted text");
-  if (command === "heading") return insertAtSelection(surface, "\n## Heading\n");
-  if (command === "paragraph") return insertAtSelection(surface, "\nParagraph text\n");
-  if (command === "quote") return insertAtSelection(surface, "\n> Quote\n");
-  if (command === "code") return insertAtSelection(surface, "\n```\ncode\n```\n");
+  if (command === "heading" || command === "h2") return applyMarkdownHeadingCommand(surface, 2);
+  if (command === "h1") return applyMarkdownHeadingCommand(surface, 1);
+  if (command === "h3") return applyMarkdownHeadingCommand(surface, 3);
+  if (command === "paragraph") return applyMarkdownParagraphCommand(surface);
+  if (command === "quote") return applyMarkdownQuoteCommand(surface);
+  if (command === "code-inline") return wrapSelection(surface, "`", "`", "code");
+  if (command === "code" || command === "code-block") return insertAtSelection(surface, "\n```\ncode\n```\n");
   if (command === "hr") return insertAtSelection(surface, "\n---\n");
   if (command === "ul") return applyMarkdownListCommand(surface, "ul");
   if (command === "ol") return applyMarkdownListCommand(surface, "ol");
@@ -910,7 +970,7 @@ ${image.caption}` : ""}
 `);
   }
   if (command === "table") return insertAtSelection(surface, markdownTable(value));
-  if (command === "clear") return "";
+  if (command === "clear") return applyMarkdownClearCommand(surface);
   return surface.value;
 }
 function countWords(value) {

@@ -573,6 +573,42 @@ describe('@batoi/uif-editor', () => {
     expect(editor.getValue()).toBe('Alpha\nBeta');
   });
 
+  it('applies Markdown heading and paragraph commands to selected lines', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="markdown">Alpha\nBeta</textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const surface = editor.surface as HTMLTextAreaElement;
+    surface.setSelectionRange(0, surface.value.length);
+
+    runEditorCommand(editor, 'h1');
+    expect(editor.getValue()).toBe('# Alpha\n# Beta');
+
+    surface.setSelectionRange(0, surface.value.length);
+    runEditorCommand(editor, 'h3');
+    expect(editor.getValue()).toBe('### Alpha\n### Beta');
+
+    surface.setSelectionRange(0, surface.value.length);
+    runEditorCommand(editor, 'paragraph');
+    expect(editor.getValue()).toBe('Alpha\nBeta');
+  });
+
+  it('applies Markdown quote, inline code, and clear formatting commands', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="markdown">**Alpha** and [Beta](/docs)</textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const surface = editor.surface as HTMLTextAreaElement;
+
+    surface.setSelectionRange(0, 9);
+    runEditorCommand(editor, 'code-inline');
+    expect(editor.getValue()).toBe('`**Alpha**` and [Beta](/docs)');
+
+    surface.setSelectionRange(0, surface.value.length);
+    runEditorCommand(editor, 'quote');
+    expect(editor.getValue()).toBe('> `**Alpha**` and [Beta](/docs)');
+
+    surface.setSelectionRange(0, surface.value.length);
+    runEditorCommand(editor, 'clear');
+    expect(editor.getValue()).toBe('Alpha and Beta');
+  });
+
   it('creates one rich list item for each selected text line', () => {
     document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="html" data-uif-preview="none"><p>Alpha<br>Beta</p></textarea>';
     const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
