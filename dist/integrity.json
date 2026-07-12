@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0",
+  "version": "2.1.1",
   "files": {
     "index.d.ts": {
       "bytes": 768336,
@@ -8,16 +8,16 @@
       "sri": "sha384-8fcA+2I+4dXoI/ZnGfGDz7Khg8nLjjbi+MOzW265grgaWuobpOnBVLHUE9XgwZRF"
     },
     "index.global.js": {
-      "bytes": 469940,
-      "gzipBytes": 120087,
-      "sha256": "84a89f04ad228b459bbcfd8c415278ea5a7ce545546602d177e5233c84ab0424",
-      "sri": "sha384-lWKjalV8ioLoZvYNClCX/gDNpUozAWls8tiQLducWPPUO/hFuReUZvrIFGk3EiQv"
+      "bytes": 470100,
+      "gzipBytes": 120170,
+      "sha256": "2af5b9091e1e7e5c373d216df82d0387a8361d6cce8528e086400545bc9880bd",
+      "sri": "sha384-j3mzK5B1fzZfrg5klmvFgXXI5w9PqachbIc4WrT79p6mWM4V+/Ta+SfRZR5dNS+d"
     },
     "index.js": {
-      "bytes": 469137,
-      "gzipBytes": 119860,
-      "sha256": "4a1e2ed02241b98c4fb07f0f3e95e3771613eb8ba5f5dc7065d70313ffc11368",
-      "sri": "sha384-8hc1nzJjlZ9zGGn6U/6ysVlkyhbaYETI4Kjhw3sMQchvaJ9+N7hM/zH8iMGxxVrE"
+      "bytes": 469297,
+      "gzipBytes": 119931,
+      "sha256": "63ce6ba46521ba22a8f242d0c5cf54cc40e256f1ebf00b4a7a9d576b103a9b92",
+      "sri": "sha384-TF0FqfkfR6t7dHgdE7+9gq066GlYWwIg5EhIETW5ijrrg+CJK59DZlu3aakec+aU"
     },
     "uif.css": {
       "bytes": 86939,
@@ -26,16 +26,16 @@
       "sri": "sha384-Mx6XIPhx+QlwvBIKstNvALNMLKSkO7YwC5auQF7tmvrvxuaI/1rz1zZP/XQuVAWh"
     },
     "uif.esm.js": {
-      "bytes": 469137,
-      "gzipBytes": 119860,
-      "sha256": "4a1e2ed02241b98c4fb07f0f3e95e3771613eb8ba5f5dc7065d70313ffc11368",
-      "sri": "sha384-8hc1nzJjlZ9zGGn6U/6ysVlkyhbaYETI4Kjhw3sMQchvaJ9+N7hM/zH8iMGxxVrE"
+      "bytes": 469297,
+      "gzipBytes": 119931,
+      "sha256": "63ce6ba46521ba22a8f242d0c5cf54cc40e256f1ebf00b4a7a9d576b103a9b92",
+      "sri": "sha384-TF0FqfkfR6t7dHgdE7+9gq066GlYWwIg5EhIETW5ijrrg+CJK59DZlu3aakec+aU"
     },
     "uif.iife.js": {
-      "bytes": 469940,
-      "gzipBytes": 120087,
-      "sha256": "84a89f04ad228b459bbcfd8c415278ea5a7ce545546602d177e5233c84ab0424",
-      "sri": "sha384-lWKjalV8ioLoZvYNClCX/gDNpUozAWls8tiQLducWPPUO/hFuReUZvrIFGk3EiQv"
+      "bytes": 470100,
+      "gzipBytes": 120170,
+      "sha256": "2af5b9091e1e7e5c373d216df82d0387a8361d6cce8528e086400545bc9880bd",
+      "sri": "sha384-j3mzK5B1fzZfrg5klmvFgXXI5w9PqachbIc4WrT79p6mWM4V+/Ta+SfRZR5dNS+d"
     }
   }
 }

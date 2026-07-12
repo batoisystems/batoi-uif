@@ -1271,8 +1271,27 @@ describe('@batoi/uif-editor', () => {
     expect(editor.getValue()).toBe('> `**Alpha**` and [Beta](/docs)');
 
     surface.setSelectionRange(0, surface.value.length);
+    runEditorCommand(editor, 'quote');
+    expect(editor.getValue()).toBe('`**Alpha**` and [Beta](/docs)');
+
+    surface.setSelectionRange(0, surface.value.length);
+    runEditorCommand(editor, 'quote');
+
+    surface.setSelectionRange(0, surface.value.length);
     runEditorCommand(editor, 'clear');
     expect(editor.getValue()).toBe('Alpha and Beta');
+  });
+
+  it('preserves block markers while toggling Markdown quotes', () => {
+    document.body.innerHTML = '<textarea data-uif="editor" data-uif-mode="markdown">## Heading\n- Item</textarea>';
+    const editor = createEditor(document.querySelector('textarea') as HTMLTextAreaElement);
+    const surface = editor.surface as HTMLTextAreaElement;
+    surface.setSelectionRange(0, surface.value.length);
+    runEditorCommand(editor, 'quote');
+    expect(editor.getValue()).toBe('> ## Heading\n> - Item');
+    surface.setSelectionRange(0, surface.value.length);
+    runEditorCommand(editor, 'quote');
+    expect(editor.getValue()).toBe('## Heading\n- Item');
   });
 
   it('creates one rich list item for each selected text line', () => {

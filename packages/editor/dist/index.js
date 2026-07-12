@@ -751,9 +751,13 @@ function applyMarkdownParagraphCommand(surface) {
   });
 }
 function applyMarkdownQuoteCommand(surface) {
+  const { lines } = selectedTextareaLineRange(surface);
+  const removeQuote = lines.length > 0 && lines.every((line) => /^\s*>\s?/.test(line) || line.trim() === "");
   return applyMarkdownLineTransform(surface, (line) => {
-    const { indent, text: text2 } = stripMarkdownBlockMarker(line);
-    return `${indent}> ${text2 || "Quote"}`;
+    if (!line.trim()) return removeQuote ? line : "> ";
+    if (removeQuote) return line.replace(/^(\s*)>\s?/, "$1");
+    const indent = line.match(/^\s*/)?.[0] ?? "";
+    return `${indent}> ${line.slice(indent.length)}`;
   });
 }
 function stripMarkdownInlineFormatting(value) {

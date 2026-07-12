@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.1
+
+- Fixed all Markdown example preview layouts, including immediate modal and drawer presentation with accessible state feedback.
+- Made Markdown quote formatting reversible while preserving headings, lists, indentation, and multi-line selections.
+- Standardized primary example navigation and replaced legacy Batoi marks with the official UIF logo in static markup.
+- Added cross-browser regression coverage for example navigation, branding, preview layouts, and quote behavior.
+
 ## 2.1.0
 
 - Rebuilt the rich HTML and Markdown editors around deterministic formatting, source fidelity, structured Markdown parsing, selection-aware history, accessible dialogs/toolbars, and governed autosave/upload hooks.

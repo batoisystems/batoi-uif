@@ -1,6 +1,6 @@
 # Roadmap
 
-Batoi UIF is currently versioned `2.1.0`. The pre-2.0 milestones below are retained as implementation history, not current release targets.
+Batoi UIF is currently versioned `2.1.1`. The pre-2.0 milestones below are retained as implementation history, not current release targets.
 
 ## v2.1 release hardening
 

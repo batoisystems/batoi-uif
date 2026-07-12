@@ -425,9 +425,13 @@ function applyMarkdownParagraphCommand(surface: HTMLTextAreaElement): string {
 }
 
 function applyMarkdownQuoteCommand(surface: HTMLTextAreaElement): string {
+  const { lines } = selectedTextareaLineRange(surface);
+  const removeQuote = lines.length > 0 && lines.every((line) => /^\s*>\s?/.test(line) || line.trim() === '');
   return applyMarkdownLineTransform(surface, (line) => {
-    const { indent, text } = stripMarkdownBlockMarker(line);
-    return `${indent}> ${text || 'Quote'}`;
+    if (!line.trim()) return removeQuote ? line : '> ';
+    if (removeQuote) return line.replace(/^(\s*)>\s?/, '$1');
+    const indent = line.match(/^\s*/)?.[0] ?? '';
+    return `${indent}> ${line.slice(indent.length)}`;
   });
 }
 

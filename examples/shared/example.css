@@ -108,6 +108,14 @@
   height: 100%;
 }
 
+.example-uif-logo {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  object-fit: contain;
+}
+
 .example-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

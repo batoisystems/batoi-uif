@@ -7,14 +7,14 @@
     <link rel="stylesheet" href="../../dist/uif.css">
     <link rel="stylesheet" href="../shared/example.css">
     <style>
-      .builder-grid{display:grid;grid-template-columns:minmax(18rem,.32fr) minmax(0,1fr);gap:1rem}.builder-card{border:1px solid #dfe3e8;border-radius:.75rem;background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.05);overflow:hidden}.builder-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1rem;border-bottom:1px solid #eef1f4}.builder-card-head h2,.builder-card-head p{margin:0}.builder-card-head p{margin-top:.18rem;color:#667085;font-size:.86rem}.builder-card-body{padding:1rem}.builder-panel{display:grid;gap:1rem;align-content:start}.builder-control{display:grid;gap:.4rem}.builder-control span{font-size:.78rem;font-weight:800;color:#667085}.code-box{overflow:auto;max-height:24rem;margin:0;padding:1rem;border-radius:.65rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}.feature-list{display:grid;gap:.55rem}.feature-list label{display:flex;align-items:center;gap:.5rem;font-weight:700;color:#344054}.markdown-preview-box{min-height:10rem;padding:1rem;border:1px dashed #cfd6df;border-radius:.65rem;background:#fbfcfd}.layout-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem}.layout-buttons button{min-height:2rem;border:1px solid #cfd6df;border-radius:.45rem;background:#fff;color:#344054;font-weight:800;cursor:pointer}.layout-buttons button[aria-pressed="true"]{border-color:#0b72bd;background:#edf7ff;color:#0b72bd}@media(max-width:64rem){.builder-grid{grid-template-columns:1fr}}
+      .builder-grid{display:grid;grid-template-columns:minmax(18rem,.32fr) minmax(0,1fr);gap:1rem}.builder-card{border:1px solid #dfe3e8;border-radius:.5rem;background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.05);overflow:hidden}.builder-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1rem;border-bottom:1px solid #eef1f4}.builder-card-head h2,.builder-card-head p{margin:0}.builder-card-head p{margin-top:.18rem;color:#667085;font-size:.86rem}.builder-card-body{padding:1rem}.builder-panel{display:grid;gap:1rem;align-content:start}.builder-control{display:grid;gap:.4rem}.builder-control span{font-size:.78rem;font-weight:800;color:#667085}.code-box{overflow:auto;max-height:24rem;margin:0;padding:1rem;border-radius:.5rem;background:#101828;color:#d1e7ff;font:.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}.feature-list{display:grid;gap:.55rem}.feature-list label{display:flex;align-items:center;gap:.5rem;font-weight:700;color:#344054}.markdown-preview-box{min-height:10rem;padding:1rem;border:1px dashed #cfd6df;border-radius:.5rem;background:#fbfcfd}.layout-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem}.layout-buttons button{min-height:2rem;border:1px solid #cfd6df;border-radius:.45rem;background:#fff;color:#344054;font-weight:800;cursor:pointer}.layout-buttons button[aria-pressed="true"]{border-color:#0b72bd;background:#edf7ff;color:#0b72bd}.layout-status{min-height:1.25rem;margin:0;color:#475467;font-size:.8rem;line-height:1.45}@media(max-width:64rem){.builder-grid{grid-template-columns:1fr}}
     </style>
   </head>
   <body class="example-page">
     <main class="example-shell">
       <div class="example-frame">
         <header class="example-topbar">
-          <a class="example-brand" href="../"><span class="example-brand-mark" data-uif-icon="batoi"></span><span><strong>Batoi UIF</strong><span>Markdown builder</span></span></a>
+          <a class="example-brand" href="../"><img class="example-uif-logo" src="../../docs/assets/logo/uif-color.svg" alt="Batoi UIF" width="32" height="32"><span><strong>Batoi UIF</strong><span>Markdown builder</span></span></a>
           <nav class="example-actions" aria-label="Feature examples">
             <a class="example-pill" href="../"><span data-uif-icon="home"></span>All examples</a>
             <a class="example-pill" href="../rich-editor/"><span data-uif-icon="edit"></span>Rich editor</a>
@@ -38,7 +38,7 @@
                 <button type="button" data-layout="modal">Modal</button>
                 <button type="button" data-layout="drawer">Drawer</button>
                 <button type="button" data-layout="preview">Preview</button>
-              </div></div>
+              </div><p class="layout-status" id="layout-status" role="status" aria-live="polite">Source and preview are visible side by side.</p></div>
               <label class="builder-control"><span>Height</span><select class="uif-input" id="height"><option value="14rem">Compact</option><option value="18rem" selected>Standard</option><option value="24rem">Long form</option></select></label>
               <div class="builder-control"><span>Enabled examples</span><div class="feature-list">
                 <label><input type="checkbox" checked disabled> Tables</label>
@@ -89,6 +89,15 @@ Visit https://example.com for more.`;
       const htmlCode = document.querySelector('#html-code');
       const rendered = document.querySelector('#rendered-html');
       const layoutButtons = document.querySelectorAll('#layout-options button');
+      const layoutStatus = document.querySelector('#layout-status');
+      const layoutMessages = {
+        source: 'Only the Markdown source is visible.',
+        split: 'Source and preview are visible side by side.',
+        tabs: 'Use the Source and Preview toolbar buttons as tabs.',
+        modal: 'Preview opened in a modal dialog. Press Escape to close it.',
+        drawer: 'Preview opened in a side drawer. Press Escape to close it.',
+        preview: 'Only the rendered preview is visible.'
+      };
       let editor;
       let layout = 'split';
 
@@ -127,9 +136,14 @@ ${sample}
         layout = button.dataset.layout;
         layoutButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
         if (editor) setEditorPreviewLayout(editor, layout);
+        if (layout === 'modal' || layout === 'drawer') {
+          editor?.element.querySelector('[data-uif-editor-command="preview"]')?.click();
+        }
+        layoutStatus.textContent = layoutMessages[layout];
         code.textContent = markup();
       }));
       render();
     </script>
+    <script type="module" src="../shared/example-nav.js"></script>
   </body>
 </html>
