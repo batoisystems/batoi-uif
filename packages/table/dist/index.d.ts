@@ -10,6 +10,14 @@ interface TableOptions {
     onPage?: (page: number, table: HTMLTableElement) => void | Promise<void>;
     onBulkAction?: (action: string, rows: HTMLTableRowElement[]) => void;
     onRowAction?: (action: string, row: HTMLTableRowElement) => void;
+    allowCrossOrigin?: boolean;
+    maxRows?: number;
+    maxCellLength?: number;
+    maxHTMLLength?: number;
+}
+interface TableController {
+    refresh(): void;
+    destroy(): void;
 }
 interface RemoteTableResponse {
     rows?: Array<Record<string, unknown>>;
@@ -46,10 +54,10 @@ declare function goToPage(table: HTMLTableElement, page: number, options?: Table
 declare function exportTable(table: HTMLTableElement, options?: TableOptions): unknown;
 declare function filterElements(targetSelector: string, query: string, mode?: 'contains' | 'startsWith' | 'token'): void;
 declare function initDeclarativeFilters(root?: Document | HTMLElement): void;
-declare function initTable(table: HTMLTableElement, options?: TableOptions): void;
+declare function initTable(table: HTMLTableElement, options?: TableOptions): TableController;
 declare const dataTable: {
     name: string;
-    init: (el: HTMLElement) => void;
+    init: (el: HTMLElement) => TableController;
 };
 
-export { type RemoteTableResponse, type TableOptions, applyResponsiveColumns, dataTable, exportTable, filterElements, filterTable, goToPage, initDeclarativeFilters, initTable, loadRemoteTable, selectedRows, setTableState, sortTable };
+export { type RemoteTableResponse, type TableController, type TableOptions, applyResponsiveColumns, dataTable, exportTable, filterElements, filterTable, goToPage, initDeclarativeFilters, initTable, loadRemoteTable, selectedRows, setTableState, sortTable };

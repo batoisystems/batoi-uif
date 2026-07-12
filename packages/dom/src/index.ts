@@ -17,8 +17,23 @@ export interface SafeHTMLRenderOptions {
   allowedAttributes?: string[];
 }
 
+export interface UIFTrustedTypesPolicy {
+  createHTML(input: string): unknown;
+}
+
+export type SafeURLContext = 'link' | 'image' | 'network' | 'navigation';
+
+export interface SafeURLPolicy {
+  context?: SafeURLContext;
+  allowRelative?: boolean;
+  allowHash?: boolean;
+  sameOrigin?: boolean;
+  protocols?: string[];
+}
+
 const initialized = new WeakMap<HTMLElement, UIFDomComponent>();
 const registry = new Map<string, UIFDomComponent>();
+let trustedTypesPolicy: UIFTrustedTypesPolicy | null = null;
 const blockedSafeHTMLTags = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'LINK', 'META', 'BASE']);
 const defaultSafeHTMLAttributes = new Set([
   'aria-describedby',
@@ -62,17 +77,29 @@ export function qsa<T extends Element = Element>(selector: string, root: ParentN
 }
 
 export function closest<T extends Element = Element>(el: Element, selector: string): T | null {
-  return el.closest<T>(selector);
+  try {
+    return el.closest<T>(selector);
+  } catch {
+    return null;
+  }
+}
+
+export function safeQuerySelector<T extends Element = Element>(selector: string, root: ParentNode = document): T | null {
+  try {
+    return root.querySelector<T>(selector);
+  } catch {
+    return null;
+  }
 }
 
 export function resolveTarget(sourceEl: HTMLElement, targetExpression = 'self'): HTMLElement | null {
   if (targetExpression === 'self') return sourceEl;
   if (targetExpression === 'parent') return sourceEl.parentElement;
-  if (targetExpression.startsWith('closest:')) return sourceEl.closest<HTMLElement>(targetExpression.slice(8));
+  if (targetExpression.startsWith('closest:')) return closest<HTMLElement>(sourceEl, targetExpression.slice(8));
   if (targetExpression.startsWith('#') || targetExpression.startsWith('.')) {
-    return document.querySelector<HTMLElement>(targetExpression);
+    return safeQuerySelector<HTMLElement>(targetExpression);
   }
-  return document.querySelector<HTMLElement>(targetExpression);
+  return safeQuerySelector<HTMLElement>(targetExpression);
 }
 
 export function setText(target: Element | null, value: unknown): void {
@@ -93,9 +120,41 @@ export function appendTextElement<K extends keyof HTMLElementTagNameMap>(
   return el;
 }
 
-function isSafeURL(value: string): boolean {
-  const normalized = value.trim().toLowerCase();
-  return normalized === '' || normalized.startsWith('#') || normalized.startsWith('/') || normalized.startsWith('http://') || normalized.startsWith('https://') || normalized.startsWith('mailto:') || normalized.startsWith('tel:');
+export function configureTrustedTypes(policy: UIFTrustedTypesPolicy | null): void {
+  trustedTypesPolicy = policy;
+}
+
+export function getTrustedTypesPolicy(): UIFTrustedTypesPolicy | null {
+  return trustedTypesPolicy;
+}
+
+function setHTMLSink(target: Element, html: string): void {
+  const value = trustedTypesPolicy?.createHTML(html) ?? html;
+  (target as unknown as { innerHTML: unknown }).innerHTML = value;
+}
+
+export function isSafeURL(value: string, policy: SafeURLPolicy = {}): boolean {
+  const candidate = value.trim();
+  if (!candidate || /[\u0000-\u001f\u007f]/.test(candidate) || candidate.startsWith('//')) return false;
+  const context = policy.context ?? 'link';
+  const allowRelative = policy.allowRelative ?? true;
+  const allowHash = policy.allowHash ?? context === 'link';
+  if (allowHash && candidate.startsWith('#')) return true;
+  if (allowRelative && (/^(?:\.\/|\.\.\/|\/)/.test(candidate) || !/^[a-z][a-z\d+.-]*:/i.test(candidate))) return true;
+  const defaults: Record<SafeURLContext, string[]> = {
+    link: ['http:', 'https:', 'mailto:', 'tel:'], image: ['http:', 'https:'], network: ['http:', 'https:'], navigation: ['http:', 'https:'],
+  };
+  try {
+    const base = typeof window === 'undefined' ? 'http://localhost/' : window.location.href;
+    const parsed = new URL(candidate, base);
+    if (!(policy.protocols ?? defaults[context]).includes(parsed.protocol.toLowerCase())) return false;
+    if (!policy.sameOrigin || typeof window === 'undefined') return true;
+    if (parsed.origin === window.location.origin) return true;
+    const websocketEquivalent = parsed.host === window.location.host && ((parsed.protocol === 'ws:' && window.location.protocol === 'http:') || (parsed.protocol === 'wss:' && window.location.protocol === 'https:'));
+    return websocketEquivalent;
+  } catch {
+    return false;
+  }
 }
 
 function cleanSafeHTMLNode(node: Node, options: Required<SafeHTMLRenderOptions>): void {
@@ -113,7 +172,10 @@ function cleanSafeHTMLNode(node: Node, options: Required<SafeHTMLRenderOptions>)
       node.removeAttribute(attribute.name);
       return;
     }
-    if ((name === 'href' || name === 'src') && !isSafeURL(value)) {
+    if (name === 'href' && !isSafeURL(value, { context: 'link' })) {
+      node.removeAttribute(attribute.name);
+    }
+    if (name === 'src' && !isSafeURL(value, { context: 'image', allowHash: false })) {
       node.removeAttribute(attribute.name);
     }
   });
@@ -123,7 +185,7 @@ function cleanSafeHTMLNode(node: Node, options: Required<SafeHTMLRenderOptions>)
 
 export function sanitizeHTML(html: string, options: SafeHTMLRenderOptions = {}): DocumentFragment {
   const template = document.createElement('template');
-  template.innerHTML = html;
+  setHTMLSink(template, html);
   const safeOptions: Required<SafeHTMLRenderOptions> = {
     allowedTags: options.allowedTags ?? [
       'a',
@@ -163,7 +225,7 @@ export function setTrustedHTML(target: Element | null, html: string, options: Tr
   if (!options.trusted) {
     throw new Error(`Batoi UIF refused untrusted HTML${options.context ? ` for ${options.context}` : ''}`);
   }
-  target.innerHTML = html;
+  setHTMLSink(target, html);
 }
 
 export function swapTrustedHTML(targetEl: HTMLElement, html: string, mode: HTMLSwapMode = 'inner'): HTMLElement {

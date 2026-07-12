@@ -10,6 +10,7 @@ This registry documents the stable declarative surface for Batoi UIF. Attributes
 | `data-uif-action`  | Declares an action on a button, link, form, or row control.      | Examples: `open`, `close`, `toggle`, `reload`, `delete`, `save`, `approve`, `reject`.                                      |
 | `data-uif-target`  | Points to the affected element.                                  | Supports CSS selectors plus framework helpers such as `self`, `parent`, and `closest:.selector` where supported.           |
 | `data-uif-src`     | URL for AJAX, form, realtime, push, chart, or remote table data. | Server responses must be governed by the consuming app.                                                                    |
+| `data-uif-allow-cross-origin` | Explicitly permits a reviewed cross-origin source where supported. | Defaults to same-origin; CORS and server authorization still apply.                                                        |
 | `data-uif-method`  | HTTP method.                                                     | Defaults depend on package behavior; forms default to `POST`, RAD actions default to `GET`.                                |
 | `data-uif-options` | JSON or compact option string.                                   | Prefer JSON for public examples.                                                                                           |
 | `data-uif-confirm` | Confirmation prompt before a guarded action.                     | Confirmation is client-side UX, not authorization.                                                                         |
@@ -44,7 +45,7 @@ This registry documents the stable declarative surface for Batoi UIF. Attributes
 | `realtime`       | `@batoi/uif-realtime`                   | Region/controller                | SSE, WebSocket, or polling feed updates.                                                                                      |
 | `push`           | `@batoi/uif-push`                       | Button/control                   | Push subscription helpers.                                                                                                    |
 | `install-prompt` | `@batoi/uif-pwa`                        | Button/control                   | PWA install prompt.                                                                                                           |
-| `mobile-shell`   | `@batoi/uif-mobile`                     | App shell container              | Mobile shell, sheets, swipe actions, pull-to-refresh hooks.                                                                   |
+| `mobile-shell`   | `@batoi/uif-mobile`                     | App shell container              | Owned mobile shell, sheet semantics, swipe/pull hooks, bottom navigation, and keyboard-accessible segmented controls.         |
 | `ai-action`      | `@batoi/uif-ai`                         | Region                           | Browser-side AI interaction UI only.                                                                                          |
 | `tool-approval`  | `@batoi/uif-mcp`                        | Region                           | Browser-side tool approval UI only.                                                                                           |
 
@@ -55,6 +56,7 @@ This registry documents the stable declarative surface for Batoi UIF. Attributes
 | `data-uif="table"`                                                    | Enhances a native table with sorting, filtering, remote rows, selection, pagination, and actions.                            |
 | `data-uif-mode`                                                       | Table behavior mode: `local`, `remote`, or `hybrid`. Defaults to `remote` when `data-uif-src` is present, otherwise `local`. |
 | `data-uif-src`                                                        | Remote JSON or trusted HTML row endpoint.                                                                                    |
+| `data-uif-allow-cross-origin`                                         | Explicitly permits an approved cross-origin remote table endpoint; same-origin is the default.                              |
 | `data-uif-columns`                                                    | Comma-separated column keys used when remote JSON returns `rows`.                                                            |
 | `data-uif-key`                                                        | Row identity field used to map remote row data to `data-uif-row-id`.                                                         |
 | `data-uif-page`                                                       | Current page for remote requests.                                                                                            |
@@ -85,20 +87,22 @@ This registry documents the stable declarative surface for Batoi UIF. Attributes
 
 Table lifecycle events include `uif:table-before-load`, `uif:table-loaded`, `uif:table-error`, `uif:table-state`, `uif:table-sort`, `uif:table-filter`, `uif:table-reset`, `uif:table-page`, `uif:table-page-size`, `uif:table-selection`, `uif:table-bulk-action`, and `uif:table-row-action`.
 
-Remote table requests include `page`, `pageSize`, and, when active, `sort`, `direction`, `q`, and `filters[field]` / `filters[field][op]` query parameters. JSON row values render as text by default. Trusted HTML row responses remain behind the framework trusted HTML boundary and must come from governed server code.
+Remote table requests include `page`, `pageSize`, and, when active, `sort`, `direction`, `q`, and `filters[field]` / `filters[field][op]` query parameters. JSON row values render as text by default. Responses default to at most 1,000 rows, 100 columns, 10,000 characters per cell, and 1,000,000 characters of trusted row HTML; programmatic `TableOptions` may adjust row, cell, and HTML limits. Trusted HTML row responses remain behind the framework trusted HTML boundary and must come from governed server code.
 
 ## Realtime
 
-| Attribute            | Purpose                                                                         |
-| -------------------- | ------------------------------------------------------------------------------- |
-| `data-uif-channel`   | Required channel name for subscriptions and connection state.                   |
-| `data-uif-src`       | Polling, SSE, or WebSocket endpoint.                                            |
-| `data-uif-mode`      | Transport mode: `poll`, `sse`, or `websocket`. Defaults to `poll`.              |
-| `data-uif-interval`  | Polling interval and request timeout in milliseconds. Defaults to `5000`.       |
-| `data-uif-reconnect` | Set to `false` to disable reconnect attempts.                                   |
-| `data-uif-target`    | Optional selector for the feed render target. Defaults to the realtime element. |
+| Attribute                         | Purpose                                                                                     |
+| --------------------------------- | ------------------------------------------------------------------------------------------- |
+| `data-uif-channel`                | Required channel name for subscriptions and connection state.                               |
+| `data-uif-src`                    | Polling, SSE, or WebSocket endpoint.                                                        |
+| `data-uif-mode`                   | Transport mode: `poll`, `sse`, or `websocket`. Defaults to `poll`.                          |
+| `data-uif-interval`               | Polling interval and request timeout in milliseconds. Defaults to `5000`.                   |
+| `data-uif-reconnect`              | Set to `false` to disable reconnect attempts.                                               |
+| `data-uif-max-payload-bytes`      | Maximum accepted remote message size. Defaults to `1000000`.                                |
+| `data-uif-max-reconnect-attempts` | Maximum reconnect attempts before entering `failed`. Defaults to `8`.                       |
+| `data-uif-target`                 | Optional selector for the feed render target. Defaults to the realtime element.             |
 
-Realtime feeds render payloads as text by default. State, message, error, open, and close lifecycle events are emitted as `uif:realtime-state`, `uif:realtime-message`, `uif:realtime-error`, `uif:realtime-open`, and `uif:realtime-close`.
+Realtime feeds render payloads as text by default. Reconnect uses capped exponential backoff with jitter, pauses while the document is hidden, and resumes when visible. Oversized or unserializable payloads are rejected before subscriber delivery. State, message, error, open, and close lifecycle events are emitted as `uif:realtime-state`, `uif:realtime-message`, `uif:realtime-error`, `uif:realtime-open`, and `uif:realtime-close`.
 
 ## AI and MCP UI
 
@@ -135,6 +139,8 @@ Form state markers:
 
 Malformed `pattern` expressions are handled as validation failures rather than runtime crashes.
 
+Enhanced `GET` and `HEAD` forms encode fields in the query string and do not send a request body. Declarative methods are limited to `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, and `DELETE`. Async validation and submissions use latest-run cancellation. Server error maps are rendered as text and bounded to 100 fields, 10 messages per field, and 2,000 characters per message.
+
 Form control CSS conventions:
 
 | Class               | Purpose                                                                                                   |
@@ -154,7 +160,7 @@ These controls keep native browser input semantics. Use regular labels, names, v
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `data-uif="editor"`       | Enhances a textarea/input into a rich HTML or Markdown editor.                                                                                                                                    |
 | `data-uif-mode`           | Editor mode: `html`, `markdown`, or `plain`.                                                                                                                                                      |
-| `data-uif-toolbar`        | Space-separated toolbar commands such as `bold italic heading quote code ul ol task link image table preview source`. Link, image, and table open editor dialogs when triggered from the toolbar. |
+| `data-uif-toolbar`        | Space-separated toolbar commands such as `bold italic h1 h2 h3 quote code-inline code-block ul ol task outdent indent link image table preview source`. Link, image, code-block, and table open editor dialogs when triggered from the toolbar. |
 | `data-uif-preview`        | Preview mode: `none`, `manual`, or `live`.                                                                                                                                                        |
 | `data-uif-editor-height`  | Minimum editor surface height.                                                                                                                                                                    |
 | `data-uif-editor-layout`  | Editor layout: `source`, `preview`, `split`, `tabs`, `modal`, or `drawer` where supported.                                                                                                        |
@@ -168,7 +174,7 @@ These controls keep native browser input semantics. Use regular labels, names, v
 
 Markdown preview escapes raw HTML by default and supports a practical subset including headings, lists, task lists, tables, links, images, code blocks, blockquotes, strikethrough, and horizontal rules. Browser-side cleanup is not a substitute for server-side sanitization before trusted render or storage.
 
-Editor command values can also be passed programmatically through `runEditorCommand(editor, command, value)`. Structured values are supported for links, images, and tables. Current command coverage includes `link-edit`, `link-remove`, `image-edit`, `image-remove`, `table-row-before`, `table-row-after`, `table-row-delete`, `table-col-before`, `table-col-after`, `table-col-delete`, `table-header-toggle`, and `table-delete`. Task lists support checkbox state synchronization plus Enter/Backspace continuation behavior in HTML and Markdown modes.
+Editor command values can also be passed programmatically through `runEditorCommand(editor, command, value)`. Structured values are supported for links, images, language-aware code blocks, and tables. Current command coverage includes `link-edit`, `link-remove`, `image-edit`, `image-remove`, `indent`, `outdent`, `table-row-before`, `table-row-after`, `table-row-delete`, `table-col-before`, `table-col-after`, `table-col-delete`, `table-header-toggle`, and `table-delete`. Task lists support checkbox state synchronization plus Enter/Backspace continuation behavior in HTML and Markdown modes. Markdown diagnostics are exposed through the editor instance, `data-uif-editor-diagnostics`, and `uif:editor-diagnostics`.
 
 ## Overlays
 

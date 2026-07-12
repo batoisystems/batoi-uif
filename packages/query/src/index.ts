@@ -112,7 +112,7 @@ export class UIFQuery {
   html(value: string): this;
   html(value?: string): string | this {
     if (value === undefined) return this.elements[0]?.innerHTML ?? '';
-    return this.each((el) => (el.innerHTML = value));
+    return this.each((el) => setTrustedHTML(el, value, { trusted: true, context: 'query html' }));
   }
 
   text(): string;
@@ -124,14 +124,14 @@ export class UIFQuery {
 
   append(content: string | Node): this {
     return this.each((el) => {
-      if (typeof content === 'string') el.insertAdjacentHTML('beforeend', content);
+      if (typeof content === 'string') swapTrustedHTML(el as HTMLElement, content, 'append');
       else el.append(content.cloneNode(true));
     });
   }
 
   prepend(content: string | Node): this {
     return this.each((el) => {
-      if (typeof content === 'string') el.insertAdjacentHTML('afterbegin', content);
+      if (typeof content === 'string') swapTrustedHTML(el as HTMLElement, content, 'prepend');
       else el.prepend(content.cloneNode(true));
     });
   }
@@ -190,6 +190,7 @@ export function serialize(form: HTMLFormElement): Record<string, FormDataEntryVa
 
 export function fragment(html: string): DocumentFragment {
   const template = document.createElement('template');
-  template.innerHTML = html;
+  setTrustedHTML(template, html, { trusted: true, context: 'query fragment' });
   return template.content;
 }
+import { setTrustedHTML, swapTrustedHTML } from '@batoi/uif-dom';

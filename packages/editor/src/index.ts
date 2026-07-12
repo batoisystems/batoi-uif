@@ -1,4 +1,13 @@
 import { emit } from '@batoi/uif-core';
+import { isSafeURL, sanitizeHTML, setTrustedHTML, swapTrustedHTML } from '@batoi/uif-dom';
+import { cancelRequest, request } from '@batoi/uif-net';
+import { markdownToHtml, parseMarkdown, renderMarkdown } from './markdown.js';
+import type { MarkdownDiagnostic } from './markdown.js';
+import { captureTextBookmark, restoreTextBookmark, type EditorTextBookmark } from './selection.js';
+import { destroyHistory, initializeHistory, prepareHistory, pushHistory, restoreHistory } from './transaction.js';
+
+export { markdownDiagnostics, markdownToHtml, parseMarkdown, parseMarkdownInline, renderMarkdown } from './markdown.js';
+export type { MarkdownBlockNode, MarkdownDiagnostic, MarkdownDiagnosticSeverity, MarkdownDocument, MarkdownInlineNode, MarkdownListItem, MarkdownListNode, MarkdownParseOptions, MarkdownRenderOptions, MarkdownSourcePosition } from './markdown.js';
 
 export type EditorMode = 'html' | 'markdown' | 'plain';
 export type EditorPreviewMode = 'none' | 'manual' | 'live';
@@ -12,6 +21,9 @@ export type EditorCommand =
   | 'h1'
   | 'h2'
   | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
   | 'paragraph'
   | 'quote'
   | 'code'
@@ -21,6 +33,8 @@ export type EditorCommand =
   | 'ul'
   | 'ol'
   | 'task'
+  | 'indent'
+  | 'outdent'
   | 'link'
   | 'link-edit'
   | 'link-remove'
@@ -36,6 +50,7 @@ export type EditorCommand =
   | 'table-col-delete'
   | 'table-delete'
   | 'table-header-toggle'
+  | 'table-caption'
   | 'undo'
   | 'redo'
   | 'preview'
@@ -54,6 +69,10 @@ export interface EditorOptions {
   autosave?: boolean;
   autosaveDelay?: number;
   autosaveUrl?: string;
+  autosaveRetries?: number;
+  csrfToken?: string;
+  csrfHeader?: string;
+  uploadMaxBytes?: number;
   required?: boolean;
   maxLength?: number;
 }
@@ -66,6 +85,7 @@ export interface EditorInstance {
   preview?: HTMLElement;
   status?: HTMLElement;
   dirty: boolean;
+  diagnostics: MarkdownDiagnostic[];
   sourceMode: boolean;
   getValue(): string;
   setValue(value: string): void;
@@ -87,6 +107,8 @@ export type EditorHookName =
   | 'afterCommand'
   | 'beforePaste'
   | 'afterPaste'
+  | 'beforeDrop'
+  | 'afterDrop'
   | 'beforePreview'
   | 'afterPreview'
   | 'validate'
@@ -98,6 +120,8 @@ export interface EditorHookContext {
   value: string;
   command?: EditorCommand;
   file?: File;
+  revision?: number;
+  signal?: AbortSignal;
 }
 
 export type EditorHookHandler = (context: EditorHookContext) => void | string | Promise<void | string>;
@@ -121,14 +145,23 @@ export interface EditorTableValue {
   header?: boolean;
 }
 
+export interface EditorCodeBlockValue {
+  code?: string;
+  language?: string;
+}
+
 const editors = new WeakMap<HTMLElement, EditorInstance>();
 const editorListeners = new WeakMap<EditorInstance, Array<() => void>>();
 const editorInitialValue = new WeakMap<EditorInstance, string>();
-const editorHistory = new WeakMap<EditorInstance, { undo: string[]; redo: string[]; last: string }>();
 const editorActiveTableCell = new WeakMap<EditorInstance, HTMLTableCellElement>();
 const commandHandlers = new Map<string, EditorCommandHandler>();
 const hookHandlers = new Map<EditorHookName, Set<EditorHookHandler>>();
 const editorAutosaveTimers = new WeakMap<EditorInstance, number>();
+const editorAutosaveKeys = new WeakMap<EditorInstance, string>();
+const editorAutosaveRevisions = new WeakMap<EditorInstance, number>();
+const editorUploadControllers = new WeakMap<EditorInstance, AbortController>();
+let activeEditorTransient: { close(restoreFocus?: boolean): void; editor: EditorInstance } | null = null;
+let editorSequence = 0;
 const defaultToolbar = ['undo', 'redo', 'bold', 'italic', 'heading', 'quote', 'code', 'ul', 'ol', 'link', 'preview', 'source'];
 const commandLabels: Record<string, string> = {
   bold: 'Bold',
@@ -139,6 +172,9 @@ const commandLabels: Record<string, string> = {
   h1: 'Heading 1',
   h2: 'Heading 2',
   h3: 'Heading 3',
+  h4: 'Heading 4',
+  h5: 'Heading 5',
+  h6: 'Heading 6',
   paragraph: 'Paragraph',
   quote: 'Quote',
   code: 'Code',
@@ -148,6 +184,8 @@ const commandLabels: Record<string, string> = {
   ul: 'Bulleted list',
   ol: 'Numbered list',
   task: 'Task list',
+  indent: 'Indent list item',
+  outdent: 'Outdent list item',
   link: 'Link',
   'link-edit': 'Edit link',
   'link-remove': 'Remove link',
@@ -163,6 +201,7 @@ const commandLabels: Record<string, string> = {
   'table-col-delete': 'Delete column',
   'table-delete': 'Delete table',
   'table-header-toggle': 'Toggle header',
+  'table-caption': 'Edit caption',
   undo: 'Undo',
   redo: 'Redo',
   preview: 'Preview',
@@ -188,6 +227,8 @@ const commandIcons: Record<string, string> = {
   ul: '<path d="M8 6h13"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M3 6h.01"></path><path d="M3 12h.01"></path><path d="M3 18h.01"></path>',
   ol: '<path d="M10 6h11"></path><path d="M10 12h11"></path><path d="M10 18h11"></path><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M4 14h2l-2 4h2"></path>',
   task: '<path d="m4 7 2 2 4-4"></path><path d="M12 8h8"></path><path d="m4 17 2 2 4-4"></path><path d="M12 18h8"></path>',
+  indent: '<path d="M9 6h12"></path><path d="M9 12h12"></path><path d="M9 18h12"></path><path d="m3 9 3 3-3 3"></path>',
+  outdent: '<path d="M9 6h12"></path><path d="M9 12h12"></path><path d="M9 18h12"></path><path d="m6 9-3 3 3 3"></path>',
   link: '<path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.2 1.2"></path><path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.2-1.2"></path>',
   image: '<rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8" cy="10" r="2"></circle><path d="m21 15-4-4-5 5-2-2-4 5"></path>',
   table: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path><path d="M9 4v16"></path><path d="M15 4v16"></path>',
@@ -240,159 +281,13 @@ function editorCommandLabel(command: string): string {
 }
 
 function editorCommandIcon(command: string): string {
-  const body = commandIcons[command] ?? '<circle cx="12" cy="12" r="8"></circle>';
+  const body = commandIcons[command] ?? (/^h[1-6]$/.test(command) ? commandIcons.heading : undefined) ?? '<circle cx="12" cy="12" r="8"></circle>';
   return `<svg class="uif-icon uif-editor-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
 }
 
-function isSafeUrl(value: string): boolean {
-  return /^(https?:\/\/|mailto:|\/|#)/i.test(value.trim());
-}
-
-function safeUrl(value: unknown, fallback: string): string {
+function safeUrl(value: unknown, fallback: string, context: 'link' | 'image' = 'link'): string {
   const candidate = String(value ?? '').trim();
-  return isSafeUrl(candidate) ? candidate : fallback;
-}
-
-function linesToList(lines: string[], ordered: boolean): string {
-  const tag = ordered ? 'ol' : 'ul';
-  const items = lines
-    .map((line) => line.replace(ordered ? /^\s*\d+\.\s+/ : /^\s*[-*+]\s+/, ''))
-    .map((line) => `<li>${inlineMarkdown(line)}</li>`)
-    .join('');
-  return `<${tag}>${items}</${tag}>`;
-}
-
-function inlineMarkdown(value: string): string {
-  let output = escapeHtml(value);
-  output = output.replace(/`([^`]+)`/g, '<code>$1</code>');
-  output = output.replace(/~~([^~]+)~~/g, '<del>$1</del>');
-  output = output.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  output = output.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-  output = output.replace(/!\[([^\]]*)\]\((https?:\/\/[^)\s]+|\/[^)\s]*)\)/g, (_match, alt: string, url: string) => {
-    return `<img src="${escapeAttr(url)}" alt="${escapeAttr(alt)}">`;
-  });
-  output = output.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|mailto:[^)\s]+|\/[^)\s]*)\)/g, (_match, label: string, url: string) => {
-    return `<a href="${escapeAttr(url)}">${escapeHtml(label)}</a>`;
-  });
-  output = output.replace(/(?<!href=")\bhttps?:\/\/[^\s<]+/g, (url) => `<a href="${escapeAttr(url)}">${escapeHtml(url)}</a>`);
-  return output;
-}
-
-function tableToHtml(lines: string[]): string {
-  const cells = (line: string) =>
-    line
-      .trim()
-      .replace(/^\||\|$/g, '')
-      .split('|')
-      .map((cell) => cell.trim());
-  const [headerLine, , ...bodyLines] = lines;
-  const header = cells(headerLine ?? '');
-  const body = bodyLines.map(cells);
-  return `<table><thead><tr>${header.map((cell) => `<th>${inlineMarkdown(cell)}</th>`).join('')}</tr></thead><tbody>${body
-    .map((row) => `<tr>${row.map((cell) => `<td>${inlineMarkdown(cell)}</td>`).join('')}</tr>`)
-    .join('')}</tbody></table>`;
-}
-
-export function markdownToHtml(markdown: string): string {
-  const lines = markdown.replace(/\r\n/g, '\n').split('\n');
-  const blocks: string[] = [];
-  let i = 0;
-  while (i < lines.length) {
-    const line = lines[i] ?? '';
-    if (!line.trim()) {
-      i += 1;
-      continue;
-    }
-    if (line.startsWith('```')) {
-      const code: string[] = [];
-      i += 1;
-      while (i < lines.length && !lines[i]?.startsWith('```')) {
-        code.push(lines[i] ?? '');
-        i += 1;
-      }
-      blocks.push(`<pre><code>${escapeHtml(code.join('\n'))}</code></pre>`);
-      i += 1;
-      continue;
-    }
-    const heading = /^(#{1,6})\s+(.+)$/.exec(line);
-    if (heading) {
-      const level = heading[1].length;
-      blocks.push(`<h${level}>${inlineMarkdown(heading[2])}</h${level}>`);
-      i += 1;
-      continue;
-    }
-    if (/^\s*[-*+]\s+\[[ xX]\]\s+/.test(line)) {
-      const items: string[] = [];
-      while (i < lines.length && /^\s*[-*+]\s+\[[ xX]\]\s+/.test(lines[i] ?? '')) {
-        const checked = /\[[xX]\]/.test(lines[i] ?? '');
-        items.push((lines[i] ?? '').replace(/^\s*[-*+]\s+\[[ xX]\]\s+/, `${checked ? '[x] ' : '[ ] '}`));
-        i += 1;
-      }
-      blocks.push(
-        `<ul class="uif-task-list">${items
-          .map((item) => `<li><input type="checkbox" disabled${item.startsWith('[x]') ? ' checked' : ''}> ${inlineMarkdown(item.slice(4))}</li>`)
-          .join('')}</ul>`,
-      );
-      continue;
-    }
-    if (/^\s*[-*+]\s+/.test(line)) {
-      const items: string[] = [];
-      while (i < lines.length && /^\s*[-*+]\s+/.test(lines[i] ?? '')) {
-        items.push(lines[i] ?? '');
-        i += 1;
-      }
-      blocks.push(linesToList(items, false));
-      continue;
-    }
-    if (/^\|.+\|$/.test(line) && /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(lines[i + 1] ?? '')) {
-      const tableLines = [line, lines[i + 1] ?? ''];
-      i += 2;
-      while (i < lines.length && /^\|.+\|$/.test(lines[i] ?? '')) {
-        tableLines.push(lines[i] ?? '');
-        i += 1;
-      }
-      blocks.push(tableToHtml(tableLines));
-      continue;
-    }
-    if (/^\s*\d+\.\s+/.test(line)) {
-      const items: string[] = [];
-      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i] ?? '')) {
-        items.push(lines[i] ?? '');
-        i += 1;
-      }
-      blocks.push(linesToList(items, true));
-      continue;
-    }
-    if (/^\s*>\s?/.test(line)) {
-      const quotes: string[] = [];
-      while (i < lines.length && /^\s*>\s?/.test(lines[i] ?? '')) {
-        quotes.push((lines[i] ?? '').replace(/^\s*>\s?/, ''));
-        i += 1;
-      }
-      blocks.push(`<blockquote>${quotes.map(inlineMarkdown).join('<br>')}</blockquote>`);
-      continue;
-    }
-    if (/^\s*---+\s*$/.test(line)) {
-      blocks.push('<hr>');
-      i += 1;
-      continue;
-    }
-    const para: string[] = [];
-    while (
-      i < lines.length &&
-      lines[i]?.trim() &&
-      !/^(#{1,6})\s+/.test(lines[i] ?? '') &&
-      !/^\s*[-*+]\s+/.test(lines[i] ?? '') &&
-      !/^\s*\d+\.\s+/.test(lines[i] ?? '') &&
-      !/^\s*>\s?/.test(lines[i] ?? '') &&
-      !lines[i]?.startsWith('```')
-    ) {
-      para.push(lines[i] ?? '');
-      i += 1;
-    }
-    blocks.push(`<p>${para.map(inlineMarkdown).join('<br>')}</p>`);
-  }
-  return blocks.join('\n');
+  return isSafeURL(candidate, { context, allowHash: context === 'link' }) ? candidate : fallback;
 }
 
 export function htmlToMarkdown(html: string): string {
@@ -413,16 +308,15 @@ export function htmlToMarkdown(html: string): string {
 }
 
 export function cleanEditorHtml(html: string): string {
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  doc.querySelectorAll('script,style,iframe,object,embed,link,meta').forEach((el) => el.remove());
-  doc.querySelectorAll<HTMLElement>('*').forEach((el) => {
-    [...el.attributes].forEach((attr) => {
-      if (attr.name.startsWith('on')) el.removeAttribute(attr.name);
-      if ((attr.name === 'href' || attr.name === 'src') && !isSafeUrl(attr.value)) el.removeAttribute(attr.name);
-      if (attr.name === 'style') el.removeAttribute(attr.name);
-    });
+  const fragment = sanitizeHTML(html, {
+    allowedTags: ['a', 'abbr', 'b', 'blockquote', 'br', 'caption', 'code', 'del', 'div', 'em', 'figcaption', 'figure', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'i', 'img', 'input', 'label', 'li', 'mark', 'ol', 'p', 'pre', 's', 'small', 'span', 'strong', 'sub', 'sup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'u', 'ul'],
+    allowedAttributes: ['alt', 'aria-label', 'checked', 'class', 'colspan', 'disabled', 'height', 'href', 'id', 'rel', 'rowspan', 'scope', 'src', 'start', 'target', 'title', 'type', 'width'],
   });
-  return doc.body.innerHTML;
+  fragment.querySelectorAll<HTMLInputElement>('input').forEach((input) => { if (input.type !== 'checkbox') input.remove(); });
+  fragment.querySelectorAll<HTMLAnchorElement>('a[target="_blank"]').forEach((link) => { link.rel = 'noopener noreferrer'; });
+  const template = document.createElement('template');
+  template.content.append(fragment);
+  return template.innerHTML;
 }
 
 function asInput(el: HTMLElement): HTMLTextAreaElement | HTMLInputElement {
@@ -447,6 +341,10 @@ function parseOptions(el: HTMLElement, options: EditorOptions = {}): Required<Ed
     autosave: options.autosave ?? el.dataset.uifAutosave === 'true',
     autosaveDelay: options.autosaveDelay ?? (Number(el.dataset.uifAutosaveDelay || '') || 1200),
     autosaveUrl: options.autosaveUrl ?? el.dataset.uifAutosaveUrl ?? '',
+    autosaveRetries: options.autosaveRetries ?? (Number(el.dataset.uifAutosaveRetries || '') || 0),
+    csrfToken: options.csrfToken ?? el.dataset.uifCsrfToken ?? document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '',
+    csrfHeader: options.csrfHeader ?? el.dataset.uifCsrfHeader ?? 'x-csrf-token',
+    uploadMaxBytes: options.uploadMaxBytes ?? (Number(el.dataset.uifUploadMaxBytes || '') || 10 * 1024 * 1024),
     required: options.required ?? (el.dataset.uifRequired === 'true' || (el instanceof HTMLTextAreaElement && el.required)),
     maxLength: options.maxLength ?? (configuredMaxLength || inputMaxLength),
   };
@@ -571,6 +469,13 @@ function applyMarkdownListCommand(surface: HTMLTextAreaElement, kind: 'ul' | 'ol
   return surface.value;
 }
 
+function applyMarkdownIndentCommand(surface: HTMLTextAreaElement, outdent: boolean): string {
+  return applyMarkdownLineTransform(surface, (line) => {
+    if (!line.trim()) return line;
+    return outdent ? line.replace(/^(?: {1,2}|\t)/, '') : `  ${line}`;
+  });
+}
+
 function currentTextareaLine(surface: HTMLTextAreaElement): { end: number; line: string; start: number } {
   const before = surface.value.slice(0, surface.selectionStart);
   const after = surface.value.slice(surface.selectionStart);
@@ -580,23 +485,26 @@ function currentTextareaLine(surface: HTMLTextAreaElement): { end: number; line:
   return { start, end, line: surface.value.slice(start, end) };
 }
 
-function handleMarkdownTaskKey(surface: HTMLTextAreaElement, event: KeyboardEvent): boolean {
+function handleMarkdownListKey(surface: HTMLTextAreaElement, event: KeyboardEvent): boolean {
   const { start, end, line } = currentTextareaLine(surface);
-  const task = /^(\s*[-*+]\s+\[[ xX]\]\s*)(.*)$/.exec(line);
-  if (!task) return false;
+  const list = /^(\s*)(?:(\d+)\.|([-*+]))\s+(\[[ xX]\]\s*)?(.*)$/.exec(line);
+  if (!list) return false;
+  const text = list[5];
   if (event.key === 'Enter') {
     event.preventDefault();
-    if (!task[2].trim()) {
+    if (!text.trim()) {
       const removeStart = start > 0 && surface.value[start - 1] === '\n' ? start - 1 : start;
-      surface.value = `${surface.value.slice(0, removeStart)}${surface.value.slice(end + (surface.value[end] === '\n' ? 1 : 0))}`;
+      surface.value = `${surface.value.slice(0, removeStart)}${surface.value.slice(end)}`;
       surface.setSelectionRange(removeStart, removeStart);
       return true;
     }
-    const insert = `\n${task[1].replace(/\[[xX]\]/, '[ ]')}`;
+    const marker = list[2] ? `${Number(list[2]) + 1}.` : list[3];
+    const task = list[4] ? '[ ] ' : '';
+    const insert = `\n${list[1]}${marker} ${task}`;
     insertAtSelection(surface, insert);
     return true;
   }
-  if (event.key === 'Backspace' && !task[2].trim() && surface.selectionStart === end && surface.selectionEnd === end) {
+  if (event.key === 'Backspace' && !text.trim() && surface.selectionStart === end && surface.selectionEnd === end) {
     event.preventDefault();
     surface.value = `${surface.value.slice(0, start)}${surface.value.slice(end)}`;
     surface.setSelectionRange(start, start);
@@ -636,7 +544,7 @@ function insertRichHtml(editor: EditorInstance, html: string): void {
   const range = richRange(editor);
   if (!range) return;
   const template = document.createElement('template');
-  template.innerHTML = cleanEditorHtml(html);
+  setTrustedHTML(template, cleanEditorHtml(html), { trusted: true, context: 'editor fragment' });
   const fragment = template.content;
   const last = fragment.lastChild;
   range.deleteContents();
@@ -691,6 +599,33 @@ function hasContent(node: Node): boolean {
   return node.textContent?.length ? true : node.childNodes.length > 0;
 }
 
+function rangeCoversInlineContents(range: Range, inline: Element): boolean {
+  const contents = document.createRange();
+  contents.selectNodeContents(inline);
+  const before = contents.cloneRange();
+  before.setEnd(range.startContainer, range.startOffset);
+  const after = contents.cloneRange();
+  after.setStart(range.endContainer, range.endOffset);
+  return !before.toString() && !after.toString() && range.toString() === contents.toString();
+}
+
+function unwrapWholeRichInline(inline: Element): void {
+  const children = [...inline.childNodes];
+  if (!children.length) {
+    inline.remove();
+    return;
+  }
+  const first = children[0];
+  const last = children.at(-1) as Node;
+  inline.replaceWith(...children);
+  const range = document.createRange();
+  range.setStartBefore(first);
+  range.setEndAfter(last);
+  const selection = document.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+}
+
 function unwrapSelectedRichInline(inline: Element, range: Range): void {
   const fragment = range.extractContents();
   unwrapMatchingElements(fragment, inline.tagName.toLowerCase());
@@ -718,6 +653,10 @@ function toggleRichInline(editor: EditorInstance, tagName: string, fallback: str
     return;
   }
   if (activeInline) {
+    if (rangeCoversInlineContents(range, activeInline)) {
+      unwrapWholeRichInline(activeInline);
+      return;
+    }
     unwrapSelectedRichInline(activeInline, range);
     return;
   }
@@ -764,6 +703,85 @@ function selectedRichLines(editor: EditorInstance, fallback: string): string[] {
     .map((line) => line.trim())
     .filter(Boolean);
   return lines.length ? lines : [fallback];
+}
+
+const richBlockSelector = 'p,h1,h2,h3,h4,h5,h6,blockquote,pre,div';
+type RichBlockTag = 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote' | 'pre';
+
+function selectedRichBlocks(editor: EditorInstance): HTMLElement[] {
+  const surface = richSurface(editor);
+  const range = richRange(editor);
+  if (!surface || !range) return [];
+  const blocks = [...surface.querySelectorAll<HTMLElement>(richBlockSelector)].filter((block) => {
+    try { return range.intersectsNode(block); } catch { return false; }
+  });
+  if (blocks.length) return blocks.filter((block) => !blocks.some((other) => other !== block && block.contains(other)));
+  const element = range.startContainer instanceof Element ? range.startContainer : range.startContainer.parentElement;
+  const closest = element?.closest<HTMLElement>(richBlockSelector);
+  return closest && surface.contains(closest) ? [closest] : [];
+}
+
+function replaceRichBlock(block: HTMLElement, tagName: RichBlockTag): HTMLElement {
+  if (block.tagName.toLowerCase() === tagName) return block;
+  const replacement = document.createElement(tagName);
+  if (tagName === 'pre') {
+    const code = document.createElement('code');
+    code.textContent = block.textContent ?? '';
+    replacement.append(code);
+  } else if (block.tagName === 'PRE') replacement.textContent = block.textContent ?? '';
+  else replacement.append(...block.childNodes);
+  block.replaceWith(replacement);
+  return replacement;
+}
+
+function transformRichBlocks(editor: EditorInstance, tagName: RichBlockTag, fallback: string): void {
+  const blocks = selectedRichBlocks(editor);
+  if (!blocks.length) {
+    insertRichHtml(editor, `<${tagName}>${tagName === 'pre' ? `<code>${escapeHtml(fallback)}</code>` : escapeHtml(fallback)}</${tagName}>`);
+    return;
+  }
+  const last = blocks.map((block) => replaceRichBlock(block, tagName)).at(-1);
+  if (last) setCaretInside(last);
+}
+
+function indentRichListItem(editor: EditorInstance): void {
+  const item = currentRichElement<HTMLLIElement>(editor, 'li');
+  const list = item?.parentElement;
+  const previous = item?.previousElementSibling;
+  if (!item || !(list instanceof HTMLUListElement || list instanceof HTMLOListElement) || !(previous instanceof HTMLLIElement)) return;
+  let nested = [...previous.children].find((child) => child.tagName === list.tagName) as HTMLUListElement | HTMLOListElement | undefined;
+  if (!nested) {
+    nested = document.createElement(list.tagName.toLowerCase()) as HTMLUListElement | HTMLOListElement;
+    if (list.classList.contains('uif-task-list')) nested.className = 'uif-task-list';
+    previous.append(nested);
+  }
+  nested.append(item);
+  setCaretInside(item);
+}
+
+function outdentRichListItem(editor: EditorInstance): void {
+  const item = currentRichElement<HTMLLIElement>(editor, 'li');
+  const list = item?.parentElement;
+  const parentItem = list?.parentElement;
+  const parentList = parentItem?.parentElement;
+  if (!item || !(list instanceof HTMLUListElement || list instanceof HTMLOListElement) || !(parentItem instanceof HTMLLIElement)) return;
+  if (!(parentList instanceof HTMLUListElement || parentList instanceof HTMLOListElement)) return;
+  parentItem.after(item);
+  if (!list.children.length) list.remove();
+  setCaretInside(item);
+}
+
+function clearRichFormatting(editor: EditorInstance): void {
+  const range = richRange(editor);
+  if (!range) return;
+  if (!range.collapsed) {
+    const fragment = range.extractContents();
+    unwrapMatchingElements(fragment, 'strong,b,em,i,u,s,del,code,mark,sub,sup,a');
+    const last = fragment.lastChild;
+    range.insertNode(fragment);
+    if (last) setRichCaretAfter(last);
+  }
+  selectedRichBlocks(editor).forEach((block) => replaceRichBlock(block, 'p'));
 }
 
 function currentRichElement<T extends Element>(editor: EditorInstance, selector: string): T | null {
@@ -816,7 +834,7 @@ function unwrapRichList(list: HTMLUListElement | HTMLOListElement): void {
   [...list.children].forEach((child) => {
     if (!(child instanceof HTMLLIElement)) return;
     const paragraph = document.createElement('p');
-    paragraph.innerHTML = child.innerHTML;
+    setTrustedHTML(paragraph, child.innerHTML, { trusted: true, context: 'editor block transform' });
     fragment.append(paragraph);
   });
   const last = fragment.lastChild;
@@ -845,7 +863,7 @@ function handleRichTaskKey(editor: EditorInstance, event: KeyboardEvent): boolea
       return true;
     }
     const next = document.createElement('li');
-    next.innerHTML = '<label><input type="checkbox"> </label>';
+    setTrustedHTML(next, '<label><input type="checkbox"> </label>', { trusted: true, context: 'editor task item' });
     item.after(next);
     setCaretInside(next.querySelector('label') ?? next);
     return true;
@@ -853,6 +871,125 @@ function handleRichTaskKey(editor: EditorInstance, event: KeyboardEvent): boolea
   if (event.key === 'Backspace' && !text) {
     event.preventDefault();
     item.remove();
+    return true;
+  }
+  return false;
+}
+
+function richListItemIsEmpty(item: HTMLLIElement): boolean {
+  const clone = item.cloneNode(true) as HTMLLIElement;
+  clone.querySelectorAll('ul,ol').forEach((list) => list.remove());
+  return !(clone.textContent ?? '').trim() && !clone.querySelector('img,figure,table,hr');
+}
+
+function exitRichListItem(item: HTMLLIElement): void {
+  const list = item.parentElement;
+  if (!(list instanceof HTMLUListElement || list instanceof HTMLOListElement)) return;
+  const parentItem = list.parentElement;
+  if (parentItem instanceof HTMLLIElement) {
+    const parentList = parentItem.parentElement;
+    if (parentList instanceof HTMLUListElement || parentList instanceof HTMLOListElement) {
+      item.remove();
+      const next = document.createElement('li');
+      next.append(document.createElement('br'));
+      parentItem.after(next);
+      if (!list.querySelector(':scope > li')) list.remove();
+      setCaretInside(next);
+      return;
+    }
+  }
+  const trailingList = list.cloneNode(false) as HTMLUListElement | HTMLOListElement;
+  while (item.nextElementSibling) trailingList.append(item.nextElementSibling);
+  const paragraph = document.createElement('p');
+  paragraph.append(document.createElement('br'));
+  item.remove();
+  list.after(paragraph, trailingList);
+  if (!trailingList.children.length) trailingList.remove();
+  if (!list.children.length) list.remove();
+  setCaretInside(paragraph);
+}
+
+function handleRichListKey(editor: EditorInstance, event: KeyboardEvent): boolean {
+  const item = currentRichElement<HTMLLIElement>(editor, 'li');
+  const list = item?.parentElement;
+  const range = richRange(editor);
+  if (!item || !range?.collapsed || !(list instanceof HTMLUListElement || list instanceof HTMLOListElement) || list.classList.contains('uif-task-list')) return false;
+  if (event.key === 'Backspace' && richListItemIsEmpty(item)) {
+    event.preventDefault();
+    exitRichListItem(item);
+    return true;
+  }
+  if (event.key !== 'Enter') return false;
+  event.preventDefault();
+  if (richListItemIsEmpty(item)) {
+    exitRichListItem(item);
+    return true;
+  }
+  const tail = document.createRange();
+  tail.setStart(range.startContainer, range.startOffset);
+  tail.setEnd(item, item.childNodes.length);
+  const trailingContent = tail.extractContents();
+  const next = document.createElement('li');
+  next.append(trailingContent);
+  if (richListItemIsEmpty(next)) next.append(document.createElement('br'));
+  item.after(next);
+  setCaretInside(next);
+  const nextRange = document.getSelection()?.getRangeAt(0);
+  nextRange?.collapse(true);
+  return true;
+}
+
+function richBlockIsEmpty(block: HTMLElement): boolean {
+  return !(block.textContent ?? '').trim() && !block.querySelector('img,figure,table,hr');
+}
+
+function setCaretAtStart(element: HTMLElement): void {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  range.collapse(true);
+  const selection = document.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+}
+
+function handleRichBlockKey(editor: EditorInstance, event: KeyboardEvent): boolean {
+  const surface = richSurface(editor);
+  const block = currentRichElement<HTMLElement>(editor, richBlockSelector);
+  const range = richRange(editor);
+  if (!surface || !block || block === surface || !range?.collapsed || block.closest('li') || block.tagName === 'PRE') return false;
+  if (event.key === 'Enter' && event.shiftKey) {
+    event.preventDefault();
+    const lineBreak = document.createElement('br');
+    range.insertNode(lineBreak);
+    setRichCaretAfter(lineBreak);
+    return true;
+  }
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    const tail = document.createRange();
+    tail.setStart(range.startContainer, range.startOffset);
+    tail.setEnd(block, block.childNodes.length);
+    const trailingContent = tail.extractContents();
+    const next = document.createElement(block.tagName.toLowerCase());
+    next.append(trailingContent);
+    if (richBlockIsEmpty(next)) next.append(document.createElement('br'));
+    block.after(next);
+    setCaretAtStart(next);
+    return true;
+  }
+  if (!richBlockIsEmpty(block)) return false;
+  if (event.key === 'Backspace' && block.previousElementSibling instanceof HTMLElement) {
+    event.preventDefault();
+    const previous = block.previousElementSibling;
+    block.remove();
+    setCaretInside(previous);
+    return true;
+  }
+  if (event.key === 'Delete' && block.nextElementSibling instanceof HTMLElement) {
+    event.preventDefault();
+    const next = block.nextElementSibling;
+    block.remove();
+    setCaretAtStart(next);
     return true;
   }
   return false;
@@ -896,12 +1033,12 @@ function imageValue(value?: unknown): Required<EditorImageValue> {
   if (typeof value === 'object' && value) {
     const data = value as EditorImageValue;
     return {
-      src: safeUrl(data.src, '/favicon.ico'),
+      src: safeUrl(data.src, '/favicon.ico', 'image'),
       alt: String(data.alt || 'Image'),
       caption: String(data.caption || ''),
     };
   }
-  return { src: safeUrl(value, '/favicon.ico'), alt: 'Image', caption: '' };
+  return { src: safeUrl(value, '/favicon.ico', 'image'), alt: 'Image', caption: '' };
 }
 
 function tableValue(value?: unknown): Required<EditorTableValue> {
@@ -914,6 +1051,14 @@ function tableValue(value?: unknown): Required<EditorTableValue> {
     };
   }
   return { rows: 2, columns: 2, header: true };
+}
+
+function codeBlockValue(value?: unknown, fallback = 'code'): Required<EditorCodeBlockValue> {
+  if (typeof value === 'object' && value) {
+    const data = value as EditorCodeBlockValue;
+    return { code: String(data.code || fallback), language: /^[\w+-]+$/.test(String(data.language || '')) ? String(data.language) : '' };
+  }
+  return { code: fallback, language: '' };
 }
 
 function tableHtml(value?: unknown): string {
@@ -937,13 +1082,97 @@ function currentTable(): HTMLTableElement | null {
   return currentTableCell()?.closest('table') ?? null;
 }
 
-function applyTableCommand(editor: EditorInstance, command: EditorCommand): boolean {
+function handleRichTableKey(editor: EditorInstance, event: KeyboardEvent): boolean {
+  if (event.key !== 'Tab') return false;
+  const surface = richSurface(editor);
+  const cell = currentTableCell();
+  const table = cell?.closest('table');
+  if (!surface || !cell || !table || !surface.contains(table)) return false;
+  const cells = [...table.querySelectorAll<HTMLTableCellElement>('th,td')];
+  const index = cells.indexOf(cell);
+  if (index < 0) return false;
+  event.preventDefault();
+  let target: HTMLTableCellElement | undefined = cells[index + (event.shiftKey ? -1 : 1)];
+  if (!target && !event.shiftKey) {
+    const columns = Math.max(1, cell.parentElement?.children.length ?? 1);
+    const body = table.tBodies.item(0) ?? table.createTBody();
+    const row = body.insertRow();
+    for (let column = 0; column < columns; column += 1) row.insertCell();
+    target = row.cells.item(0) ?? undefined;
+  }
+  if (target) {
+    editorActiveTableCell.set(editor, target);
+    const range = document.createRange();
+    range.selectNodeContents(target);
+    range.collapse(true);
+    const selection = document.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }
+  return true;
+}
+
+function appendTableCell(row: HTMLTableRowElement): HTMLTableCellElement {
+  const cell = document.createElement(row.parentElement?.tagName === 'THEAD' ? 'th' : 'td');
+  row.append(cell);
+  return cell;
+}
+
+function pasteRichTableGrid(editor: EditorInstance, text: string): boolean {
+  if (!text.includes('\t') && !/[\r\n]/.test(text)) return false;
+  const surface = richSurface(editor);
+  const cell = currentTableCell();
+  const table = cell?.closest('table');
+  const startRow = cell?.parentElement;
+  if (!surface || !cell || !table || !(startRow instanceof HTMLTableRowElement) || !surface.contains(table)) return false;
+  const normalized = text.replace(/\r\n?/g, '\n').replace(/\n$/, '');
+  const grid = normalized.split('\n').slice(0, 20).map((line) => line.split('\t').slice(0, 20));
+  if (!grid.length || !grid.some((row) => row.length)) return false;
+  const rows = [...table.rows];
+  const startRowIndex = rows.indexOf(startRow);
+  const startColumn = cell.cellIndex;
+  if (startRowIndex < 0 || startColumn < 0) return false;
+  const requiredColumns = startColumn + Math.max(...grid.map((row) => row.length));
+  rows.forEach((row) => {
+    while (row.cells.length < requiredColumns) appendTableCell(row);
+  });
+  const body = table.tBodies.item(0) ?? table.createTBody();
+  while (table.rows.length < startRowIndex + grid.length) {
+    const row = body.insertRow();
+    while (row.cells.length < requiredColumns) appendTableCell(row);
+  }
+  let last = cell;
+  grid.forEach((values, rowOffset) => {
+    const row = table.rows.item(startRowIndex + rowOffset);
+    values.forEach((value, columnOffset) => {
+      const target = row?.cells.item(startColumn + columnOffset);
+      if (!target) return;
+      target.textContent = value;
+      last = target;
+    });
+  });
+  editorActiveTableCell.set(editor, last);
+  setCaretInside(last);
+  return true;
+}
+
+function applyTableCommand(editor: EditorInstance, command: EditorCommand, value?: unknown): boolean {
   const table = currentTable();
   const cell = currentTableCell() ?? editorActiveTableCell.get(editor) ?? null;
   const activeTable = table ?? cell?.closest('table') ?? null;
   if (!activeTable || !cell) return false;
   const row = cell.parentElement as HTMLTableRowElement;
   const cellIndex = cell.cellIndex;
+  if (command === 'table-caption') {
+    const text = typeof value === 'object' && value ? String((value as { caption?: unknown }).caption ?? '').trim() : String(value ?? '').trim();
+    const caption = activeTable.caption;
+    if (!text) caption?.remove();
+    else {
+      const next = caption ?? activeTable.createCaption();
+      next.textContent = text;
+    }
+    return true;
+  }
   if (command === 'table-row-before') {
     const previous = row.cloneNode(true) as HTMLTableRowElement;
     previous.querySelectorAll('th,td').forEach((item) => (item.textContent = ''));
@@ -1023,7 +1252,7 @@ function applyTableCommand(editor: EditorInstance, command: EditorCommand): bool
         thead.append(first);
         first.querySelectorAll('td').forEach((td) => {
           const th = document.createElement('th');
-          th.innerHTML = td.innerHTML;
+          setTrustedHTML(th, td.innerHTML, { trusted: true, context: 'editor table header' });
           td.replaceWith(th);
         });
       }
@@ -1038,12 +1267,18 @@ function applyRichHtmlCommand(editor: EditorInstance, command: EditorCommand, va
   else if (command === 'italic') toggleRichInline(editor, 'em', 'italic text', 'em,i');
   else if (command === 'underline') toggleRichInline(editor, 'u', 'underlined text');
   else if (command === 'strike') toggleRichInline(editor, 's', 'deleted text', 's,del');
-  else if (command === 'heading') insertRichHtml(editor, `<h2>${escapeHtml(selectedRichText(editor, 'Heading'))}</h2>`);
-  else if (command === 'h1' || command === 'h2' || command === 'h3') insertRichHtml(editor, `<${command}>${escapeHtml(selectedRichText(editor, 'Heading'))}</${command}>`);
-  else if (command === 'paragraph') insertRichHtml(editor, `<p>${escapeHtml(selectedRichText(editor, 'Paragraph text'))}</p>`);
-  else if (command === 'quote') insertRichHtml(editor, `<blockquote>${escapeHtml(selectedRichText(editor, 'Quote'))}</blockquote>`);
+  else if (command === 'heading') transformRichBlocks(editor, 'h2', 'Heading');
+  else if (command === 'h1' || command === 'h2' || command === 'h3' || command === 'h4' || command === 'h5' || command === 'h6') transformRichBlocks(editor, command, 'Heading');
+  else if (command === 'paragraph') transformRichBlocks(editor, 'p', 'Paragraph text');
+  else if (command === 'quote') transformRichBlocks(editor, 'blockquote', 'Quote');
   else if (command === 'code-inline') wrapRichSelection(editor, 'code', 'code');
-  else if (command === 'code' || command === 'code-block') insertRichHtml(editor, `<pre><code>${escapeHtml(selectedRichText(editor, 'code'))}</code></pre>`);
+  else if (command === 'code' || command === 'code-block') {
+    const code = codeBlockValue(value, selectedRichText(editor, 'code'));
+    transformRichBlocks(editor, 'pre', code.code);
+    const codeElement = currentRichElement<HTMLElement>(editor, 'pre')?.querySelector('code');
+    if (code.language) codeElement?.setAttribute('class', `language-${code.language}`);
+    else codeElement?.removeAttribute('class');
+  }
   else if (command === 'ul' || command === 'ol') {
     const tag = command;
     const existingList = currentRichList(editor);
@@ -1061,6 +1296,8 @@ function applyRichHtmlCommand(editor: EditorInstance, command: EditorCommand, va
     insertRichHtml(editor, `<${tag}>${items}</${tag}>`);
   }
   else if (command === 'task') insertRichHtml(editor, '<ul class="uif-task-list"><li><label><input type="checkbox"> Task</label></li></ul>');
+  else if (command === 'indent') indentRichListItem(editor);
+  else if (command === 'outdent') outdentRichListItem(editor);
   else if (command === 'hr') insertRichHtml(editor, '<hr>');
   else if (command === 'link' || command === 'link-edit') {
     const link = linkValue(value, selectedRichText(editor, 'Link text'));
@@ -1109,12 +1346,9 @@ function applyRichHtmlCommand(editor: EditorInstance, command: EditorCommand, va
     if (figure) figure.remove();
     else existing.remove();
   } else if (command === 'table') insertRichHtml(editor, tableHtml(value));
-  else if (command.startsWith('table-')) applyTableCommand(editor, command);
+  else if (command.startsWith('table-')) applyTableCommand(editor, command, value);
   else if (command === 'clear') {
-    const surface = richSurface(editor);
-    if (surface) surface.textContent = surface.textContent ?? '';
-  } else if (command !== 'preview' && command !== 'source' && command !== 'fullscreen') {
-    document.execCommand(command);
+    clearRichFormatting(editor);
   }
 }
 
@@ -1126,11 +1360,15 @@ function applyHtmlSourceCommand(editor: EditorInstance, command: EditorCommand, 
   if (command === 'underline') return wrapSelection(surface, '<u>', '</u>', 'underlined text');
   if (command === 'strike') return wrapSelection(surface, '<s>', '</s>', 'deleted text');
   if (command === 'heading') return wrapSelection(surface, `<${value || 'h2'}>`, `</${value || 'h2'}>`, 'Heading');
-  if (command === 'h1' || command === 'h2' || command === 'h3') return wrapSelection(surface, `<${command}>`, `</${command}>`, 'Heading');
+  if (command === 'h1' || command === 'h2' || command === 'h3' || command === 'h4' || command === 'h5' || command === 'h6') return wrapSelection(surface, `<${command}>`, `</${command}>`, 'Heading');
   if (command === 'paragraph') return wrapSelection(surface, '<p>', '</p>', 'Paragraph text');
   if (command === 'quote') return wrapSelection(surface, '<blockquote>', '</blockquote>', 'Quote');
   if (command === 'code-inline') return wrapSelection(surface, '<code>', '</code>', 'code');
-  if (command === 'code' || command === 'code-block') return wrapSelection(surface, '<pre><code>', '</code></pre>', 'code');
+  if (command === 'code' || command === 'code-block') {
+    const code = codeBlockValue(value, 'code');
+    const language = code.language ? ` class="language-${escapeAttr(code.language)}"` : '';
+    return wrapSelection(surface, `<pre><code${language}>`, '</code></pre>', code.code);
+  }
   if (command === 'hr') return insertAtSelection(surface, '\n<hr>\n');
   if (command === 'ul') return insertAtSelection(surface, '\n<ul><li>Item</li></ul>\n');
   if (command === 'ol') return insertAtSelection(surface, '\n<ol><li>Item</li></ol>\n');
@@ -1159,6 +1397,88 @@ function markdownTable(value?: unknown): string {
   return `\n${[header, rule, ...rows].join('\n')}\n`;
 }
 
+interface MarkdownTableContext {
+  column: number;
+  endLine: number;
+  line: number;
+  lines: string[];
+  startLine: number;
+}
+
+function markdownTableCells(line: string): string[] {
+  return line.trim().replace(/^\||\|$/g, '').split(/(?<!\\)\|/).map((cell) => cell.replaceAll('\\|', '|').trim());
+}
+
+function markdownTableRule(line: string): boolean {
+  const cells = markdownTableCells(line);
+  return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell));
+}
+
+function markdownTableContext(surface: HTMLTextAreaElement): MarkdownTableContext | null {
+  const lines = surface.value.split('\n');
+  const line = surface.value.slice(0, surface.selectionStart).split('\n').length - 1;
+  for (let startLine = 0; startLine < lines.length - 1; startLine += 1) {
+    if (!lines[startLine].includes('|') || !markdownTableRule(lines[startLine + 1])) continue;
+    let endLine = startLine + 1;
+    while (endLine + 1 < lines.length && lines[endLine + 1].includes('|') && lines[endLine + 1].trim()) endLine += 1;
+    if (line < startLine || line > endLine) continue;
+    const lineStart = lines.slice(0, line).reduce((total, entry) => total + entry.length + 1, 0);
+    const beforeCaret = lines[line].slice(0, Math.max(0, surface.selectionStart - lineStart));
+    const pipes = (beforeCaret.match(/(?<!\\)\|/g) ?? []).length;
+    const width = markdownTableCells(lines[startLine]).length;
+    return { column: Math.min(width - 1, Math.max(0, pipes - (lines[line].trimStart().startsWith('|') ? 1 : 0))), endLine, line, lines, startLine };
+  }
+  return null;
+}
+
+function renderMarkdownTableRow(cells: string[]): string {
+  return `| ${cells.map((cell) => cell.replaceAll('|', '\\|')).join(' | ')} |`;
+}
+
+function markdownTableCellOffset(line: string, column: number): number {
+  let pipes = 0;
+  for (let index = 0; index < line.length; index += 1) {
+    if (line[index] !== '|' || line[index - 1] === '\\') continue;
+    if (pipes === column) return Math.min(line.length, index + 2);
+    pipes += 1;
+  }
+  return line.length;
+}
+
+function applyMarkdownTableCommand(surface: HTMLTextAreaElement, command: EditorCommand): string {
+  const context = markdownTableContext(surface);
+  if (!context) return surface.value;
+  const rows = context.lines.slice(context.startLine, context.endLine + 1).map(markdownTableCells);
+  let targetRow = Math.max(2, context.line - context.startLine);
+  let targetColumn = context.column;
+  if (command === 'table-row-before' || command === 'table-row-after') {
+    const current = Math.max(2, context.line - context.startLine);
+    const insertAt = command === 'table-row-before' ? current : current + 1;
+    rows.splice(Math.min(rows.length, insertAt), 0, Array.from({ length: rows[0].length }, () => ''));
+    targetRow = Math.min(rows.length - 1, insertAt);
+  } else if (command === 'table-row-delete') {
+    if (context.line - context.startLine < 2 || rows.length <= 2) return surface.value;
+    rows.splice(context.line - context.startLine, 1);
+    targetRow = Math.min(rows.length - 1, context.line - context.startLine);
+  } else {
+    if (command === 'table-col-delete' && rows[0].length <= 1) return surface.value;
+    const insertAt = command === 'table-col-before' ? context.column : context.column + 1;
+    rows.forEach((row, rowIndex) => {
+      if (command === 'table-col-delete') row.splice(context.column, 1);
+      else row.splice(insertAt, 0, rowIndex === 0 ? 'Column' : rowIndex === 1 ? '---' : '');
+    });
+    targetColumn = command === 'table-col-delete' ? Math.min(context.column, rows[0].length - 1) : insertAt;
+  }
+  const rendered = rows.map(renderMarkdownTableRow);
+  context.lines.splice(context.startLine, context.endLine - context.startLine + 1, ...rendered);
+  surface.value = context.lines.join('\n');
+  const absoluteLine = context.startLine + targetRow;
+  const lineStart = context.lines.slice(0, absoluteLine).reduce((total, entry) => total + entry.length + 1, 0);
+  const cursor = lineStart + markdownTableCellOffset(context.lines[absoluteLine], targetColumn);
+  surface.setSelectionRange(cursor, cursor);
+  return surface.value;
+}
+
 function applyMarkdownCommand(editor: EditorInstance, command: EditorCommand, value?: unknown): string {
   const surface = editor.surface instanceof HTMLTextAreaElement ? editor.surface : null;
   if (!surface) return editor.getValue();
@@ -1168,14 +1488,23 @@ function applyMarkdownCommand(editor: EditorInstance, command: EditorCommand, va
   if (command === 'heading' || command === 'h2') return applyMarkdownHeadingCommand(surface, 2);
   if (command === 'h1') return applyMarkdownHeadingCommand(surface, 1);
   if (command === 'h3') return applyMarkdownHeadingCommand(surface, 3);
+  if (command === 'h4') return applyMarkdownLineTransform(surface, (line) => `${stripMarkdownBlockMarker(line).indent}#### ${stripMarkdownBlockMarker(line).text}`);
+  if (command === 'h5') return applyMarkdownLineTransform(surface, (line) => `${stripMarkdownBlockMarker(line).indent}##### ${stripMarkdownBlockMarker(line).text}`);
+  if (command === 'h6') return applyMarkdownLineTransform(surface, (line) => `${stripMarkdownBlockMarker(line).indent}###### ${stripMarkdownBlockMarker(line).text}`);
   if (command === 'paragraph') return applyMarkdownParagraphCommand(surface);
   if (command === 'quote') return applyMarkdownQuoteCommand(surface);
   if (command === 'code-inline') return wrapSelection(surface, '`', '`', 'code');
-  if (command === 'code' || command === 'code-block') return insertAtSelection(surface, '\n```\ncode\n```\n');
+  if (command === 'code' || command === 'code-block') {
+    const selected = surface.value.slice(surface.selectionStart, surface.selectionEnd);
+    const code = codeBlockValue(value, selected || 'code');
+    return insertAtSelection(surface, `\n\`\`\`${code.language}\n${code.code}\n\`\`\`\n`);
+  }
   if (command === 'hr') return insertAtSelection(surface, '\n---\n');
   if (command === 'ul') return applyMarkdownListCommand(surface, 'ul');
   if (command === 'ol') return applyMarkdownListCommand(surface, 'ol');
   if (command === 'task') return applyMarkdownListCommand(surface, 'task');
+  if (command === 'indent') return applyMarkdownIndentCommand(surface, false);
+  if (command === 'outdent') return applyMarkdownIndentCommand(surface, true);
   if (command === 'link' || command === 'link-edit') {
     const link = linkValue(value, 'link');
     if (surface.selectionStart === surface.selectionEnd) return insertAtSelection(surface, `[${link.text}](${link.href})`);
@@ -1186,6 +1515,7 @@ function applyMarkdownCommand(editor: EditorInstance, command: EditorCommand, va
     return insertAtSelection(surface, `\n![${image.alt}](${image.src})${image.caption ? `\n\n${image.caption}` : ''}\n`);
   }
   if (command === 'table') return insertAtSelection(surface, markdownTable(value));
+  if (command.startsWith('table-row-') || command.startsWith('table-col-')) return applyMarkdownTableCommand(surface, command);
   if (command === 'clear') return applyMarkdownClearCommand(surface);
   return surface.value;
 }
@@ -1194,13 +1524,35 @@ function countWords(value: string): number {
   return value.trim().split(/\s+/).filter(Boolean).length;
 }
 
+function htmlSourceDiagnostics(value: string): MarkdownDiagnostic[] {
+  const normalized = cleanEditorHtml(value);
+  if (normalized === value) return [];
+  let offset = 0;
+  const limit = Math.min(value.length, normalized.length);
+  while (offset < limit && value[offset] === normalized[offset]) offset += 1;
+  const before = value.slice(0, offset);
+  return [{
+    code: 'html-source-normalized',
+    column: before.length - before.lastIndexOf('\n'),
+    line: before.split('\n').length,
+    message: 'This HTML will be normalized when returning to rich mode.',
+    severity: 'warning',
+  }];
+}
+
 function updateStatus(instance: EditorInstance): void {
   if (!instance.status) return;
   const value = instance.getValue();
   const words = countWords(value);
   const chars = value.length;
   const state = instance.dirty ? 'Unsaved changes' : 'Clean';
-  instance.status.textContent = `${words} words · ${chars} characters · ${state}`;
+  const diagnostics = instance.diagnostics.length ? ` · ${instance.diagnostics.length} ${instance.diagnostics.length === 1 ? 'issue' : 'issues'}` : '';
+  const source = instance.surface instanceof HTMLTextAreaElement && !instance.surface.hidden ? instance.surface : null;
+  const beforeCaret = source?.value.slice(0, source.selectionStart) ?? '';
+  const line = source ? beforeCaret.split('\n').length : 0;
+  const column = source ? beforeCaret.length - beforeCaret.lastIndexOf('\n') : 0;
+  const position = source ? ` · Line ${line}, column ${column}` : '';
+  instance.status.textContent = `${words} words · ${chars} characters · ${state}${diagnostics}${position}`;
 }
 
 function syncRichControlAttributes(root: HTMLElement): void {
@@ -1228,71 +1580,63 @@ export function validateEditor(editor: EditorInstance): string[] {
   return errors;
 }
 
-async function autosaveEditor(editor: EditorInstance, url?: string): Promise<void> {
+async function autosaveEditor(editor: EditorInstance, revision: number, options: { csrfHeader: string; csrfToken: string; retries: number; url?: string }): Promise<void> {
   const value = editor.getValue();
   editor.element.dataset.uifAutosaveState = 'saving';
-  await runEditorHooks('autosave', { editor, value });
-  if (url) {
-    await fetch(url, {
+  await runEditorHooks('autosave', { editor, value, revision });
+  if (revision !== editorAutosaveRevisions.get(editor)) return;
+  if (options.url) {
+    await request(options.url, {
+      key: editorAutosaveKeys.get(editor),
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ name: editor.input.name, value }),
+      credentials: 'same-origin',
+      timeout: 15_000,
+      retries: options.retries,
+      retryDelay: 500,
+      csrfToken: options.csrfToken || undefined,
+      csrfHeader: options.csrfHeader,
     });
   }
+  if (revision !== editorAutosaveRevisions.get(editor)) return;
   editor.element.dataset.uifAutosaveState = 'saved';
   editor.dirty = false;
   editorInitialValue.set(editor, value);
   updateStatus(editor);
-  emit('uif:editor-autosave', { editor, value }, editor.element);
+  emit('uif:editor-autosave', { editor, value, revision }, editor.element);
 }
 
-function scheduleAutosave(editor: EditorInstance, delay: number, url?: string): void {
+function scheduleAutosave(editor: EditorInstance, delay: number, options: { csrfHeader: string; csrfToken: string; retries: number; url?: string }): void {
   const existing = editorAutosaveTimers.get(editor);
   if (existing) window.clearTimeout(existing);
+  const revision = (editorAutosaveRevisions.get(editor) ?? 0) + 1;
+  editorAutosaveRevisions.set(editor, revision);
+  const key = editorAutosaveKeys.get(editor);
+  if (key) cancelRequest(key);
   editorAutosaveTimers.set(
     editor,
     window.setTimeout(() => {
-      void autosaveEditor(editor, url).catch((error: unknown) => {
+      void autosaveEditor(editor, revision, options).catch((error: unknown) => {
+        if (revision !== editorAutosaveRevisions.get(editor)) return;
         editor.element.dataset.uifAutosaveState = 'error';
+        emit('uif:editor-autosave-error', { editor, error, revision, value: editor.getValue() }, editor.element);
         emit('uif:editor-error', { editor, error }, editor.element);
       });
     }, delay),
   );
 }
 
-function pushHistory(instance: EditorInstance, next: string): void {
-  const history = editorHistory.get(instance);
-  if (!history || history.last === next) return;
-  history.undo.push(history.last);
-  if (history.undo.length > 60) history.undo.shift();
-  history.redo = [];
-  history.last = next;
-}
-
-function restoreHistory(instance: EditorInstance, direction: 'undo' | 'redo'): void {
-  const history = editorHistory.get(instance);
-  if (!history) return;
-  const from = direction === 'undo' ? history.undo : history.redo;
-  const to = direction === 'undo' ? history.redo : history.undo;
-  const value = from.pop();
-  if (value === undefined) return;
-  to.push(instance.getValue());
-  history.last = value;
-  instance.setValue(value);
-}
-
 export function queryEditorCommand(editor: EditorInstance, command: EditorCommand | string): boolean {
   if (command === 'preview') return !editor.preview?.hidden;
   if (command === 'source') return editor.sourceMode;
-  if (editor.mode !== 'html') return false;
-  try {
-    return document.queryCommandState(command);
-  } catch {
-    return false;
-  }
+  if (editor.mode !== 'html' || editor.surface instanceof HTMLTextAreaElement) return false;
+  const selectors: Record<string, string> = { bold: 'strong,b', italic: 'em,i', underline: 'u', strike: 's,del', 'code-inline': 'code', h1: 'h1', h2: 'h2', h3: 'h3', h4: 'h4', h5: 'h5', h6: 'h6', heading: 'h1,h2,h3,h4,h5,h6', paragraph: 'p', quote: 'blockquote', ul: 'ul', ol: 'ol', task: '.uif-task-list' };
+  return selectors[command] ? currentRichElement(editor, selectors[command]) !== null : false;
 }
 
 export function runEditorCommand(editor: EditorInstance, command: EditorCommand, value?: unknown): void {
+  prepareHistory(editor, { origin: 'command' });
   const custom = commandHandlers.get(command);
   if (custom) {
     void runEditorHooks('beforeCommand', { editor, value: editor.getValue(), command });
@@ -1341,11 +1685,21 @@ export function formatEditor(editor: EditorInstance, command: EditorCommand, val
 
 function syncPreview(instance: EditorInstance): void {
   if (!instance.preview) return;
-  instance.preview.innerHTML = instance.mode === 'markdown' ? markdownToHtml(instance.getValue()) : cleanEditorHtml(instance.getValue());
+  if (instance.mode === 'markdown') {
+    const document = parseMarkdown(instance.getValue());
+    instance.diagnostics = document.diagnostics;
+    setTrustedHTML(instance.preview, renderMarkdown(document, { sourceMap: true }), { trusted: true, context: 'editor markdown preview' });
+  } else {
+    instance.diagnostics = instance.sourceMode && instance.surface instanceof HTMLTextAreaElement ? htmlSourceDiagnostics(instance.getValue()) : [];
+    setTrustedHTML(instance.preview, cleanEditorHtml(instance.getValue()), { trusted: true, context: 'editor HTML preview' });
+  }
+  instance.element.dataset.uifEditorDiagnostics = String(instance.diagnostics.length);
+  emit('uif:editor-diagnostics', { editor: instance, diagnostics: instance.diagnostics }, instance.element);
 }
 
-function openPreviewOverlay(editor: EditorInstance, layout: EditorLayout): void {
+function openPreviewOverlay(editor: EditorInstance, layout: EditorLayout, anchor?: HTMLElement): void {
   if (!editor.preview) return;
+  activeEditorTransient?.close(false);
   syncPreview(editor);
   const backdrop = document.createElement('div');
   backdrop.className = 'uif-editor-preview-backdrop';
@@ -1353,26 +1707,34 @@ function openPreviewOverlay(editor: EditorInstance, layout: EditorLayout): void 
   panel.className = layout === 'drawer' ? 'uif-editor-preview-drawer' : 'uif-editor-preview-modal';
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-modal', 'true');
-  panel.innerHTML = `<div class="uif-editor-preview-head"><strong>Preview</strong><button type="button" class="uif-editor-preview-close" aria-label="Close preview">&times;</button></div><div class="uif-editor-preview-content">${editor.preview.innerHTML}</div>`;
-  const close = () => {
+  setTrustedHTML(panel, `<div class="uif-editor-preview-head"><strong>Preview</strong><button type="button" class="uif-editor-preview-close" aria-label="Close preview">&times;</button></div><div class="uif-editor-preview-content">${editor.preview.innerHTML}</div>`, { trusted: true, context: 'editor preview overlay' });
+  let closed = false;
+  const onKeydown = (event: KeyboardEvent) => {
+    if (trapEditorFocus(panel, event)) return;
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    close();
+  };
+  const close = (restoreFocus = true) => {
+    if (closed) return;
+    closed = true;
+    document.removeEventListener('keydown', onKeydown);
     panel.remove();
     backdrop.remove();
-    editor.surface.focus();
+    if (activeEditorTransient?.editor === editor) activeEditorTransient = null;
+    if (restoreFocus) (anchor ?? editor.surface).focus();
   };
-  backdrop.addEventListener('click', close);
+  backdrop.addEventListener('click', () => close());
   const closeButton = panel.querySelector('button');
-  closeButton?.addEventListener('click', close);
+  closeButton?.addEventListener('click', () => close());
   closeButton?.addEventListener('keydown', (event) => {
     if (!(event instanceof KeyboardEvent) || (event.key !== 'Enter' && event.key !== ' ')) return;
     event.preventDefault();
     close();
   });
-  document.addEventListener('keydown', function onKeydown(event) {
-    if (event.key !== 'Escape') return;
-    document.removeEventListener('keydown', onKeydown);
-    close();
-  });
+  document.addEventListener('keydown', onKeydown);
   document.body.append(backdrop, panel);
+  activeEditorTransient = { editor, close };
   panel.querySelector<HTMLButtonElement>('button')?.focus();
 }
 
@@ -1430,6 +1792,40 @@ function currentImageValue(editor: EditorInstance): Required<EditorImageValue> {
   };
 }
 
+function currentCodeBlockValue(editor: EditorInstance): Required<EditorCodeBlockValue> {
+  if (editor.surface instanceof HTMLTextAreaElement) {
+    const selected = editor.surface.value.slice(editor.surface.selectionStart, editor.surface.selectionEnd);
+    return { code: selected, language: '' };
+  }
+  const pre = currentRichElement<HTMLElement>(editor, 'pre');
+  const code = pre?.querySelector('code');
+  return { code: code?.textContent || selectedRichText(editor, ''), language: code?.className.match(/(?:^|\s)language-([\w+-]+)/)?.[1] || '' };
+}
+
+function selectedSourceText(editor: EditorInstance): string {
+  return editor.surface instanceof HTMLTextAreaElement
+    ? editor.surface.value.slice(editor.surface.selectionStart, editor.surface.selectionEnd)
+    : '';
+}
+
+function editorFocusableElements(root: HTMLElement): HTMLElement[] {
+  return [...root.querySelectorAll<HTMLElement>('button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])')]
+    .filter((element) => !element.hidden && element.getAttribute('aria-hidden') !== 'true');
+}
+
+function trapEditorFocus(root: HTMLElement, event: KeyboardEvent): boolean {
+  if (event.key !== 'Tab') return false;
+  const focusable = editorFocusableElements(root);
+  if (!focusable.length) return false;
+  const current = focusable.indexOf(document.activeElement as HTMLElement);
+  const next = event.shiftKey
+    ? (current <= 0 ? focusable.length - 1 : current - 1)
+    : (current < 0 || current === focusable.length - 1 ? 0 : current + 1);
+  event.preventDefault();
+  focusable[next].focus();
+  return true;
+}
+
 function positionEditorCommandDialog(dialog: HTMLElement, anchor?: HTMLElement): void {
   const margin = 8;
   const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
@@ -1461,27 +1857,35 @@ function editorToolbarAnchorRect(dialog: HTMLElement): DOMRect {
 }
 
 function openEditorCommandDialog(editor: EditorInstance, command: EditorCommand, apply: (value: unknown) => void, anchor?: HTMLElement): void {
-  document.querySelectorAll('.uif-editor-dialog').forEach((existing) => existing.remove());
+  activeEditorTransient?.close(false);
   const dialog = document.createElement('form');
   dialog.className = 'uif-editor-dialog';
   dialog.setAttribute('role', 'dialog');
+  dialog.setAttribute('aria-modal', 'true');
   dialog.setAttribute('aria-label', editorCommandLabel(command));
   if (command === 'link') {
-    const link = editor.mode === 'html' ? currentLinkValue(editor) : { text: '', href: '', title: '', target: '_self' as const };
-    dialog.innerHTML = `<div class="uif-editor-dialog-grid">${formField('text', 'Text', link.text, 'text', 'Link text')}${formField('href', 'URL', link.href, 'text', 'https://example.com')}${formField('title', 'Title', link.title, 'text', 'Optional title')}<label class="uif-editor-dialog-check"><input type="checkbox" name="blank"${link.target === '_blank' ? ' checked' : ''}> Open in new tab</label></div>`;
+    const link = editor.mode === 'html' ? currentLinkValue(editor) : { text: selectedSourceText(editor), href: '', title: '', target: '_self' as const };
+    setTrustedHTML(dialog, `<div class="uif-editor-dialog-grid">${formField('text', 'Text', link.text, 'text', 'Link text')}${formField('href', 'URL', link.href, 'text', 'https://example.com')}${formField('title', 'Title', link.title, 'text', 'Optional title')}<label class="uif-editor-dialog-check"><input type="checkbox" name="blank"${link.target === '_blank' ? ' checked' : ''}> Open in new tab</label></div>`, { trusted: true, context: 'editor link dialog' });
   } else if (command === 'image') {
-    const image = editor.mode === 'html' ? currentImageValue(editor) : { src: '', alt: '', caption: '' };
-    dialog.innerHTML = `<div class="uif-editor-dialog-grid">${formField('src', 'Image URL', image.src, 'text', '/image.png')}${formField('alt', 'Alt text', image.alt, 'text', 'Image description')}${formField('caption', 'Caption', image.caption, 'text', 'Optional caption')}</div>`;
+    const image = editor.mode === 'html' ? currentImageValue(editor) : { src: '', alt: selectedSourceText(editor), caption: '' };
+    setTrustedHTML(dialog, `<div class="uif-editor-dialog-grid">${formField('src', 'Image URL', image.src, 'text', '/image.png')}${formField('alt', 'Alt text', image.alt, 'text', 'Image description')}${formField('caption', 'Caption', image.caption, 'text', 'Optional caption')}</div>`, { trusted: true, context: 'editor image dialog' });
   } else if (command === 'table') {
-    dialog.innerHTML = `<div class="uif-editor-dialog-grid">${formField('rows', 'Rows', '2', 'number')}${formField('columns', 'Columns', '2', 'number')}<label class="uif-editor-dialog-check"><input type="checkbox" name="header" checked> Header row</label></div>`;
+    setTrustedHTML(dialog, `<div class="uif-editor-dialog-grid">${formField('rows', 'Rows', '2', 'number')}${formField('columns', 'Columns', '2', 'number')}<label class="uif-editor-dialog-check"><input type="checkbox" name="header" checked> Header row</label></div>`, { trusted: true, context: 'editor table dialog' });
+  } else if (command === 'table-caption') {
+    const caption = currentTable()?.caption?.textContent || '';
+    setTrustedHTML(dialog, `<div class="uif-editor-dialog-grid">${formField('caption', 'Caption', caption, 'text', 'Table description')}</div>`, { trusted: true, context: 'editor table caption dialog' });
+  } else if (command === 'code-block') {
+    const code = currentCodeBlockValue(editor);
+    setTrustedHTML(dialog, `<div class="uif-editor-dialog-grid">${formField('language', 'Language', code.language, 'text', 'Optional language')}${formField('code', 'Code', code.code, 'text', 'Code')}</div>`, { trusted: true, context: 'editor code dialog' });
   }
-  dialog.insertAdjacentHTML('beforeend', '<div class="uif-editor-dialog-actions"><button type="button" class="uif-btn uif-btn-secondary" data-uif-editor-dialog-cancel>Cancel</button><button type="submit" class="uif-btn">Apply</button></div>');
+  swapTrustedHTML(dialog, '<div class="uif-editor-dialog-actions"><button type="button" class="uif-btn uif-btn-secondary" data-uif-editor-dialog-cancel>Cancel</button><button type="submit" class="uif-btn">Apply</button></div>', 'append');
   const closeDialog = (restoreFocus = true) => {
     dialog.remove();
     document.removeEventListener('pointerdown', handleOutsidePointer, true);
     window.removeEventListener('resize', handleViewportChange);
     window.removeEventListener('scroll', handleViewportChange, true);
-    if (restoreFocus) editor.focus();
+    if (restoreFocus) (anchor ?? editor.surface).focus();
+    if (activeEditorTransient?.editor === editor) activeEditorTransient = null;
   };
   const handleOutsidePointer = (event: PointerEvent) => {
     const target = event.target instanceof Node ? event.target : null;
@@ -1495,17 +1899,21 @@ function openEditorCommandDialog(editor: EditorInstance, command: EditorCommand,
     if (command === 'link') apply({ text: data.get('text'), href: data.get('href'), title: data.get('title'), target: data.get('blank') ? '_blank' : '_self' });
     if (command === 'image') apply({ src: data.get('src'), alt: data.get('alt'), caption: data.get('caption') });
     if (command === 'table') apply({ rows: data.get('rows'), columns: data.get('columns'), header: Boolean(data.get('header')) });
+    if (command === 'table-caption') apply({ caption: data.get('caption') });
+    if (command === 'code-block') apply({ language: data.get('language'), code: data.get('code') });
     closeDialog(false);
   });
   dialog.querySelector('[data-uif-editor-dialog-cancel]')?.addEventListener('click', () => {
     closeDialog();
   });
   dialog.addEventListener('keydown', (event) => {
+    if (trapEditorFocus(dialog, event)) return;
     if (event.key !== 'Escape') return;
     event.preventDefault();
     closeDialog();
   });
   document.body.append(dialog);
+  activeEditorTransient = { editor, close: closeDialog };
   positionEditorCommandDialog(dialog, anchor);
   document.addEventListener('pointerdown', handleOutsidePointer, true);
   window.addEventListener('resize', handleViewportChange);
@@ -1518,15 +1926,19 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
   const input = asInput(el);
   const config = parseOptions(el, options);
   const wrapper = document.createElement('div');
+  const editorId = ++editorSequence;
   wrapper.className = 'uif-editor';
   wrapper.dataset.uifMode = config.mode;
   const toolbar = document.createElement('div');
   toolbar.className = 'uif-editor-toolbar';
   toolbar.setAttribute('role', 'toolbar');
+  toolbar.setAttribute('aria-label', 'Editor formatting');
   const body = document.createElement('div');
   body.className = 'uif-editor-body';
   const surface = config.mode === 'markdown' || config.mode === 'plain' ? document.createElement('textarea') : document.createElement('div');
   surface.className = config.mode === 'markdown' || config.mode === 'plain' ? 'uif-editor-source' : 'uif-editor-surface';
+  surface.id ||= `uif-editor-surface-${editorId}`;
+  toolbar.setAttribute('aria-controls', surface.id);
   surface.style.minHeight = config.height;
   if (config.placeholder) surface.setAttribute('aria-placeholder', config.placeholder);
   if (surface instanceof HTMLTextAreaElement) {
@@ -1535,7 +1947,7 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
     surface.placeholder = config.placeholder;
   } else {
     surface.contentEditable = 'true';
-    surface.innerHTML = config.mode === 'html' ? cleanEditorHtml(input.value) : escapeHtml(input.value);
+    setTrustedHTML(surface, config.mode === 'html' ? cleanEditorHtml(input.value) : escapeHtml(input.value), { trusted: true, context: 'editor initial value' });
   }
   const preview = document.createElement('div');
   preview.className = 'uif-editor-preview';
@@ -1543,6 +1955,10 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
   const status = document.createElement('div');
   status.className = 'uif-editor-status';
   status.setAttribute('role', 'status');
+  const announcer = document.createElement('div');
+  announcer.className = 'uif-sr-only';
+  announcer.setAttribute('aria-live', 'polite');
+  announcer.setAttribute('aria-atomic', 'true');
   const initialSourceMode = config.mode === 'html' ? false : config.mode === 'markdown' ? config.layout !== 'preview' : true;
   config.toolbar.forEach((command) => {
     const button = document.createElement('button');
@@ -1552,11 +1968,13 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
     const label = editorCommandLabel(command);
     button.setAttribute('aria-label', label);
     button.title = label;
-    button.innerHTML = `${editorCommandIcon(command)}<span class="uif-sr-only">${escapeHtml(label)}</span>`;
+    setTrustedHTML(button, `${editorCommandIcon(command)}<span class="uif-sr-only">${escapeHtml(label)}</span>`, { trusted: true, context: 'editor toolbar' });
     if (command === 'source') button.setAttribute('aria-pressed', String(initialSourceMode));
     if (command === 'preview') button.setAttribute('aria-pressed', String(!preview.hidden));
     toolbar.append(button);
   });
+  const toolbarButtons = () => [...toolbar.querySelectorAll<HTMLButtonElement>('.uif-editor-button:not([disabled])')];
+  toolbarButtons().forEach((button, index) => { button.tabIndex = index === 0 ? 0 : -1; });
   input.hidden = true;
   input.setAttribute('data-uif-editor-input', 'true');
   input.insertAdjacentElement('afterend', wrapper);
@@ -1565,20 +1983,24 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
   const tableTools = document.createElement('div');
   tableTools.className = 'uif-editor-table-tools';
   tableTools.hidden = true;
-  tableTools.innerHTML = [
+  setTrustedHTML(tableTools, [
     ['table-row-before', 'Row before'],
     ['table-row-after', 'Row'],
     ['table-col-before', 'Column before'],
     ['table-col-after', 'Column'],
     ['table-row-delete', 'Delete row'],
     ['table-col-delete', 'Delete column'],
+    ['table-caption', 'Caption'],
     ['table-header-toggle', 'Header'],
     ['table-delete', 'Delete table'],
   ]
     .map(([command, label]) => `<button type="button" class="uif-editor-tool-chip" data-uif-editor-command="${command}">${label}</button>`)
-    .join('');
+    .join(''), { trusted: true, context: 'editor table tools' });
   if (config.mode === 'html') wrapper.append(tableTools);
   if (config.status) wrapper.append(status);
+  wrapper.append(announcer);
+  let destroyed = false;
+  let resetTimer: number | undefined;
   const instance: EditorInstance = {
     element: wrapper,
     mode: config.mode,
@@ -1587,41 +2009,83 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
     preview,
     status: config.status ? status : undefined,
     dirty: false,
+    diagnostics: [],
     sourceMode: initialSourceMode,
     getValue() {
       return input.value;
     },
     setValue(next: string) {
+      const canonical = config.mode === 'html' && !(instance.sourceMode && instance.surface instanceof HTMLTextAreaElement) ? cleanEditorHtml(next) : next;
       const previous = input.value;
-      if (previous !== next) pushHistory(instance, next);
-      input.value = next;
-      if (instance.surface instanceof HTMLTextAreaElement && instance.surface.value !== next) instance.surface.value = next;
-      if (!(surface instanceof HTMLTextAreaElement) && surface.innerHTML !== next) surface.innerHTML = config.mode === 'html' ? cleanEditorHtml(next) : escapeHtml(next);
-      instance.dirty = next !== editorInitialValue.get(instance);
+      if (previous !== canonical) pushHistory(instance, canonical);
+      input.value = canonical;
+      if (instance.surface instanceof HTMLTextAreaElement && instance.surface.value !== canonical) instance.surface.value = canonical;
+      if (!(surface instanceof HTMLTextAreaElement) && surface.innerHTML !== canonical) setTrustedHTML(surface, config.mode === 'html' ? canonical : escapeHtml(canonical), { trusted: true, context: 'editor value' });
+      instance.dirty = canonical !== editorInitialValue.get(instance);
       syncPreview(instance);
       updateStatus(instance);
-      emit('uif:editor-change', { value: next, editor: instance }, wrapper);
+      emit('uif:editor-change', { value: canonical, editor: instance }, wrapper);
       validateEditor(instance);
-      if (config.autosave && instance.dirty) scheduleAutosave(instance, config.autosaveDelay, config.autosaveUrl || undefined);
+      if (config.autosave) {
+        if (instance.dirty) scheduleAutosave(instance, config.autosaveDelay, {
+          url: config.autosaveUrl || undefined,
+          retries: config.autosaveRetries,
+          csrfToken: config.csrfToken,
+          csrfHeader: config.csrfHeader,
+        });
+        else {
+          const timer = editorAutosaveTimers.get(instance);
+          if (timer) window.clearTimeout(timer);
+          const key = editorAutosaveKeys.get(instance);
+          if (key) cancelRequest(key);
+          editorAutosaveRevisions.set(instance, (editorAutosaveRevisions.get(instance) ?? 0) + 1);
+          instance.element.dataset.uifAutosaveState = 'saved';
+        }
+      }
     },
     focus() {
       instance.surface.focus();
     },
     destroy() {
+      destroyed = true;
+      if (resetTimer !== undefined) window.clearTimeout(resetTimer);
+      if (activeEditorTransient?.editor === instance) activeEditorTransient.close(false);
       wrapper.remove();
       input.hidden = false;
       editors.delete(el);
       editorListeners.get(instance)?.forEach((cleanup) => cleanup());
       const autosaveTimer = editorAutosaveTimers.get(instance);
       if (autosaveTimer) window.clearTimeout(autosaveTimer);
+      const autosaveKey = editorAutosaveKeys.get(instance);
+      if (autosaveKey) cancelRequest(autosaveKey);
+      editorUploadControllers.get(instance)?.abort();
+      editorUploadControllers.delete(instance);
+      destroyHistory(instance);
       editorListeners.delete(instance);
       emit('uif:editor-destroy', { editor: instance }, input);
     },
   };
-  editorInitialValue.set(instance, input.value);
-  editorHistory.set(instance, { undo: [], redo: [], last: input.value });
+  const initialValue = config.mode === 'html' ? cleanEditorHtml(input.value) : input.value;
+  input.value = initialValue;
+  editorInitialValue.set(instance, initialValue);
+  editorAutosaveKeys.set(instance, `uif-editor-autosave-${editorId}`);
+  editorAutosaveRevisions.set(instance, 0);
+  initializeHistory(instance, initialValue);
   editorListeners.set(instance, []);
+  const addEditorListener = (target: EventTarget, type: string, listener: EventListener, options?: boolean | AddEventListenerOptions) => {
+    target.addEventListener(type, listener, options);
+    const cleanup = () => target.removeEventListener(type, listener, options);
+    editorListeners.get(instance)?.push(cleanup);
+    return cleanup;
+  };
+  const announce = (message: string) => { announcer.textContent = message; };
   let savedRange: Range | null = null;
+  let richBookmark: EditorTextBookmark | null = null;
+  let richScroll = { left: 0, top: 0 };
+  let composing = false;
+  let sourceSelection: { end: number; scrollLeft: number; scrollTop: number; start: number } | null = null;
+  let htmlSourceBaseline = '';
+  let htmlSourceCleanup: (() => void) | null = null;
   const saveRichSelection = () => {
     if (surface instanceof HTMLTextAreaElement || instance.surface !== surface) return;
     const selection = document.getSelection();
@@ -1642,7 +2106,47 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
     const value = activeSurface instanceof HTMLTextAreaElement ? activeSurface.value : cleanEditorHtml(activeSurface.innerHTML);
     void runEditorHooks('beforeInput', { editor: instance, value });
     instance.setValue(value);
+    if (instance.mode === 'markdown') syncMarkdownSourceToPreview();
     void runEditorHooks('afterInput', { editor: instance, value });
+  };
+  const updateToolbarStates = () => {
+    wrapper.querySelectorAll<HTMLButtonElement>('.uif-editor-button[data-uif-editor-command]').forEach((button) => {
+      const command = button.dataset.uifEditorCommand;
+      if (!command || command === 'source' || command === 'preview') return;
+      const active = queryEditorCommand(instance, command);
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+  };
+  let syncingMarkdownScroll = false;
+  const markdownSource = surface instanceof HTMLTextAreaElement ? surface : null;
+  const releaseMarkdownScroll = () => window.requestAnimationFrame(() => { syncingMarkdownScroll = false; });
+  const sourceScrollRatio = () => {
+    if (!markdownSource) return 0;
+    const max = markdownSource.scrollHeight - markdownSource.clientHeight;
+    return max > 0 ? markdownSource.scrollTop / max : 0;
+  };
+  const syncMarkdownSourceToPreview = () => {
+    if (instance.mode !== 'markdown' || !markdownSource || preview.hidden || syncingMarkdownScroll) return;
+    syncingMarkdownScroll = true;
+    const lines = Math.max(1, markdownSource.value.split('\n').length);
+    const line = Math.round(sourceScrollRatio() * (lines - 1)) + 1;
+    const markers = [...preview.querySelectorAll<HTMLElement>('[data-uif-md-line]')];
+    const marker = markers.reduce<HTMLElement | null>((match, entry) => Number(entry.dataset.uifMdLine || 1) <= line ? entry : match, null);
+    const max = preview.scrollHeight - preview.clientHeight;
+    preview.scrollTop = marker ? Math.min(max, Math.max(0, marker.offsetTop)) : max * sourceScrollRatio();
+    releaseMarkdownScroll();
+  };
+  const syncMarkdownPreviewToSource = () => {
+    if (instance.mode !== 'markdown' || !markdownSource || markdownSource.hidden || syncingMarkdownScroll) return;
+    syncingMarkdownScroll = true;
+    const markers = [...preview.querySelectorAll<HTMLElement>('[data-uif-md-line]')];
+    const marker = markers.reduce<HTMLElement | null>((match, entry) => entry.offsetTop <= preview.scrollTop + 1 ? entry : match, null);
+    const lines = Math.max(1, markdownSource.value.split('\n').length);
+    const line = Number(marker?.dataset.uifMdLine || 1);
+    const max = markdownSource.scrollHeight - markdownSource.clientHeight;
+    markdownSource.scrollTop = max * Math.min(1, Math.max(0, (line - 1) / Math.max(1, lines - 1)));
+    releaseMarkdownScroll();
   };
   const updateActiveTableCell = (target: EventTarget | null) => {
     const cell = target instanceof Element ? target.closest<HTMLTableCellElement>('td,th') : null;
@@ -1660,11 +2164,32 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
   };
   const handleEditorKeydown = (event: KeyboardEvent) => {
     const activeSurface = instance.surface;
-    if (activeSurface instanceof HTMLTextAreaElement && instance.mode === 'markdown' && handleMarkdownTaskKey(activeSurface, event)) {
+    if (!(activeSurface instanceof HTMLTextAreaElement) && handleRichTableKey(instance, event)) {
+      syncFromSurface();
+      return;
+    }
+    if (event.key === 'Tab') {
+      const markdownList = activeSurface instanceof HTMLTextAreaElement && /^\s*(?:[-*+] |\d+\. )/.test(currentTextareaLine(activeSurface).line);
+      const richList = !(activeSurface instanceof HTMLTextAreaElement) && currentRichElement(instance, 'li') !== null;
+      if (markdownList || richList) {
+        event.preventDefault();
+        formatEditor(instance, event.shiftKey ? 'outdent' : 'indent');
+        return;
+      }
+    }
+    if (activeSurface instanceof HTMLTextAreaElement && instance.mode === 'markdown' && handleMarkdownListKey(activeSurface, event)) {
       syncFromSurface();
       return;
     }
     if (!(activeSurface instanceof HTMLTextAreaElement) && handleRichTaskKey(instance, event)) {
+      syncFromSurface();
+      return;
+    }
+    if (!(activeSurface instanceof HTMLTextAreaElement) && handleRichListKey(instance, event)) {
+      syncFromSurface();
+      return;
+    }
+    if (!(activeSurface instanceof HTMLTextAreaElement) && handleRichBlockKey(instance, event)) {
       syncFromSurface();
       return;
     }
@@ -1690,23 +2215,114 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
       formatEditor(instance, 'undo');
     }
   };
-  const handleEditorPaste = () => {
+  const insertRichTransfer = (html: string, text: string) => {
+    if (html) insertRichHtml(instance, html);
+    else if (text) {
+      const paragraphs = text.replace(/\r\n/g, '\n').split(/\n{2,}/).map((part) => `<p>${escapeHtml(part).replaceAll('\n', '<br>')}</p>`).join('');
+      insertRichHtml(instance, paragraphs);
+    }
+  };
+  const handleEditorPaste = (event: ClipboardEvent) => {
+    prepareHistory(instance, { origin: 'paste' });
     void runEditorHooks('beforePaste', { editor: instance, value: instance.getValue() });
+    if (!(instance.surface instanceof HTMLTextAreaElement)) {
+      event.preventDefault();
+      const html = event.clipboardData?.getData('text/html') ?? '';
+      const text = event.clipboardData?.getData('text/plain') ?? '';
+      if (!pasteRichTableGrid(instance, text)) insertRichTransfer(html, text);
+      syncFromSurface();
+      saveRichSelection();
+      updateToolbarStates();
+      void runEditorHooks('afterPaste', { editor: instance, value: instance.getValue() });
+      return;
+    }
     window.setTimeout(() => {
       syncFromSurface();
       void runEditorHooks('afterPaste', { editor: instance, value: instance.getValue() });
     });
   };
+  const handleEditorDrop = async (event: DragEvent) => {
+    if (instance.surface instanceof HTMLTextAreaElement) return;
+    event.preventDefault();
+    prepareHistory(instance, { origin: 'drop' });
+    const files = Array.from(event.dataTransfer?.files ?? []);
+    editorUploadControllers.get(instance)?.abort();
+    const uploadController = new AbortController();
+    editorUploadControllers.set(instance, uploadController);
+    try {
+      await runEditorHooks('beforeDrop', { editor: instance, value: instance.getValue(), signal: uploadController.signal });
+      if (files.length) {
+        instance.element.dataset.uifUploadState = 'uploading';
+        for (const file of files) {
+          if (!file.type.startsWith('image/')) continue;
+          if (file.size > config.uploadMaxBytes) throw new Error(`Image exceeds the ${config.uploadMaxBytes} byte upload limit`);
+          const results = await runEditorHooks('uploadImage', { editor: instance, value: instance.getValue(), file, signal: uploadController.signal });
+          if (uploadController.signal.aborted) return;
+          const url = results.find((result): result is string => typeof result === 'string' && isSafeURL(result, { context: 'image', allowHash: false }));
+          if (url) insertRichHtml(instance, `<img src="${escapeAttr(url)}" alt="${escapeAttr(file.name)}">`);
+        }
+        instance.element.dataset.uifUploadState = 'uploaded';
+      } else {
+        insertRichTransfer(event.dataTransfer?.getData('text/html') ?? '', event.dataTransfer?.getData('text/plain') ?? '');
+      }
+      syncFromSurface();
+      saveRichSelection();
+      updateToolbarStates();
+      await runEditorHooks('afterDrop', { editor: instance, value: instance.getValue(), signal: uploadController.signal });
+    } catch (error) {
+      if (uploadController.signal.aborted) return;
+      instance.element.dataset.uifUploadState = 'error';
+      emit('uif:editor-upload-error', { editor: instance, error }, instance.element);
+      emit('uif:editor-error', { editor: instance, error }, instance.element);
+    } finally {
+      if (editorUploadControllers.get(instance) === uploadController) editorUploadControllers.delete(instance);
+    }
+  };
   const bindCurrentSurfaceEvents = (current: HTMLElement) => {
-    current.addEventListener('input', syncFromSurface);
-    current.addEventListener('change', syncFromSurface);
-    current.addEventListener('keydown', (event) => {
+    const listeners = editorListeners.get(instance) as Array<() => void>;
+    const start = listeners.length;
+    addEditorListener(current, 'compositionstart', () => {
+      prepareHistory(instance, { origin: 'composition' });
+      composing = true;
+    });
+    addEditorListener(current, 'compositionend', () => {
+      composing = false;
+      syncFromSurface();
+    });
+    addEditorListener(current, 'beforeinput', (event) => {
+      if (!composing) prepareHistory(instance, { origin: current instanceof HTMLTextAreaElement && instance.sourceMode ? 'source' : 'input', inputType: event instanceof InputEvent ? event.inputType : '' });
+    });
+    addEditorListener(current, 'input', () => { if (!composing) syncFromSurface(); });
+    addEditorListener(current, 'change', syncFromSurface);
+    addEditorListener(current, 'keyup', () => updateStatus(instance));
+    addEditorListener(current, 'mouseup', () => updateStatus(instance));
+    addEditorListener(current, 'select', () => updateStatus(instance));
+    addEditorListener(current, 'keydown', (event) => {
       if (event instanceof KeyboardEvent) handleEditorKeydown(event);
     });
-    current.addEventListener('paste', handleEditorPaste);
-    current.addEventListener('focus', () => emit('uif:editor-focus', { editor: instance }, wrapper));
-    current.addEventListener('blur', () => emit('uif:editor-blur', { editor: instance }, wrapper));
+    addEditorListener(current, 'paste', (event) => handleEditorPaste(event as ClipboardEvent));
+    addEditorListener(current, 'dragover', (event) => { if (!(instance.surface instanceof HTMLTextAreaElement)) event.preventDefault(); });
+    addEditorListener(current, 'drop', (event) => { void handleEditorDrop(event as DragEvent); });
+    addEditorListener(current, 'focus', () => emit('uif:editor-focus', { editor: instance }, wrapper));
+    addEditorListener(current, 'blur', () => emit('uif:editor-blur', { editor: instance }, wrapper));
+    return () => listeners.splice(start, listeners.length - start).forEach((cleanup) => cleanup());
   };
+  if (input.form) {
+    addEditorListener(input.form, 'reset', () => {
+      if (resetTimer !== undefined) window.clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(() => {
+        resetTimer = undefined;
+        if (destroyed) return;
+        const value = config.mode === 'html' ? cleanEditorHtml(input.value) : input.value;
+        editorInitialValue.set(instance, value);
+        instance.setValue(value);
+        initializeHistory(instance, value);
+        instance.dirty = false;
+        updateStatus(instance);
+        emit('uif:editor-reset', { editor: instance, value }, wrapper);
+      });
+    });
+  }
   const setMarkdownSourceMode = (sourceVisible: boolean, focus = true) => {
     instance.sourceMode = sourceVisible;
     surface.hidden = !sourceVisible;
@@ -1717,36 +2333,58 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
     }
     const sourceButton = wrapper.querySelector<HTMLButtonElement>('[data-uif-editor-command="source"]');
     sourceButton?.setAttribute('aria-pressed', String(instance.sourceMode));
+    updateStatus(instance);
     if (focus) (sourceVisible ? surface : preview).focus();
   };
   bindCurrentSurfaceEvents(surface);
-  surface.addEventListener('keyup', (event) => {
+  if (config.mode === 'markdown') {
+    addEditorListener(surface, 'scroll', syncMarkdownSourceToPreview as EventListener);
+    addEditorListener(preview, 'scroll', syncMarkdownPreviewToSource as EventListener);
+  }
+  addEditorListener(surface, 'keyup', (event) => {
     saveRichSelection();
     updateTableTools(event.target);
+    updateToolbarStates();
   });
-  surface.addEventListener('mouseup', (event) => {
+  addEditorListener(surface, 'mouseup', (event) => {
     saveRichSelection();
     updateTableTools(event.target);
+    updateToolbarStates();
   });
-  toolbar.addEventListener('mousedown', (event) => {
+  addEditorListener(toolbar, 'mousedown', (event) => {
     if (event.target instanceof Element && event.target.closest('[data-uif-editor-command]')) event.preventDefault();
   });
-  toolbar.addEventListener('keydown', (event) => {
+  addEditorListener(toolbar, 'keydown', (event) => {
     if (!(event instanceof KeyboardEvent)) return;
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) {
+      const buttons = toolbarButtons();
+      const current = event.target instanceof HTMLButtonElement ? buttons.indexOf(event.target) : -1;
+      if (current < 0 || !buttons.length) return;
+      event.preventDefault();
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (current + (event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length;
+      buttons.forEach((button, index) => { button.tabIndex = index === next ? 0 : -1; });
+      buttons[next]?.focus();
+      return;
+    }
     if (event.key !== 'Enter' && event.key !== ' ') return;
     const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-uif-editor-command]') : null;
     if (!button) return;
     event.preventDefault();
     button.click();
   });
-  toolbar.addEventListener('click', (event) => {
+  addEditorListener(toolbar, 'focusin', (event) => {
+    const button = event.target instanceof HTMLButtonElement ? event.target : null;
+    if (!button?.classList.contains('uif-editor-button')) return;
+    toolbarButtons().forEach((entry) => { entry.tabIndex = entry === button ? 0 : -1; });
+  });
+  addEditorListener(toolbar, 'click', (event) => {
     const button = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-uif-editor-command]') : null;
     const command = button?.dataset.uifEditorCommand as EditorCommand | undefined;
     if (!button || !command) return;
     if (command === 'preview') {
       const layout = (instance.element.dataset.uifEditorLayout as EditorLayout | undefined) ?? config.layout;
       if (config.mode === 'markdown' && (layout === 'modal' || layout === 'drawer')) {
-        openPreviewOverlay(instance, layout);
+        openPreviewOverlay(instance, layout, button);
         return;
       }
       void runEditorHooks('beforePreview', { editor: instance, value: instance.getValue(), command });
@@ -1766,6 +2404,7 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
       }
       button.setAttribute('aria-pressed', String(!preview.hidden));
       emit('uif:editor-preview', { editor: instance, visible: !preview.hidden }, wrapper);
+      announce(`Preview ${preview.hidden ? 'hidden' : 'shown'}`);
       void runEditorHooks('afterPreview', { editor: instance, value: instance.getValue(), command });
       return;
     }
@@ -1773,27 +2412,62 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
       instance.sourceMode = !instance.sourceMode;
       button.setAttribute('aria-pressed', String(instance.sourceMode));
       if (instance.sourceMode) {
+        saveRichSelection();
+        richBookmark = captureTextBookmark(surface) ?? richBookmark;
+        richScroll = { left: surface.scrollLeft, top: surface.scrollTop };
         const source = document.createElement('textarea');
         source.className = 'uif-editor-source';
         source.style.minHeight = config.height;
         source.value = instance.getValue();
+        htmlSourceBaseline = source.value;
         body.replaceChild(source, surface);
         instance.surface = source;
-        bindCurrentSurfaceEvents(source);
+        htmlSourceCleanup = bindCurrentSurfaceEvents(source);
         savedRange = null;
         editorActiveTableCell.delete(instance);
         updateTableTools();
         source.focus();
+        if (sourceSelection) {
+          source.setSelectionRange(sourceSelection.start, sourceSelection.end);
+          source.scrollTop = sourceSelection.scrollTop;
+          source.scrollLeft = sourceSelection.scrollLeft;
+        } else if (richBookmark?.text) {
+          const selectedStart = source.value.indexOf(richBookmark.text);
+          if (selectedStart >= 0) source.setSelectionRange(selectedStart, selectedStart + richBookmark.text.length);
+        }
       } else {
-        body.replaceChild(surface, instance.surface);
+        const source = instance.surface as HTMLTextAreaElement;
+        htmlSourceCleanup?.();
+        htmlSourceCleanup = null;
+        sourceSelection = { start: source.selectionStart, end: source.selectionEnd, scrollTop: source.scrollTop, scrollLeft: source.scrollLeft };
+        const sourceValue = source.value;
+        const cleaned = cleanEditorHtml(sourceValue);
+        if (cleaned !== source.value) source.value = cleaned;
+        instance.setValue(cleaned);
+        body.replaceChild(surface, source);
         instance.surface = surface;
-        surface.innerHTML = cleanEditorHtml(instance.getValue());
-        savedRange = null;
+        if (surface.innerHTML !== cleaned) {
+          setTrustedHTML(surface, cleaned, { trusted: true, context: 'editor input normalization' });
+          savedRange = null;
+        }
         editorActiveTableCell.delete(instance);
         updateTableTools();
         surface.focus();
+        surface.scrollTop = richScroll.top;
+        surface.scrollLeft = richScroll.left;
+        if (!richBookmark || !restoreTextBookmark(surface, richBookmark)) {
+          if (cleaned === htmlSourceBaseline) restoreRichSelection();
+        }
+        saveRichSelection();
+        richBookmark = captureTextBookmark(surface) ?? richBookmark;
+        if (cleaned !== sourceValue) {
+          emit('uif:editor-normalize', { editor: instance, source: sourceValue, normalized: cleaned }, wrapper);
+        }
+        updateToolbarStates();
       }
       emit('uif:editor-mode-change', { editor: instance, source: instance.sourceMode }, wrapper);
+      updateStatus(instance);
+      announce(`${instance.sourceMode ? 'Source' : 'Rich'} mode`);
       return;
     }
     if (command === 'source' && config.mode === 'markdown') {
@@ -1810,11 +2484,12 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
         setMarkdownSourceMode(!instance.sourceMode);
       }
       emit('uif:editor-mode-change', { editor: instance, source: instance.sourceMode }, wrapper);
+      announce(`${instance.sourceMode ? 'Source' : 'Preview'} mode`);
       return;
     }
     emit('uif:editor-command', { editor: instance, command }, wrapper);
     restoreRichSelection();
-    if ((command === 'link' || command === 'image' || command === 'table') && !(event instanceof CustomEvent)) {
+    if ((command === 'link' || command === 'image' || command === 'table' || command === 'code-block') && !(event instanceof CustomEvent)) {
       openEditorCommandDialog(instance, command, (value) => {
         restoreRichSelection();
         formatEditor(instance, command, value);
@@ -1824,24 +2499,39 @@ export function createEditor(el: HTMLElement, options: EditorOptions = {}): Edit
       return;
     }
     if (config.mode === 'markdown' && !instance.sourceMode) setMarkdownSourceMode(true);
+    const wasActive = queryEditorCommand(instance, command);
     formatEditor(instance, command);
     saveRichSelection();
     updateTableTools();
+    updateToolbarStates();
+    if (!['undo', 'redo', 'link', 'image', 'table', 'code-block', 'clear', 'hr'].includes(command)) {
+      announce(`${editorCommandLabel(command)} ${wasActive ? 'off' : 'on'}`);
+    }
   });
-  tableTools.addEventListener('click', (event) => {
+  addEditorListener(tableTools, 'click', (event) => {
     const button = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-uif-editor-command]') : null;
     const command = button?.dataset.uifEditorCommand as EditorCommand | undefined;
     if (!command) return;
     restoreRichSelection();
+    if (command === 'table-caption') {
+      openEditorCommandDialog(instance, command, (value) => {
+        restoreRichSelection();
+        formatEditor(instance, command, value);
+        saveRichSelection();
+        updateTableTools();
+      }, button ?? undefined);
+      return;
+    }
     formatEditor(instance, command);
     saveRichSelection();
     updateTableTools();
+    updateToolbarStates();
   });
-  tableTools.addEventListener('mousedown', (event) => {
+  addEditorListener(tableTools, 'mousedown', (event) => {
     if (event.target instanceof Element && event.target.closest('[data-uif-editor-command]')) event.preventDefault();
   });
   editors.set(el, instance);
-  instance.setValue(input.value);
+  instance.setValue(initialValue);
   setEditorPreviewLayout(instance, config.layout);
   emit('uif:editor-init', { editor: instance }, wrapper);
   return instance;

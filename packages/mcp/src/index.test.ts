@@ -52,4 +52,39 @@ describe('mcp', () => {
     (el.querySelector('[data-uif-action="approve"]') as HTMLButtonElement).click();
     expect(approve).toHaveBeenCalledWith(expect.objectContaining({ detail: expect.objectContaining({ tool: 'db.create_index', risk: 'high', irreversible: true }) }));
   });
+
+  it('bounds and safely serializes tool payloads', () => {
+    const el = document.createElement('div');
+    const circular: Record<string, unknown> = {};
+    circular.self = circular;
+
+    renderToolResult(el, circular, { maxCharacters: 20 });
+    expect(el.textContent).toContain('[Unserializable tool payload]');
+    renderToolResult(el, { value: '1234567890' }, { maxCharacters: 8 });
+    expect(el.textContent).toContain('[truncated]');
+  });
+
+  it('blocks expired approvals and makes accepted decisions one-shot and correlated', () => {
+    const expiredHost = document.createElement('div');
+    const expired = vi.fn();
+    const approve = vi.fn();
+    expiredHost.addEventListener('uif:tool-expired', expired);
+    expiredHost.addEventListener('uif:tool-approve', approve);
+    renderToolReviewFlow(expiredHost, { tool: 'deploy', requestId: 'req-expired', expiresAt: '2000-01-01T00:00:00.000Z' });
+    (expiredHost.querySelector('[data-uif-action="approve"]') as HTMLButtonElement).click();
+    expect(expired).toHaveBeenCalledWith(expect.objectContaining({ detail: expect.objectContaining({ requestId: 'req-expired' }) }));
+    expect(approve).not.toHaveBeenCalled();
+
+    const acceptedHost = document.createElement('div');
+    const accepted = vi.fn();
+    acceptedHost.addEventListener('uif:tool-approve', accepted);
+    renderToolReviewFlow(acceptedHost, { tool: 'deploy', requestId: 'req-1', auditRef: 'audit-7', expiresAt: '2999-01-01T00:00:00.000Z' });
+    const button = acceptedHost.querySelector('[data-uif-action="approve"]') as HTMLButtonElement;
+    button.click();
+    button.click();
+    expect(accepted).toHaveBeenCalledOnce();
+    expect(accepted).toHaveBeenCalledWith(expect.objectContaining({ detail: expect.objectContaining({ requestId: 'req-1', auditRef: 'audit-7' }) }));
+    expect(button.disabled).toBe(true);
+    expect(acceptedHost.querySelector('.uif-tool-review')?.getAttribute('data-uif-decision')).toBe('approve');
+  });
 });

@@ -7,6 +7,7 @@ export interface RequestOptions extends RequestInit {
   dedupe?: boolean;
   retries?: number;
   retryDelay?: number;
+  idempotent?: boolean;
   csrfToken?: string;
   csrfHeader?: string;
   onUploadProgress?: (loaded: number, total: number) => void;
@@ -34,6 +35,10 @@ export interface DataConnector<T = unknown> {
   transform?: (value: unknown) => T | Promise<T>;
 }
 
+export interface ConnectorBindingOptions extends RequestOptions {
+  onError?: (error: unknown) => void;
+}
+
 type RequestInterceptor = (url: string, options: RequestOptions) => void | RequestOptions | Promise<void | RequestOptions>;
 type ResponseInterceptor = (response: Response) => void | Response | Promise<void | Response>;
 
@@ -41,6 +46,7 @@ const requestInterceptors: RequestInterceptor[] = [];
 const responseInterceptors: ResponseInterceptor[] = [];
 const controllers = new Map<string, AbortController>();
 const pending = new Map<string, Promise<unknown>>();
+let connectorSequence = 0;
 
 export function useRequestInterceptor(fn: RequestInterceptor): () => void {
   requestInterceptors.push(fn);
@@ -59,6 +65,16 @@ async function parseResponse(response: Response, parseAs: RequestOptions['parseA
     return response.status === 204 ? null : response.json();
   }
   return response.text();
+}
+
+function canRetry(method: string, options: RequestOptions): boolean {
+  return options.idempotent === true || ['GET', 'HEAD', 'OPTIONS'].includes(method);
+}
+
+function isRetryableError(error: unknown): boolean {
+  if (error instanceof DOMException && error.name === 'AbortError') return false;
+  const status = (error as UIFRequestError | undefined)?.status;
+  return status === undefined || status === 408 || status === 429 || status >= 500;
 }
 
 function delay(ms: number): Promise<void> {
@@ -85,6 +101,10 @@ export async function request<T = unknown>(url: string, options: RequestOptions 
   if (options.dedupe && pending.has(key)) return pending.get(key) as Promise<T>;
   cancelRequest(key);
   const controller = new AbortController();
+  const externalSignal = options.signal;
+  const abortFromExternal = () => controller.abort(externalSignal?.reason);
+  if (externalSignal?.aborted) abortFromExternal();
+  else externalSignal?.addEventListener('abort', abortFromExternal, { once: true });
   controllers.set(key, controller);
   const timeout = options.timeout ? window.setTimeout(() => controller.abort(), options.timeout) : undefined;
   let req: RequestOptions = { ...options, headers: withCsrf(options.headers, options), signal: controller.signal };
@@ -92,11 +112,12 @@ export async function request<T = unknown>(url: string, options: RequestOptions 
   const runner = async (): Promise<T> => {
     for (const interceptor of requestInterceptors) {
       const next = await interceptor(url, req);
-      if (next) req = next;
+      if (next) req = { ...next, signal: controller.signal };
     }
 
     emit('uif:request', { url, options: req });
-    const attempts = Math.max(0, req.retries ?? 0) + 1;
+    const method = String(req.method ?? 'GET').toUpperCase();
+    const attempts = (canRetry(method, req) ? Math.max(0, Math.min(10, Math.floor(req.retries ?? 0))) : 0) + 1;
     let lastError: unknown;
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
       try {
@@ -121,7 +142,7 @@ export async function request<T = unknown>(url: string, options: RequestOptions 
         return data as T;
       } catch (error) {
         lastError = error;
-        if (attempt >= attempts || controller.signal.aborted) break;
+        if (attempt >= attempts || controller.signal.aborted || !isRetryableError(error)) break;
         await delay(req.retryDelay ?? 250 * attempt);
       }
     }
@@ -131,8 +152,9 @@ export async function request<T = unknown>(url: string, options: RequestOptions 
 
   const promise = runner().finally(() => {
     if (timeout) window.clearTimeout(timeout);
-    controllers.delete(key);
-    pending.delete(key);
+    if (controllers.get(key) === controller) controllers.delete(key);
+    if (pending.get(key) === promise) pending.delete(key);
+    externalSignal?.removeEventListener('abort', abortFromExternal);
     emit('uif:complete', { url, key });
   });
   pending.set(key, promise);
@@ -161,19 +183,37 @@ export function upload<T = unknown>(url: string, formData: FormData, options: Re
     return new Promise<T>((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open(options.method ?? 'POST', url);
+      xhr.timeout = Math.max(0, options.timeout ?? 0);
+      xhr.withCredentials = options.credentials === 'include';
       const headers = withCsrf(options.headers, options);
-      if (headers && !(headers instanceof Headers) && !Array.isArray(headers)) {
-        Object.entries(headers).forEach(([name, value]) => xhr.setRequestHeader(name, String(value)));
-      }
+      new Headers(headers).forEach((value, name) => xhr.setRequestHeader(name, value));
+      const abort = () => xhr.abort();
+      const cleanup = () => options.signal?.removeEventListener('abort', abort);
       xhr.upload.addEventListener('progress', (event) => options.onUploadProgress?.(event.loaded, event.total));
       xhr.addEventListener('load', () => {
+        cleanup();
+        let data: unknown;
         try {
-          resolve(JSON.parse(xhr.responseText || 'null') as T);
+          data = JSON.parse(xhr.responseText || 'null');
         } catch {
-          resolve(xhr.responseText as T);
+          data = xhr.responseText;
+        }
+        if (xhr.status >= 200 && xhr.status < 300) resolve(data as T);
+        else {
+          const error = new Error(`Upload failed: ${xhr.status}`) as UIFRequestError;
+          error.status = xhr.status;
+          error.data = data;
+          reject(error);
         }
       });
-      xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+      xhr.addEventListener('error', () => { cleanup(); reject(new Error('Upload failed')); });
+      xhr.addEventListener('timeout', () => { cleanup(); reject(new DOMException('Upload timed out', 'TimeoutError')); });
+      xhr.addEventListener('abort', () => { cleanup(); reject(new DOMException('Upload aborted', 'AbortError')); });
+      if (options.signal?.aborted) {
+        reject(new DOMException('Upload aborted', 'AbortError'));
+        return;
+      }
+      options.signal?.addEventListener('abort', abort, { once: true });
       xhr.send(formData);
     });
   }
@@ -243,17 +283,31 @@ export async function loadConnector<T = unknown>(connector: DataConnector<T>, op
   return connector.transform ? connector.transform(value) : (value as T);
 }
 
-export function bindConnector<T = unknown>(connector: DataConnector<T>, handler: (value: T) => void | Promise<void>, options: RequestOptions = {}): () => void {
+export function bindConnector<T = unknown>(connector: DataConnector<T>, handler: (value: T) => void | Promise<void>, options: ConnectorBindingOptions = {}): () => void {
   let stopped = false;
+  let running = false;
   let timer: number | undefined;
+  const key = options.key ?? `connector:${++connectorSequence}`;
   const load = async () => {
-    const value = await loadConnector(connector, options);
-    if (!stopped) await handler(value);
+    if (stopped || running) return;
+    running = true;
+    try {
+      const value = await loadConnector(connector, { ...options, key });
+      if (!stopped) await handler(value);
+    } catch (error) {
+      if (!stopped && !(error instanceof DOMException && error.name === 'AbortError')) {
+        options.onError?.(error);
+        window.dispatchEvent(new CustomEvent('uif:connector-error', { detail: { connector, error } }));
+      }
+    } finally {
+      running = false;
+    }
   };
   void load();
-  if (connector.refreshInterval) timer = window.setInterval(() => void load(), connector.refreshInterval);
+  if (connector.refreshInterval) timer = window.setInterval(() => void load(), Math.max(250, connector.refreshInterval));
   return () => {
     stopped = true;
     if (timer) window.clearInterval(timer);
+    cancelRequest(key);
   };
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { isInitialized, mount, registerComponent, resolveTarget, setSafeHTML, setText, setTrustedHTML, swapTrustedHTML, unmount } from './index.js';
+import { configureTrustedTypes, getTrustedTypesPolicy, isInitialized, isSafeURL, mount, registerComponent, resolveTarget, safeQuerySelector, setSafeHTML, setText, setTrustedHTML, swapTrustedHTML, unmount } from './index.js';
 
 describe('dom', () => {
   it('resolves target expressions', () => {
@@ -8,6 +8,8 @@ describe('dom', () => {
     expect(resolveTarget(button, '#target')).toBe(document.querySelector('#target'));
     expect(resolveTarget(button, 'parent')).toBe(button.parentElement);
     expect(resolveTarget(button, 'closest:.wrap')).toBe(button.parentElement);
+    expect(resolveTarget(button, '[invalid')).toBeNull();
+    expect(safeQuerySelector('[invalid')).toBeNull();
   });
 
   it('mounts components once and unmounts them', () => {
@@ -40,6 +42,29 @@ describe('dom', () => {
     expect(target.querySelector('p')?.hasAttribute('onclick')).toBe(false);
     expect(target.querySelector('a')?.hasAttribute('href')).toBe(false);
     expect(target.textContent).toContain('Hello link');
+  });
+
+  it('routes safe and trusted HTML sinks through an optional Trusted Types policy', () => {
+    const calls: string[] = [];
+    const policy = { createHTML: (input: string) => { calls.push(input); return input; } };
+    configureTrustedTypes(policy);
+    expect(getTrustedTypesPolicy()).toBe(policy);
+    const target = document.createElement('div');
+    setSafeHTML(target, '<strong>Safe</strong>');
+    setTrustedHTML(target, '<em>Trusted</em>', { trusted: true });
+    expect(calls).toEqual(['<strong>Safe</strong>', '<em>Trusted</em>']);
+    configureTrustedTypes(null);
+    expect(getTrustedTypesPolicy()).toBeNull();
+  });
+
+  it('applies URL policy by context and origin', () => {
+    expect(isSafeURL('/docs', { context: 'navigation', sameOrigin: true })).toBe(true);
+    expect(isSafeURL('mailto:team@example.com', { context: 'link' })).toBe(true);
+    expect(isSafeURL('tel:+123456789', { context: 'link' })).toBe(true);
+    expect(isSafeURL('javascript:alert(1)', { context: 'link' })).toBe(false);
+    expect(isSafeURL('//evil.example/path', { context: 'network' })).toBe(false);
+    expect(isSafeURL('data:image/svg+xml,<svg/>', { context: 'image' })).toBe(false);
+    expect(isSafeURL('https://evil.example/path', { context: 'network', sameOrigin: true })).toBe(false);
   });
 
   it('swaps trusted HTML and returns the updated element', () => {

@@ -1,5 +1,6 @@
 // src/index.ts
 import { request } from "@batoi/uif-net";
+import { isSafeURL, safeQuerySelector, setTrustedHTML } from "@batoi/uif-dom";
 
 // src/flint.ts
 function asRows(input) {
@@ -1283,6 +1284,7 @@ async function loadChartData(el) {
     if (table) return adaptTable(table);
   }
   if (el.dataset.uifSrc) {
+    if (!isSafeURL(el.dataset.uifSrc, { context: "network", allowHash: false, sameOrigin: el.dataset.uifAllowCrossOrigin !== "true" })) throw new Error("Batoi UIF blocked an unsafe chart data URL");
     const response = await request(
       el.dataset.uifSrc,
       { method: "GET" }
@@ -1294,6 +1296,7 @@ async function loadChartData(el) {
 }
 async function loadFlintChart(el) {
   if (el.dataset.uifSrc) {
+    if (!isSafeURL(el.dataset.uifSrc, { context: "network", allowHash: false, sameOrigin: el.dataset.uifAllowCrossOrigin !== "true" })) throw new Error("Batoi UIF blocked an unsafe chart data URL");
     const response = await request(el.dataset.uifSrc, { method: "GET" });
     return adaptFlintChart(flintInputFromElement(el, response), optionsFromElement(el, false));
   }
@@ -1340,7 +1343,8 @@ function chartDrilldownOptions(el, options) {
     action: el.dataset.uifDrilldown || configured.action || (el.dataset.uifDrilldownTarget ? "target" : el.dataset.uifDrilldownUrl ? "url" : "event"),
     target: el.dataset.uifDrilldownTarget || configured.target,
     url: el.dataset.uifDrilldownUrl || configured.url,
-    param: el.dataset.uifDrilldownParam || configured.param || "label"
+    param: el.dataset.uifDrilldownParam || configured.param || "label",
+    allowCrossOrigin: el.dataset.uifAllowCrossOrigin === "true" || configured.allowCrossOrigin
   };
 }
 function buildSelectionDetail(target, data, options) {
@@ -1389,19 +1393,28 @@ async function runDrilldown(el, detail, options) {
   );
   if (options.action === "event") return;
   if (options.action === "route" || options.action === "url" && !options.target) {
-    if (options.url)
-      window.location.assign(resolveDrilldownUrl(options.url, detail, options.param || "label"));
+    if (options.url) {
+      const url = resolveDrilldownUrl(options.url, detail, options.param || "label");
+      if (!isSafeURL(url, { context: "navigation", sameOrigin: !options.allowCrossOrigin })) {
+        el.dispatchEvent(new CustomEvent("uif:chart-drilldown-error", { detail: { error: new Error("Batoi UIF blocked an unsafe chart drilldown URL"), selection: detail, drilldown: options }, bubbles: true }));
+        return;
+      }
+      window.location.assign(url);
+    }
     return;
   }
   if (!options.target || !options.url) return;
-  const target = document.querySelector(options.target);
+  const target = safeQuerySelector(options.target);
   if (!target) return;
   target.dataset.uifState = "loading";
   try {
-    target.innerHTML = await request(
-      resolveDrilldownUrl(options.url, detail, options.param || "label"),
+    const url = resolveDrilldownUrl(options.url, detail, options.param || "label");
+    if (!isSafeURL(url, { context: "network", allowHash: false, sameOrigin: !options.allowCrossOrigin })) throw new Error("Batoi UIF blocked an unsafe chart drilldown URL");
+    const html = await request(
+      url,
       { method: "GET", parseAs: "text" }
     );
+    setTrustedHTML(target, html, { trusted: true, context: "chart drilldown" });
     target.dataset.uifState = "loaded";
   } catch (error) {
     target.dataset.uifState = "error";
@@ -1432,14 +1445,14 @@ function initChart(el) {
         data = await loadChartData(el);
         options = optionsFromElement(el);
       }
-      el.innerHTML = renderChart(data, responsiveOptions(el, options));
+      setTrustedHTML(el, renderChart(data, responsiveOptions(el, options)), { trusted: true, context: "chart render" });
       el.dataset.uifState = data.length ? "refreshed" : "empty";
       el.dispatchEvent(
         new CustomEvent("uif:chart-refresh", { detail: { data, options }, bubbles: true })
       );
     } catch (error) {
       el.dataset.uifState = "error";
-      el.innerHTML = `<div class="uif-chart-state" data-uif-state="error">${esc(el.dataset.uifError || "Unable to load chart")}</div>`;
+      setTrustedHTML(el, `<div class="uif-chart-state" data-uif-state="error">${esc(el.dataset.uifError || "Unable to load chart")}</div>`, { trusted: true, context: "chart error" });
       el.dispatchEvent(new CustomEvent("uif:chart-error", { detail: { error }, bubbles: true }));
       throw error;
     }
@@ -1447,7 +1460,7 @@ function initChart(el) {
   const resize = typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => {
     if (resizeTimer) window.clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(() => {
-      el.innerHTML = renderChart(data, responsiveOptions(el, options));
+      setTrustedHTML(el, renderChart(data, responsiveOptions(el, options)), { trusted: true, context: "chart resize" });
     }, 80);
   }) : null;
   resize?.observe(el);
@@ -1494,7 +1507,7 @@ function initChart(el) {
     }
   };
   controllers.set(el, controller);
-  void refresh();
+  void refresh().catch(() => void 0);
   return controller;
 }
 function refreshChart(el) {

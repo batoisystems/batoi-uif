@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "categories": ["authority", "html", "navigation", "network", "realtime", "selector", "service-worker", "storage", "url"],
+  "packages": {
+    "actions": { "boundaries": ["navigation", "selector", "url"], "policy": "Declarative commands use validated targets and governed navigation." },
+    "ai": { "boundaries": ["authority", "html"], "policy": "Model content renders as bounded text; privileged execution remains server-side." },
+    "charts": { "boundaries": ["html", "network", "url"], "policy": "SVG output uses governed sinks and remote/drilldown URLs use centralized policy." },
+    "components": { "boundaries": ["html", "selector"], "policy": "Components construct DOM or consume explicitly trusted server markup and safe targets." },
+    "core": { "boundaries": [], "policy": "Lifecycle and registry orchestration does not accept remote authority." },
+    "css": { "boundaries": [], "policy": "Static CSS distribution has no executable trust boundary." },
+    "dashboard": { "boundaries": ["html"], "policy": "Custom widget HTML is explicitly caller-trusted; ordinary values render as text." },
+    "desktop": { "boundaries": ["html", "storage", "url"], "policy": "Body HTML is caller-trusted; links and versioned preference storage are governed." },
+    "dom": { "boundaries": ["html", "selector", "url"], "policy": "Central sanitizer, Trusted Types sink, selector containment, and URL policy." },
+    "editor": { "boundaries": ["html", "network", "url"], "policy": "HTML is sanitized at every edit boundary; autosave/upload authority remains server-side." },
+    "effects": { "boundaries": ["selector"], "policy": "Animation and effect targets tolerate malformed selectors and own lifecycle state." },
+    "extension-kit": { "boundaries": [], "policy": "Extension profile helpers expose browser UI metadata without privileged execution." },
+    "forms": { "boundaries": ["html", "network", "selector", "url"], "policy": "Actions use URL policy; errors are bounded text; server validation remains authoritative." },
+    "icons": { "boundaries": ["html"], "policy": "First-party SVG definitions render through governed DOM sinks." },
+    "mcp": { "boundaries": ["authority", "html"], "policy": "Tool payloads are bounded text-only review UI; execution and audit remain server-side." },
+    "mobile": { "boundaries": [], "policy": "Mobile shell behavior owns local DOM lifecycle without remote authority." },
+    "net": { "boundaries": ["network"], "policy": "Fetch/upload cancellation, retries, errors, credentials, and connectors are governed." },
+    "overlays": { "boundaries": ["selector"], "policy": "Overlay ownership and focus targets remain local DOM operations." },
+    "push": { "boundaries": ["network", "service-worker", "url"], "policy": "Subscription APIs require permission and server endpoints remain same-origin." },
+    "pwa": { "boundaries": ["network", "service-worker", "storage", "url"], "policy": "Worker scope, cache eligibility, updates, and idempotent offline work are bounded." },
+    "query": { "boundaries": ["html", "selector"], "policy": "String insertion is explicitly trusted; selector operations use DOM ownership rules." },
+    "rad-adapter": { "boundaries": ["authority", "html", "navigation", "network", "selector", "url"], "policy": "Versioned bounded envelopes apply trusted partials and allowlisted UI actions only." },
+    "realtime": { "boundaries": ["network", "realtime", "url"], "policy": "Endpoints, payload size, reconnect attempts, visibility, and teardown are bounded." },
+    "router": { "boundaries": ["html", "navigation", "network", "selector", "url"], "policy": "Guards, same-origin partials, stale cancellation, history, and trusted HTML are governed." },
+    "state": { "boundaries": ["storage"], "policy": "Versioned bounded persistence reports parse, schema, quota, and access failures." },
+    "table": { "boundaries": ["html", "network", "selector", "url"], "policy": "Remote payload shape/render limits and trusted-row HTML boundaries are explicit." }
+  }
+}

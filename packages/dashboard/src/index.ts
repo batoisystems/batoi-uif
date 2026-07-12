@@ -1,4 +1,5 @@
 import { renderChart, type ChartDatum, type ChartOptions } from '@batoi/uif-charts';
+import { setTrustedHTML } from '@batoi/uif-dom';
 
 export type DashboardWidgetType = 'metric' | 'chart' | 'table' | 'list' | 'custom';
 export type DashboardFilterOperator = 'equals' | 'contains' | 'between' | 'gte' | 'lte';
@@ -37,6 +38,13 @@ export interface DashboardRenderOptions {
   className?: string;
   emptyText?: string;
 }
+
+export interface DashboardController {
+  refresh(config?: DashboardConfig): void;
+  destroy(): void;
+}
+
+const dashboardControllers = new WeakMap<HTMLElement, DashboardController>();
 
 function esc(value: unknown): string {
   return String(value ?? '')
@@ -137,9 +145,30 @@ export function renderDashboard(input: DashboardConfig, options: DashboardRender
   return `<section class="${esc(className)}" data-uif-dashboard-columns="${config.columns}" data-uif-dashboard-density="${esc(config.density)}"><header class="uif-dashboard-head"><div><h2>${esc(config.title)}</h2>${config.description ? `<p>${esc(config.description)}</p>` : ''}</div></header><div class="uif-dashboard-grid">${config.widgets.map((widget) => renderDashboardWidget(widget, options)).join('')}</div></section>`;
 }
 
-export function initDashboard(el: HTMLElement): void {
+export function initDashboard(el: HTMLElement): DashboardController | null {
   const raw = el.dataset.uifDashboard || el.dataset.uifOptions;
-  if (!raw) return;
-  const config = createDashboardConfig(JSON.parse(raw) as DashboardConfig);
-  el.innerHTML = renderDashboard(config);
+  if (!raw) return null;
+  dashboardControllers.get(el)?.destroy();
+  const original = [...el.childNodes].map((node) => node.cloneNode(true));
+  let destroyed = false;
+  const controller: DashboardController = {
+    refresh(config) {
+      if (destroyed) return;
+      try {
+        const next = config ?? createDashboardConfig(JSON.parse(el.dataset.uifDashboard || el.dataset.uifOptions || raw) as DashboardConfig);
+        setTrustedHTML(el, renderDashboard(next), { trusted: true, context: 'dashboard render' });
+      } catch (error) {
+        el.dispatchEvent(new CustomEvent('uif:dashboard-error', { bubbles: true, detail: { code: 'dashboard-invalid-options', element: el, error } }));
+      }
+    },
+    destroy() {
+      if (destroyed) return;
+      destroyed = true;
+      el.replaceChildren(...original.map((node) => node.cloneNode(true)));
+      if (dashboardControllers.get(el) === controller) dashboardControllers.delete(el);
+    },
+  };
+  dashboardControllers.set(el, controller);
+  controller.refresh();
+  return controller;
 }

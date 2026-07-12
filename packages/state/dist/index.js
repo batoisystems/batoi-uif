@@ -20,12 +20,51 @@ function createStore(initialState) {
   return createAdvancedStore(initialState);
 }
 function createAdvancedStore(initialState, options = {}) {
-  const storage = options.persist === "local" ? window.localStorage : options.persist === "session" ? window.sessionStorage : void 0;
-  const persisted = storage && options.key ? storage.getItem(options.key) : null;
-  let state = persisted ? JSON.parse(persisted) : structuredClone(initialState);
+  const persistVersion = Math.max(1, Math.floor(options.persistVersion ?? 1));
+  const maxPersistBytes = Math.max(1, Math.floor(options.maxPersistBytes ?? 1e6));
+  const reportPersistError = (operation, error) => {
+    const cause = error instanceof Error ? error : new Error(String(error));
+    options.onPersistError?.(new Error(`State persistence ${operation} failed: ${cause.message}`, { cause }));
+  };
+  let storage;
+  try {
+    storage = options.persist === "local" ? window.localStorage : options.persist === "session" ? window.sessionStorage : void 0;
+  } catch (error) {
+    reportPersistError("initialization", error);
+  }
+  let state = structuredClone(initialState);
+  if (storage && options.key) {
+    try {
+      const persisted = storage.getItem(options.key);
+      if (persisted !== null) {
+        if (byteLength(persisted) > maxPersistBytes) throw new Error(`payload exceeds the ${maxPersistBytes} byte limit`);
+        const parsed = JSON.parse(persisted);
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("payload must be a JSON object");
+        if ("__uifStateVersion" in parsed) {
+          const envelope = parsed;
+          if (envelope.__uifStateVersion !== persistVersion) throw new Error(`version ${String(envelope.__uifStateVersion)} does not match ${persistVersion}`);
+          if (!envelope.state || typeof envelope.state !== "object" || Array.isArray(envelope.state)) throw new Error("envelope state must be a JSON object");
+          state = envelope.state;
+        } else {
+          if (persistVersion !== 1) throw new Error(`legacy state does not match version ${persistVersion}`);
+          state = parsed;
+        }
+      }
+    } catch (error) {
+      reportPersistError("read", error);
+    }
+  }
   const subscribers = /* @__PURE__ */ new Map();
   const notify = (path) => {
-    if (storage && options.key) storage.setItem(options.key, JSON.stringify(state));
+    if (storage && options.key) {
+      try {
+        const serialized = JSON.stringify({ __uifStateVersion: persistVersion, state });
+        if (byteLength(serialized) > maxPersistBytes) throw new Error(`payload exceeds the ${maxPersistBytes} byte limit`);
+        storage.setItem(options.key, serialized);
+      } catch (error) {
+        reportPersistError("write", error);
+      }
+    }
     subscribers.get(path)?.forEach((fn) => fn(getByPath(state, path)));
     if (path !== "*") subscribers.get("*")?.forEach((fn) => fn(state));
   };
@@ -161,6 +200,17 @@ function makeScopedKey(namespace, key) {
 function stripScope(namespace, key) {
   return key.startsWith(`${namespace}:`) ? key.slice(namespace.length + 1) : key;
 }
+var localStoreMetadataKey = "__uif_meta__";
+function localStoreError(operation, error) {
+  const message = error instanceof Error ? error.message : String(error);
+  return new Error(`Local store ${operation} failed: ${message}`, { cause: error });
+}
+function validateLocalStoreKey(key) {
+  if (!key || key.length > 200 || key === localStoreMetadataKey) throw new Error("Local store key must be 1-200 characters and not reserved");
+}
+function byteLength(value) {
+  return new TextEncoder().encode(value).length;
+}
 function makeMemoryStorage() {
   const map = /* @__PURE__ */ new Map();
   return {
@@ -186,33 +236,88 @@ function makeMemoryStorage() {
 }
 function createLocalStore(options = {}) {
   const namespace = options.namespace || "uif";
-  const storage = options.driver === "memory" ? makeMemoryStorage() : window.localStorage;
+  const version = Math.max(1, Math.floor(options.version ?? 1));
+  const maxBytes = Math.max(1, Math.floor(options.maxBytes ?? 1e6));
+  const maxEntries = Math.max(1, Math.floor(options.maxEntries ?? 1e3));
+  let storage;
+  try {
+    storage = options.driver === "memory" ? makeMemoryStorage() : window.localStorage;
+    const metadataKey = makeScopedKey(namespace, localStoreMetadataKey);
+    const rawMetadata = storage.getItem(metadataKey);
+    if (rawMetadata) {
+      const metadata = JSON.parse(rawMetadata);
+      if (metadata.version !== version) throw new Error(`namespace version ${String(metadata.version)} does not match ${version}`);
+    } else storage.setItem(metadataKey, JSON.stringify({ version }));
+  } catch (error) {
+    throw localStoreError("initialization", error);
+  }
+  const serialize = (value) => {
+    let serialized;
+    try {
+      serialized = JSON.stringify(value);
+    } catch (error) {
+      throw localStoreError("serialization", error);
+    }
+    if (serialized === void 0) throw new Error("Local store values must be JSON-serializable");
+    if (byteLength(serialized) > maxBytes) throw new Error(`Local store value exceeds the ${maxBytes} byte limit`);
+    return serialized;
+  };
+  const scopedEntries = () => {
+    const entries = [];
+    for (let index = 0; index < storage.length; index += 1) {
+      const scopedKey = storage.key(index);
+      if (!scopedKey?.startsWith(`${namespace}:`)) continue;
+      const key = stripScope(namespace, scopedKey);
+      if (key === localStoreMetadataKey) continue;
+      const raw = storage.getItem(scopedKey);
+      if (raw !== null) entries.push({ key, raw });
+    }
+    return entries;
+  };
   const api = {
     namespace,
+    version,
     async get(key) {
-      const raw = storage.getItem(makeScopedKey(namespace, key));
-      return raw === null ? void 0 : JSON.parse(raw);
+      validateLocalStoreKey(key);
+      try {
+        const raw = storage.getItem(makeScopedKey(namespace, key));
+        return raw === null ? void 0 : JSON.parse(raw);
+      } catch (error) {
+        throw localStoreError(`read for ${key}`, error);
+      }
     },
     async set(key, value) {
-      storage.setItem(makeScopedKey(namespace, key), JSON.stringify(value));
+      validateLocalStoreKey(key);
+      const exists = storage.getItem(makeScopedKey(namespace, key)) !== null;
+      if (!exists && scopedEntries().length >= maxEntries) throw new Error(`Local store exceeds the ${maxEntries} entry limit`);
+      try {
+        storage.setItem(makeScopedKey(namespace, key), serialize(value));
+      } catch (error) {
+        if (error instanceof Error && error.message.startsWith("Local store ")) throw error;
+        throw localStoreError(`write for ${key}`, error);
+      }
     },
     async delete(key) {
-      storage.removeItem(makeScopedKey(namespace, key));
+      validateLocalStoreKey(key);
+      try {
+        storage.removeItem(makeScopedKey(namespace, key));
+      } catch (error) {
+        throw localStoreError(`delete for ${key}`, error);
+      }
     },
     async list() {
-      const items = [];
-      for (let index = 0; index < storage.length; index += 1) {
-        const scopedKey = storage.key(index);
-        if (!scopedKey?.startsWith(`${namespace}:`)) continue;
-        const raw = storage.getItem(scopedKey);
-        if (raw === null) continue;
-        items.push({ key: stripScope(namespace, scopedKey), value: JSON.parse(raw) });
+      try {
+        return scopedEntries().map(({ key, raw }) => ({ key, value: JSON.parse(raw) }));
+      } catch (error) {
+        throw localStoreError("list", error);
       }
-      return items;
     },
     async clear() {
-      const keys = await api.list();
-      keys.forEach((item) => storage.removeItem(makeScopedKey(namespace, item.key)));
+      try {
+        scopedEntries().forEach((item) => storage.removeItem(makeScopedKey(namespace, item.key)));
+      } catch (error) {
+        throw localStoreError("clear", error);
+      }
     },
     async exportJSON(space = 2) {
       const entries = await api.list();
@@ -226,10 +331,24 @@ function createLocalStore(options = {}) {
       );
     },
     async importJSON(json) {
+      if (byteLength(json) > maxBytes) throw new Error(`Local store import exceeds the ${maxBytes} byte limit`);
       const parsed = JSON.parse(json);
       if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Local store import must be a JSON object");
-      await api.clear();
-      await Promise.all(Object.entries(parsed).map(([key, value]) => api.set(key, value)));
+      const next = Object.entries(parsed);
+      if (next.length > maxEntries) throw new Error(`Local store import exceeds the ${maxEntries} entry limit`);
+      const serialized = next.map(([key, value]) => {
+        validateLocalStoreKey(key);
+        return { key, raw: serialize(value) };
+      });
+      const previous = scopedEntries();
+      try {
+        await api.clear();
+        serialized.forEach(({ key, raw }) => storage.setItem(makeScopedKey(namespace, key), raw));
+      } catch (error) {
+        scopedEntries().forEach((item) => storage.removeItem(makeScopedKey(namespace, item.key)));
+        previous.forEach(({ key, raw }) => storage.setItem(makeScopedKey(namespace, key), raw));
+        throw localStoreError("import", error);
+      }
     }
   };
   return api;

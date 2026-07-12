@@ -1,5 +1,17 @@
 import { appendTextElement } from '@batoi/uif-dom';
 
+export interface AIRenderOptions {
+  maxCharacters?: number;
+}
+
+function boundedAIText(el: HTMLElement, value: string, options: AIRenderOptions = {}): string {
+  const limit = Math.max(1, Math.floor(options.maxCharacters ?? 100_000));
+  if (value.length <= limit) return value;
+  el.dataset.uifTruncated = 'true';
+  el.dispatchEvent(new CustomEvent('uif:ai-error', { bubbles: true, detail: { code: 'ai-content-limit', limit } }));
+  return value.slice(0, limit);
+}
+
 export function renderAIAction(el: HTMLElement): void {
   const agent = el.dataset.uifAgent || 'assistant';
   const tool = el.dataset.uifTool || 'action';
@@ -15,7 +27,7 @@ export function renderAIAction(el: HTMLElement): void {
   el.replaceChildren(card);
 }
 
-export function renderPromptPanel(el: HTMLElement, history: string[] = []): void {
+export function renderPromptPanel(el: HTMLElement, history: string[] = [], options: AIRenderOptions = {}): void {
   const form = document.createElement('form');
   form.className = 'uif-ai-prompt';
   form.dataset.uifRole = 'prompt';
@@ -24,13 +36,14 @@ export function renderPromptPanel(el: HTMLElement, history: string[] = []): void
   textarea.dataset.uifRole = 'input';
   const historyEl = document.createElement('div');
   historyEl.className = 'uif-ai-history';
-  history.forEach((item) => {
+  history.slice(0, 50).forEach((item) => {
     const button = document.createElement('button');
     button.type = 'button';
-    button.textContent = item;
+    const prompt = boundedAIText(el, item, options);
+    button.textContent = prompt;
     button.addEventListener('click', () => {
-      textarea.value = item;
-      el.dispatchEvent(new CustomEvent('uif:ai-history-select', { detail: { prompt: item }, bubbles: true }));
+      textarea.value = prompt;
+      el.dispatchEvent(new CustomEvent('uif:ai-history-select', { detail: { prompt }, bubbles: true }));
     });
     historyEl.append(button);
   });
@@ -41,24 +54,30 @@ export function renderPromptPanel(el: HTMLElement, history: string[] = []): void
   el.replaceChildren(form);
 }
 
-export function renderAssistantResponse(el: HTMLElement, content: string): void {
+export function renderAssistantResponse(el: HTMLElement, content: string, options: AIRenderOptions = {}): void {
   const response = document.createElement('div');
   response.className = 'uif-ai-response';
-  response.textContent = content;
+  response.textContent = boundedAIText(el, content, options);
   response.setAttribute('role', 'status');
   el.replaceChildren(response);
 }
 
-export function appendStreamingChunk(el: HTMLElement, chunk: string): void {
-  el.textContent = `${el.textContent || ''}${chunk}`;
+export function appendStreamingChunk(el: HTMLElement, chunk: string, options: AIRenderOptions = {}): void {
+  el.textContent = boundedAIText(el, `${el.textContent || ''}${chunk}`, options);
 }
 
-export function createStreamSurface(el: HTMLElement): { append(chunk: string): void; cancel(): void } {
+export function createStreamSurface(el: HTMLElement, options: AIRenderOptions = {}): { append(chunk: string): void; cancel(): void } {
   const controller = new AbortController();
   el.dataset.uifState = 'streaming';
   return {
     append(chunk: string) {
-      if (!controller.signal.aborted) appendStreamingChunk(el, chunk);
+      if (!controller.signal.aborted) {
+        appendStreamingChunk(el, chunk, options);
+        if (el.dataset.uifTruncated === 'true') {
+          controller.abort();
+          el.dataset.uifState = 'limited';
+        }
+      }
     },
     cancel() {
       controller.abort();
@@ -68,11 +87,11 @@ export function createStreamSurface(el: HTMLElement): { append(chunk: string): v
   };
 }
 
-export function renderAIResultCard(el: HTMLElement, content: string): void {
+export function renderAIResultCard(el: HTMLElement, content: string, options: AIRenderOptions = {}): void {
   const card = document.createElement('div');
   card.className = 'uif-ai-result';
   card.setAttribute('role', 'region');
-  const contentEl = appendTextElement(card, 'div', content);
+  const contentEl = appendTextElement(card, 'div', boundedAIText(el, content, options));
   contentEl.dataset.uifRole = 'content';
   ['accept', 'reject', 'copy', 'insert'].forEach((action) => {
     const button = document.createElement('button');

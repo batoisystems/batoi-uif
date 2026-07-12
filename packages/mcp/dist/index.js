@@ -1,6 +1,20 @@
 // src/index.ts
 import { emit } from "@batoi/uif-core";
 import { appendTextElement } from "@batoi/uif-dom";
+function boundedItems(items, options) {
+  return items.slice(0, Math.max(1, Math.floor(options.maxItems ?? 100)));
+}
+function serializeToolValue(value, options = {}) {
+  const limit = Math.max(1, Math.floor(options.maxCharacters ?? 1e5));
+  let serialized;
+  try {
+    serialized = JSON.stringify(value, null, 2) ?? "null";
+  } catch {
+    return "[Unserializable tool payload]";
+  }
+  return serialized.length > limit ? `${serialized.slice(0, limit)}
+[truncated]` : serialized;
+}
 function renderToolApproval(el) {
   const tool = el.dataset.uifTool || "tool";
   const risk = el.dataset.uifRisk || "medium";
@@ -35,13 +49,13 @@ function renderToolApproval(el) {
     if (action === "approve" || action === "reject") emit(`uif:tool-${action}`, { tool, risk, irreversible }, el);
   });
 }
-function renderApprovalPolicy(el, checks) {
+function renderApprovalPolicy(el, checks, options = {}) {
   const section = document.createElement("section");
   section.className = "uif-tool-policy";
   section.setAttribute("role", "region");
   appendTextElement(section, "h3", "Policy checks");
   const list = document.createElement("ul");
-  checks.forEach((check) => {
+  boundedItems(checks, options).forEach((check) => {
     const item = document.createElement("li");
     item.dataset.uifState = check.state;
     appendTextElement(item, "strong", check.label);
@@ -56,19 +70,19 @@ function renderToolProgress(el, message) {
   progress.setAttribute("role", "status");
   el.replaceChildren(progress);
 }
-function renderToolTimeline(el, steps) {
+function renderToolTimeline(el, steps, options = {}) {
   const list = document.createElement("ol");
   list.className = "uif-tool-timeline";
-  steps.forEach((step) => {
+  boundedItems(steps, options).forEach((step) => {
     const item = appendTextElement(list, "li", step.label);
     item.dataset.uifState = step.state ?? "pending";
   });
   el.replaceChildren(list);
 }
-function renderToolAuditTrail(el, entries) {
+function renderToolAuditTrail(el, entries, options = {}) {
   const list = document.createElement("ol");
   list.className = "uif-tool-audit";
-  entries.forEach((entry) => {
+  boundedItems(entries, options).forEach((entry) => {
     const item = document.createElement("li");
     appendTextElement(item, "strong", entry.actor ?? "system");
     item.append(` ${entry.action} `);
@@ -86,14 +100,16 @@ function renderDiff(el, before, after) {
   afterEl.dataset.uifRole = "after";
   el.replaceChildren(diff);
 }
-function renderToolResult(el, result) {
-  const pre = appendTextElement(document.createElement("div"), "pre", JSON.stringify(result, null, 2), "uif-tool-result");
+function renderToolResult(el, result, options = {}) {
+  const pre = appendTextElement(document.createElement("div"), "pre", serializeToolValue(result, options), "uif-tool-result");
   el.replaceChildren(pre);
 }
-function renderToolReviewFlow(el, request) {
+function renderToolReviewFlow(el, request, options = {}) {
   const review = document.createElement("section");
   review.className = "uif-tool-review";
   review.dataset.risk = request.risk ?? "medium";
+  if (request.requestId) review.dataset.uifRequestId = request.requestId;
+  if (request.expiresAt) review.dataset.uifExpiresAt = request.expiresAt;
   review.setAttribute("role", "region");
   const header = document.createElement("header");
   appendTextElement(header, "strong", request.tool);
@@ -103,17 +119,17 @@ function renderToolReviewFlow(el, request) {
     const payload = document.createElement("section");
     payload.className = "uif-tool-payload";
     appendTextElement(payload, "h3", "Payload preview");
-    appendTextElement(payload, "pre", JSON.stringify(request.payload, null, 2));
+    appendTextElement(payload, "pre", serializeToolValue(request.payload, options));
     review.append(payload);
   }
   if (request.policy?.length) {
     const policyHost = document.createElement("div");
-    renderApprovalPolicy(policyHost, request.policy);
+    renderApprovalPolicy(policyHost, request.policy, options);
     review.append(...Array.from(policyHost.childNodes));
   }
   if (request.timeline?.length) {
     const timelineHost = document.createElement("div");
-    renderToolTimeline(timelineHost, request.timeline);
+    renderToolTimeline(timelineHost, request.timeline, options);
     review.append(...Array.from(timelineHost.childNodes));
   }
   if (request.diff) {
@@ -123,12 +139,12 @@ function renderToolReviewFlow(el, request) {
   }
   if (request.result !== void 0) {
     const resultHost = document.createElement("div");
-    renderToolResult(resultHost, request.result);
+    renderToolResult(resultHost, request.result, options);
     review.append(...Array.from(resultHost.childNodes));
   }
   if (request.audit?.length) {
     const auditHost = document.createElement("div");
-    renderToolAuditTrail(auditHost, request.audit);
+    renderToolAuditTrail(auditHost, request.audit, options);
     review.append(...Array.from(auditHost.childNodes));
   }
   const actions = document.createElement("footer");
@@ -141,10 +157,25 @@ function renderToolReviewFlow(el, request) {
   });
   review.append(actions);
   el.replaceChildren(review);
+  let decided = false;
   el.addEventListener("click", (event) => {
     const target = event.target instanceof HTMLElement ? event.target.closest("[data-uif-action]") : null;
     const action = target?.dataset.uifAction;
-    if (action === "approve" || action === "reject") emit(`uif:tool-${action}`, { tool: request.tool, risk: request.risk ?? "medium", irreversible: Boolean(request.irreversible), payload: request.payload }, el);
+    if (action !== "approve" && action !== "reject") return;
+    if (decided) {
+      emit("uif:tool-replay-blocked", { tool: request.tool, requestId: request.requestId }, el);
+      return;
+    }
+    if (action === "approve" && request.expiresAt && Date.parse(request.expiresAt) <= Date.now()) {
+      emit("uif:tool-expired", { tool: request.tool, requestId: request.requestId, expiresAt: request.expiresAt }, el);
+      return;
+    }
+    decided = true;
+    review.dataset.uifDecision = action;
+    actions.querySelectorAll("button").forEach((button) => {
+      button.disabled = true;
+    });
+    emit(`uif:tool-${action}`, { tool: request.tool, risk: request.risk ?? "medium", irreversible: Boolean(request.irreversible), payload: request.payload, requestId: request.requestId, expiresAt: request.expiresAt, auditRef: request.auditRef }, el);
   });
 }
 var toolApproval = { name: "tool-approval", init: renderToolApproval };

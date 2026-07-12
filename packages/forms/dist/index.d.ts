@@ -1,4 +1,12 @@
 type FormErrors = Record<string, string[]>;
+interface FormController {
+    refresh(): void;
+    destroy(): void;
+}
+interface RepeatableController {
+    refresh(): void;
+    destroy(): void;
+}
 type FormField = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 type AsyncRuleHandler = (field: FormField, form: HTMLFormElement, signal: AbortSignal) => Promise<string[]>;
 type FieldAdapter = (field: FormField) => string;
@@ -12,11 +20,11 @@ declare function clearErrors(formEl: HTMLFormElement): void;
 declare function showErrors(formEl: HTMLFormElement, errors: FormErrors): void;
 declare function showErrorSummary(formEl: HTMLFormElement, errors: FormErrors): HTMLElement | null;
 declare function validateFormAsync(formEl: HTMLFormElement): Promise<FormErrors>;
-declare function initRepeatableGroup(root: HTMLElement): void;
-declare function initForm(formEl: HTMLFormElement): void;
+declare function initRepeatableGroup(root: HTMLElement): RepeatableController;
+declare function initForm(formEl: HTMLFormElement): FormController;
 declare const form: {
     name: string;
     init: typeof initForm;
 };
 
-export { type FormErrors, clearErrors, form, initForm, initRepeatableGroup, registerAsyncRule, registerFieldAdapter, registerValidationMessage, showErrorSummary, showErrors, validateField, validateForm, validateFormAsync };
+export { type FormController, type FormErrors, type RepeatableController, clearErrors, form, initForm, initRepeatableGroup, registerAsyncRule, registerFieldAdapter, registerValidationMessage, showErrorSummary, showErrors, validateField, validateForm, validateFormAsync };

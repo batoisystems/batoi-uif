@@ -1,8 +1,14 @@
 // src/index.ts
-import { setTrustedHTML } from "@batoi/uif-dom";
-var initializedTables = /* @__PURE__ */ new WeakSet();
+import { isSafeURL, setTrustedHTML } from "@batoi/uif-dom";
+import { cancelRequest, request } from "@batoi/uif-net";
+var tableControllers = /* @__PURE__ */ new WeakMap();
 var initializedFilters = /* @__PURE__ */ new WeakSet();
-var tableAbortControllers = /* @__PURE__ */ new WeakMap();
+var tableRequestKeys = /* @__PURE__ */ new WeakMap();
+var tableRequestSequence = 0;
+var DEFAULT_MAX_ROWS = 1e3;
+var DEFAULT_MAX_COLUMNS = 100;
+var DEFAULT_MAX_CELL_LENGTH = 1e4;
+var DEFAULT_MAX_HTML_LENGTH = 1e6;
 function cssEscape(value) {
   return typeof CSS !== "undefined" && typeof CSS.escape === "function" ? CSS.escape(value) : value.replace(/["\\#.;,[\]=:]/g, "\\$&");
 }
@@ -152,7 +158,22 @@ function applyResponsiveColumns(table) {
     if (cell.dataset.uifHide) cell.classList.add(`uif-hide-${cell.dataset.uifHide}`);
   });
 }
-function renderRemoteRows(table, data, columns) {
+function tableLimit(value, fallback) {
+  return Number.isFinite(value) ? Math.max(1, Math.floor(value)) : fallback;
+}
+function normalizeRemoteResponse(data, options) {
+  if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("Invalid remote table response");
+  const source = data;
+  const maxRows = tableLimit(options.maxRows, DEFAULT_MAX_ROWS);
+  const maxHTMLLength = tableLimit(options.maxHTMLLength, DEFAULT_MAX_HTML_LENGTH);
+  if (source.rows && (!Array.isArray(source.rows) || source.rows.length > maxRows || source.rows.some((row) => !row || typeof row !== "object" || Array.isArray(row)))) throw new Error("UIF_TABLE_LIMIT");
+  if (source.columns && (!Array.isArray(source.columns) || source.columns.length > DEFAULT_MAX_COLUMNS)) throw new Error("UIF_TABLE_LIMIT");
+  if (source.html && String(source.html).length > maxHTMLLength) throw new Error("UIF_TABLE_LIMIT");
+  if (source.html !== void 0) source.html = String(source.html);
+  if (source.columns) source.columns = source.columns.filter((column) => column && typeof column.key === "string");
+  return source;
+}
+function renderRemoteRows(table, data, columns, maxCellLength) {
   const body = table.tBodies[0] || table.createTBody();
   if (data.html) {
     setTrustedHTML(body, data.html, { trusted: true, context: "remote table rows" });
@@ -172,7 +193,7 @@ function renderRemoteRows(table, data, columns) {
       if (key && row[key] !== void 0) tr.dataset.uifRowId = String(row[key]);
       columns.forEach((column) => {
         const td = document.createElement("td");
-        td.textContent = String(row[column] ?? "");
+        td.textContent = String(row[column] ?? "").slice(0, maxCellLength);
         tr.append(td);
       });
       return tr;
@@ -219,18 +240,24 @@ function appendTableQuery(url, table, options) {
 async function loadRemoteTable(table, options = {}) {
   const src = options.src || table.dataset.uifSrc;
   if (!src) return null;
+  if (!isSafeURL(src, { context: "network", allowHash: false, sameOrigin: !(options.allowCrossOrigin ?? table.dataset.uifAllowCrossOrigin === "true") })) {
+    const error = new Error("Batoi UIF blocked an unsafe table data URL");
+    setTableState(table, "error");
+    table.dispatchEvent(new CustomEvent("uif:table-error", { detail: { table, error }, bubbles: true }));
+    throw error;
+  }
   const url = new URL(src, window.location.href);
   appendTableQuery(url, table, options);
-  tableAbortControllers.get(table)?.abort();
-  const controller = new AbortController();
-  tableAbortControllers.set(table, controller);
+  const key = tableRequestKeys.get(table) ?? `table:${++tableRequestSequence}`;
+  tableRequestKeys.set(table, key);
+  cancelRequest(key);
   table.dispatchEvent(new CustomEvent("uif:table-before-load", { detail: { table, url }, bubbles: true }));
   setTableState(table, "loading");
   try {
-    const response = await fetch(url, { signal: controller.signal });
-    const data = await response.json();
+    const response = await request(url.href, { key, method: "GET", parseAs: "json", credentials: "same-origin", timeout: 15e3 });
+    const data = normalizeRemoteResponse(response, options);
     const columns = options.columns ?? data.columns?.map((column) => column.key) ?? getColumns(table);
-    renderRemoteRows(table, data, columns);
+    renderRemoteRows(table, data, columns, tableLimit(options.maxCellLength, DEFAULT_MAX_CELL_LENGTH));
     table.dataset.uifPage = String(data.page ?? options.page ?? table.dataset.uifPage ?? 1);
     table.dataset.uifPageSize = String(data.pageSize ?? options.pageSize ?? table.dataset.uifPageSize ?? 25);
     table.dataset.uifTotal = String(data.total ?? data.rows?.length ?? rows(table).length);
@@ -249,8 +276,6 @@ async function loadRemoteTable(table, options = {}) {
     setTableState(table, "error");
     table.dispatchEvent(new CustomEvent("uif:table-error", { detail: { table, error }, bubbles: true }));
     throw error;
-  } finally {
-    if (tableAbortControllers.get(table) === controller) tableAbortControllers.delete(table);
   }
 }
 async function goToPage(table, page, options = {}) {
@@ -269,7 +294,13 @@ function exportTable(table, options = {}) {
 }
 function filterElements(targetSelector, query, mode = "contains") {
   const normalized = query.trim().toLowerCase();
-  document.querySelectorAll(targetSelector).forEach((item) => {
+  let targets;
+  try {
+    targets = document.querySelectorAll(targetSelector);
+  } catch {
+    return;
+  }
+  targets.forEach((item) => {
     const text = item.textContent?.trim().toLowerCase() ?? "";
     const matched = normalized === "" || (mode === "startsWith" ? text.startsWith(normalized) : mode === "token" ? text.split(/\s+/).includes(normalized) : text.includes(normalized));
     item.hidden = !matched;
@@ -370,8 +401,10 @@ function resetTable(table, options = {}) {
   if (getTableMode(table) === "remote") void loadRemoteTable(table, options);
 }
 function initTable(table, options = {}) {
-  if (initializedTables.has(table)) return;
-  initializedTables.add(table);
+  const existing = tableControllers.get(table);
+  if (existing) return existing;
+  const listenerController = new AbortController();
+  const listenerOptions = { signal: listenerController.signal };
   table.dataset.uifState = table.dataset.uifState || "idle";
   applyResponsiveColumns(table);
   table.querySelectorAll("th[data-uif-sort]").forEach((header, index) => {
@@ -393,13 +426,13 @@ function initTable(table, options = {}) {
         sortTable(table, key || index, nextDirection);
       }
     };
-    header.addEventListener("click", sort2);
+    header.addEventListener("click", sort2, listenerOptions);
     header.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         sort2();
       }
-    });
+    }, listenerOptions);
   });
   const sort = activeSort(table);
   if (sort) updateSortHeaders(table, sort.column, sort.direction);
@@ -413,8 +446,8 @@ function initTable(table, options = {}) {
       else if (getTableMode(table) === "remote") refreshForControlChange(table, options);
       else filterTable(table, filterInput.value, void 0, filterInput.dataset.uifFilterOp || "contains");
     };
-    filterInput.addEventListener("input", handler);
-    filterInput.addEventListener("change", handler);
+    filterInput.addEventListener("input", handler, listenerOptions);
+    filterInput.addEventListener("change", handler, listenerOptions);
   });
   controlsForTable(table, "data-uif-table-page-size").forEach((control) => {
     control.addEventListener("change", () => {
@@ -423,11 +456,11 @@ function initTable(table, options = {}) {
       table.dispatchEvent(new CustomEvent("uif:table-page-size", { detail: { table, pageSize: Number(table.dataset.uifPageSize) }, bubbles: true }));
       if (getTableMode(table) === "remote") void loadRemoteTable(table, options);
       updatePaginationControls(table);
-    });
+    }, listenerOptions);
   });
   document.querySelectorAll(`[data-uif-table-reset="#${cssEscape(table.id)}"]`).forEach((resetEl) => {
-    resetEl.addEventListener("click", () => resetTable(table, options));
-  });
+    resetEl.addEventListener("click", () => resetTable(table, options), listenerOptions);
+  }, listenerOptions);
   table.addEventListener("keydown", (event) => {
     const cell = event.target instanceof HTMLElement ? event.target.closest("td,th") : null;
     if (!cell || event.target instanceof HTMLInputElement || event.target instanceof HTMLButtonElement || event.target instanceof HTMLSelectElement || !["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"].includes(event.key)) return;
@@ -447,13 +480,13 @@ function initTable(table, options = {}) {
       const selected = selectedRows(table);
       options.onBulkAction?.(action, selected);
       table.dispatchEvent(new CustomEvent("uif:table-bulk-action", { detail: { table, action, rows: selected, ids: selectedRowIds(table) }, bubbles: true }));
-    });
+    }, listenerOptions);
   });
   document.querySelectorAll(`[data-uif-table-page][data-uif-target="#${cssEscape(table.id)}"]`).forEach((pageEl) => {
     pageEl.addEventListener("click", () => {
       void goToPage(table, pageFromControl(pageEl, table), options);
-    });
-  });
+    }, listenerOptions);
+  }, listenerOptions);
   table.addEventListener("change", (event) => {
     const checkbox = event.target instanceof HTMLInputElement ? event.target : null;
     if (!checkbox) return;
@@ -464,7 +497,7 @@ function initTable(table, options = {}) {
       });
     }
     if (checkbox.matches('[data-uif-role="select-all"],[data-uif-role="row-select"]')) updateSelectionState(table);
-  });
+  }, listenerOptions);
   table.addEventListener("click", (event) => {
     const actionEl = event.target instanceof HTMLElement ? event.target.closest("[data-uif-row-action]") : null;
     const row = actionEl?.closest("tr");
@@ -478,6 +511,23 @@ function initTable(table, options = {}) {
   updateSelectionState(table);
   updatePaginationControls(table);
   if (options.src || table.dataset.uifSrc) void loadRemoteTable(table, options);
+  const controller = {
+    refresh() {
+      applyResponsiveColumns(table);
+      updateSelectionState(table);
+      updatePaginationControls(table);
+      if (options.src || table.dataset.uifSrc) void loadRemoteTable(table, options);
+    },
+    destroy() {
+      listenerController.abort();
+      const key = tableRequestKeys.get(table);
+      if (key) cancelRequest(key);
+      tableRequestKeys.delete(table);
+      if (tableControllers.get(table) === controller) tableControllers.delete(table);
+    }
+  };
+  tableControllers.set(table, controller);
+  return controller;
 }
 var dataTable = { name: "table", init: (el) => initTable(el) };
 export {

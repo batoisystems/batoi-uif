@@ -99,6 +99,7 @@ interface DrilldownOptions {
     target?: string;
     url?: string;
     param?: string;
+    allowCrossOrigin?: boolean;
 }
 interface ChartController {
     refresh(): Promise<void>;

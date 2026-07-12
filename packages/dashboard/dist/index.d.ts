@@ -33,6 +33,10 @@ interface DashboardRenderOptions {
     className?: string;
     emptyText?: string;
 }
+interface DashboardController {
+    refresh(config?: DashboardConfig): void;
+    destroy(): void;
+}
 declare function createDashboardConfig(config: DashboardConfig): DashboardConfig;
 declare function applyDashboardFilters<T extends Record<string, unknown>>(rows: T[], filters?: DashboardFilter[]): T[];
 declare function summarizeDashboard(rows: Array<Record<string, unknown>>, field: string): {
@@ -44,6 +48,6 @@ declare function summarizeDashboard(rows: Array<Record<string, unknown>>, field:
 };
 declare function renderDashboardWidget(widget: DashboardWidget, options?: DashboardRenderOptions): string;
 declare function renderDashboard(input: DashboardConfig, options?: DashboardRenderOptions): string;
-declare function initDashboard(el: HTMLElement): void;
+declare function initDashboard(el: HTMLElement): DashboardController | null;
 
-export { type DashboardConfig, type DashboardFilter, type DashboardFilterOperator, type DashboardRenderOptions, type DashboardWidget, type DashboardWidgetType, applyDashboardFilters, createDashboardConfig, initDashboard, renderDashboard, renderDashboardWidget, summarizeDashboard };
+export { type DashboardConfig, type DashboardController, type DashboardFilter, type DashboardFilterOperator, type DashboardRenderOptions, type DashboardWidget, type DashboardWidgetType, applyDashboardFilters, createDashboardConfig, initDashboard, renderDashboard, renderDashboardWidget, summarizeDashboard };

@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-components",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,8 +18,9 @@
     "build": "tsup src/index.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-core": "2.0.0",
-    "@batoi/uif-effects": "2.0.0",
-    "@batoi/uif-overlays": "2.0.0"
-  }
+    "@batoi/uif-core": "2.1.0",
+    "@batoi/uif-effects": "2.1.0",
+    "@batoi/uif-overlays": "2.1.0"
+  },
+  "license": "Apache-2.0"
 }

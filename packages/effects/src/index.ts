@@ -160,7 +160,12 @@ export function cancelAnimation(el: HTMLElement): void {
   el.style.animationFillMode = '';
 }
 
-export function initAnimation(el: HTMLElement): void {
+export interface AnimationController { refresh(): void; destroy(): void; }
+const animationControllers = new WeakMap<HTMLElement, AnimationController>();
+
+export function initAnimation(el: HTMLElement): AnimationController {
+  const existing = animationControllers.get(el);
+  if (existing) return existing;
   const animation = el.dataset.uifAnimation || 'fade-in';
   const duration = Number(el.dataset.uifDuration || '') || undefined;
   const delay = Number(el.dataset.uifDelay || '') || undefined;
@@ -174,32 +179,50 @@ export function initAnimation(el: HTMLElement): void {
     hasRun = true;
     void animate(el, animation, { duration, delay, repeat, easing, once });
   };
+  let observer: IntersectionObserver | null = null;
+  let eventName: 'mouseenter' | 'focusin' | 'click' | null = null;
   if (trigger === 'load') run();
   if (trigger === 'hover') {
-    el.addEventListener('mouseenter', run);
-    return;
+    eventName = 'mouseenter';
+    el.addEventListener(eventName, run);
   }
   if (trigger === 'focus') {
-    el.addEventListener('focusin', run);
-    return;
+    eventName = 'focusin';
+    el.addEventListener(eventName, run);
   }
   if (trigger === 'click') {
-    el.addEventListener('click', run);
-    return;
+    eventName = 'click';
+    el.addEventListener(eventName, run);
   }
   if (trigger === 'intersect' && 'IntersectionObserver' in window) {
-    const observer = new IntersectionObserver((entries) => {
+    const intersectionObserver = new IntersectionObserver((entries) => {
       if (entries.some((entry) => entry.isIntersecting)) {
         run();
-        observer.disconnect();
+        intersectionObserver.disconnect();
       }
     });
-    observer.observe(el);
+    observer = intersectionObserver;
+    intersectionObserver.observe(el);
   }
+  const controller: AnimationController = {
+    refresh() {
+      hasRun = false;
+      run();
+    },
+    destroy() {
+      if (eventName) el.removeEventListener(eventName, run);
+      observer?.disconnect();
+      cancelAnimation(el);
+      if (animationControllers.get(el) === controller) animationControllers.delete(el);
+    },
+  };
+  animationControllers.set(el, controller);
+  return controller;
 }
 
-export function initAnimationTriggers(root: ParentNode = document): void {
-  root.querySelectorAll<HTMLElement>('[data-uif="animate"]').forEach(initAnimation);
+export function initAnimationTriggers(root: ParentNode = document): () => void {
+  const controllers = [...root.querySelectorAll<HTMLElement>('[data-uif="animate"]')].map(initAnimation);
+  return () => controllers.forEach((controller) => controller.destroy());
 }
 
 export function observeMotion(root: HTMLElement = document.documentElement): void {

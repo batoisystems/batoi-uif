@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-table",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,6 +18,8 @@
     "build": "tsup src/index.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-dom": "2.0.0"
-  }
+    "@batoi/uif-dom": "2.1.0",
+    "@batoi/uif-net": "2.1.0"
+  },
+  "license": "Apache-2.0"
 }

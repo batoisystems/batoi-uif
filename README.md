@@ -10,7 +10,7 @@ Batoi UIF is a dependency-free frontend application interface framework for serv
 
 It is designed as the frontend foundation for Batoi RAD and as a future open-source framework for HTML-first applications that need app-like behavior without shipping a large runtime stack.
 
-> Status: **v0 experimental**
+> Status: **v2 active development**
 
 ## Browser Distribution
 
@@ -96,7 +96,7 @@ or:
 
 ## Current Repository Note
 
-This repository contains the experimental v0 scaffold implemented as npm workspaces with TypeScript package source and plain JavaScript/CSS distribution targets. The implementation is intentionally compact while the APIs, examples, and package boundaries stabilize.
+This repository contains the v2 framework implemented as npm workspaces with TypeScript package source and plain JavaScript/CSS distribution targets. Public APIs remain under active development; consult release notes before upgrading production applications.
 
 ## Target Packages
 
@@ -105,12 +105,12 @@ Core framework packages:
 - `@batoi/uif-core` for initialization, lifecycle events, plugin registry, and option parsing.
 - `@batoi/uif-css` for reset, tokens, utilities, themes, and component CSS.
 - `@batoi/uif-dom` for DOM helpers, target resolution, mounting, auto-init, observers, and component registry.
-- `@batoi/uif-net` for native `fetch` helpers, form submission, upload, timeout, interceptors, and normalized errors.
+- `@batoi/uif-net` for cancellable native `fetch`, safe retry policy, form submission, progress-aware upload, non-overlapping connector polling, interceptors, and normalized errors.
 - `@batoi/uif-icons` for first-party dependency-free SVG icons and declarative icon mounting.
 - `@batoi/uif-state` for small state stores and declarative bindings.
 - `@batoi/uif-forms` for validation, async submission, and accessible error rendering.
 - `@batoi/uif-router` for lightweight route behavior.
-- `@batoi/uif-pwa` for service worker, install prompt, online/offline, and cache helpers.
+- `@batoi/uif-pwa` for same-origin service worker registration, install and update prompts, online/offline state, bounded idempotent task retries, and explicit public-response cache helpers.
 - `@batoi/uif-components` for dependency-free components such as buttons, workspace shells, modals, drawers/off-canvas panels, dropdowns, tooltips, popovers, tabs, toasts, accordions, cards, command menus, nav, and tables.
 - `@batoi/uif-rad-adapter` for Batoi RAD partial updates, content swaps, action binding, and rehydration.
 
@@ -119,7 +119,7 @@ Planned application capability packages:
 - `@batoi/uif-charts` for SVG-first charts and dashboard visuals.
 - `@batoi/uif-realtime` for SSE, WebSocket, and polling modes.
 - `@batoi/uif-push` for push subscription helpers and in-app notifications.
-- `@batoi/uif-mobile` for mobile shell, bottom navigation, sheet modal, offline banner, and safe-area utilities.
+- `@batoi/uif-mobile` for owned mobile-shell lifecycle, bottom navigation, sheet semantics, singleton offline status, keyboard-accessible segmented controls, and safe-area utilities.
 - `@batoi/uif-ai` for browser-side AI interaction UI.
 - `@batoi/uif-mcp` for browser-side MCP approval, progress, result, and audit UI.
 
@@ -200,6 +200,7 @@ Reference docs:
 - `docs/utility-migration-matrix.md` documents curated utilities, Bootstrap/Tailwind migration snippets, and feature coverage.
 - `docs/rad-workspace-migration.md` shows how RAD workspace shells, registers, manage forms, analytics routes, and editor routes can move to UIF without Bootstrap, jQuery, Chart.js, Bootstrap Table, or Summernote.
 - `docs/security.md` explains the trusted HTML boundary, safe text rendering, and AI/MCP server-side governance model.
+- `docs/editors.md` documents the rich HTML and Markdown profiles, parser diagnostics, keyboard behavior, and governed upload hooks.
 
 ### Micro App
 
@@ -227,7 +228,7 @@ See `examples/micro-app-dashboard/` for a copy-ready static Micro App with local
   name="body"
   data-uif="editor"
   data-uif-mode="html"
-  data-uif-toolbar="undo redo bold italic strike heading quote code ul ol task link image table preview source"
+  data-uif-toolbar="undo redo bold italic strike heading quote code ul ol task outdent indent link image table preview source"
   data-uif-editor-status="true"
   data-uif-required="true"
   data-uif-autosave="true"
@@ -330,6 +331,8 @@ Multi-series charts use a compact `values` contract:
   data-uif-channel="workspace:123"
   data-uif-src="/events/workspace/123"
   data-uif-mode="poll"
+  data-uif-max-payload-bytes="250000"
+  data-uif-max-reconnect-attempts="8"
   data-uif-target="#activity-feed"
 ></div>
 ```
@@ -380,7 +383,7 @@ Important attributes include:
 - `data-uif-icon-class`
 - `data-uif-icon-hidden`
 
-Expected v1 `data-uif` values include `button`, `modal`, `drawer`, `offcanvas`, `dropdown`, `tooltip`, `popover`, `tabs`, `toast`, `accordion`, `table`, `form`, `ajax`, `route`, `shell`, `nav`, `chart`, `realtime`, `push`, `mobile-shell`, `ai-action`, and `tool-approval`.
+The v2 `data-uif` contract includes `button`, `modal`, `drawer`, `offcanvas`, `dropdown`, `tooltip`, `popover`, `tabs`, `toast`, `accordion`, `table`, `form`, `ajax`, `route`, `shell`, `nav`, `chart`, `realtime`, `push`, `mobile-shell`, `ai-action`, and `tool-approval`.
 
 ## Development
 
@@ -397,15 +400,15 @@ npm run dev:playground
 
 If working before that migration is complete, use the currently available workspace scripts in the repository and avoid mixing package-manager lockfiles.
 
-## Implementation Milestones
+## Version 2
 
-- v0.1 foundation: npm workspaces, TypeScript source, core, CSS, DOM, net, forms, baseline tests.
-- v0.2 RAD adapter: partial updates, content swap, confirmation, loading states, JSON response handling, rehydration.
-- v0.3 components: modal, drawer/off-canvas, dropdown, tooltip, popover, tabs, toast, accordion, card, nav, table.
-- v0.4 charts/dashboard: SVG-first chart package and dashboard example.
-- v0.5 realtime/push/mobile: SSE, WebSocket, polling fallback, notifications, mobile shell.
-- v0.6 AI/MCP UI: action cards, approval cards, progress/result UI, audit trail, server-mediated flows.
-- v1.0 stable public release: hardened APIs, complete docs, browser QA, accessibility pass, and open-source release readiness.
+The repository and framework packages are versioned `2.1.0`. Version 2 consolidates the npm workspace and TypeScript architecture, dependency-free browser distribution, RAD adapter, components, editors, SVG charts, realtime and mobile capabilities, and governed AI/MCP interface surfaces.
+
+The current status is active v2 hardening. Public release readiness requires the automated release gate plus real-browser editor, accessibility, CSP/Trusted Types, mobile viewport, and deployed-artifact verification described in [Compatibility and Release Policy](docs/compatibility-and-release-policy.md).
+
+Release builds generate `dist/integrity.json` with checksums and SRI values for the root browser artifacts. `release-api.json` protects the established package export surface from accidental removals.
+
+Editor behavior and the supported Markdown profile are documented in [Editors](docs/editors.md). HTML, URL, CSP, Trusted Types, AI, and MCP boundaries are documented in [Security](docs/security.md).
 
 ## License
 

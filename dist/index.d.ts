@@ -175,14 +175,29 @@ interface SafeHTMLRenderOptions {
     allowedTags?: string[];
     allowedAttributes?: string[];
 }
+interface UIFTrustedTypesPolicy {
+    createHTML(input: string): unknown;
+}
+type SafeURLContext = 'link' | 'image' | 'network' | 'navigation';
+interface SafeURLPolicy {
+    context?: SafeURLContext;
+    allowRelative?: boolean;
+    allowHash?: boolean;
+    sameOrigin?: boolean;
+    protocols?: string[];
+}
 declare function registerComponent(name: string, component: Omit<UIFDomComponent, 'name'>): void;
 declare function registerComponent(component: UIFDomComponent): void;
 declare function qs<T extends Element = Element>(selector: string, root?: ParentNode): T | null;
 declare function qsa<T extends Element = Element>(selector: string, root?: ParentNode): T[];
 declare function closest<T extends Element = Element>(el: Element, selector: string): T | null;
+declare function safeQuerySelector<T extends Element = Element>(selector: string, root?: ParentNode): T | null;
 declare function resolveTarget(sourceEl: HTMLElement, targetExpression?: string): HTMLElement | null;
 declare function setText(target: Element | null, value: unknown): void;
 declare function appendTextElement<K extends keyof HTMLElementTagNameMap>(parent: Element, tagName: K, text: unknown, className?: string): HTMLElementTagNameMap[K];
+declare function configureTrustedTypes(policy: UIFTrustedTypesPolicy | null): void;
+declare function getTrustedTypesPolicy(): UIFTrustedTypesPolicy | null;
+declare function isSafeURL(value: string, policy?: SafeURLPolicy): boolean;
 declare function sanitizeHTML(html: string, options?: SafeHTMLRenderOptions): DocumentFragment;
 declare function setSafeHTML(target: Element | null, html: string, options?: SafeHTMLRenderOptions): void;
 declare function setTrustedHTML(target: Element | null, html: string, options?: TrustedHTMLRenderOptions): void;
@@ -271,14 +286,120 @@ declare function timeline(steps: AnimationStep[], options?: EffectOptions): Prom
 declare function stagger(elements: Iterable<HTMLElement>, animation: string, options?: EffectOptions): Promise<void>;
 declare function animateGroup(root: ParentNode, selector: string, animation: string, options?: EffectOptions): Promise<void>;
 declare function cancelAnimation(el: HTMLElement): void;
-declare function initAnimation(el: HTMLElement): void;
-declare function initAnimationTriggers(root?: ParentNode): void;
+interface AnimationController {
+    refresh(): void;
+    destroy(): void;
+}
+declare function initAnimation(el: HTMLElement): AnimationController;
+declare function initAnimationTriggers(root?: ParentNode): () => void;
 declare function observeMotion(root?: HTMLElement): void;
+
+type MarkdownDiagnosticSeverity = 'info' | 'warning' | 'error';
+interface MarkdownDiagnostic {
+    code: string;
+    column: number;
+    line: number;
+    message: string;
+    severity: MarkdownDiagnosticSeverity;
+}
+interface MarkdownParseOptions {
+    maxInputLength?: number;
+    maxLines?: number;
+    maxNesting?: number;
+    maxTableColumns?: number;
+}
+interface MarkdownRenderOptions {
+    sourceMap?: boolean;
+}
+interface MarkdownSourcePosition {
+    endLine: number;
+    startLine: number;
+}
+type MarkdownInlineNode = {
+    type: 'text';
+    value: string;
+} | {
+    type: 'break';
+} | {
+    type: 'code';
+    value: string;
+} | {
+    type: 'strong';
+    children: MarkdownInlineNode[];
+} | {
+    type: 'emphasis';
+    children: MarkdownInlineNode[];
+} | {
+    type: 'strike';
+    children: MarkdownInlineNode[];
+} | {
+    type: 'link';
+    children: MarkdownInlineNode[];
+    href: string;
+    title?: string;
+} | {
+    type: 'image';
+    alt: string;
+    src: string;
+    title?: string;
+};
+interface MarkdownListItem {
+    checked?: boolean;
+    children: MarkdownListNode[];
+    content: MarkdownInlineNode[];
+}
+interface MarkdownListNode {
+    type: 'list';
+    ordered: boolean;
+    start: number;
+    task: boolean;
+    items: MarkdownListItem[];
+    position?: MarkdownSourcePosition;
+}
+type MarkdownBlockNode = {
+    type: 'heading';
+    depth: number;
+    content: MarkdownInlineNode[];
+    position?: MarkdownSourcePosition;
+} | {
+    type: 'paragraph';
+    content: MarkdownInlineNode[];
+    position?: MarkdownSourcePosition;
+} | {
+    type: 'codeBlock';
+    language?: string;
+    value: string;
+    position?: MarkdownSourcePosition;
+} | {
+    type: 'blockquote';
+    children: MarkdownBlockNode[];
+    position?: MarkdownSourcePosition;
+} | MarkdownListNode | {
+    type: 'table';
+    align: Array<'left' | 'center' | 'right' | undefined>;
+    header: MarkdownInlineNode[][];
+    rows: MarkdownInlineNode[][][];
+    position?: MarkdownSourcePosition;
+} | {
+    type: 'thematicBreak';
+    position?: MarkdownSourcePosition;
+};
+interface MarkdownDocument {
+    type: 'document';
+    children: MarkdownBlockNode[];
+    diagnostics: MarkdownDiagnostic[];
+    truncated: boolean;
+}
+declare function parseMarkdownInline(value: string): MarkdownInlineNode[];
+declare function parseMarkdown(markdown: string, options?: MarkdownParseOptions): MarkdownDocument;
+declare function renderMarkdown(document: MarkdownDocument, options?: MarkdownRenderOptions): string;
+declare function markdownToHtml(markdown: string, options?: MarkdownParseOptions): string;
+declare function markdownDiagnostics(markdown: string, options?: MarkdownParseOptions): MarkdownDiagnostic[];
 
 type EditorMode = 'html' | 'markdown' | 'plain';
 type EditorPreviewMode = 'none' | 'manual' | 'live';
 type EditorLayout = 'source' | 'preview' | 'split' | 'tabs' | 'modal' | 'drawer';
-type EditorCommand = 'bold' | 'italic' | 'underline' | 'strike' | 'heading' | 'h1' | 'h2' | 'h3' | 'paragraph' | 'quote' | 'code' | 'code-inline' | 'code-block' | 'hr' | 'ul' | 'ol' | 'task' | 'link' | 'link-edit' | 'link-remove' | 'image' | 'image-edit' | 'image-remove' | 'table' | 'table-row-before' | 'table-row-after' | 'table-row-delete' | 'table-col-before' | 'table-col-after' | 'table-col-delete' | 'table-delete' | 'table-header-toggle' | 'undo' | 'redo' | 'preview' | 'source' | 'fullscreen' | 'clear';
+type EditorCommand = 'bold' | 'italic' | 'underline' | 'strike' | 'heading' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'paragraph' | 'quote' | 'code' | 'code-inline' | 'code-block' | 'hr' | 'ul' | 'ol' | 'task' | 'indent' | 'outdent' | 'link' | 'link-edit' | 'link-remove' | 'image' | 'image-edit' | 'image-remove' | 'table' | 'table-row-before' | 'table-row-after' | 'table-row-delete' | 'table-col-before' | 'table-col-after' | 'table-col-delete' | 'table-delete' | 'table-header-toggle' | 'table-caption' | 'undo' | 'redo' | 'preview' | 'source' | 'fullscreen' | 'clear';
 interface EditorOptions {
     mode?: EditorMode;
     toolbar?: string[];
@@ -290,6 +411,10 @@ interface EditorOptions {
     autosave?: boolean;
     autosaveDelay?: number;
     autosaveUrl?: string;
+    autosaveRetries?: number;
+    csrfToken?: string;
+    csrfHeader?: string;
+    uploadMaxBytes?: number;
     required?: boolean;
     maxLength?: number;
 }
@@ -301,6 +426,7 @@ interface EditorInstance {
     preview?: HTMLElement;
     status?: HTMLElement;
     dirty: boolean;
+    diagnostics: MarkdownDiagnostic[];
     sourceMode: boolean;
     getValue(): string;
     setValue(value: string): void;
@@ -313,12 +439,14 @@ interface EditorCommandContext {
     value?: unknown;
 }
 type EditorCommandHandler = (context: EditorCommandContext) => void;
-type EditorHookName = 'beforeInput' | 'afterInput' | 'beforeCommand' | 'afterCommand' | 'beforePaste' | 'afterPaste' | 'beforePreview' | 'afterPreview' | 'validate' | 'autosave' | 'uploadImage';
+type EditorHookName = 'beforeInput' | 'afterInput' | 'beforeCommand' | 'afterCommand' | 'beforePaste' | 'afterPaste' | 'beforeDrop' | 'afterDrop' | 'beforePreview' | 'afterPreview' | 'validate' | 'autosave' | 'uploadImage';
 interface EditorHookContext {
     editor: EditorInstance;
     value: string;
     command?: EditorCommand;
     file?: File;
+    revision?: number;
+    signal?: AbortSignal;
 }
 type EditorHookHandler = (context: EditorHookContext) => void | string | Promise<void | string>;
 interface EditorLinkValue {
@@ -337,11 +465,14 @@ interface EditorTableValue {
     columns?: number;
     header?: boolean;
 }
+interface EditorCodeBlockValue {
+    code?: string;
+    language?: string;
+}
 declare function registerEditorCommand(name: EditorCommand | string, handler: EditorCommandHandler): void;
 declare function unregisterEditorCommand(name: EditorCommand | string): void;
 declare function registerEditorHook(name: EditorHookName, handler: EditorHookHandler): () => void;
 declare function escapeHtml(value: unknown): string;
-declare function markdownToHtml(markdown: string): string;
 declare function htmlToMarkdown(html: string): string;
 declare function cleanEditorHtml(html: string): string;
 declare function validateEditor(editor: EditorInstance): string[];
@@ -411,6 +542,7 @@ interface RequestOptions extends RequestInit {
     dedupe?: boolean;
     retries?: number;
     retryDelay?: number;
+    idempotent?: boolean;
     csrfToken?: string;
     csrfHeader?: string;
     onUploadProgress?: (loaded: number, total: number) => void;
@@ -434,6 +566,9 @@ interface DataConnector<T = unknown> {
     refreshInterval?: number;
     transform?: (value: unknown) => T | Promise<T>;
 }
+interface ConnectorBindingOptions extends RequestOptions {
+    onError?: (error: unknown) => void;
+}
 type RequestInterceptor = (url: string, options: RequestOptions) => void | RequestOptions | Promise<void | RequestOptions>;
 type ResponseInterceptor = (response: Response) => void | Response | Promise<void | Response>;
 declare function useRequestInterceptor(fn: RequestInterceptor): () => void;
@@ -447,9 +582,17 @@ declare function upload<T = unknown>(url: string, formData: FormData, options?: 
 declare function parseCSV(text: string): string[][];
 declare function csvToObjects(text: string): Array<Record<string, string>>;
 declare function loadConnector<T = unknown>(connector: DataConnector<T>, options?: RequestOptions): Promise<T>;
-declare function bindConnector<T = unknown>(connector: DataConnector<T>, handler: (value: T) => void | Promise<void>, options?: RequestOptions): () => void;
+declare function bindConnector<T = unknown>(connector: DataConnector<T>, handler: (value: T) => void | Promise<void>, options?: ConnectorBindingOptions): () => void;
 
 type FormErrors = Record<string, string[]>;
+interface FormController {
+    refresh(): void;
+    destroy(): void;
+}
+interface RepeatableController {
+    refresh(): void;
+    destroy(): void;
+}
 type FormField = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 type AsyncRuleHandler = (field: FormField, form: HTMLFormElement, signal: AbortSignal) => Promise<string[]>;
 type FieldAdapter = (field: FormField) => string;
@@ -463,8 +606,8 @@ declare function clearErrors(formEl: HTMLFormElement): void;
 declare function showErrors(formEl: HTMLFormElement, errors: FormErrors): void;
 declare function showErrorSummary(formEl: HTMLFormElement, errors: FormErrors): HTMLElement | null;
 declare function validateFormAsync(formEl: HTMLFormElement): Promise<FormErrors>;
-declare function initRepeatableGroup(root: HTMLElement): void;
-declare function initForm(formEl: HTMLFormElement): void;
+declare function initRepeatableGroup(root: HTMLElement): RepeatableController;
+declare function initForm(formEl: HTMLFormElement): FormController;
 declare const form: {
     name: string;
     init: typeof initForm;
@@ -9556,7 +9699,7 @@ interface IconSearchOptions {
     includeDeprecated?: boolean;
 }
 
-declare const iconMetadata: Record<"code" | "hr" | "input" | "link" | "map" | "menu" | "meter" | "search" | "select" | "table" | "textarea" | "video" | "circle" | "filter" | "image" | "stop" | "annotation" | "loading" | "close" | "copy" | "drag" | "error" | "pause" | "play" | "uif" | "chart" | "dashboard" | "tool-approval" | "warning" | "target" | "success" | "offline" | "billing" | "organization" | "home" | "prompt" | "role" | "grid" | "palette" | "id" | "regression" | "shift" | "keys" | "sparkline" | "timeline" | "heatmap" | "histogram" | "box-plot" | "control-chart" | "treemap" | "area-chart" | "bar-chart" | "donut-chart" | "gauge-chart" | "funnel-chart" | "line-chart" | "pie-chart" | "radar-chart" | "scatter-chart" | "bubble-chart" | "waterfall-chart" | "route" | "alert" | "list" | "info" | "badge" | "breadcrumb" | "skeleton" | "sidebar" | "stepper" | "wizard" | "card" | "message" | "cache" | "queue" | "approval" | "browser" | "workspace" | "version" | "desktop-app" | "sync" | "storage" | "checkbox" | "repeat" | "markdown" | "quote" | "code-block" | "image-edit" | "undo" | "redo" | "indent" | "columns" | "command" | "file" | "key" | "anchor" | "draft" | "batoi" | "arrow-down" | "arrow-left" | "arrow-right" | "arrow-up" | "bot" | "check" | "check-circle" | "chevron-down" | "chevron-left" | "chevron-right" | "chevron-up" | "circle-dot" | "external-link" | "hash" | "maximize" | "minus" | "moon" | "more-horizontal" | "more-vertical" | "plus" | "settings" | "spark" | "star" | "sun" | "terminal" | "theme" | "arrow-down-left" | "arrow-down-right" | "arrow-up-left" | "arrow-up-right" | "chevrons-down" | "chevrons-left" | "chevrons-right" | "chevrons-up" | "corner-down-left" | "corner-down-right" | "corner-up-left" | "corner-up-right" | "layout-dashboard" | "layout-list" | "layout-panel-left" | "layout-panel-top" | "panel-bottom" | "panel-left" | "panel-right" | "panel-top" | "play-circle" | "plus-circle" | "plus-square" | "power" | "rotate-clockwise" | "search-check" | "search-x" | "square-dot" | "square-stack" | "stop-circle" | "arrow-left-right" | "arrow-up-down" | "ban" | "check-check" | "circle-alert" | "circle-help" | "ellipsis" | "ellipsis-vertical" | "maximize2" | "minimize" | "minimize2" | "move" | "move-horizontal" | "move-vertical" | "panel-close" | "panel-open" | "pin" | "pin-off" | "rotate-counter-clockwise" | "scan" | "scan-line" | "toggle-left" | "toggle-right" | "checkbox-checked" | "checkbox-minus" | "field-required" | "input-error" | "input-password" | "input-search" | "radio-checked" | "radio-unchecked" | "validation-error" | "command-palette" | "density-comfortable" | "density-compact" | "empty-box" | "empty-search" | "empty-state" | "focus-mode" | "nav-back" | "nav-forward" | "quick-action" | "sidebar-collapse" | "sidebar-expand" | "shortcut" | "split-view" | "spotlight" | "state-error" | "state-success" | "state-warning" | "tour" | "app-launcher" | "app-shell" | "bottom-sheet" | "command-key" | "dock" | "floating-action" | "gesture" | "inspector" | "launcher" | "navigator" | "onboarding" | "resizer" | "shell-command" | "status-bar" | "touch-target" | "workspace-switcher" | "action-bar" | "context-panel" | "filter-chip" | "keyboard-shortcut" | "side-panel" | "top-bar" | "x-square" | "zoom-in" | "zoom-out" | "chart-candlestick" | "chart-column" | "chart-no-axes" | "chart-stacked" | "axis-x" | "axis-y" | "chart-combo" | "chart-network" | "chart-spline" | "chart-step" | "conversion-funnel" | "dial" | "forecast" | "horizontal-bar-chart" | "kpi" | "progress-ring" | "scorecard" | "stacked-area-chart" | "table-chart" | "trend-down" | "trend-up" | "ab-test" | "cohort" | "experiment" | "goal-chart" | "growth-loop" | "retention" | "segment" | "target-metric" | "activation" | "benchmark" | "churn" | "expansion-revenue" | "forecast-band" | "ltv" | "mrr" | "nps" | "revenue-chart" | "roi" | "session-chart" | "win-rate" | "adoption-chart" | "capacity-chart" | "cohort-grid" | "contribution-chart" | "dependency-chart" | "error-rate" | "latency" | "percentile" | "saturation" | "throughput-chart" | "vertical-bar-chart" | "anomaly-chart" | "baseline-chart" | "burndown-chart" | "burnup-chart" | "distribution-chart" | "gantt-chart" | "health-score" | "leaderboard-chart" | "map-chart" | "matrix-chart" | "pareto-chart" | "sankey-chart" | "bullet-chart" | "funnel-stage" | "metric-card" | "pivot-chart" | "variance-chart" | "bank" | "cart" | "cash" | "credit-card" | "receipt" | "badge-dollar" | "badge-percent" | "barcode" | "gift" | "invoice" | "landmark" | "shopping-bag" | "store" | "ticket" | "truck" | "vault" | "wallet" | "coins" | "coupon" | "dollar-sign" | "hand-coins" | "package-check" | "package-open" | "package-plus" | "package-x" | "percent" | "refund" | "scale" | "ship" | "shopping-cart-check" | "shopping-cart-plus" | "warehouse" | "billable" | "checkout" | "dispute" | "dunning" | "estimate" | "payment-failed" | "payment-link" | "payment-method" | "payout" | "price-tag" | "subscription" | "tax-receipt" | "usage" | "cart-abandoned" | "discount-code" | "fulfillment" | "inventory" | "inventory-alert" | "order-cancelled" | "order-check" | "order-pending" | "pos-terminal" | "procurement" | "purchase-order" | "return" | "shipment-track" | "shipping-label" | "account-payable" | "account-receivable" | "bill-pay" | "card-terminal" | "cash-register" | "chargeback" | "credit-note" | "debit-note" | "delivery-note" | "payment-scheduled" | "pricing-table" | "revenue-recognition" | "sales-order" | "vendor" | "billing-cycle" | "collection-case" | "contract-value" | "payment-gateway" | "remittance" | "revenue-ledger" | "sku" | "supplier" | "tax-id" | "till" | "trial" | "wholesale" | "at-sign" | "bell" | "mail" | "mic" | "paperclip" | "send" | "share" | "bell-off" | "megaphone" | "phone-call" | "broadcast" | "chat-check" | "chat-plus" | "chat-x" | "inbox-mail" | "mail-check" | "mail-open" | "mail-plus" | "mail-x" | "message-circle" | "message-square" | "mic-off" | "notification-dot" | "phone-forwarded" | "phone-incoming" | "phone-missed" | "phone-off" | "phone-outgoing" | "rss-feed" | "share-2" | "announcement" | "comment-check" | "comment-x" | "feedback" | "inbox-alert" | "mention" | "message-lock" | "thread" | "channel" | "channel-lock" | "channel-plus" | "collaboration" | "conversation" | "meeting" | "moderation" | "notification-check" | "notification-snooze" | "presence-away" | "presence-busy" | "presence-online" | "reaction" | "thread-resolved" | "call-muted" | "call-transfer" | "comment-thread" | "conversation-star" | "escalation-message" | "meeting-cancelled" | "meeting-check" | "mention-alert" | "notification-priority" | "presence-offline" | "support-inbox" | "survey" | "targeted-broadcast" | "transcript" | "voicemail" | "call-incoming" | "call-recording" | "chat-bot" | "chat-error" | "chat-resolved" | "contact-card" | "email-bounce" | "email-template" | "notification-digest" | "webhook-event" | "auto-reply" | "call-queue" | "campaign" | "chat-typing" | "email-opened" | "email-sent" | "inbox-priority" | "live-chat" | "message-draft" | "notification-muted" | "sms" | "support-agent" | "archive" | "camera" | "document" | "edit" | "folder" | "printer" | "save" | "align-center" | "align-left" | "align-right" | "book-open" | "bookmark" | "camera-off" | "clipboard" | "clipboard-check" | "clipboard-list" | "copy-check" | "file-check" | "file-code" | "file-down" | "file-minus" | "file-plus" | "file-text" | "file-up" | "file-x" | "folder-open" | "folder-plus" | "folder-sync" | "image-plus" | "pencil" | "scissors" | "sticky" | "clipboard-copy" | "clipboard-x" | "crop" | "eraser" | "file-archive" | "file-audio" | "file-image" | "file-json" | "file-lock" | "file-spreadsheet" | "file-video" | "folder-check" | "folder-down" | "folder-lock" | "folder-up" | "folder-x" | "newspaper" | "paintbrush" | "document-import" | "document-export" | "document-search" | "document-signature" | "file-csv" | "file-pdf" | "file-template" | "image-check" | "scan-document" | "template-plus" | "asset" | "asset-library" | "collection" | "content-calendar" | "empty-file" | "empty-folder" | "file-diff" | "file-history" | "knowledge-base" | "media-library" | "citation" | "glossary" | "publish" | "redact" | "review-changes" | "rich-text" | "translation" | "web-page" | "video-off" | "approval-document" | "content-block" | "document-merge" | "document-split" | "file-xml" | "folder-shared" | "image-crop" | "media-playlist" | "page-break" | "seo" | "snippet" | "style-guide" | "alt-text" | "content-approval" | "form-template" | "media-caption" | "version-compare" | "battery" | "bluetooth" | "cloud" | "cpu" | "database" | "desktop" | "laptop" | "phone" | "server" | "chip" | "cloud-download" | "cloud-upload" | "database-backup" | "database-zap" | "device-tablet" | "hard-drive" | "headphones" | "keyboard" | "monitor" | "plug-zap" | "server-cog" | "wifi-off" | "bluetooth-connected" | "cloud-check" | "cloud-x" | "database-check" | "database-lock" | "mouse" | "network" | "monitor-smartphone" | "router" | "router-wifi" | "smartphone" | "tablet" | "usb" | "barcode-scanner" | "battery-charging" | "battery-full" | "battery-low" | "nfc" | "printer-check" | "server-check" | "server-lock" | "signal" | "signal-low" | "smartwatch" | "watch" | "wifi" | "app-window" | "mobile-camera" | "mobile-check" | "mobile-home" | "mobile-nav" | "mobile-rotate" | "mobile-scan" | "mobile-tab" | "mobile-vibrate" | "mobile-x" | "offline-sync" | "pwa-install" | "edge-device" | "kiosk" | "local-storage" | "platform-desktop" | "platform-mobile" | "platform-web" | "push-device" | "push-subscription" | "service-worker" | "biometric" | "camera-capture" | "geolocation" | "mobile-bottom-sheet" | "mobile-drawer" | "mobile-gesture" | "mobile-offline" | "mobile-permission" | "mobile-sheet" | "orientation-lock" | "passkey" | "sensor-alert" | "vibration-off" | "wearable" | "airplay" | "beacon" | "bluetooth-off" | "camera-switch" | "device-hub" | "display-check" | "firmware" | "gpu" | "iot-device" | "mobile-hotspot" | "printer-error" | "qr-scanner" | "audit" | "award" | "brain" | "briefcase" | "building" | "calculator" | "eye" | "eye-off" | "help" | "lock" | "policy" | "shield" | "accessibility" | "check-square" | "fingerprint" | "life-buoy" | "scale-balanced" | "shield-check" | "shield-lock" | "shield-x" | "user-check" | "user-cog" | "user-minus" | "user-plus" | "user-x" | "users-round" | "unlock" | "user" | "users" | "badge-alert" | "badge-check" | "certificate" | "key-round" | "lock-keyhole" | "lock-open" | "permission" | "scan-face" | "shield-alert" | "shield-user" | "user-round" | "user-round-check" | "users-plus" | "agent" | "agent-check" | "agent-x" | "ai-spark" | "audit-log" | "consent" | "model" | "prompt-lock" | "risk-score" | "tool-denied" | "api-key" | "credential" | "org-chart" | "secret" | "service-account" | "session" | "session-expired" | "tenant" | "token" | "workspace-lock" | "access-request" | "approval-policy" | "audit-trail" | "data-residency" | "governance" | "policy-lock" | "data-retention" | "scim" | "sso" | "trust-center" | "user-invite" | "user-provision" | "aria" | "assistive-mode" | "compliance-evidence" | "consent-record" | "incident-response" | "keyboard-access" | "permission-review" | "privacy" | "screen-reader" | "voice-access" | "access-expiry" | "audit-event" | "data-classification" | "device-policy" | "encryption-key" | "identity-provider" | "ip-allowlist" | "legal-hold" | "tls-certificate" | "zero-trust" | "x-circle" | "activity" | "calendar" | "clock" | "download" | "flag" | "inbox" | "layers" | "package" | "qr-code" | "refresh" | "rocket" | "sliders" | "tag" | "tool" | "trash" | "branch" | "bug" | "calendar-check" | "calendar-clock" | "calendar-days" | "calendar-plus" | "calendar-x" | "grab" | "history" | "kanban" | "list-check" | "list-filter" | "loader-circle" | "log-in" | "log-out" | "project" | "puzzle" | "reply-all" | "reply" | "sliders-horizontal" | "sliders-vertical" | "sort-asc" | "sort-desc" | "stamp" | "step" | "timer" | "wrench" | "upload" | "automation" | "backlog" | "dependency" | "git-branch" | "git-commit" | "git-merge" | "git-pull-request" | "milestone" | "route-turn" | "status-dot" | "task-check" | "task-clock" | "task-x" | "webhook" | "column-add" | "column-delete" | "data-join" | "data-split" | "data-transform" | "filter-check" | "filter-x" | "row-add" | "row-delete" | "table-export" | "table-import" | "table-search" | "table-settings" | "workflow-branch" | "approval-pending" | "approval-rejected" | "approval-request" | "escalation" | "handoff" | "queue-next" | "retry" | "rollback" | "runbook" | "sla" | "task-priority" | "ai-run" | "event-stream" | "html-partial" | "hydrate" | "job" | "job-failed" | "job-running" | "mcp-call" | "mcp-result" | "orchestration" | "partial-swap" | "polling" | "rehydrate" | "revalidate" | "sse" | "websocket" | "appointment" | "booking" | "checklist-clock" | "dispatch-board" | "incident-alert" | "maintenance" | "process-loop" | "recurrence" | "repair" | "rota" | "service-window" | "triage-queue" | "work-order" | "workflow" | "batch-job" | "blocked-task" | "calendar-sync" | "change-request" | "decision-node" | "event-trigger" | "form-approval" | "job-queue" | "manual-step" | "process-map" | "release" | "rule-engine" | "task-delegated" | "workflow-template" | "box" | "compass" | "globe" | "heart" | "location" | "flask" | "heart-pulse" | "magnet" | "presentation" | "school" | "sitemap" | "suitcase" | "train" | "wand" | "ambulance" | "bed" | "bus" | "car" | "clinic" | "dna" | "factory" | "flag-triangle" | "globe-lock" | "graduation-cap" | "leaf" | "library" | "map-pin-check" | "map-pin-plus" | "map-pin-x" | "microscope" | "plane" | "pill" | "recycle" | "stethoscope" | "syringe" | "traffic-light" | "wheelchair" | "wind-turbine" | "blood-drop" | "campus" | "cargo-ship" | "classroom" | "container" | "currency-dollar" | "currency-rupee" | "exam" | "first-aid" | "forklift" | "insurance" | "investment" | "lab-report" | "ledger" | "loan" | "medical-chart" | "parcel-location" | "patient" | "tax" | "vaccine" | "building-hospital" | "delivery-bike" | "drone" | "fleet-vehicle" | "geo-fence" | "map-route" | "route-off" | "route-plus" | "satellite" | "traffic-cone" | "agriculture" | "case-management" | "crm" | "energy" | "hospitality" | "legal" | "manufacturing" | "public-sector" | "quality-control" | "real-estate" | "recruiting" | "service-desk" | "support-case" | "ticket-queue" | "tourism" | "asset-maintenance" | "care-team" | "dispatch" | "facilities" | "field-service" | "fleet-route" | "patient-portal" | "repair-order" | "site-visit" | "triage" | "claims" | "construction" | "hotel-room" | "insurance-policy" | "lab" | "meter-reading" | "mining" | "pharmacy" | "radiology" | "restaurant" | "telemedicine" | "utility-pole" | "airport" | "branch-office" | "call-center" | "data-center" | "emergency-room" | "government-office" | "insurance-claim" | "inventory-site" | "logistics-hub" | "power-grid", IconMetadata>;
+declare const iconMetadata: Record<"code" | "hr" | "input" | "link" | "map" | "menu" | "meter" | "search" | "select" | "table" | "textarea" | "video" | "circle" | "filter" | "image" | "stop" | "annotation" | "loading" | "close" | "copy" | "drag" | "error" | "pause" | "play" | "uif" | "chart" | "dashboard" | "tool-approval" | "warning" | "target" | "success" | "offline" | "billing" | "organization" | "home" | "prompt" | "role" | "grid" | "palette" | "id" | "regression" | "shift" | "keys" | "sparkline" | "timeline" | "heatmap" | "histogram" | "box-plot" | "control-chart" | "treemap" | "area-chart" | "bar-chart" | "donut-chart" | "gauge-chart" | "funnel-chart" | "line-chart" | "pie-chart" | "radar-chart" | "scatter-chart" | "bubble-chart" | "waterfall-chart" | "route" | "network" | "alert" | "list" | "info" | "badge" | "breadcrumb" | "skeleton" | "sidebar" | "stepper" | "wizard" | "card" | "message" | "cache" | "queue" | "approval" | "browser" | "workspace" | "version" | "desktop-app" | "sync" | "storage" | "checkbox" | "repeat" | "document" | "command" | "undo" | "redo" | "markdown" | "quote" | "code-block" | "indent" | "image-edit" | "columns" | "signal" | "file" | "key" | "anchor" | "draft" | "batoi" | "arrow-down" | "arrow-left" | "arrow-right" | "arrow-up" | "bot" | "check" | "check-circle" | "chevron-down" | "chevron-left" | "chevron-right" | "chevron-up" | "circle-dot" | "external-link" | "hash" | "maximize" | "minus" | "moon" | "more-horizontal" | "more-vertical" | "plus" | "settings" | "spark" | "star" | "sun" | "terminal" | "theme" | "arrow-down-left" | "arrow-down-right" | "arrow-up-left" | "arrow-up-right" | "chevrons-down" | "chevrons-left" | "chevrons-right" | "chevrons-up" | "corner-down-left" | "corner-down-right" | "corner-up-left" | "corner-up-right" | "layout-dashboard" | "layout-list" | "layout-panel-left" | "layout-panel-top" | "panel-bottom" | "panel-left" | "panel-right" | "panel-top" | "play-circle" | "plus-circle" | "plus-square" | "power" | "rotate-clockwise" | "search-check" | "search-x" | "square-dot" | "square-stack" | "stop-circle" | "arrow-left-right" | "arrow-up-down" | "ban" | "check-check" | "circle-alert" | "circle-help" | "ellipsis" | "ellipsis-vertical" | "maximize2" | "minimize" | "minimize2" | "move" | "move-horizontal" | "move-vertical" | "panel-close" | "panel-open" | "pin" | "pin-off" | "rotate-counter-clockwise" | "scan" | "scan-line" | "toggle-left" | "toggle-right" | "checkbox-checked" | "checkbox-minus" | "field-required" | "input-error" | "input-password" | "input-search" | "radio-checked" | "radio-unchecked" | "validation-error" | "command-palette" | "density-comfortable" | "density-compact" | "empty-box" | "empty-search" | "empty-state" | "focus-mode" | "nav-back" | "nav-forward" | "quick-action" | "sidebar-collapse" | "sidebar-expand" | "shortcut" | "split-view" | "spotlight" | "state-error" | "state-success" | "state-warning" | "tour" | "app-launcher" | "app-shell" | "bottom-sheet" | "command-key" | "dock" | "floating-action" | "gesture" | "inspector" | "launcher" | "navigator" | "onboarding" | "resizer" | "shell-command" | "status-bar" | "touch-target" | "workspace-switcher" | "action-bar" | "context-panel" | "filter-chip" | "keyboard-shortcut" | "side-panel" | "top-bar" | "x-square" | "zoom-in" | "zoom-out" | "chart-candlestick" | "chart-column" | "chart-no-axes" | "chart-stacked" | "axis-x" | "axis-y" | "chart-combo" | "chart-network" | "chart-spline" | "chart-step" | "conversion-funnel" | "dial" | "forecast" | "horizontal-bar-chart" | "kpi" | "progress-ring" | "scorecard" | "stacked-area-chart" | "table-chart" | "trend-down" | "trend-up" | "ab-test" | "cohort" | "experiment" | "goal-chart" | "growth-loop" | "retention" | "segment" | "target-metric" | "activation" | "benchmark" | "churn" | "expansion-revenue" | "forecast-band" | "ltv" | "mrr" | "nps" | "revenue-chart" | "roi" | "session-chart" | "win-rate" | "adoption-chart" | "capacity-chart" | "cohort-grid" | "contribution-chart" | "dependency-chart" | "error-rate" | "latency" | "percentile" | "saturation" | "throughput-chart" | "vertical-bar-chart" | "anomaly-chart" | "baseline-chart" | "burndown-chart" | "burnup-chart" | "distribution-chart" | "gantt-chart" | "health-score" | "leaderboard-chart" | "map-chart" | "matrix-chart" | "pareto-chart" | "sankey-chart" | "bullet-chart" | "funnel-stage" | "metric-card" | "pivot-chart" | "variance-chart" | "bank" | "cart" | "cash" | "credit-card" | "receipt" | "badge-dollar" | "badge-percent" | "barcode" | "gift" | "invoice" | "landmark" | "shopping-bag" | "store" | "ticket" | "truck" | "vault" | "wallet" | "coins" | "coupon" | "dollar-sign" | "hand-coins" | "package-check" | "package-open" | "package-plus" | "package-x" | "percent" | "refund" | "scale" | "ship" | "shopping-cart-check" | "shopping-cart-plus" | "warehouse" | "billable" | "checkout" | "dispute" | "dunning" | "estimate" | "payment-failed" | "payment-link" | "payment-method" | "payout" | "price-tag" | "subscription" | "tax-receipt" | "usage" | "cart-abandoned" | "discount-code" | "fulfillment" | "inventory" | "inventory-alert" | "order-cancelled" | "order-check" | "order-pending" | "pos-terminal" | "procurement" | "purchase-order" | "return" | "shipment-track" | "shipping-label" | "account-payable" | "account-receivable" | "bill-pay" | "card-terminal" | "cash-register" | "chargeback" | "credit-note" | "debit-note" | "delivery-note" | "payment-scheduled" | "pricing-table" | "revenue-recognition" | "sales-order" | "vendor" | "billing-cycle" | "collection-case" | "contract-value" | "payment-gateway" | "remittance" | "revenue-ledger" | "sku" | "supplier" | "tax-id" | "till" | "trial" | "wholesale" | "at-sign" | "bell" | "mail" | "mic" | "paperclip" | "send" | "share" | "bell-off" | "megaphone" | "phone-call" | "broadcast" | "chat-check" | "chat-plus" | "chat-x" | "inbox-mail" | "mail-check" | "mail-open" | "mail-plus" | "mail-x" | "message-circle" | "message-square" | "mic-off" | "notification-dot" | "phone-forwarded" | "phone-incoming" | "phone-missed" | "phone-off" | "phone-outgoing" | "rss-feed" | "share-2" | "announcement" | "comment-check" | "comment-x" | "feedback" | "inbox-alert" | "mention" | "message-lock" | "thread" | "channel" | "channel-lock" | "channel-plus" | "collaboration" | "conversation" | "meeting" | "moderation" | "notification-check" | "notification-snooze" | "presence-away" | "presence-busy" | "presence-online" | "reaction" | "thread-resolved" | "call-muted" | "call-transfer" | "comment-thread" | "conversation-star" | "escalation-message" | "meeting-cancelled" | "meeting-check" | "mention-alert" | "notification-priority" | "presence-offline" | "support-inbox" | "survey" | "targeted-broadcast" | "transcript" | "voicemail" | "call-incoming" | "call-recording" | "chat-bot" | "chat-error" | "chat-resolved" | "contact-card" | "email-bounce" | "email-template" | "notification-digest" | "webhook-event" | "auto-reply" | "call-queue" | "campaign" | "chat-typing" | "email-opened" | "email-sent" | "inbox-priority" | "live-chat" | "message-draft" | "notification-muted" | "sms" | "support-agent" | "archive" | "camera" | "edit" | "folder" | "printer" | "save" | "align-center" | "align-left" | "align-right" | "book-open" | "bookmark" | "camera-off" | "clipboard" | "clipboard-check" | "clipboard-list" | "copy-check" | "file-check" | "file-code" | "file-down" | "file-minus" | "file-plus" | "file-text" | "file-up" | "file-x" | "folder-open" | "folder-plus" | "folder-sync" | "image-plus" | "pencil" | "scissors" | "sticky" | "clipboard-copy" | "clipboard-x" | "crop" | "eraser" | "file-archive" | "file-audio" | "file-image" | "file-json" | "file-lock" | "file-spreadsheet" | "file-video" | "folder-check" | "folder-down" | "folder-lock" | "folder-up" | "folder-x" | "newspaper" | "paintbrush" | "document-import" | "document-export" | "document-search" | "document-signature" | "file-csv" | "file-pdf" | "file-template" | "image-check" | "scan-document" | "template-plus" | "asset" | "asset-library" | "collection" | "content-calendar" | "empty-file" | "empty-folder" | "file-diff" | "file-history" | "knowledge-base" | "media-library" | "citation" | "glossary" | "publish" | "redact" | "review-changes" | "rich-text" | "translation" | "web-page" | "video-off" | "approval-document" | "content-block" | "document-merge" | "document-split" | "file-xml" | "folder-shared" | "image-crop" | "media-playlist" | "page-break" | "seo" | "snippet" | "style-guide" | "alt-text" | "content-approval" | "form-template" | "media-caption" | "version-compare" | "battery" | "bluetooth" | "cloud" | "cpu" | "database" | "desktop" | "laptop" | "phone" | "server" | "chip" | "cloud-download" | "cloud-upload" | "database-backup" | "database-zap" | "device-tablet" | "hard-drive" | "headphones" | "keyboard" | "monitor" | "plug-zap" | "server-cog" | "wifi-off" | "bluetooth-connected" | "cloud-check" | "cloud-x" | "database-check" | "database-lock" | "mouse" | "monitor-smartphone" | "router" | "router-wifi" | "smartphone" | "tablet" | "usb" | "barcode-scanner" | "battery-charging" | "battery-full" | "battery-low" | "nfc" | "printer-check" | "server-check" | "server-lock" | "signal-low" | "smartwatch" | "watch" | "wifi" | "app-window" | "mobile-camera" | "mobile-check" | "mobile-home" | "mobile-nav" | "mobile-rotate" | "mobile-scan" | "mobile-tab" | "mobile-vibrate" | "mobile-x" | "offline-sync" | "pwa-install" | "edge-device" | "kiosk" | "local-storage" | "platform-desktop" | "platform-mobile" | "platform-web" | "push-device" | "push-subscription" | "service-worker" | "biometric" | "camera-capture" | "geolocation" | "mobile-bottom-sheet" | "mobile-drawer" | "mobile-gesture" | "mobile-offline" | "mobile-permission" | "mobile-sheet" | "orientation-lock" | "passkey" | "sensor-alert" | "vibration-off" | "wearable" | "airplay" | "beacon" | "bluetooth-off" | "camera-switch" | "device-hub" | "display-check" | "firmware" | "gpu" | "iot-device" | "mobile-hotspot" | "printer-error" | "qr-scanner" | "audit" | "award" | "brain" | "briefcase" | "building" | "calculator" | "eye" | "eye-off" | "help" | "lock" | "policy" | "shield" | "accessibility" | "check-square" | "fingerprint" | "life-buoy" | "scale-balanced" | "shield-check" | "shield-lock" | "shield-x" | "user-check" | "user-cog" | "user-minus" | "user-plus" | "user-x" | "users-round" | "unlock" | "user" | "users" | "badge-alert" | "badge-check" | "certificate" | "key-round" | "lock-keyhole" | "lock-open" | "permission" | "scan-face" | "shield-alert" | "shield-user" | "user-round" | "user-round-check" | "users-plus" | "agent" | "agent-check" | "agent-x" | "ai-spark" | "audit-log" | "consent" | "model" | "prompt-lock" | "risk-score" | "tool-denied" | "api-key" | "credential" | "org-chart" | "secret" | "service-account" | "session" | "session-expired" | "tenant" | "token" | "workspace-lock" | "access-request" | "approval-policy" | "audit-trail" | "data-residency" | "governance" | "policy-lock" | "data-retention" | "scim" | "sso" | "trust-center" | "user-invite" | "user-provision" | "aria" | "assistive-mode" | "compliance-evidence" | "consent-record" | "incident-response" | "keyboard-access" | "permission-review" | "privacy" | "screen-reader" | "voice-access" | "access-expiry" | "audit-event" | "data-classification" | "device-policy" | "encryption-key" | "identity-provider" | "ip-allowlist" | "legal-hold" | "tls-certificate" | "zero-trust" | "x-circle" | "activity" | "calendar" | "clock" | "download" | "flag" | "inbox" | "layers" | "package" | "qr-code" | "refresh" | "rocket" | "sliders" | "tag" | "tool" | "trash" | "branch" | "bug" | "calendar-check" | "calendar-clock" | "calendar-days" | "calendar-plus" | "calendar-x" | "grab" | "history" | "kanban" | "list-check" | "list-filter" | "loader-circle" | "log-in" | "log-out" | "project" | "puzzle" | "reply-all" | "reply" | "sliders-horizontal" | "sliders-vertical" | "sort-asc" | "sort-desc" | "stamp" | "step" | "timer" | "wrench" | "upload" | "automation" | "backlog" | "dependency" | "git-branch" | "git-commit" | "git-merge" | "git-pull-request" | "milestone" | "route-turn" | "status-dot" | "task-check" | "task-clock" | "task-x" | "webhook" | "column-add" | "column-delete" | "data-join" | "data-split" | "data-transform" | "filter-check" | "filter-x" | "row-add" | "row-delete" | "table-export" | "table-import" | "table-search" | "table-settings" | "workflow-branch" | "approval-pending" | "approval-rejected" | "approval-request" | "escalation" | "handoff" | "queue-next" | "retry" | "rollback" | "runbook" | "sla" | "task-priority" | "ai-run" | "event-stream" | "html-partial" | "hydrate" | "job" | "job-failed" | "job-running" | "mcp-call" | "mcp-result" | "orchestration" | "partial-swap" | "polling" | "rehydrate" | "revalidate" | "sse" | "websocket" | "appointment" | "booking" | "checklist-clock" | "dispatch-board" | "incident-alert" | "maintenance" | "process-loop" | "recurrence" | "repair" | "rota" | "service-window" | "triage-queue" | "work-order" | "workflow" | "batch-job" | "blocked-task" | "calendar-sync" | "change-request" | "decision-node" | "event-trigger" | "form-approval" | "job-queue" | "manual-step" | "process-map" | "release" | "rule-engine" | "task-delegated" | "workflow-template" | "box" | "compass" | "globe" | "heart" | "location" | "flask" | "heart-pulse" | "magnet" | "presentation" | "school" | "sitemap" | "suitcase" | "train" | "wand" | "ambulance" | "bed" | "bus" | "car" | "clinic" | "dna" | "factory" | "flag-triangle" | "globe-lock" | "graduation-cap" | "leaf" | "library" | "map-pin-check" | "map-pin-plus" | "map-pin-x" | "microscope" | "plane" | "pill" | "recycle" | "stethoscope" | "syringe" | "traffic-light" | "wheelchair" | "wind-turbine" | "blood-drop" | "campus" | "cargo-ship" | "classroom" | "container" | "currency-dollar" | "currency-rupee" | "exam" | "first-aid" | "forklift" | "insurance" | "investment" | "lab-report" | "ledger" | "loan" | "medical-chart" | "parcel-location" | "patient" | "tax" | "vaccine" | "building-hospital" | "delivery-bike" | "drone" | "fleet-vehicle" | "geo-fence" | "map-route" | "route-off" | "route-plus" | "satellite" | "traffic-cone" | "agriculture" | "case-management" | "crm" | "energy" | "hospitality" | "legal" | "manufacturing" | "public-sector" | "quality-control" | "real-estate" | "recruiting" | "service-desk" | "support-case" | "ticket-queue" | "tourism" | "asset-maintenance" | "care-team" | "dispatch" | "facilities" | "field-service" | "fleet-route" | "patient-portal" | "repair-order" | "site-visit" | "triage" | "claims" | "construction" | "hotel-room" | "insurance-policy" | "lab" | "meter-reading" | "mining" | "pharmacy" | "radiology" | "restaurant" | "telemedicine" | "utility-pole" | "airport" | "branch-office" | "call-center" | "data-center" | "emergency-room" | "government-office" | "insurance-claim" | "inventory-site" | "logistics-hub" | "power-grid", IconMetadata>;
 declare function getIconMetadata(name: IconName | string): IconMetadata | undefined;
 declare function iconsByCategory(category: IconCategory | string): IconName[];
 declare function searchIcons(query?: string, options?: IconSearchOptions): IconName[];
@@ -9802,6 +9945,10 @@ interface DashboardRenderOptions {
     className?: string;
     emptyText?: string;
 }
+interface DashboardController {
+    refresh(config?: DashboardConfig): void;
+    destroy(): void;
+}
 declare function createDashboardConfig(config: DashboardConfig): DashboardConfig;
 declare function applyDashboardFilters<T extends Record<string, unknown>>(rows: T[], filters?: DashboardFilter[]): T[];
 declare function summarizeDashboard(rows: Array<Record<string, unknown>>, field: string): {
@@ -9813,7 +9960,7 @@ declare function summarizeDashboard(rows: Array<Record<string, unknown>>, field:
 };
 declare function renderDashboardWidget(widget: DashboardWidget, options?: DashboardRenderOptions): string;
 declare function renderDashboard(input: DashboardConfig, options?: DashboardRenderOptions): string;
-declare function initDashboard(el: HTMLElement): void;
+declare function initDashboard(el: HTMLElement): DashboardController | null;
 
 type DesktopWorkspaceMode = 'none' | 'optional' | 'required';
 type DesktopOfflineMode = 'none' | 'cache' | 'queue';
@@ -9864,6 +10011,12 @@ interface DesktopSettingsStore {
     remove(key: string): void | Promise<void>;
     clear(): void | Promise<void>;
 }
+interface SynchronousDesktopSettingsStore extends DesktopSettingsStore {
+    get<T = unknown>(key: string): T | null;
+    set<T = unknown>(key: string, value: T): void;
+    remove(key: string): void;
+    clear(): void;
+}
 interface DesktopWorkspaceSession {
     workspaceId: string;
     workspaceName: string;
@@ -9895,7 +10048,7 @@ declare function renderDesktopSyncStatus(status: DesktopSyncStatus | DesktopShel
 declare function renderDesktopShell(options: DesktopShellOptions): string;
 declare function setDesktopStatus(element: HTMLElement, status: DesktopShellStatus): void;
 declare function initDesktopShell(element: HTMLElement): () => void;
-declare function createMemorySettingsStore(namespace?: string): DesktopSettingsStore;
+declare function createMemorySettingsStore(namespace?: string): SynchronousDesktopSettingsStore;
 declare function createLocalSettingsStore(namespace: string): DesktopSettingsStore;
 declare function bindDesktopSettings(element: HTMLElement, store: DesktopSettingsStore): void;
 declare function createWorkspaceSession(input: DesktopWorkspaceSession): DesktopWorkspaceSession;
@@ -9921,6 +10074,14 @@ interface TableOptions {
     onPage?: (page: number, table: HTMLTableElement) => void | Promise<void>;
     onBulkAction?: (action: string, rows: HTMLTableRowElement[]) => void;
     onRowAction?: (action: string, row: HTMLTableRowElement) => void;
+    allowCrossOrigin?: boolean;
+    maxRows?: number;
+    maxCellLength?: number;
+    maxHTMLLength?: number;
+}
+interface TableController {
+    refresh(): void;
+    destroy(): void;
 }
 interface RemoteTableResponse {
     rows?: Array<Record<string, unknown>>;
@@ -9957,14 +10118,15 @@ declare function goToPage(table: HTMLTableElement, page: number, options?: Table
 declare function exportTable(table: HTMLTableElement, options?: TableOptions): unknown;
 declare function filterElements(targetSelector: string, query: string, mode?: 'contains' | 'startsWith' | 'token'): void;
 declare function initDeclarativeFilters(root?: Document | HTMLElement): void;
-declare function initTable(table: HTMLTableElement, options?: TableOptions): void;
+declare function initTable(table: HTMLTableElement, options?: TableOptions): TableController;
 declare const dataTable: {
     name: string;
-    init: (el: HTMLElement) => void;
+    init: (el: HTMLElement) => TableController;
 };
 
 type SwapMode = 'inner' | 'outer' | 'append' | 'prepend' | 'before' | 'after';
 interface RadResponse {
+    version?: 1 | 2;
     ok?: boolean;
     html?: string;
     target?: string;
@@ -9996,10 +10158,21 @@ interface RouterOptions {
     afterNavigate?: (url: URL, target: HTMLElement | null) => void;
     restoreFocus?: boolean;
     restoreScroll?: boolean;
+    allowCrossOrigin?: boolean;
+    maxHTMLLength?: number;
 }
-declare function initRouter(root?: Document | HTMLElement, options?: RouterOptions): void;
+declare function initRouter(root?: Document | HTMLElement, options?: RouterOptions): () => void;
 
-declare function registerServiceWorker(path?: string): Promise<ServiceWorkerRegistration | undefined>;
+interface OfflineTaskOptions {
+    idempotent: true;
+    key?: string;
+    maxAttempts?: number;
+}
+interface ServiceWorkerOptions {
+    scope?: string;
+    updateViaCache?: ServiceWorkerUpdateViaCache;
+}
+declare function registerServiceWorker(path?: string, options?: ServiceWorkerOptions): Promise<ServiceWorkerRegistration | undefined>;
 declare function unregisterServiceWorker(): Promise<void>;
 declare function setupInstallPrompt(): () => Promise<void>;
 declare function onOnline(handler: () => void): () => void;
@@ -10011,11 +10184,13 @@ declare const cacheStrategies: {
     staleWhileRevalidate: string;
 };
 declare function createCacheStrategy(name: keyof typeof cacheStrategies): string;
-declare function queueOfflineTask(task: () => Promise<void>): void;
+declare function isCacheableRequest(request: Request): boolean;
+declare function isCacheableResponse(response: Response): boolean;
+declare function queueOfflineTask(task: () => Promise<void>, options: OfflineTaskOptions): void;
 declare function flushOfflineQueue(): Promise<void>;
 declare function initOfflineQueue(): () => void;
 declare function onAppUpdate(handler: (registration: ServiceWorkerRegistration) => void): () => void;
-declare function initInstallPrompt(el: HTMLElement): void;
+declare function initInstallPrompt(el: HTMLElement): () => void;
 
 type State = Record<string, unknown>;
 type Subscriber = (value: unknown) => void;
@@ -10026,6 +10201,9 @@ interface StoreOptions {
     persist?: 'local' | 'session';
     key?: string;
     computed?: Record<string, Computed>;
+    maxPersistBytes?: number;
+    onPersistError?: (error: Error) => void;
+    persistVersion?: number;
 }
 interface MicroAppStoreOptions extends StoreOptions {
     historyLimit?: number;
@@ -10034,9 +10212,13 @@ type ArtifactStoreOptions = MicroAppStoreOptions;
 interface LocalStoreOptions {
     namespace?: string;
     driver?: 'localstorage' | 'memory';
+    maxBytes?: number;
+    maxEntries?: number;
+    version?: number;
 }
 interface LocalStore {
     namespace: string;
+    version: number;
     get<T = unknown>(key: string): Promise<T | undefined>;
     set<T = unknown>(key: string, value: T): Promise<void>;
     delete(key: string): Promise<void>;
@@ -10229,6 +10411,7 @@ interface DrilldownOptions {
     target?: string;
     url?: string;
     param?: string;
+    allowCrossOrigin?: boolean;
 }
 interface ChartController {
     refresh(): Promise<void>;
@@ -10336,13 +10519,21 @@ interface RealtimeOptions {
     reconnect?: boolean;
     backoff?: number;
     maxBackoff?: number;
+    maxPayloadBytes?: number;
+    maxReconnectAttempts?: number;
+    jitter?: number;
     heartbeat?: number;
+    allowCrossOrigin?: boolean;
 }
 interface RealtimeBindingOptions extends Omit<RealtimeOptions, 'mode'> {
     transport?: RealtimeMode | 'polling';
     fallback?: 'polling' | 'none';
     onMessage?: RealtimeHandler;
     onState?: (state: RealtimeState) => void;
+}
+interface RealtimeController {
+    refresh(): void;
+    destroy(): void;
 }
 interface PresenceUser {
     id: string;
@@ -10367,7 +10558,7 @@ declare function updatePresence(channel: string, user: Omit<PresenceUser, 'lastS
 declare function removePresence(channel: string, userId: string): void;
 declare function getPresence(channel: string): PresenceUser[];
 declare function disconnect(channel: string): void;
-declare function initRealtime(el: HTMLElement): void;
+declare function initRealtime(el: HTMLElement): RealtimeController | null;
 declare const realtime: {
     name: string;
     init: typeof initRealtime;
@@ -10394,15 +10585,24 @@ declare function unsubscribeFromPush(): Promise<boolean>;
 declare function showInAppNotification(message: string, options?: {
     type?: string;
 }): HTMLElement;
-declare function initPush(el: HTMLElement): void;
+interface PushController {
+    refresh(): void;
+    destroy(): void;
+}
+declare function initPush(el: HTMLElement): PushController;
 declare const push: {
     name: string;
     init: typeof initPush;
 };
 
-declare function initMobileShell(el: HTMLElement): void;
+interface MobileController {
+    refresh(): void;
+    destroy(): void;
+}
+declare function initMobileShell(el: HTMLElement): MobileController;
 declare function showOfflineBanner(message?: string): HTMLElement;
-declare function initSegmentedControl(el: HTMLElement): void;
+declare function hideOfflineBanner(): void;
+declare function initSegmentedControl(el: HTMLElement): MobileController;
 declare function initSheetModal(el: HTMLElement): void;
 declare function initSwipeAction(el: HTMLElement): void;
 declare function initPullToRefresh(el: HTMLElement): void;
@@ -10411,15 +10611,18 @@ declare const mobileShell: {
     init: typeof initMobileShell;
 };
 
+interface AIRenderOptions {
+    maxCharacters?: number;
+}
 declare function renderAIAction(el: HTMLElement): void;
-declare function renderPromptPanel(el: HTMLElement, history?: string[]): void;
-declare function renderAssistantResponse(el: HTMLElement, content: string): void;
-declare function appendStreamingChunk(el: HTMLElement, chunk: string): void;
-declare function createStreamSurface(el: HTMLElement): {
+declare function renderPromptPanel(el: HTMLElement, history?: string[], options?: AIRenderOptions): void;
+declare function renderAssistantResponse(el: HTMLElement, content: string, options?: AIRenderOptions): void;
+declare function appendStreamingChunk(el: HTMLElement, chunk: string, options?: AIRenderOptions): void;
+declare function createStreamSurface(el: HTMLElement, options?: AIRenderOptions): {
     append(chunk: string): void;
     cancel(): void;
 };
-declare function renderAIResultCard(el: HTMLElement, content: string): void;
+declare function renderAIResultCard(el: HTMLElement, content: string, options?: AIRenderOptions): void;
 declare const aiAction: {
     name: string;
     init: typeof renderAIAction;
@@ -10432,6 +10635,9 @@ interface ToolPolicyCheck {
 }
 interface ToolReviewRequest {
     tool: string;
+    requestId?: string;
+    expiresAt?: string;
+    auditRef?: string;
     risk?: string;
     irreversible?: boolean;
     payload?: unknown;
@@ -10451,21 +10657,25 @@ interface ToolReviewRequest {
     };
     result?: unknown;
 }
+interface ToolRenderOptions {
+    maxCharacters?: number;
+    maxItems?: number;
+}
 declare function renderToolApproval(el: HTMLElement): void;
-declare function renderApprovalPolicy(el: HTMLElement, checks: ToolPolicyCheck[]): void;
+declare function renderApprovalPolicy(el: HTMLElement, checks: ToolPolicyCheck[], options?: ToolRenderOptions): void;
 declare function renderToolProgress(el: HTMLElement, message: string): void;
 declare function renderToolTimeline(el: HTMLElement, steps: Array<{
     label: string;
     state?: string;
-}>): void;
+}>, options?: ToolRenderOptions): void;
 declare function renderToolAuditTrail(el: HTMLElement, entries: Array<{
     actor?: string;
     action: string;
     at?: string;
-}>): void;
+}>, options?: ToolRenderOptions): void;
 declare function renderDiff(el: HTMLElement, before: string, after: string): void;
-declare function renderToolResult(el: HTMLElement, result: unknown): void;
-declare function renderToolReviewFlow(el: HTMLElement, request: ToolReviewRequest): void;
+declare function renderToolResult(el: HTMLElement, result: unknown, options?: ToolRenderOptions): void;
+declare function renderToolReviewFlow(el: HTMLElement, request: ToolReviewRequest, options?: ToolRenderOptions): void;
 declare const toolApproval: {
     name: string;
     init: typeof renderToolApproval;
@@ -10481,4 +10691,4 @@ interface BatoiUIFApp {
 declare function start(root?: Document | HTMLElement): BatoiUIFApp;
 declare function autoStart(root?: Document | HTMLElement): void;
 
-export { type ActionContext, type ActionDiagnostic, type ActionHandler, type AnimationPreset, type AnimationStep, type ArtifactStoreOptions, type BatoiUIFApp, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type ConnectorMode, type ConnectorType, type DashboardConfig, type DashboardFilter, type DashboardFilterOperator, type DashboardRenderOptions, type DashboardWidget, type DashboardWidgetType, type DataConnector, type DesktopAiMode, type DesktopAppManifest, type DesktopCapability, type DesktopNavigationItem, type DesktopOfflineMode, type DesktopPlatform, type DesktopSettingsStore, type DesktopShellOptions, type DesktopShellStatus, type DesktopSyncQueueItem, type DesktopSyncState, type DesktopSyncStatus, type DesktopValidationResult, type DesktopWorkspaceMode, type DesktopWorkspaceSession, type DrilldownOptions, type EditorCommand, type EditorCommandContext, type EditorCommandHandler, type EditorHookContext, type EditorHookHandler, type EditorHookName, type EditorImageValue, type EditorInstance, type EditorLayout, type EditorLinkValue, type EditorMode, type EditorOptions, type EditorPreviewMode, type EditorTableValue, type EffectOptions, type ExtensionManifestOptions, type ExtensionMessage, type ExtensionSurface, type FlintChartAdapterResult, type FlintChartEncoding, type FlintChartInput, type FlintChartSpec, type FormErrors, type HTMLSwapMode, type HistogramBin, type HistogramOptions, type IconCategory, type IconDefinition, type IconMetadata, type IconName, type IconOptions, type IconRegistry, type IconSearchOptions, type IconStatus, type LocalStore, type LocalStoreOptions, type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppConnectorWorkflow, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type MicroAppStoreOptions, type MountIconsOptions, type NotificationItem, type OverlayOptions, type ParsedAction, type PresenceUser, type QueryHandler, type QueryInput, type RadResponse, type RealtimeBindingOptions, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RequestOptions, type RouterOptions, type SafeHTMLRenderOptions, type StoreOptions, type SummaryStats, type SwapMode, type SyncQueue, type SyncQueueItem, type TableAdapterOptions, type TableOptions, type ToolPolicyCheck, type ToolReviewRequest, type TrustedHTMLRenderOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFValue, accordion, adaptFlintChart, adaptRecords, adaptTable, addNotification, adminSecurityIcons, aiAction, alert, animate, animateGroup, animationPresets, appendStreamingChunk, appendTextElement, applyDashboardFilters, applyPermissionNavigation, applyResponsiveColumns, autoInit, autoStart, badge, bindActions, bindChartExports, bindConnector, bindDesktopOfflineIndicator, bindDesktopSettings, bindRadActions, bindRealtime, brandIcons, breadcrumb, button, cacheStrategies, canUseDesktopAction, cancelAnimation, cancelRequest, card, carousel, chart, chartIcons, cleanEditorHtml, clearActionDiagnostics, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, commerceIcons, communicationIcons, connect, contentIcons, coreUiIcons, correlation, createAdvancedStore, createArtifactStore, createCacheStrategy, createDashboardConfig, createDesktopManifest, createDesktopShell, createDesktopSyncStatus, createEditor, createExtensionManifest, createExtensionMessage, createLocalSettingsStore, createLocalStore, createMemorySettingsStore, createMicroAppStore, createStore, createStreamSurface, createSyncQueue, createWorkspaceSession, csvToObjects, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, detectDesktopPlatform, deviceIcons, disconnect, dispatchAction, dispatchActions, domainIcons, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, escapeHtml, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, formatEditor, fragment, get, getActionDiagnostics, getConnectionState, getEditorValue, getIconMetadata, getNotifications, getOverlayStack, getPresence, getPushSubscription, goToPage, hasDesktopCapability, hasIcon, hide, histogramBins, htmlToMarkdown, icon, iconElement, iconMetadata, iconSets, icons, iconsByCategory, init, initAll, initAnimation, initAnimationTriggers, initChart, initComponent, initDashboard, initDeclarativeFilters, initDesktopShell, initEditor, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, isExtensionRuntime, isInitialized, lightbox, linearRegression, listMicroAppConnectorWorkflows, loadConnector, loadPartial, loadRemoteTable, markNotificationsRead, markdownToHtml, masonry, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, observeMotion, offcanvas, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseActionSpec, parseCSV, parseChartData, parseDesktopManifestElement, parseMicroAppManifest, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queryEditorCommand, queueOfflineTask, ready, realtime, refreshChart, registerAction, registerAsyncRule, registerComponent, registerEditorCommand, registerEditorHook, registerFieldAdapter, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, registerValidationMessage, rehydrate, removePresence, renderAIAction, renderAIResultCard, renderApprovalPolicy, renderAssistantResponse, renderChart, renderDashboard, renderDashboardWidget, renderDesktopShell, renderDesktopSyncStatus, renderDiff, renderFlintChart, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolReviewFlow, renderToolTimeline, renderWorkspaceIdentity, request, requestNotificationPermission, resolveActionTarget, resolveTarget, runEditorCommand, sanitizeHTML, searchIcons, selectedRows, sequence, serialize, setAccent, setDensity, setDesktopStatus, setEditorPreviewLayout, setEditorValue, setSafeHTML, setTableState, setText, setTrustedHTML, setupInstallPrompt, shell, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, stagger, start, stepper, submitForm, subscribe, subscribeToPush, summarizeDashboard, summarizeDesktopQueue, summaryStats, swapContent, swapTrustedHTML, table, tabs, timeline, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterAction, unregisterEditorCommand, unregisterServiceWorker, unsubscribeFromPush, updatePresence, upload, useRequestInterceptor, useResponseInterceptor, validateDesktopManifest, validateEditor, validateField, validateForm, validateFormAsync, validateMicroAppConnectorWorkflows, validateMicroAppManifest, wizard, workflowIcons, zScores };
+export { type AIRenderOptions, type ActionContext, type ActionDiagnostic, type ActionHandler, type AnimationController, type AnimationPreset, type AnimationStep, type ArtifactStoreOptions, type BatoiUIFApp, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type ConnectorBindingOptions, type ConnectorMode, type ConnectorType, type DashboardConfig, type DashboardController, type DashboardFilter, type DashboardFilterOperator, type DashboardRenderOptions, type DashboardWidget, type DashboardWidgetType, type DataConnector, type DesktopAiMode, type DesktopAppManifest, type DesktopCapability, type DesktopNavigationItem, type DesktopOfflineMode, type DesktopPlatform, type DesktopSettingsStore, type DesktopShellOptions, type DesktopShellStatus, type DesktopSyncQueueItem, type DesktopSyncState, type DesktopSyncStatus, type DesktopValidationResult, type DesktopWorkspaceMode, type DesktopWorkspaceSession, type DrilldownOptions, type EditorCodeBlockValue, type EditorCommand, type EditorCommandContext, type EditorCommandHandler, type EditorHookContext, type EditorHookHandler, type EditorHookName, type EditorImageValue, type EditorInstance, type EditorLayout, type EditorLinkValue, type EditorMode, type EditorOptions, type EditorPreviewMode, type EditorTableValue, type EffectOptions, type ExtensionManifestOptions, type ExtensionMessage, type ExtensionSurface, type FlintChartAdapterResult, type FlintChartEncoding, type FlintChartInput, type FlintChartSpec, type FormController, type FormErrors, type HTMLSwapMode, type HistogramBin, type HistogramOptions, type IconCategory, type IconDefinition, type IconMetadata, type IconName, type IconOptions, type IconRegistry, type IconSearchOptions, type IconStatus, type LocalStore, type LocalStoreOptions, type MarkdownBlockNode, type MarkdownDiagnostic, type MarkdownDiagnosticSeverity, type MarkdownDocument, type MarkdownInlineNode, type MarkdownListItem, type MarkdownListNode, type MarkdownParseOptions, type MarkdownRenderOptions, type MarkdownSourcePosition, type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppConnectorWorkflow, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type MicroAppStoreOptions, type MobileController, type MountIconsOptions, type NotificationItem, type OfflineTaskOptions, type OverlayOptions, type ParsedAction, type PresenceUser, type PushController, type QueryHandler, type QueryInput, type RadResponse, type RealtimeBindingOptions, type RealtimeController, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RepeatableController, type RequestOptions, type RouterOptions, type SafeHTMLRenderOptions, type SafeURLContext, type SafeURLPolicy, type ServiceWorkerOptions, type StoreOptions, type SummaryStats, type SwapMode, type SyncQueue, type SyncQueueItem, type TableAdapterOptions, type TableController, type TableOptions, type ToolPolicyCheck, type ToolRenderOptions, type ToolReviewRequest, type TrustedHTMLRenderOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFTrustedTypesPolicy, type UIFValue, accordion, adaptFlintChart, adaptRecords, adaptTable, addNotification, adminSecurityIcons, aiAction, alert, animate, animateGroup, animationPresets, appendStreamingChunk, appendTextElement, applyDashboardFilters, applyPermissionNavigation, applyResponsiveColumns, autoInit, autoStart, badge, bindActions, bindChartExports, bindConnector, bindDesktopOfflineIndicator, bindDesktopSettings, bindRadActions, bindRealtime, brandIcons, breadcrumb, button, cacheStrategies, canUseDesktopAction, cancelAnimation, cancelRequest, card, carousel, chart, chartIcons, cleanEditorHtml, clearActionDiagnostics, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, commerceIcons, communicationIcons, configureTrustedTypes, connect, contentIcons, coreUiIcons, correlation, createAdvancedStore, createArtifactStore, createCacheStrategy, createDashboardConfig, createDesktopManifest, createDesktopShell, createDesktopSyncStatus, createEditor, createExtensionManifest, createExtensionMessage, createLocalSettingsStore, createLocalStore, createMemorySettingsStore, createMicroAppStore, createStore, createStreamSurface, createSyncQueue, createWorkspaceSession, csvToObjects, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, detectDesktopPlatform, deviceIcons, disconnect, dispatchAction, dispatchActions, domainIcons, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, escapeHtml, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, formatEditor, fragment, get, getActionDiagnostics, getConnectionState, getEditorValue, getIconMetadata, getNotifications, getOverlayStack, getPresence, getPushSubscription, getTrustedTypesPolicy, goToPage, hasDesktopCapability, hasIcon, hide, hideOfflineBanner, histogramBins, htmlToMarkdown, icon, iconElement, iconMetadata, iconSets, icons, iconsByCategory, init, initAll, initAnimation, initAnimationTriggers, initChart, initComponent, initDashboard, initDeclarativeFilters, initDesktopShell, initEditor, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, isCacheableRequest, isCacheableResponse, isExtensionRuntime, isInitialized, isSafeURL, lightbox, linearRegression, listMicroAppConnectorWorkflows, loadConnector, loadPartial, loadRemoteTable, markNotificationsRead, markdownDiagnostics, markdownToHtml, masonry, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, observeMotion, offcanvas, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseActionSpec, parseCSV, parseChartData, parseDesktopManifestElement, parseMarkdown, parseMarkdownInline, parseMicroAppManifest, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queryEditorCommand, queueOfflineTask, ready, realtime, refreshChart, registerAction, registerAsyncRule, registerComponent, registerEditorCommand, registerEditorHook, registerFieldAdapter, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, registerValidationMessage, rehydrate, removePresence, renderAIAction, renderAIResultCard, renderApprovalPolicy, renderAssistantResponse, renderChart, renderDashboard, renderDashboardWidget, renderDesktopShell, renderDesktopSyncStatus, renderDiff, renderFlintChart, renderMarkdown, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolReviewFlow, renderToolTimeline, renderWorkspaceIdentity, request, requestNotificationPermission, resolveActionTarget, resolveTarget, runEditorCommand, safeQuerySelector, sanitizeHTML, searchIcons, selectedRows, sequence, serialize, setAccent, setDensity, setDesktopStatus, setEditorPreviewLayout, setEditorValue, setSafeHTML, setTableState, setText, setTrustedHTML, setupInstallPrompt, shell, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, stagger, start, stepper, submitForm, subscribe, subscribeToPush, summarizeDashboard, summarizeDesktopQueue, summaryStats, swapContent, swapTrustedHTML, table, tabs, timeline, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterAction, unregisterEditorCommand, unregisterServiceWorker, unsubscribeFromPush, updatePresence, upload, useRequestInterceptor, useResponseInterceptor, validateDesktopManifest, validateEditor, validateField, validateForm, validateFormAsync, validateMicroAppConnectorWorkflows, validateMicroAppManifest, wizard, workflowIcons, zScores };

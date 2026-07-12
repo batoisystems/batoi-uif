@@ -1,8 +1,10 @@
 import { emit } from '@batoi/uif-core';
-import { swapTrustedHTML } from '@batoi/uif-dom';
-import { request } from '@batoi/uif-net';
+import { isSafeURL, swapTrustedHTML } from '@batoi/uif-dom';
+import { cancelRequest, request } from '@batoi/uif-net';
 
 export type FormErrors = Record<string, string[]>;
+export interface FormController { refresh(): void; destroy(): void; }
+export interface RepeatableController { refresh(): void; destroy(): void; }
 type FormField = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 type RuleHandler = (value: string, arg: string | undefined, form: HTMLFormElement, field: FormField) => boolean;
 type AsyncRuleHandler = (
@@ -38,10 +40,13 @@ const ruleHandlers: Record<string, RuleHandler> = {
 const asyncRuleHandlers = new Map<string, AsyncRuleHandler>();
 const fieldAdapters = new Map<string, FieldAdapter>();
 const validationMessages = new Map<string, ValidationMessageHandler>();
-const initializedForms = new WeakSet<HTMLFormElement>();
-const initializedRepeatables = new WeakSet<HTMLElement>();
+const formControllers = new WeakMap<HTMLFormElement, FormController>();
+const repeatableControllers = new WeakMap<HTMLElement, RepeatableController>();
 const validationControllers = new WeakMap<HTMLFormElement, AbortController>();
 const submitKeys = new WeakMap<HTMLFormElement, string>();
+const MAX_ERROR_FIELDS = 100;
+const MAX_ERROR_MESSAGE_LENGTH = 2_000;
+let fieldIdSequence = 0;
 
 export function registerAsyncRule(name: string, handler: AsyncRuleHandler): void {
   asyncRuleHandlers.set(name, handler);
@@ -101,8 +106,30 @@ function resolveFormTarget(formEl: HTMLFormElement): HTMLElement | null {
   if (!expr) return null;
   if (expr === 'self') return formEl;
   if (expr === 'parent') return formEl.parentElement;
-  if (expr.startsWith('closest:')) return formEl.closest<HTMLElement>(expr.slice(8));
-  return document.querySelector<HTMLElement>(expr);
+  try {
+    if (expr.startsWith('closest:')) return formEl.closest<HTMLElement>(expr.slice(8));
+    return document.querySelector<HTMLElement>(expr);
+  } catch {
+    return null;
+  }
+}
+
+function queryTarget(selector: string | undefined): HTMLElement | null {
+  if (!selector) return null;
+  try {
+    return document.querySelector<HTMLElement>(selector);
+  } catch {
+    return null;
+  }
+}
+
+function normalizedErrors(errors: FormErrors): FormErrors {
+  return Object.fromEntries(Object.entries(errors).slice(0, MAX_ERROR_FIELDS).map(([name, messages]) => [name, messages.slice(0, 10).map((message) => String(message).slice(0, MAX_ERROR_MESSAGE_LENGTH))]));
+}
+
+function ensureFieldId(field: HTMLElement, name: string): string {
+  if (!field.id) field.id = `uif-field-${cssEscape(name).replace(/\\/g, '-')}-${++fieldIdSequence}`;
+  return field.id;
 }
 
 function swap(target: HTMLElement | null, html: string, mode = 'inner'): void {
@@ -150,23 +177,25 @@ export function clearErrors(formEl: HTMLFormElement): void {
 }
 
 export function showErrors(formEl: HTMLFormElement, errors: FormErrors): void {
-  Object.entries(errors).forEach(([name, messages]) => {
+  Object.entries(normalizedErrors(errors)).forEach(([name, messages]) => {
     const field = formEl.elements.namedItem(name);
     const fieldEl = field instanceof HTMLElement ? field : formEl.querySelector<HTMLElement>(`#${cssEscape(name)}`);
     if (!fieldEl) return;
     const msg = document.createElement('div');
     msg.className = 'uif-error';
-    msg.id = `${fieldEl.id || name}-error`;
+    msg.id = `${ensureFieldId(fieldEl, name)}-error`;
     msg.textContent = messages[0] ?? 'Invalid value';
     msg.setAttribute('role', 'alert');
     fieldEl.setAttribute('aria-invalid', 'true');
-    fieldEl.setAttribute('aria-describedby', msg.id);
+    const describedBy = new Set((fieldEl.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean));
+    describedBy.add(msg.id);
+    fieldEl.setAttribute('aria-describedby', [...describedBy].join(' '));
     fieldEl.insertAdjacentElement('afterend', msg);
   });
 }
 
 export function showErrorSummary(formEl: HTMLFormElement, errors: FormErrors): HTMLElement | null {
-  const entries = Object.entries(errors);
+  const entries = Object.entries(normalizedErrors(errors));
   if (!entries.length) return null;
   const summary = document.createElement('div');
   summary.className = 'uif-error-summary';
@@ -177,7 +206,9 @@ export function showErrorSummary(formEl: HTMLFormElement, errors: FormErrors): H
   entries.forEach(([name, messages]) => {
     const item = document.createElement('li');
     const link = document.createElement('a');
-    link.href = `#${cssEscape(name)}`;
+    const field = formEl.elements.namedItem(name);
+    const fieldEl = field instanceof HTMLElement ? field : queryTarget(`#${cssEscape(name)}`);
+    link.href = `#${fieldEl ? ensureFieldId(fieldEl, name) : cssEscape(name)}`;
     link.textContent = messages[0] ?? 'Invalid value';
     item.append(link);
     list.append(item);
@@ -191,21 +222,24 @@ export async function validateFormAsync(formEl: HTMLFormElement): Promise<FormEr
   validationControllers.get(formEl)?.abort();
   const controller = new AbortController();
   validationControllers.set(formEl, controller);
-  const errors = validateForm(formEl);
-  const asyncFields = Array.from(formEl.querySelectorAll<FormField>('[data-uif-validate-async]'));
-  await Promise.all(
-    asyncFields.map(async (field) => {
-      if (controller.signal.aborted) throw abortError();
-      const name = fieldName(field);
-      const handler = asyncRuleHandlers.get(field.dataset.uifValidateAsync || '');
-      const fieldErrors = handler ? await handler(field, formEl, controller.signal) : [];
-      if (controller.signal.aborted) throw abortError();
-      if (fieldErrors.length) errors[name] = [...(errors[name] ?? []), ...fieldErrors];
-    }),
-  );
-  if (controller.signal.aborted) throw abortError();
-  validationControllers.delete(formEl);
-  return errors;
+  try {
+    const errors = validateForm(formEl);
+    const asyncFields = Array.from(formEl.querySelectorAll<FormField>('[data-uif-validate-async]'));
+    await Promise.all(
+      asyncFields.map(async (field) => {
+        if (controller.signal.aborted) throw abortError();
+        const name = fieldName(field);
+        const handler = asyncRuleHandlers.get(field.dataset.uifValidateAsync || '');
+        const fieldErrors = handler ? await handler(field, formEl, controller.signal) : [];
+        if (controller.signal.aborted) throw abortError();
+        if (fieldErrors.length) errors[name] = [...(errors[name] ?? []), ...fieldErrors];
+      }),
+    );
+    if (controller.signal.aborted) throw abortError();
+    return normalizedErrors(errors);
+  } finally {
+    if (validationControllers.get(formEl) === controller) validationControllers.delete(formEl);
+  }
 }
 
 function setFormState(formEl: HTMLFormElement, state: 'idle' | 'submitting' | 'success' | 'error'): void {
@@ -214,32 +248,53 @@ function setFormState(formEl: HTMLFormElement, state: 'idle' | 'submitting' | 's
   emit(`uif:form-${state}`, { form: formEl }, formEl);
 }
 
-export function initRepeatableGroup(root: HTMLElement): void {
-  if (initializedRepeatables.has(root)) return;
-  initializedRepeatables.add(root);
-  root.addEventListener('click', (event) => {
+function formRequest(formEl: HTMLFormElement, url: string, method: string): { url: string; body?: FormData } {
+  const data = new FormData(formEl);
+  if (method !== 'GET' && method !== 'HEAD') return { url, body: data };
+  const target = new URL(url, window.location.href);
+  data.forEach((value, name) => target.searchParams.append(name, typeof value === 'string' ? value : value.name));
+  return { url: target.href };
+}
+
+export function initRepeatableGroup(root: HTMLElement): RepeatableController {
+  const existing = repeatableControllers.get(root);
+  if (existing) return existing;
+  const listener = (event: Event) => {
     const action = event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('[data-uif-repeat-action]') : null;
     if (!action) return;
     const template = root.querySelector<HTMLTemplateElement>('template[data-uif-role="template"]');
     const list = root.querySelector<HTMLElement>('[data-uif-role="items"]') || root;
     if (action.dataset.uifRepeatAction === 'add' && template) list.append(template.content.cloneNode(true));
     if (action.dataset.uifRepeatAction === 'remove') action.closest<HTMLElement>('[data-uif-role="item"]')?.remove();
-  });
+  };
+  root.addEventListener('click', listener);
+  const controller: RepeatableController = {
+    refresh() {},
+    destroy() {
+      root.removeEventListener('click', listener);
+      if (repeatableControllers.get(root) === controller) repeatableControllers.delete(root);
+    },
+  };
+  repeatableControllers.set(root, controller);
+  return controller;
 }
 
-export function initForm(formEl: HTMLFormElement): void {
-  if (initializedForms.has(formEl)) return;
-  initializedForms.add(formEl);
+export function initForm(formEl: HTMLFormElement): FormController {
+  const existing = formControllers.get(formEl);
+  if (existing) return existing;
+  const listenerController = new AbortController();
+  const repeatables = new Set<RepeatableController>();
   formEl.dataset.uifState ||= 'idle';
-  formEl.querySelectorAll<HTMLElement>('[data-uif="repeatable"]').forEach(initRepeatableGroup);
+  const refresh = () => formEl.querySelectorAll<HTMLElement>('[data-uif="repeatable"]').forEach((root) => repeatables.add(initRepeatableGroup(root)));
+  refresh();
   const markDirty = (event: Event) => {
     const field = event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('input,select,textarea') : null;
     field?.setAttribute('data-uif-dirty', 'true');
     formEl.dataset.uifDirty = 'true';
     emit('uif:form-dirty', { form: formEl, field }, formEl);
   };
-  formEl.addEventListener('input', markDirty);
-  formEl.addEventListener('change', markDirty);
+  formEl.addEventListener('input', markDirty, { signal: listenerController.signal });
+  formEl.addEventListener('change', markDirty, { signal: listenerController.signal });
   formEl.addEventListener(
     'blur',
     (event) => {
@@ -247,7 +302,7 @@ export function initForm(formEl: HTMLFormElement): void {
       field?.setAttribute('data-uif-touched', 'true');
       emit('uif:form-touched', { form: formEl, field }, formEl);
     },
-    true,
+    { capture: true, signal: listenerController.signal },
   );
   formEl.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -270,13 +325,21 @@ export function initForm(formEl: HTMLFormElement): void {
 
     setFormState(formEl, 'submitting');
     const url = formEl.dataset.uifSrc || formEl.getAttribute('action') || window.location.href;
-    const method = (formEl.dataset.uifMethod || formEl.getAttribute('method') || 'POST').toUpperCase();
+    if (!isSafeURL(url, { context: 'network', allowHash: false, sameOrigin: formEl.dataset.uifAllowCrossOrigin !== 'true' })) {
+      const error = new Error('Batoi UIF blocked an unsafe form action URL');
+      formEl.dispatchEvent(new CustomEvent('uif:form-error', { detail: { form: formEl, error }, bubbles: true }));
+      setFormState(formEl, 'error');
+      return;
+    }
+    const requestedMethod = (formEl.dataset.uifMethod || formEl.getAttribute('method') || 'POST').toUpperCase();
+    const method = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(requestedMethod) ? requestedMethod : 'POST';
+    const submission = formRequest(formEl, url, method);
     const key = submitKeys.get(formEl) || `form:${formEl.id || formEl.name || Math.random().toString(36).slice(2)}`;
     submitKeys.set(formEl, key);
     try {
-      const result = await request<string | { html?: string; target?: string; swap?: string; errors?: FormErrors; focus?: string }>(url, {
+      const result = await request<string | { html?: string; target?: string; swap?: string; errors?: FormErrors; focus?: string }>(submission.url, {
         method,
-        body: new FormData(formEl),
+        body: submission.body,
         key,
       });
       const target = resolveFormTarget(formEl);
@@ -284,21 +347,38 @@ export function initForm(formEl: HTMLFormElement): void {
       if (typeof result === 'string') {
         swap(target, result, mode);
       } else if (result?.errors) {
-        showErrors(formEl, result.errors);
-        showErrorSummary(formEl, result.errors);
+        const errors = normalizedErrors(result.errors);
+        showErrors(formEl, errors);
+        showErrorSummary(formEl, errors);
         setFormState(formEl, 'error');
         return;
       } else if (result?.html) {
-        swap(result.target ? document.querySelector<HTMLElement>(result.target) : target, result.html, result.swap || mode);
+        swap(result.target ? queryTarget(result.target) : target, result.html, result.swap || mode);
       }
-      if (typeof result !== 'string' && result?.focus) document.querySelector<HTMLElement>(result.focus)?.focus();
+      if (typeof result !== 'string' && result?.focus) queryTarget(result.focus)?.focus();
       setFormState(formEl, 'success');
     } catch (error) {
       if (isAbortError(error)) return;
+      formEl.dispatchEvent(new CustomEvent('uif:form-error', { detail: { form: formEl, error }, bubbles: true }));
       setFormState(formEl, 'error');
-      throw error;
     }
-  });
+  }, { signal: listenerController.signal });
+  const controller: FormController = {
+    refresh,
+    destroy() {
+      listenerController.abort();
+      validationControllers.get(formEl)?.abort();
+      validationControllers.delete(formEl);
+      const key = submitKeys.get(formEl);
+      if (key) cancelRequest(key);
+      submitKeys.delete(formEl);
+      repeatables.forEach((repeatable) => repeatable.destroy());
+      repeatables.clear();
+      if (formControllers.get(formEl) === controller) formControllers.delete(formEl);
+    },
+  };
+  formControllers.set(formEl, controller);
+  return controller;
 }
 
 export const form = {

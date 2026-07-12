@@ -33,8 +33,12 @@ declare function timeline(steps: AnimationStep[], options?: EffectOptions): Prom
 declare function stagger(elements: Iterable<HTMLElement>, animation: string, options?: EffectOptions): Promise<void>;
 declare function animateGroup(root: ParentNode, selector: string, animation: string, options?: EffectOptions): Promise<void>;
 declare function cancelAnimation(el: HTMLElement): void;
-declare function initAnimation(el: HTMLElement): void;
-declare function initAnimationTriggers(root?: ParentNode): void;
+interface AnimationController {
+    refresh(): void;
+    destroy(): void;
+}
+declare function initAnimation(el: HTMLElement): AnimationController;
+declare function initAnimationTriggers(root?: ParentNode): () => void;
 declare function observeMotion(root?: HTMLElement): void;
 
-export { type AnimationPreset, type AnimationStep, type EffectOptions, animate, animateGroup, animationPresets, cancelAnimation, collapse, expand, hide, initAnimation, initAnimationTriggers, observeMotion, sequence, show, stagger, timeline, toggle, transition };
+export { type AnimationController, type AnimationPreset, type AnimationStep, type EffectOptions, animate, animateGroup, animationPresets, cancelAnimation, collapse, expand, hide, initAnimation, initAnimationTriggers, observeMotion, sequence, show, stagger, timeline, toggle, transition };

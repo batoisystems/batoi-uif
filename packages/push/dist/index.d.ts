@@ -19,10 +19,14 @@ declare function unsubscribeFromPush(): Promise<boolean>;
 declare function showInAppNotification(message: string, options?: {
     type?: string;
 }): HTMLElement;
-declare function initPush(el: HTMLElement): void;
+interface PushController {
+    refresh(): void;
+    destroy(): void;
+}
+declare function initPush(el: HTMLElement): PushController;
 declare const push: {
     name: string;
     init: typeof initPush;
 };
 
-export { type NotificationItem, addNotification, getNotifications, getPushSubscription, initPush, markNotificationsRead, push, registerPushServiceWorker, requestNotificationPermission, showInAppNotification, subscribeToPush, unreadCount, unsubscribeFromPush };
+export { type NotificationItem, type PushController, addNotification, getNotifications, getPushSubscription, initPush, markNotificationsRead, push, registerPushServiceWorker, requestNotificationPermission, showInAppNotification, subscribeToPush, unreadCount, unsubscribeFromPush };

@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { configureTrustedTypes } from '@batoi/uif-dom';
 import {
   applyPermissionNavigation,
   canUseDesktopAction,
@@ -6,11 +7,14 @@ import {
   createDesktopShell,
   createLocalSettingsStore,
   createMemorySettingsStore,
+  initDesktopShell,
   parseDesktopManifestElement,
   renderDesktopShell,
   summarizeDesktopQueue,
   validateDesktopManifest,
 } from './index.js';
+
+afterEach(() => configureTrustedTypes(null));
 
 describe('@batoi/uif-desktop', () => {
   it('validates required manifest fields', () => {
@@ -37,6 +41,36 @@ describe('@batoi/uif-desktop', () => {
     expect(html).toContain('2 queued');
   });
 
+  it('blocks unsafe navigation URLs and uses the configured HTML policy', () => {
+    const createHTML = vi.fn((value: string) => value);
+    configureTrustedTypes({ createHTML });
+    const element = document.createElement('div');
+    element.dataset.uifDesktop = JSON.stringify({
+      id: 'workspace',
+      name: 'Workspace',
+      navigation: [{ id: 'unsafe', label: 'Unsafe', href: 'javascript:alert(1)' }],
+    });
+
+    const dispose = initDesktopShell(element);
+
+    expect(createHTML).toHaveBeenCalledOnce();
+    expect(element.querySelector('a')?.getAttribute('href')).toBe('#');
+    dispose();
+  });
+
+  it('leaves server content intact and reports malformed desktop options', () => {
+    document.body.innerHTML = '<section data-uif-desktop="{bad"><p>Server fallback</p></section>';
+    const element = document.querySelector('section') as HTMLElement;
+    const errors: string[] = [];
+    element.addEventListener('uif:desktop-error', (event) => errors.push((event as CustomEvent).detail.code));
+
+    const dispose = initDesktopShell(element);
+
+    expect(element.textContent).toContain('Server fallback');
+    expect(errors).toEqual(['desktop-invalid-options']);
+    dispose();
+  });
+
   it('supports memory and local settings stores', () => {
     const memory = createMemorySettingsStore('test');
     memory.set('density', 'compact');
@@ -49,6 +83,20 @@ describe('@batoi/uif-desktop', () => {
     expect(local.get('theme')).toBe('light');
     local.clear();
     expect(local.get('theme')).toBeNull();
+  });
+
+  it('falls back to memory for malformed or unavailable local settings storage', () => {
+    window.localStorage.clear();
+    window.localStorage.setItem('desktop-resilient:theme', '{bad');
+    const local = createLocalSettingsStore('desktop-resilient');
+    expect(local.get('theme')).toBeNull();
+
+    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new DOMException('Quota exceeded', 'QuotaExceededError'); });
+    local.set('theme', 'dark');
+    expect(local.get('theme')).toBe('dark');
+    expect(() => local.remove('theme')).not.toThrow();
+    expect(local.get('theme')).toBeNull();
+    setItem.mockRestore();
   });
 
   it('filters permission-aware navigation', () => {

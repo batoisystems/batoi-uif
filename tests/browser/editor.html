@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batoi UIF editor browser fixture</title>
+    <link rel="stylesheet" href="/packages/css/index.css">
+  </head>
+  <body>
+    <form id="rich-form">
+      <textarea id="rich" data-uif-mode="html" data-uif-preview="none" data-uif-editor-status="true" data-uif-toolbar="bold italic link source"><p>Alpha <strong>Beta</strong></p><ul><li>First item</li></ul><table><tbody><tr><td>A</td><td>B</td></tr></tbody></table></textarea>
+    </form>
+    <textarea id="markdown" data-uif-mode="markdown" data-uif-editor-layout="source" data-uif-preview="live" data-uif-editor-status="true"># Heading
+
+- First</textarea>
+    <script type="module">
+      import { createEditor } from '/packages/editor/src/index.ts';
+
+      window.editorFixtures = {
+        rich: createEditor(document.querySelector('#rich')),
+        markdown: createEditor(document.querySelector('#markdown')),
+      };
+    </script>
+  </body>
+</html>

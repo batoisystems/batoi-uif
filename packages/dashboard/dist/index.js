@@ -1,5 +1,7 @@
 // src/index.ts
 import { renderChart } from "@batoi/uif-charts";
+import { setTrustedHTML } from "@batoi/uif-dom";
+var dashboardControllers = /* @__PURE__ */ new WeakMap();
 function esc(value) {
   return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
@@ -76,9 +78,30 @@ function renderDashboard(input, options = {}) {
 }
 function initDashboard(el) {
   const raw = el.dataset.uifDashboard || el.dataset.uifOptions;
-  if (!raw) return;
-  const config = createDashboardConfig(JSON.parse(raw));
-  el.innerHTML = renderDashboard(config);
+  if (!raw) return null;
+  dashboardControllers.get(el)?.destroy();
+  const original = [...el.childNodes].map((node) => node.cloneNode(true));
+  let destroyed = false;
+  const controller = {
+    refresh(config) {
+      if (destroyed) return;
+      try {
+        const next = config ?? createDashboardConfig(JSON.parse(el.dataset.uifDashboard || el.dataset.uifOptions || raw));
+        setTrustedHTML(el, renderDashboard(next), { trusted: true, context: "dashboard render" });
+      } catch (error) {
+        el.dispatchEvent(new CustomEvent("uif:dashboard-error", { bubbles: true, detail: { code: "dashboard-invalid-options", element: el, error } }));
+      }
+    },
+    destroy() {
+      if (destroyed) return;
+      destroyed = true;
+      el.replaceChildren(...original.map((node) => node.cloneNode(true)));
+      if (dashboardControllers.get(el) === controller) dashboardControllers.delete(el);
+    }
+  };
+  dashboardControllers.set(el, controller);
+  controller.refresh();
+  return controller;
 }
 export {
   applyDashboardFilters,

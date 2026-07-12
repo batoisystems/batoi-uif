@@ -595,6 +595,18 @@
   outline: none;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--uif-accent), transparent 82%);
 }
+.uif-editor-button.is-active,
+.uif-editor-button[aria-pressed='true'] {
+  border-color: var(--uif-accent);
+  background: color-mix(in srgb, var(--uif-accent), var(--uif-surface-elevated) 88%);
+  color: var(--uif-accent);
+}
+.uif-editor[data-uif-upload-state='uploading'] .uif-editor-surface {
+  cursor: progress;
+}
+.uif-editor[data-uif-editor-diagnostics]:not([data-uif-editor-diagnostics='0']) .uif-editor-status {
+  color: var(--uif-warning-text, var(--uif-text));
+}
 .uif-editor-surface,
 .uif-editor-source,
 .uif-editor-preview {
@@ -3052,6 +3064,19 @@ select.uif-input {
   border-color: var(--uif-accent);
   color: var(--uif-accent);
   outline: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .uif-editor,
+  .uif-editor *,
+  .uif-editor-dialog,
+  .uif-editor-preview-modal,
+  .uif-editor-preview-drawer,
+  .uif-editor-preview-backdrop {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 .uif-editor[data-uif-editor-layout='preview'] .uif-editor-source {
   display: none;

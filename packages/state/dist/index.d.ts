@@ -7,6 +7,9 @@ interface StoreOptions {
     persist?: 'local' | 'session';
     key?: string;
     computed?: Record<string, Computed>;
+    maxPersistBytes?: number;
+    onPersistError?: (error: Error) => void;
+    persistVersion?: number;
 }
 interface MicroAppStoreOptions extends StoreOptions {
     historyLimit?: number;
@@ -15,9 +18,13 @@ type ArtifactStoreOptions = MicroAppStoreOptions;
 interface LocalStoreOptions {
     namespace?: string;
     driver?: 'localstorage' | 'memory';
+    maxBytes?: number;
+    maxEntries?: number;
+    version?: number;
 }
 interface LocalStore {
     namespace: string;
+    version: number;
     get<T = unknown>(key: string): Promise<T | undefined>;
     set<T = unknown>(key: string, value: T): Promise<void>;
     delete(key: string): Promise<void>;

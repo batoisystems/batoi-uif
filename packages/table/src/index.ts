@@ -1,4 +1,5 @@
-import { setTrustedHTML } from '@batoi/uif-dom';
+import { isSafeURL, setTrustedHTML } from '@batoi/uif-dom';
+import { cancelRequest, request } from '@batoi/uif-net';
 
 export interface TableOptions {
   filterInput?: HTMLInputElement | null;
@@ -12,7 +13,13 @@ export interface TableOptions {
   onPage?: (page: number, table: HTMLTableElement) => void | Promise<void>;
   onBulkAction?: (action: string, rows: HTMLTableRowElement[]) => void;
   onRowAction?: (action: string, row: HTMLTableRowElement) => void;
+  allowCrossOrigin?: boolean;
+  maxRows?: number;
+  maxCellLength?: number;
+  maxHTMLLength?: number;
 }
+
+export interface TableController { refresh(): void; destroy(): void; }
 
 export interface RemoteTableResponse {
   rows?: Array<Record<string, unknown>>;
@@ -42,9 +49,14 @@ interface TableFilter {
   op: FilterOperator;
 }
 
-const initializedTables = new WeakSet<HTMLTableElement>();
+const tableControllers = new WeakMap<HTMLTableElement, TableController>();
 const initializedFilters = new WeakSet<HTMLInputElement | HTMLSelectElement>();
-const tableAbortControllers = new WeakMap<HTMLTableElement, AbortController>();
+const tableRequestKeys = new WeakMap<HTMLTableElement, string>();
+let tableRequestSequence = 0;
+const DEFAULT_MAX_ROWS = 1_000;
+const DEFAULT_MAX_COLUMNS = 100;
+const DEFAULT_MAX_CELL_LENGTH = 10_000;
+const DEFAULT_MAX_HTML_LENGTH = 1_000_000;
 
 function cssEscape(value: string): string {
   return typeof CSS !== 'undefined' && typeof CSS.escape === 'function' ? CSS.escape(value) : value.replace(/["\\#.;,[\]=:]/g, '\\$&');
@@ -222,7 +234,24 @@ export function applyResponsiveColumns(table: HTMLTableElement): void {
   });
 }
 
-function renderRemoteRows(table: HTMLTableElement, data: RemoteTableResponse, columns: string[]): void {
+function tableLimit(value: number | undefined, fallback: number): number {
+  return Number.isFinite(value) ? Math.max(1, Math.floor(value!)) : fallback;
+}
+
+function normalizeRemoteResponse(data: unknown, options: TableOptions): RemoteTableResponse {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid remote table response');
+  const source = data as RemoteTableResponse;
+  const maxRows = tableLimit(options.maxRows, DEFAULT_MAX_ROWS);
+  const maxHTMLLength = tableLimit(options.maxHTMLLength, DEFAULT_MAX_HTML_LENGTH);
+  if (source.rows && (!Array.isArray(source.rows) || source.rows.length > maxRows || source.rows.some((row) => !row || typeof row !== 'object' || Array.isArray(row)))) throw new Error('UIF_TABLE_LIMIT');
+  if (source.columns && (!Array.isArray(source.columns) || source.columns.length > DEFAULT_MAX_COLUMNS)) throw new Error('UIF_TABLE_LIMIT');
+  if (source.html && String(source.html).length > maxHTMLLength) throw new Error('UIF_TABLE_LIMIT');
+  if (source.html !== undefined) source.html = String(source.html);
+  if (source.columns) source.columns = source.columns.filter((column) => column && typeof column.key === 'string');
+  return source;
+}
+
+function renderRemoteRows(table: HTMLTableElement, data: RemoteTableResponse, columns: string[], maxCellLength: number): void {
   const body = table.tBodies[0] || table.createTBody();
   if (data.html) {
     setTrustedHTML(body, data.html, { trusted: true, context: 'remote table rows' });
@@ -242,7 +271,7 @@ function renderRemoteRows(table: HTMLTableElement, data: RemoteTableResponse, co
       if (key && row[key] !== undefined) tr.dataset.uifRowId = String(row[key]);
       columns.forEach((column) => {
         const td = document.createElement('td');
-        td.textContent = String(row[column] ?? '');
+        td.textContent = String(row[column] ?? '').slice(0, maxCellLength);
         tr.append(td);
       });
       return tr;
@@ -295,18 +324,24 @@ function appendTableQuery(url: URL, table: HTMLTableElement, options: TableOptio
 export async function loadRemoteTable(table: HTMLTableElement, options: TableOptions = {}): Promise<RemoteTableResponse | null> {
   const src = options.src || table.dataset.uifSrc;
   if (!src) return null;
+  if (!isSafeURL(src, { context: 'network', allowHash: false, sameOrigin: !(options.allowCrossOrigin ?? table.dataset.uifAllowCrossOrigin === 'true') })) {
+    const error = new Error('Batoi UIF blocked an unsafe table data URL');
+    setTableState(table, 'error');
+    table.dispatchEvent(new CustomEvent('uif:table-error', { detail: { table, error }, bubbles: true }));
+    throw error;
+  }
   const url = new URL(src, window.location.href);
   appendTableQuery(url, table, options);
-  tableAbortControllers.get(table)?.abort();
-  const controller = new AbortController();
-  tableAbortControllers.set(table, controller);
+  const key = tableRequestKeys.get(table) ?? `table:${++tableRequestSequence}`;
+  tableRequestKeys.set(table, key);
+  cancelRequest(key);
   table.dispatchEvent(new CustomEvent('uif:table-before-load', { detail: { table, url }, bubbles: true }));
   setTableState(table, 'loading');
   try {
-    const response = await fetch(url, { signal: controller.signal });
-    const data = (await response.json()) as RemoteTableResponse;
+    const response = await request<unknown>(url.href, { key, method: 'GET', parseAs: 'json', credentials: 'same-origin', timeout: 15_000 });
+    const data = normalizeRemoteResponse(response, options);
     const columns = options.columns ?? data.columns?.map((column) => column.key) ?? getColumns(table);
-    renderRemoteRows(table, data, columns);
+    renderRemoteRows(table, data, columns, tableLimit(options.maxCellLength, DEFAULT_MAX_CELL_LENGTH));
     table.dataset.uifPage = String(data.page ?? options.page ?? table.dataset.uifPage ?? 1);
     table.dataset.uifPageSize = String(data.pageSize ?? options.pageSize ?? table.dataset.uifPageSize ?? 25);
     table.dataset.uifTotal = String(data.total ?? data.rows?.length ?? rows(table).length);
@@ -325,8 +360,6 @@ export async function loadRemoteTable(table: HTMLTableElement, options: TableOpt
     setTableState(table, 'error');
     table.dispatchEvent(new CustomEvent('uif:table-error', { detail: { table, error }, bubbles: true }));
     throw error;
-  } finally {
-    if (tableAbortControllers.get(table) === controller) tableAbortControllers.delete(table);
   }
 }
 
@@ -348,7 +381,13 @@ export function exportTable(table: HTMLTableElement, options: TableOptions = {})
 
 export function filterElements(targetSelector: string, query: string, mode: 'contains' | 'startsWith' | 'token' = 'contains'): void {
   const normalized = query.trim().toLowerCase();
-  document.querySelectorAll<HTMLElement>(targetSelector).forEach((item) => {
+  let targets: NodeListOf<HTMLElement>;
+  try {
+    targets = document.querySelectorAll<HTMLElement>(targetSelector);
+  } catch {
+    return;
+  }
+  targets.forEach((item) => {
     const text = item.textContent?.trim().toLowerCase() ?? '';
     const matched =
       normalized === '' ||
@@ -458,9 +497,11 @@ function resetTable(table: HTMLTableElement, options: TableOptions = {}): void {
   if (getTableMode(table) === 'remote') void loadRemoteTable(table, options);
 }
 
-export function initTable(table: HTMLTableElement, options: TableOptions = {}): void {
-  if (initializedTables.has(table)) return;
-  initializedTables.add(table);
+export function initTable(table: HTMLTableElement, options: TableOptions = {}): TableController {
+  const existing = tableControllers.get(table);
+  if (existing) return existing;
+  const listenerController = new AbortController();
+  const listenerOptions = { signal: listenerController.signal };
   table.dataset.uifState = table.dataset.uifState || 'idle';
   applyResponsiveColumns(table);
   table.querySelectorAll<HTMLTableCellElement>('th[data-uif-sort]').forEach((header, index) => {
@@ -482,13 +523,13 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
         sortTable(table, key || index, nextDirection);
       }
     };
-    header.addEventListener('click', sort);
+    header.addEventListener('click', sort, listenerOptions);
     header.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
         sort();
       }
-    });
+    }, listenerOptions);
   });
   const sort = activeSort(table);
   if (sort) updateSortHeaders(table, sort.column, sort.direction);
@@ -502,8 +543,8 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
       else if (getTableMode(table) === 'remote') refreshForControlChange(table, options);
       else filterTable(table, filterInput.value, undefined, (filterInput.dataset.uifFilterOp as FilterOperator | undefined) || 'contains');
     };
-    filterInput.addEventListener('input', handler);
-    filterInput.addEventListener('change', handler);
+    filterInput.addEventListener('input', handler, listenerOptions);
+    filterInput.addEventListener('change', handler, listenerOptions);
   });
   controlsForTable(table, 'data-uif-table-page-size').forEach((control) => {
     control.addEventListener('change', () => {
@@ -512,11 +553,11 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
       table.dispatchEvent(new CustomEvent('uif:table-page-size', { detail: { table, pageSize: Number(table.dataset.uifPageSize) }, bubbles: true }));
       if (getTableMode(table) === 'remote') void loadRemoteTable(table, options);
       updatePaginationControls(table);
-    });
+    }, listenerOptions);
   });
   document.querySelectorAll<HTMLElement>(`[data-uif-table-reset="#${cssEscape(table.id)}"]`).forEach((resetEl) => {
-    resetEl.addEventListener('click', () => resetTable(table, options));
-  });
+    resetEl.addEventListener('click', () => resetTable(table, options), listenerOptions);
+  }, listenerOptions);
   table.addEventListener('keydown', (event) => {
     const cell = event.target instanceof HTMLElement ? event.target.closest<HTMLTableCellElement>('td,th') : null;
     if (!cell || event.target instanceof HTMLInputElement || event.target instanceof HTMLButtonElement || event.target instanceof HTMLSelectElement || !['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
@@ -536,13 +577,13 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
       const selected = selectedRows(table);
       options.onBulkAction?.(action, selected);
       table.dispatchEvent(new CustomEvent('uif:table-bulk-action', { detail: { table, action, rows: selected, ids: selectedRowIds(table) }, bubbles: true }));
-    });
+    }, listenerOptions);
   });
   document.querySelectorAll<HTMLElement>(`[data-uif-table-page][data-uif-target="#${cssEscape(table.id)}"]`).forEach((pageEl) => {
     pageEl.addEventListener('click', () => {
       void goToPage(table, pageFromControl(pageEl, table), options);
-    });
-  });
+    }, listenerOptions);
+  }, listenerOptions);
   table.addEventListener('change', (event) => {
     const checkbox = event.target instanceof HTMLInputElement ? event.target : null;
     if (!checkbox) return;
@@ -553,7 +594,7 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
       });
     }
     if (checkbox.matches('[data-uif-role="select-all"],[data-uif-role="row-select"]')) updateSelectionState(table);
-  });
+  }, listenerOptions);
   table.addEventListener('click', (event) => {
     const actionEl = event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('[data-uif-row-action]') : null;
     const row = actionEl?.closest<HTMLTableRowElement>('tr');
@@ -567,6 +608,23 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
   updateSelectionState(table);
   updatePaginationControls(table);
   if (options.src || table.dataset.uifSrc) void loadRemoteTable(table, options);
+  const controller: TableController = {
+    refresh() {
+      applyResponsiveColumns(table);
+      updateSelectionState(table);
+      updatePaginationControls(table);
+      if (options.src || table.dataset.uifSrc) void loadRemoteTable(table, options);
+    },
+    destroy() {
+      listenerController.abort();
+      const key = tableRequestKeys.get(table);
+      if (key) cancelRequest(key);
+      tableRequestKeys.delete(table);
+      if (tableControllers.get(table) === controller) tableControllers.delete(table);
+    },
+  };
+  tableControllers.set(table, controller);
+  return controller;
 }
 
 export const dataTable = { name: 'table', init: (el: HTMLElement) => initTable(el as HTMLTableElement) };

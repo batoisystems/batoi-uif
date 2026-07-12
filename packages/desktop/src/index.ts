@@ -54,6 +54,13 @@ export interface DesktopSettingsStore {
   clear(): void | Promise<void>;
 }
 
+interface SynchronousDesktopSettingsStore extends DesktopSettingsStore {
+  get<T = unknown>(key: string): T | null;
+  set<T = unknown>(key: string, value: T): void;
+  remove(key: string): void;
+  clear(): void;
+}
+
 export interface DesktopWorkspaceSession {
   workspaceId: string;
   workspaceName: string;
@@ -88,7 +95,11 @@ function esc(value: unknown): string {
 
 function parseJSON<T>(value: string | undefined): T | undefined {
   if (!value) return undefined;
-  return JSON.parse(value) as T;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return undefined;
+  }
 }
 
 function safeStorage(): Storage | undefined {
@@ -181,7 +192,7 @@ function renderNav(items: DesktopNavigationItem[] = []): string {
   return items
     .map(
       (item) =>
-        `<a class="uif-desktop-nav-item" href="${esc(item.href || '#')}"${item.active ? ' aria-current="page"' : ''}${item.permission ? ` data-uif-permission="${esc(item.permission)}"` : ''}>${item.icon ? `<span data-uif-icon="${esc(item.icon)}"></span>` : ''}<span>${esc(item.label)}</span>${item.badge !== undefined ? `<em>${esc(item.badge)}</em>` : ''}</a>`,
+        `<a class="uif-desktop-nav-item" href="${esc(item.href && isSafeURL(item.href, { context: 'link' }) ? item.href : '#')}"${item.active ? ' aria-current="page"' : ''}${item.permission ? ` data-uif-permission="${esc(item.permission)}"` : ''}>${item.icon ? `<span data-uif-icon="${esc(item.icon)}"></span>` : ''}<span>${esc(item.label)}</span>${item.badge !== undefined ? `<em>${esc(item.badge)}</em>` : ''}</a>`,
     )
     .join('');
 }
@@ -215,18 +226,24 @@ export function setDesktopStatus(element: HTMLElement, status: DesktopShellStatu
   element.querySelectorAll<HTMLElement>('[data-uif="desktop-status"], .uif-desktop-actions').forEach((target) => {
     const current = target.matches('[data-uif="desktop-status"]') ? target : target.querySelector<HTMLElement>('[data-uif-sync-status]');
     if (!current) return;
-    current.outerHTML = renderDesktopSyncStatus(status);
+    const template = document.createElement('template');
+    setTrustedHTML(template, renderDesktopSyncStatus(status), { trusted: true, context: 'desktop status' });
+    current.replaceWith(template.content);
   });
 }
 
 export function initDesktopShell(element: HTMLElement): () => void {
   const raw = element.dataset.uifOptions || element.dataset.uifDesktop;
-  if (raw) element.innerHTML = renderDesktopShell(parseJSON<DesktopShellOptions>(raw) as DesktopShellOptions);
+  if (raw) {
+    const options = parseJSON<DesktopShellOptions>(raw);
+    if (options) setTrustedHTML(element, renderDesktopShell(options), { trusted: true, context: 'desktop shell' });
+    else element.dispatchEvent(new CustomEvent('uif:desktop-error', { bubbles: true, detail: { code: 'desktop-invalid-options', element } }));
+  }
   const dispose = bindDesktopOfflineIndicator(element);
   return dispose;
 }
 
-export function createMemorySettingsStore(namespace = 'uif-desktop'): DesktopSettingsStore {
+export function createMemorySettingsStore(namespace = 'uif-desktop'): SynchronousDesktopSettingsStore {
   const values = new Map<string, unknown>();
   const keyFor = (key: string) => `${namespace}:${key}`;
   return {
@@ -252,19 +269,38 @@ export function createLocalSettingsStore(namespace: string): DesktopSettingsStor
   if (!storage) return fallback;
   return {
     get<T = unknown>(key: string): T | null {
-      const value = storage.getItem(keyFor(key));
-      return value === null ? null : (JSON.parse(value) as T);
+      try {
+        const value = storage.getItem(keyFor(key));
+        return value === null ? fallback.get<T>(key) : (JSON.parse(value) as T);
+      } catch {
+        return fallback.get<T>(key);
+      }
     },
     set<T = unknown>(key: string, value: T): void {
-      storage.setItem(keyFor(key), JSON.stringify(value));
+      fallback.set(key, value);
+      try {
+        storage.setItem(keyFor(key), JSON.stringify(value));
+      } catch {
+        // The memory copy keeps preferences usable when storage is blocked or full.
+      }
     },
     remove(key: string): void {
-      storage.removeItem(keyFor(key));
+      fallback.remove(key);
+      try {
+        storage.removeItem(keyFor(key));
+      } catch {
+        // Memory state is already cleared.
+      }
     },
     clear(): void {
-      Object.keys(storage)
-        .filter((key) => key.startsWith(`${namespace}:`))
-        .forEach((key) => storage.removeItem(key));
+      fallback.clear();
+      try {
+        Object.keys(storage)
+          .filter((key) => key.startsWith(`${namespace}:`))
+          .forEach((key) => storage.removeItem(key));
+      } catch {
+        // Memory state is already cleared.
+      }
     },
   };
 }
@@ -352,3 +388,4 @@ export function bindDesktopOfflineIndicator(element: HTMLElement, options: { off
     window.removeEventListener('offline', update);
   };
 }
+import { isSafeURL, setTrustedHTML } from '@batoi/uif-dom';

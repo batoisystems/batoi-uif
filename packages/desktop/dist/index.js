@@ -1,10 +1,15 @@
 // src/index.ts
+import { isSafeURL, setTrustedHTML } from "@batoi/uif-dom";
 function esc(value) {
   return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
 function parseJSON(value) {
   if (!value) return void 0;
-  return JSON.parse(value);
+  try {
+    return JSON.parse(value);
+  } catch {
+    return void 0;
+  }
 }
 function safeStorage() {
   try {
@@ -82,7 +87,7 @@ function createDesktopShell(options) {
 }
 function renderNav(items = []) {
   return items.map(
-    (item) => `<a class="uif-desktop-nav-item" href="${esc(item.href || "#")}"${item.active ? ' aria-current="page"' : ""}${item.permission ? ` data-uif-permission="${esc(item.permission)}"` : ""}>${item.icon ? `<span data-uif-icon="${esc(item.icon)}"></span>` : ""}<span>${esc(item.label)}</span>${item.badge !== void 0 ? `<em>${esc(item.badge)}</em>` : ""}</a>`
+    (item) => `<a class="uif-desktop-nav-item" href="${esc(item.href && isSafeURL(item.href, { context: "link" }) ? item.href : "#")}"${item.active ? ' aria-current="page"' : ""}${item.permission ? ` data-uif-permission="${esc(item.permission)}"` : ""}>${item.icon ? `<span data-uif-icon="${esc(item.icon)}"></span>` : ""}<span>${esc(item.label)}</span>${item.badge !== void 0 ? `<em>${esc(item.badge)}</em>` : ""}</a>`
   ).join("");
 }
 function renderDesktopSyncStatus(status) {
@@ -112,12 +117,18 @@ function setDesktopStatus(element, status) {
   element.querySelectorAll('[data-uif="desktop-status"], .uif-desktop-actions').forEach((target) => {
     const current = target.matches('[data-uif="desktop-status"]') ? target : target.querySelector("[data-uif-sync-status]");
     if (!current) return;
-    current.outerHTML = renderDesktopSyncStatus(status);
+    const template = document.createElement("template");
+    setTrustedHTML(template, renderDesktopSyncStatus(status), { trusted: true, context: "desktop status" });
+    current.replaceWith(template.content);
   });
 }
 function initDesktopShell(element) {
   const raw = element.dataset.uifOptions || element.dataset.uifDesktop;
-  if (raw) element.innerHTML = renderDesktopShell(parseJSON(raw));
+  if (raw) {
+    const options = parseJSON(raw);
+    if (options) setTrustedHTML(element, renderDesktopShell(options), { trusted: true, context: "desktop shell" });
+    else element.dispatchEvent(new CustomEvent("uif:desktop-error", { bubbles: true, detail: { code: "desktop-invalid-options", element } }));
+  }
   const dispose = bindDesktopOfflineIndicator(element);
   return dispose;
 }
@@ -146,17 +157,33 @@ function createLocalSettingsStore(namespace) {
   if (!storage) return fallback;
   return {
     get(key) {
-      const value = storage.getItem(keyFor(key));
-      return value === null ? null : JSON.parse(value);
+      try {
+        const value = storage.getItem(keyFor(key));
+        return value === null ? fallback.get(key) : JSON.parse(value);
+      } catch {
+        return fallback.get(key);
+      }
     },
     set(key, value) {
-      storage.setItem(keyFor(key), JSON.stringify(value));
+      fallback.set(key, value);
+      try {
+        storage.setItem(keyFor(key), JSON.stringify(value));
+      } catch {
+      }
     },
     remove(key) {
-      storage.removeItem(keyFor(key));
+      fallback.remove(key);
+      try {
+        storage.removeItem(keyFor(key));
+      } catch {
+      }
     },
     clear() {
-      Object.keys(storage).filter((key) => key.startsWith(`${namespace}:`)).forEach((key) => storage.removeItem(key));
+      fallback.clear();
+      try {
+        Object.keys(storage).filter((key) => key.startsWith(`${namespace}:`)).forEach((key) => storage.removeItem(key));
+      } catch {
+      }
     }
   };
 }

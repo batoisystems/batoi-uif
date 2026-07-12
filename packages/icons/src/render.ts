@@ -1,3 +1,4 @@
+import { setTrustedHTML } from '@batoi/uif-dom';
 import { icons, type IconName } from './icons.js';
 import type { IconDefinition, IconOptions } from './types.js';
 
@@ -55,6 +56,6 @@ export function iconElement(name: IconName | string, options: IconOptions = {}):
   const markup = icon(name, options);
   if (!markup) throw new Error(`Unknown icon: ${name}`);
   const template = document.createElement('template');
-  template.innerHTML = markup;
+  setTrustedHTML(template, markup, { trusted: true, context: 'icon element' });
   return template.content.firstElementChild as SVGSVGElement;
 }

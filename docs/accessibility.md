@@ -27,7 +27,7 @@ Batoi UIF components are progressive enhancements over meaningful HTML. Server-r
 | `table` | Native table semantics or `role="table"` for enhanced containers | Sort/filter/select controls stay keyboard reachable | Loading and empty states should be announced through surrounding context |
 | `form` | Field errors should use `aria-describedby`; invalid fields use `aria-invalid` | Submit works with Enter; validation errors should be reachable | Error summary should identify invalid fields and keep server errors text-safe |
 | `shell` | Nav uses `role="navigation"`; active links use `aria-current="page"` | Shell nav supports arrow movement; nested sections use disclosure controls | Skip link moves focus to the main content region |
-| `mobile-shell` | Native landmarks where possible | Touch gestures must not remove keyboard operation | Safe-area and sheet behaviors should keep controls reachable |
+| `mobile-shell` | Native landmarks where possible; sheet dialogs; polite offline status | Segmented controls use roving focus with arrow, Home, and End keys; touch gestures must retain button/keyboard alternatives | Safe-area and sheet behaviors should keep controls reachable |
 
 ## Overlay Stack
 

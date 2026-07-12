@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { animate, animationPresets, cancelAnimation, hide, initAnimationTriggers, observeMotion, show, toggle } from './index.js';
+import { animate, animationPresets, cancelAnimation, hide, initAnimation, initAnimationTriggers, observeMotion, show, toggle } from './index.js';
 
 describe('effects', () => {
   it('shows, hides, and toggles with reduced motion', async () => {
@@ -33,5 +33,19 @@ describe('effects', () => {
     cancelAnimation(el);
     await pending;
     expect(el.classList.contains('uif-is-animating')).toBe(false);
+  });
+
+  it('owns declarative trigger listeners through animation controllers', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false })));
+    const el = document.createElement('button');
+    el.dataset.uifTrigger = 'click';
+    el.dataset.uifAnimation = 'fade-in';
+    const controller = initAnimation(el);
+    expect(initAnimation(el)).toBe(controller);
+
+    controller.destroy();
+    el.click();
+    expect(el.classList.contains('uif-is-animating')).toBe(false);
+    expect(initAnimation(el)).not.toBe(controller);
   });
 });

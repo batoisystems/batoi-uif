@@ -5,6 +5,7 @@ interface RequestOptions extends RequestInit {
     dedupe?: boolean;
     retries?: number;
     retryDelay?: number;
+    idempotent?: boolean;
     csrfToken?: string;
     csrfHeader?: string;
     onUploadProgress?: (loaded: number, total: number) => void;
@@ -28,6 +29,9 @@ interface DataConnector<T = unknown> {
     refreshInterval?: number;
     transform?: (value: unknown) => T | Promise<T>;
 }
+interface ConnectorBindingOptions extends RequestOptions {
+    onError?: (error: unknown) => void;
+}
 type RequestInterceptor = (url: string, options: RequestOptions) => void | RequestOptions | Promise<void | RequestOptions>;
 type ResponseInterceptor = (response: Response) => void | Response | Promise<void | Response>;
 declare function useRequestInterceptor(fn: RequestInterceptor): () => void;
@@ -41,6 +45,6 @@ declare function upload<T = unknown>(url: string, formData: FormData, options?: 
 declare function parseCSV(text: string): string[][];
 declare function csvToObjects(text: string): Array<Record<string, string>>;
 declare function loadConnector<T = unknown>(connector: DataConnector<T>, options?: RequestOptions): Promise<T>;
-declare function bindConnector<T = unknown>(connector: DataConnector<T>, handler: (value: T) => void | Promise<void>, options?: RequestOptions): () => void;
+declare function bindConnector<T = unknown>(connector: DataConnector<T>, handler: (value: T) => void | Promise<void>, options?: ConnectorBindingOptions): () => void;
 
-export { type ConnectorMode, type ConnectorType, type DataConnector, type RequestOptions, type UIFRequestError, bindConnector, cancelRequest, csvToObjects, get, loadConnector, parseCSV, post, request, submitForm, upload, useRequestInterceptor, useResponseInterceptor };
+export { type ConnectorBindingOptions, type ConnectorMode, type ConnectorType, type DataConnector, type RequestOptions, type UIFRequestError, bindConnector, cancelRequest, csvToObjects, get, loadConnector, parseCSV, post, request, submitForm, upload, useRequestInterceptor, useResponseInterceptor };

@@ -59,6 +59,33 @@ describe('table', () => {
     vi.unstubAllGlobals();
   });
 
+  it('bounds remote rows and cell text before rendering', async () => {
+    document.body.innerHTML = '<table><thead><tr><th>Name</th></tr></thead><tbody><tr><td>Fallback</td></tr></tbody></table>';
+    const table = document.querySelector('table') as HTMLTableElement;
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ rows: [{ name: 'x'.repeat(20) }] })));
+    await loadRemoteTable(table, { src: '/rows', columns: ['name'], maxCellLength: 10 });
+    expect(table.tBodies[0].rows[0].cells[0].textContent).toBe('x'.repeat(10));
+
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ rows: [{ name: 'one' }, { name: 'two' }] })));
+    await expect(loadRemoteTable(table, { src: '/rows', columns: ['name'], maxRows: 1 })).rejects.toThrow('UIF_TABLE_LIMIT');
+    expect(table.dataset.uifState).toBe('error');
+  });
+
+  it('rejects malformed and oversized trusted HTML table responses', async () => {
+    const table = document.createElement('table');
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json(['invalid'])));
+    await expect(loadRemoteTable(table, { src: '/rows' })).rejects.toThrow('Invalid remote table response');
+
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({ html: '<tr><td>Too long</td></tr>' })));
+    await expect(loadRemoteTable(table, { src: '/rows', maxHTMLLength: 10 })).rejects.toThrow('UIF_TABLE_LIMIT');
+  });
+
+  it('ignores malformed declarative filter selectors', () => {
+    document.body.innerHTML = '<p data-row>Visible</p>';
+    expect(() => filterElements('[', 'visible')).not.toThrow();
+    expect((document.querySelector('[data-row]') as HTMLElement).hidden).toBe(false);
+  });
+
   it('loads pages through pagination hooks and updates metadata', async () => {
     document.body.innerHTML = '<table id="accounts" data-uif-src="/rows" data-uif-columns="name" data-uif-page-size="2"><thead><tr><th>Name</th></tr></thead><tbody></tbody></table>';
     const table = document.querySelector('table') as HTMLTableElement;
@@ -179,5 +206,39 @@ describe('table', () => {
     const table = document.querySelector('table') as HTMLTableElement;
     setTableState(table, 'empty');
     expect(table.querySelector('.uif-table-state')?.textContent).toBe('No accounts found');
+  });
+
+  it('owns external controls through a refreshable and destroyable controller', () => {
+    document.body.innerHTML = `
+      <input data-uif-table-filter="#accounts">
+      <table id="accounts"><thead><tr><th>Name</th></tr></thead><tbody><tr><td>Ada</td></tr><tr><td>Grace</td></tr></tbody></table>`;
+    const table = document.querySelector('table') as HTMLTableElement;
+    const input = document.querySelector('input') as HTMLInputElement;
+    const controller = initTable(table);
+    expect(initTable(table)).toBe(controller);
+
+    controller.destroy();
+    input.value = 'Ada';
+    input.dispatchEvent(new Event('input'));
+    expect(table.tBodies[0].rows[1].hidden).toBe(false);
+
+    const next = initTable(table);
+    expect(next).not.toBe(controller);
+    input.dispatchEvent(new Event('input'));
+    expect(table.tBodies[0].rows[1].hidden).toBe(true);
+    next.refresh();
+    next.destroy();
+  });
+
+  it('blocks cross-origin remote table sources by default', async () => {
+    const table = document.createElement('table');
+    table.dataset.uifSrc = 'https://evil.example/rows';
+    const fetch = vi.fn();
+    vi.stubGlobal('fetch', fetch);
+
+    await expect(loadRemoteTable(table)).rejects.toThrow(/unsafe table data URL/);
+
+    expect(fetch).not.toHaveBeenCalled();
+    expect(table.dataset.uifState).toBe('error');
   });
 });

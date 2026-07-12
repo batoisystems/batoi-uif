@@ -47,6 +47,12 @@ interface DesktopSettingsStore {
     remove(key: string): void | Promise<void>;
     clear(): void | Promise<void>;
 }
+interface SynchronousDesktopSettingsStore extends DesktopSettingsStore {
+    get<T = unknown>(key: string): T | null;
+    set<T = unknown>(key: string, value: T): void;
+    remove(key: string): void;
+    clear(): void;
+}
 interface DesktopWorkspaceSession {
     workspaceId: string;
     workspaceName: string;
@@ -78,7 +84,7 @@ declare function renderDesktopSyncStatus(status: DesktopSyncStatus | DesktopShel
 declare function renderDesktopShell(options: DesktopShellOptions): string;
 declare function setDesktopStatus(element: HTMLElement, status: DesktopShellStatus): void;
 declare function initDesktopShell(element: HTMLElement): () => void;
-declare function createMemorySettingsStore(namespace?: string): DesktopSettingsStore;
+declare function createMemorySettingsStore(namespace?: string): SynchronousDesktopSettingsStore;
 declare function createLocalSettingsStore(namespace: string): DesktopSettingsStore;
 declare function bindDesktopSettings(element: HTMLElement, store: DesktopSettingsStore): void;
 declare function createWorkspaceSession(input: DesktopWorkspaceSession): DesktopWorkspaceSession;

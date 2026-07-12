@@ -4,6 +4,7 @@ var requestInterceptors = [];
 var responseInterceptors = [];
 var controllers = /* @__PURE__ */ new Map();
 var pending = /* @__PURE__ */ new Map();
+var connectorSequence = 0;
 function useRequestInterceptor(fn) {
   requestInterceptors.push(fn);
   return () => requestInterceptors.splice(requestInterceptors.indexOf(fn), 1);
@@ -19,6 +20,14 @@ async function parseResponse(response, parseAs) {
     return response.status === 204 ? null : response.json();
   }
   return response.text();
+}
+function canRetry(method, options) {
+  return options.idempotent === true || ["GET", "HEAD", "OPTIONS"].includes(method);
+}
+function isRetryableError(error) {
+  if (error instanceof DOMException && error.name === "AbortError") return false;
+  const status = error?.status;
+  return status === void 0 || status === 408 || status === 429 || status >= 500;
 }
 function delay(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -40,16 +49,21 @@ async function request(url, options = {}) {
   if (options.dedupe && pending.has(key)) return pending.get(key);
   cancelRequest(key);
   const controller = new AbortController();
+  const externalSignal = options.signal;
+  const abortFromExternal = () => controller.abort(externalSignal?.reason);
+  if (externalSignal?.aborted) abortFromExternal();
+  else externalSignal?.addEventListener("abort", abortFromExternal, { once: true });
   controllers.set(key, controller);
   const timeout = options.timeout ? window.setTimeout(() => controller.abort(), options.timeout) : void 0;
   let req = { ...options, headers: withCsrf(options.headers, options), signal: controller.signal };
   const runner = async () => {
     for (const interceptor of requestInterceptors) {
       const next = await interceptor(url, req);
-      if (next) req = next;
+      if (next) req = { ...next, signal: controller.signal };
     }
     emit("uif:request", { url, options: req });
-    const attempts = Math.max(0, req.retries ?? 0) + 1;
+    const method = String(req.method ?? "GET").toUpperCase();
+    const attempts = (canRetry(method, req) ? Math.max(0, Math.min(10, Math.floor(req.retries ?? 0))) : 0) + 1;
     let lastError;
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
       try {
@@ -71,7 +85,7 @@ async function request(url, options = {}) {
         return data;
       } catch (error) {
         lastError = error;
-        if (attempt >= attempts || controller.signal.aborted) break;
+        if (attempt >= attempts || controller.signal.aborted || !isRetryableError(error)) break;
         await delay(req.retryDelay ?? 250 * attempt);
       }
     }
@@ -80,8 +94,9 @@ async function request(url, options = {}) {
   };
   const promise = runner().finally(() => {
     if (timeout) window.clearTimeout(timeout);
-    controllers.delete(key);
-    pending.delete(key);
+    if (controllers.get(key) === controller) controllers.delete(key);
+    if (pending.get(key) === promise) pending.delete(key);
+    externalSignal?.removeEventListener("abort", abortFromExternal);
     emit("uif:complete", { url, key });
   });
   pending.set(key, promise);
@@ -106,19 +121,46 @@ function upload(url, formData, options = {}) {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open(options.method ?? "POST", url);
+      xhr.timeout = Math.max(0, options.timeout ?? 0);
+      xhr.withCredentials = options.credentials === "include";
       const headers = withCsrf(options.headers, options);
-      if (headers && !(headers instanceof Headers) && !Array.isArray(headers)) {
-        Object.entries(headers).forEach(([name, value]) => xhr.setRequestHeader(name, String(value)));
-      }
+      new Headers(headers).forEach((value, name) => xhr.setRequestHeader(name, value));
+      const abort = () => xhr.abort();
+      const cleanup = () => options.signal?.removeEventListener("abort", abort);
       xhr.upload.addEventListener("progress", (event) => options.onUploadProgress?.(event.loaded, event.total));
       xhr.addEventListener("load", () => {
+        cleanup();
+        let data;
         try {
-          resolve(JSON.parse(xhr.responseText || "null"));
+          data = JSON.parse(xhr.responseText || "null");
         } catch {
-          resolve(xhr.responseText);
+          data = xhr.responseText;
+        }
+        if (xhr.status >= 200 && xhr.status < 300) resolve(data);
+        else {
+          const error = new Error(`Upload failed: ${xhr.status}`);
+          error.status = xhr.status;
+          error.data = data;
+          reject(error);
         }
       });
-      xhr.addEventListener("error", () => reject(new Error("Upload failed")));
+      xhr.addEventListener("error", () => {
+        cleanup();
+        reject(new Error("Upload failed"));
+      });
+      xhr.addEventListener("timeout", () => {
+        cleanup();
+        reject(new DOMException("Upload timed out", "TimeoutError"));
+      });
+      xhr.addEventListener("abort", () => {
+        cleanup();
+        reject(new DOMException("Upload aborted", "AbortError"));
+      });
+      if (options.signal?.aborted) {
+        reject(new DOMException("Upload aborted", "AbortError"));
+        return;
+      }
+      options.signal?.addEventListener("abort", abort, { once: true });
       xhr.send(formData);
     });
   }
@@ -184,16 +226,30 @@ async function loadConnector(connector, options = {}) {
 }
 function bindConnector(connector, handler, options = {}) {
   let stopped = false;
+  let running = false;
   let timer;
+  const key = options.key ?? `connector:${++connectorSequence}`;
   const load = async () => {
-    const value = await loadConnector(connector, options);
-    if (!stopped) await handler(value);
+    if (stopped || running) return;
+    running = true;
+    try {
+      const value = await loadConnector(connector, { ...options, key });
+      if (!stopped) await handler(value);
+    } catch (error) {
+      if (!stopped && !(error instanceof DOMException && error.name === "AbortError")) {
+        options.onError?.(error);
+        window.dispatchEvent(new CustomEvent("uif:connector-error", { detail: { connector, error } }));
+      }
+    } finally {
+      running = false;
+    }
   };
   void load();
-  if (connector.refreshInterval) timer = window.setInterval(() => void load(), connector.refreshInterval);
+  if (connector.refreshInterval) timer = window.setInterval(() => void load(), Math.max(250, connector.refreshInterval));
   return () => {
     stopped = true;
     if (timer) window.clearInterval(timer);
+    cancelRequest(key);
   };
 }
 export {

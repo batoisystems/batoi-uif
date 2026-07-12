@@ -1,4 +1,5 @@
 // src/index.ts
+import { setTrustedHTML, swapTrustedHTML } from "@batoi/uif-dom";
 function toElements(input, root = document) {
   if (!input) return [];
   if (typeof input === "string") return Array.from(root.querySelectorAll(input));
@@ -82,7 +83,7 @@ var UIFQuery = class _UIFQuery {
   }
   html(value) {
     if (value === void 0) return this.elements[0]?.innerHTML ?? "";
-    return this.each((el) => el.innerHTML = value);
+    return this.each((el) => setTrustedHTML(el, value, { trusted: true, context: "query html" }));
   }
   text(value) {
     if (value === void 0) return this.elements[0]?.textContent ?? "";
@@ -90,13 +91,13 @@ var UIFQuery = class _UIFQuery {
   }
   append(content) {
     return this.each((el) => {
-      if (typeof content === "string") el.insertAdjacentHTML("beforeend", content);
+      if (typeof content === "string") swapTrustedHTML(el, content, "append");
       else el.append(content.cloneNode(true));
     });
   }
   prepend(content) {
     return this.each((el) => {
-      if (typeof content === "string") el.insertAdjacentHTML("afterbegin", content);
+      if (typeof content === "string") swapTrustedHTML(el, content, "prepend");
       else el.prepend(content.cloneNode(true));
     });
   }
@@ -145,7 +146,7 @@ function serialize(form) {
 }
 function fragment(html) {
   const template = document.createElement("template");
-  template.innerHTML = html;
+  setTrustedHTML(template, html, { trusted: true, context: "query fragment" });
   return template.content;
 }
 export {

@@ -120,7 +120,10 @@ function cancelAnimation(el) {
   el.style.animationDirection = "";
   el.style.animationFillMode = "";
 }
+var animationControllers = /* @__PURE__ */ new WeakMap();
 function initAnimation(el) {
+  const existing = animationControllers.get(el);
+  if (existing) return existing;
   const animation = el.dataset.uifAnimation || "fade-in";
   const duration = Number(el.dataset.uifDuration || "") || void 0;
   const delay = Number(el.dataset.uifDelay || "") || void 0;
@@ -134,31 +137,49 @@ function initAnimation(el) {
     hasRun = true;
     void animate(el, animation, { duration, delay, repeat, easing, once });
   };
+  let observer = null;
+  let eventName = null;
   if (trigger === "load") run();
   if (trigger === "hover") {
-    el.addEventListener("mouseenter", run);
-    return;
+    eventName = "mouseenter";
+    el.addEventListener(eventName, run);
   }
   if (trigger === "focus") {
-    el.addEventListener("focusin", run);
-    return;
+    eventName = "focusin";
+    el.addEventListener(eventName, run);
   }
   if (trigger === "click") {
-    el.addEventListener("click", run);
-    return;
+    eventName = "click";
+    el.addEventListener(eventName, run);
   }
   if (trigger === "intersect" && "IntersectionObserver" in window) {
-    const observer = new IntersectionObserver((entries) => {
+    const intersectionObserver = new IntersectionObserver((entries) => {
       if (entries.some((entry) => entry.isIntersecting)) {
         run();
-        observer.disconnect();
+        intersectionObserver.disconnect();
       }
     });
-    observer.observe(el);
+    observer = intersectionObserver;
+    intersectionObserver.observe(el);
   }
+  const controller = {
+    refresh() {
+      hasRun = false;
+      run();
+    },
+    destroy() {
+      if (eventName) el.removeEventListener(eventName, run);
+      observer?.disconnect();
+      cancelAnimation(el);
+      if (animationControllers.get(el) === controller) animationControllers.delete(el);
+    }
+  };
+  animationControllers.set(el, controller);
+  return controller;
 }
 function initAnimationTriggers(root = document) {
-  root.querySelectorAll('[data-uif="animate"]').forEach(initAnimation);
+  const controllers = [...root.querySelectorAll('[data-uif="animate"]')].map(initAnimation);
+  return () => controllers.forEach((controller) => controller.destroy());
 }
 function observeMotion(root = document.documentElement) {
   root.dataset.uifMotion = prefersReducedMotion() ? "reduce" : "safe";

@@ -145,6 +145,7 @@ function searchIcons(query = "", options = {}) {
 }
 
 // src/render.ts
+import { setTrustedHTML } from "@batoi/uif-dom";
 var customIcons = {};
 function escapeAttribute(value) {
   return value.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
@@ -189,7 +190,7 @@ function iconElement(name, options = {}) {
   const markup = icon(name, options);
   if (!markup) throw new Error(`Unknown icon: ${name}`);
   const template = document.createElement("template");
-  template.innerHTML = markup;
+  setTrustedHTML(template, markup, { trusted: true, context: "icon element" });
   return template.content.firstElementChild;
 }
 

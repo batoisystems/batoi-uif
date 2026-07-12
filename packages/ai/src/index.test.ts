@@ -34,4 +34,22 @@ describe('ai', () => {
     expect(streamHost.textContent).toBe('hello');
     expect(cancelled).toHaveLength(1);
   });
+
+  it('bounds assistant responses, history, and streaming content', () => {
+    const response = document.createElement('div');
+    const errors: string[] = [];
+    response.addEventListener('uif:ai-error', (event) => errors.push((event as CustomEvent).detail.code));
+    renderAssistantResponse(response, '123456', { maxCharacters: 4 });
+    expect(response.textContent).toBe('1234');
+    expect(response.dataset.uifTruncated).toBe('true');
+
+    const streamHost = document.createElement('div');
+    const stream = createStreamSurface(streamHost, { maxCharacters: 5 });
+    stream.append('123');
+    stream.append('456');
+    stream.append('ignored');
+    expect(streamHost.textContent).toBe('12345');
+    expect(streamHost.dataset.uifState).toBe('limited');
+    expect(errors).toEqual(['ai-content-limit']);
+  });
 });

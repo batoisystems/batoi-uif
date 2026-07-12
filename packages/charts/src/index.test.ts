@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { configureTrustedTypes } from '@batoi/uif-dom';
 import {
   adaptRecords,
   adaptFlintChart,
@@ -17,6 +18,8 @@ import {
   exportChartData,
   exportChartSvg,
 } from './index.js';
+
+afterEach(() => configureTrustedTypes(null));
 
 describe('charts', () => {
   it('renders svg bar charts without external libraries', () => {
@@ -519,6 +522,33 @@ describe('charts', () => {
 
     controller.destroy();
     el.remove();
+  });
+
+  it('routes chart rendering through the configured HTML policy', async () => {
+    const createHTML = vi.fn((value: string) => value);
+    configureTrustedTypes({ createHTML });
+    const el = document.createElement('div');
+    el.dataset.uifData = '[{"label":"Jan","value":12}]';
+    const refreshed = new Promise<void>((resolve) => el.addEventListener('uif:chart-refresh', () => resolve(), { once: true }));
+
+    const controller = initChart(el);
+    await refreshed;
+
+    expect(createHTML).toHaveBeenCalled();
+    expect(el.querySelector('svg')).not.toBeNull();
+    controller.destroy();
+  });
+
+  it('blocks cross-origin chart data sources by default', async () => {
+    const el = document.createElement('div');
+    el.dataset.uifSrc = 'https://evil.example/chart.json';
+    const fetch = vi.fn();
+    vi.stubGlobal('fetch', fetch);
+    const controller = initChart(el);
+    await expect(controller.refresh()).rejects.toThrow(/unsafe chart data URL/);
+    expect(fetch).not.toHaveBeenCalled();
+    expect(el.dataset.uifState).toBe('error');
+    controller.destroy();
   });
 
   it('exposes declarative Flint warnings on the chart element', async () => {

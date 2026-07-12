@@ -63,6 +63,8 @@ Keep RAD route parts server-owned:
 
 UIF enhances the rendered HTML. It does not replace server-side authorization, sanitization, or audit logging.
 
+RAD JSON responses may include `version: 1` or `version: 2`, `ok`, `html`, `target`, `swap`, `message`, `focus`, `redirect`, `errors`, `events`, and `actions`. Keep HTML server-generated and trusted. Browser processing is bounded and recognizes only `toast`, `focus`, and same-origin `redirect` actions; privileged work must complete on the governed server before returning UI instructions.
+
 ## Partial Rehydration
 
 When RAD returns trusted partial HTML, target a region and let UIF rehydrate the replacement:

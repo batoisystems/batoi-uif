@@ -1,6 +1,7 @@
 // src/index.ts
 var initialized = /* @__PURE__ */ new WeakMap();
 var registry = /* @__PURE__ */ new Map();
+var trustedTypesPolicy = null;
 var blockedSafeHTMLTags = /* @__PURE__ */ new Set(["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "LINK", "META", "BASE"]);
 var defaultSafeHTMLAttributes = /* @__PURE__ */ new Set([
   "aria-describedby",
@@ -32,16 +33,27 @@ function qsa(selector, root = document) {
   return Array.from(root.querySelectorAll(selector));
 }
 function closest(el, selector) {
-  return el.closest(selector);
+  try {
+    return el.closest(selector);
+  } catch {
+    return null;
+  }
+}
+function safeQuerySelector(selector, root = document) {
+  try {
+    return root.querySelector(selector);
+  } catch {
+    return null;
+  }
 }
 function resolveTarget(sourceEl, targetExpression = "self") {
   if (targetExpression === "self") return sourceEl;
   if (targetExpression === "parent") return sourceEl.parentElement;
-  if (targetExpression.startsWith("closest:")) return sourceEl.closest(targetExpression.slice(8));
+  if (targetExpression.startsWith("closest:")) return closest(sourceEl, targetExpression.slice(8));
   if (targetExpression.startsWith("#") || targetExpression.startsWith(".")) {
-    return document.querySelector(targetExpression);
+    return safeQuerySelector(targetExpression);
   }
-  return document.querySelector(targetExpression);
+  return safeQuerySelector(targetExpression);
 }
 function setText(target, value) {
   if (!target) return;
@@ -54,9 +66,41 @@ function appendTextElement(parent, tagName, text, className) {
   parent.append(el);
   return el;
 }
-function isSafeURL(value) {
-  const normalized = value.trim().toLowerCase();
-  return normalized === "" || normalized.startsWith("#") || normalized.startsWith("/") || normalized.startsWith("http://") || normalized.startsWith("https://") || normalized.startsWith("mailto:") || normalized.startsWith("tel:");
+function configureTrustedTypes(policy) {
+  trustedTypesPolicy = policy;
+}
+function getTrustedTypesPolicy() {
+  return trustedTypesPolicy;
+}
+function setHTMLSink(target, html) {
+  const value = trustedTypesPolicy?.createHTML(html) ?? html;
+  target.innerHTML = value;
+}
+function isSafeURL(value, policy = {}) {
+  const candidate = value.trim();
+  if (!candidate || /[\u0000-\u001f\u007f]/.test(candidate) || candidate.startsWith("//")) return false;
+  const context = policy.context ?? "link";
+  const allowRelative = policy.allowRelative ?? true;
+  const allowHash = policy.allowHash ?? context === "link";
+  if (allowHash && candidate.startsWith("#")) return true;
+  if (allowRelative && (/^(?:\.\/|\.\.\/|\/)/.test(candidate) || !/^[a-z][a-z\d+.-]*:/i.test(candidate))) return true;
+  const defaults = {
+    link: ["http:", "https:", "mailto:", "tel:"],
+    image: ["http:", "https:"],
+    network: ["http:", "https:"],
+    navigation: ["http:", "https:"]
+  };
+  try {
+    const base = typeof window === "undefined" ? "http://localhost/" : window.location.href;
+    const parsed = new URL(candidate, base);
+    if (!(policy.protocols ?? defaults[context]).includes(parsed.protocol.toLowerCase())) return false;
+    if (!policy.sameOrigin || typeof window === "undefined") return true;
+    if (parsed.origin === window.location.origin) return true;
+    const websocketEquivalent = parsed.host === window.location.host && (parsed.protocol === "ws:" && window.location.protocol === "http:" || parsed.protocol === "wss:" && window.location.protocol === "https:");
+    return websocketEquivalent;
+  } catch {
+    return false;
+  }
 }
 function cleanSafeHTMLNode(node, options) {
   if (!(node instanceof Element)) return;
@@ -72,7 +116,10 @@ function cleanSafeHTMLNode(node, options) {
       node.removeAttribute(attribute.name);
       return;
     }
-    if ((name === "href" || name === "src") && !isSafeURL(value)) {
+    if (name === "href" && !isSafeURL(value, { context: "link" })) {
+      node.removeAttribute(attribute.name);
+    }
+    if (name === "src" && !isSafeURL(value, { context: "image", allowHash: false })) {
       node.removeAttribute(attribute.name);
     }
   });
@@ -80,7 +127,7 @@ function cleanSafeHTMLNode(node, options) {
 }
 function sanitizeHTML(html, options = {}) {
   const template = document.createElement("template");
-  template.innerHTML = html;
+  setHTMLSink(template, html);
   const safeOptions = {
     allowedTags: options.allowedTags ?? [
       "a",
@@ -118,7 +165,7 @@ function setTrustedHTML(target, html, options = {}) {
   if (!options.trusted) {
     throw new Error(`Batoi UIF refused untrusted HTML${options.context ? ` for ${options.context}` : ""}`);
   }
-  target.innerHTML = html;
+  setHTMLSink(target, html);
 }
 function swapTrustedHTML(targetEl, html, mode = "inner") {
   if (mode === "inner") {
@@ -200,13 +247,17 @@ export {
   appendTextElement,
   autoInit,
   closest,
+  configureTrustedTypes,
+  getTrustedTypesPolicy,
   isInitialized,
+  isSafeURL,
   mount,
   observe,
   qs,
   qsa,
   registerComponent,
   resolveTarget,
+  safeQuerySelector,
   sanitizeHTML,
   setSafeHTML,
   setText,

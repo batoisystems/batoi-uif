@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createArtifactStore, createMicroAppStore, createStore } from './index.js';
+import { createAdvancedStore, createArtifactStore, createMicroAppStore, createStore } from './index.js';
 
 describe('state', () => {
   it('gets, sets, subscribes, and binds values', () => {
@@ -45,5 +45,44 @@ describe('state', () => {
     expect(store.get('title')).toBe('Demo');
     expect(() => store.importJSON('[]')).toThrow('Micro App state must be a JSON object');
     expect(createArtifactStore({ ok: true }).get('ok')).toBe(true);
+  });
+
+  it('uses versioned bounded persistence while accepting legacy version-one objects', () => {
+    window.localStorage.clear();
+    window.localStorage.setItem('legacy-state', '{"title":"Legacy"}');
+    const legacy = createAdvancedStore({ title: 'Initial' }, { persist: 'local', key: 'legacy-state' });
+    expect(legacy.get('title')).toBe('Legacy');
+    legacy.set('title', 'Versioned');
+    expect(window.localStorage.getItem('legacy-state')).toContain('"__uifStateVersion":1');
+
+    const errors: Error[] = [];
+    const mismatch = createAdvancedStore(
+      { title: 'Fallback' },
+      { persist: 'local', key: 'legacy-state', persistVersion: 2, onPersistError: (error) => errors.push(error) },
+    );
+    expect(mismatch.get('title')).toBe('Fallback');
+    expect(errors[0]?.message).toContain('version 1 does not match 2');
+  });
+
+  it('reports malformed, oversized, and failed persistence without aborting state updates', () => {
+    window.localStorage.clear();
+    window.localStorage.setItem('bad-state', '{bad');
+    const errors: Error[] = [];
+    const store = createAdvancedStore(
+      { title: 'Fallback' },
+      { persist: 'local', key: 'bad-state', maxPersistBytes: 80, onPersistError: (error) => errors.push(error) },
+    );
+    expect(store.get('title')).toBe('Fallback');
+    expect(errors[0]?.message).toContain('State persistence read failed');
+
+    store.set('title', 'A value that makes the versioned persistence envelope exceed the configured byte boundary');
+    expect(store.get('title')).toContain('configured byte boundary');
+    expect(errors.at(-1)?.message).toContain('80 byte limit');
+
+    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new DOMException('Quota exceeded', 'QuotaExceededError'); });
+    store.set('title', 'In memory');
+    expect(store.get('title')).toBe('In memory');
+    expect(errors.at(-1)?.message).toContain('Quota exceeded');
+    setItem.mockRestore();
   });
 });

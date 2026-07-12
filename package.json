@@ -1,10 +1,13 @@
 {
   "name": "batoi-uif",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Batoi UIF — Unified Interface Framework",
   "license": "Apache-2.0",
   "packageManager": "npm@10.0.0",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "type": "module",
   "workspaces": [
     "packages/*",
@@ -13,24 +16,30 @@
   ],
   "scripts": {
     "build": "npm --workspace @batoi/uif-core run build && npm --workspace @batoi/uif-dom run build && npm --workspace @batoi/uif-query run build && npm --workspace @batoi/uif-effects run build && npm --workspace @batoi/uif-actions run build && npm --workspace @batoi/uif-overlays run build && npm --workspace @batoi/uif-net run build && npm --workspace @batoi/uif-icons run build && npm --workspace @batoi/uif-components run build && npm --workspace @batoi/uif-forms run build && npm --workspace @batoi/uif-editor run build && npm --workspace @batoi/uif-state run build && npm --workspace @batoi/uif-table run build && npm --workspace @batoi/uif-router run build && npm --workspace @batoi/uif-rad-adapter run build && npm --workspace @batoi/uif-pwa run build && npm --workspace @batoi/uif-charts run build && npm --workspace @batoi/uif-dashboard run build && npm --workspace @batoi/uif-desktop run build && npm --workspace @batoi/uif-realtime run build && npm --workspace @batoi/uif-push run build && npm --workspace @batoi/uif-mobile run build && npm --workspace @batoi/uif-ai run build && npm --workspace @batoi/uif-mcp run build && npm --workspace @batoi/uif-extension-kit run build && npm run build:dist && npm --workspace @batoi/uif-docs run build && npm --workspace @batoi/uif-playground run build",
-    "build:dist": "tsup index.ts --format esm,iife --dts --global-name BatoiUIF --out-dir dist --clean --minify && node scripts/build-css.mjs",
+    "build:dist": "tsup index.ts --format esm,iife --dts --global-name BatoiUIF --out-dir dist --clean --minify && node scripts/build-css.mjs && node scripts/generate-release-integrity.mjs",
     "dev:docs": "npm --workspace @batoi/uif-docs run dev",
     "dev:playground": "npm --workspace @batoi/uif-playground run dev",
     "lint": "eslint .",
     "format": "prettier --check .",
     "test": "vitest run",
-    "verify:release": "node scripts/verify-release.mjs"
+    "test:browser": "playwright test",
+    "audit:security": "npm audit --audit-level=moderate",
+    "release:api-baseline": "node scripts/generate-api-baseline.mjs",
+    "verify:packages": "node scripts/verify-package-contents.mjs",
+    "verify:packed-install": "node scripts/smoke-packed-install.mjs",
+    "verify:release": "npm run verify:packages && npm run verify:packed-install && node scripts/verify-release.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@playwright/test": "^1.61.1",
     "@types/node": "^22.15.14",
     "eslint": "^9.25.0",
     "eslint-config-prettier": "^10.1.2",
+    "jsdom": "^29.1.1",
     "prettier": "^3.5.3",
     "tsup": "^8.4.0",
     "typescript": "^5.8.3",
-    "vite": "^5.4.19",
-    "vitest": "^2.1.9",
-    "jsdom": "^25.0.1"
+    "vite": "^8.1.4",
+    "vitest": "^4.1.10"
   }
 }

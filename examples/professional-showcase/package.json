@@ -1,5 +1,6 @@
 {
   "name": "@batoi/uif-example-professional-showcase",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "version": "2.1.0"
 }

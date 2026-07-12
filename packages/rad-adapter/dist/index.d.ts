@@ -1,5 +1,6 @@
 type SwapMode = 'inner' | 'outer' | 'append' | 'prepend' | 'before' | 'after';
 interface RadResponse {
+    version?: 1 | 2;
     ok?: boolean;
     html?: string;
     target?: string;
