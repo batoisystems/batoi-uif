@@ -402,7 +402,7 @@ If working before that migration is complete, use the currently available worksp
 
 ## Version 2
 
-The repository and framework packages are versioned `2.1.1`. Version 2 consolidates the npm workspace and TypeScript architecture, dependency-free browser distribution, RAD adapter, components, editors, SVG charts, realtime and mobile capabilities, and governed AI/MCP interface surfaces.
+The repository and framework packages are versioned `2.1.2`. Version 2 consolidates the npm workspace and TypeScript architecture, dependency-free browser distribution, RAD adapter, components, editors, SVG charts, realtime and mobile capabilities, and governed AI/MCP interface surfaces.
 
 The current status is active v2 hardening. Public release readiness requires the automated release gate plus real-browser editor, accessibility, CSP/Trusted Types, mobile viewport, and deployed-artifact verification described in [Compatibility and Release Policy](docs/compatibility-and-release-policy.md).
 

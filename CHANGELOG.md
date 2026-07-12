@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.2
+
+- Corrected the npm lockfile so clean installs retain the published `fast-json-stable-stringify@2.1.0` artifact and original `punycode` range.
+- Added a release verification guard that rejects lockfile tarball URLs whose embedded version does not match the locked package version.
+
 ## 2.1.1
 
 - Fixed all Markdown example preview layouts, including immediate modal and drawer presentation with accessible state feedback.

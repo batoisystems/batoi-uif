@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-dashboard",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,8 +18,8 @@
     "build": "tsup src/index.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-charts": "2.1.1",
-    "@batoi/uif-dom": "2.1.1"
+    "@batoi/uif-charts": "2.1.2",
+    "@batoi/uif-dom": "2.1.2"
   },
   "license": "Apache-2.0"
 }

@@ -25,6 +25,12 @@ function assert(condition, message) {
   if (!condition) failures.push(message);
 }
 
+for (const [path, entry] of Object.entries(lockfile.packages ?? {})) {
+  if (!path.startsWith('node_modules/') || typeof entry?.resolved !== 'string' || !entry.resolved.startsWith('https://registry.npmjs.org/')) continue;
+  const tarball = new URL(entry.resolved).pathname;
+  assert(tarball.endsWith(`-${entry.version}.tgz`), `${path} lockfile tarball does not match version ${entry.version}`);
+}
+
 const packages = await readdir(new URL('packages', root), { withFileTypes: true });
 const packageDirectories = packages.filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
 const boundaryPackages = Object.keys(securityBoundaries.packages ?? {}).sort();
