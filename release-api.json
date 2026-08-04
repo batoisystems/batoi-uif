@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "version": "2.1.2",
+  "version": "2.2.0",
   "packages": {
     "actions": {
       "exports": [
@@ -582,6 +582,8 @@
         "AnimationPreset",
         "AnimationStep",
         "EffectOptions",
+        "TypedTextController",
+        "TypedTextOptions",
         "animate",
         "animateGroup",
         "animationPresets",
@@ -591,6 +593,7 @@
         "hide",
         "initAnimation",
         "initAnimationTriggers",
+        "initTypedText",
         "observeMotion",
         "sequence",
         "show",
@@ -604,6 +607,8 @@
         "AnimationPreset": "912ee72a043333c314ac5b364e299d6a4da5156f16fa2fcdf4b5422b262cc367",
         "AnimationStep": "d34f0a736825b89bc4b2315681e452c808f5e7bf04da3713a7a281b9f5af037a",
         "EffectOptions": "0c0be0d87d1301349e6e7bc3b1c8bc3718f6326633e308436cb1e0f99fbed2f2",
+        "TypedTextController": "f023fa9ef7c72a33871e07185e465e88c7619b83a38d8390b6fd7c89dd6ff2f7",
+        "TypedTextOptions": "c85a4c68f6bda469be868f27aec57cca8d7e6861dd82f77f39645ce384456361",
         "animate": "b57f10c27aa2fba00b19645f3bb076d5bb8cd56fbf6483b6db9aaa8e66a78214",
         "animateGroup": "7ba63048ea9a1288161d523716352194376c64195d9bb888232d56f284daf5d7",
         "animationPresets": "75703c4dbcb7a3cc4f1d42e98a57bf35bc821df0206b7018b1979c88bc1884e4",
@@ -613,6 +618,7 @@
         "hide": "0a43822c56ebdea6e6ae2cc43132ac8d3821ab819c073bf83731cd798bce75cf",
         "initAnimation": "8f72dd71d0e03ad3e6b394ce4b3ae098d7547d14b6f97668150cd5a0a8aaaed1",
         "initAnimationTriggers": "fbf57a8293683d6e83eb341efb5d9f758a158b001edc623a022a0e5cab1ff041",
+        "initTypedText": "ab4294482a537759e989d94fb354abaf8af670a672939e67e82c625c082852a1",
         "observeMotion": "f25f634966bb7d97a98cdb33feb9ed92dd0bfafce3bf252b47a14be95aa76221",
         "sequence": "873e8482f048542c39a824ea049a96eba41546f7b0c20e59db4965594f19e72f",
         "show": "7af09323a18c9561c47d8cc370c3be7f8ca9ae19d72c80a2dc176cd9aa36551f",
@@ -732,9 +738,9 @@
         "hasIcon": "cc81ab8dc99d0d6fc8771df2a60f08098b755e4c0f1fded8240c78653731c4a4",
         "icon": "e68018d883e9a4141df32a64d16e8382f7c4262dd469228fd6e68519e9c2e5ba",
         "iconElement": "3c085f8c67cb823e8ff084db340a569c8f50fd4cd3c64fa415b88248be4ff86b",
-        "iconMetadata": "de91c3e6c5af85208c212bf04ba7a5f39a7032e324f1c38c8d898511f42393a8",
+        "iconMetadata": "75435014d4c9ba19192b9361a08d0ab78197d80f20f48200c6b6912991483844",
         "iconSets": "7cc2958f4eba987c516eadb15e26bc4ba4934cc409c7ee6d4100613ca467f19e",
-        "icons": "91c070674ec4647ffed369b79e8041969cda2c65eb31da2e595c82d51b0a6405",
+        "icons": "466bd0f915f838d6da17b5bcad8f149cf12ae678a076c3e1dd1dfdf299589fdd",
         "iconsByCategory": "bc0835f94c893435232798341fd8ece320f1f0c3f3e5173be431f719924820f8",
         "mountIcons": "709d7d61694a1e9893b027e09792c2c76cd45404c4878b46ffc5de9c34817dfb",
         "registerIcon": "54e3eb1629f11864226d0edb8ebddd33f68ed663576f61e1624397ec5d6d37ba",

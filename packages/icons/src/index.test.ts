@@ -60,6 +60,18 @@ describe('icons', () => {
     expect(markup).toContain('stroke="currentColor"');
   });
 
+  it('includes common first-party brand icons with searchable metadata', () => {
+    ['facebook', 'github', 'instagram', 'linkedin', 'x-twitter', 'youtube'].forEach((name) => {
+      expect(hasIcon(name)).toBe(true);
+      expect(icon(name)).toContain('<svg');
+      expect(getIconMetadata(name)?.category).toBe('brand');
+    });
+    expect(searchIcons('twitter')).toContain('x-twitter');
+    expect(searchIcons('social media', { category: 'brand' })).toEqual(
+      expect.arrayContaining(['facebook', 'instagram', 'linkedin', 'x-twitter']),
+    );
+  });
+
   it('includes a broad first-party icon set for application interfaces', () => {
     expect(Object.keys(icons).length).toBeGreaterThanOrEqual(1000);
     [

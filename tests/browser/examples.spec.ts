@@ -47,3 +47,31 @@ test('example pages use the UIF logo and shared navigation', async ({ page }) =>
   await expect(page.locator('.example-brand .example-uif-logo')).toBeVisible();
   await expect(page.locator('.example-topbar nav a[aria-current="page"]')).toHaveText('Markdown');
 });
+
+test('component gallery exposes complete interactive media and typed-text examples', async ({ page }) => {
+  await page.goto('/examples/component-gallery/');
+
+  const cards = page.locator('.component-card');
+  await expect(page.locator('#component-count')).toHaveText(String(await cards.count()));
+  await expect(page.locator('#multi-image-slider img')).toHaveCount(3);
+  await expect(page.locator('#multi-image-slider [data-uif-role="status"]')).toHaveText('Slide 1 of 3');
+  await page.locator('#multi-image-slider [data-uif-action="next"]').click();
+  await expect(page.locator('#multi-image-slider [data-uif-role="status"]')).toHaveText('Slide 2 of 3');
+
+  const responsiveCode = page.locator('.component-card').filter({ hasText: 'Responsive Shell' }).locator('pre code');
+  await expect(responsiveCode).toContainText('Responsive content region.');
+  await expect(responsiveCode).not.toContainText('...');
+  await expect(page.locator('#typed-text [data-uif="typed-text"]')).toHaveClass(/uif-typed-text/);
+  await expect(page.locator('#testimonial-slider [data-uif-role="slide"]')).toHaveCount(2);
+});
+
+test('icon gallery provides CSS usage and first-party brand icons', async ({ page }) => {
+  await page.goto('/examples/icon-gallery/');
+  await page.locator('#icon-category').selectOption('brand');
+
+  await expect(page.locator('[data-icon-name="facebook"]')).toBeVisible();
+  await expect(page.locator('[data-icon-name="x-twitter"]')).toBeVisible();
+  const facebook = page.locator('[data-icon-name="facebook"]');
+  await expect(facebook.locator('pre code').nth(1)).toContainText('[data-uif-icon="facebook"] .uif-icon');
+  await expect(facebook.getByRole('button', { name: 'CSS' })).toBeVisible();
+});

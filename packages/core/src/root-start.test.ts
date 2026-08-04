@@ -33,4 +33,17 @@ describe('root start lifecycle', () => {
     expect(document.querySelector('#out')?.textContent).toBe('Updated');
     second.destroy();
   });
+
+  it('hydrates and destroys typed-text effects with the root lifecycle', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    document.body.innerHTML = '<span data-uif="typed-text" data-uif-strings=\'["Alpha","Beta"]\'>Fallback</span>';
+    const root = document.body;
+    const app = start(root);
+    const typed = root.querySelector<HTMLElement>('[data-uif="typed-text"]')!;
+
+    expect(typed.textContent).toBe('Alpha');
+    expect(typed.classList.contains('uif-typed-text')).toBe(true);
+    app.destroy();
+    expect(typed.classList.contains('uif-typed-text')).toBe(false);
+  });
 });

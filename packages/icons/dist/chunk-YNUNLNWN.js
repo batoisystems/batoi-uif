@@ -12,7 +12,7 @@ import {
 } from "./chunk-5GJBKAVV.js";
 import {
   brandIcons
-} from "./chunk-44AFBWBG.js";
+} from "./chunk-AGK62RJ7.js";
 import {
   chartIcons
 } from "./chunk-HAXDAJZR.js";

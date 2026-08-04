@@ -1,6 +1,12 @@
 # Roadmap
 
-Batoi UIF is currently versioned `2.1.2`. The pre-2.0 milestones below are retained as implementation history, not current release targets.
+Batoi UIF is currently versioned `2.2.0`. The pre-2.0 milestones below are retained as implementation history, not current release targets.
+
+## v2.2 gallery and visual system
+
+- Complete component examples, reusable image/testimonial sliders, typed text, expanded brand icons, and per-icon CSS guidance.
+- Refined typography, semantic font-weight utilities, and semantic icon colors without runtime or webfont dependencies.
+- Status: implementation complete; release publication and deployed website synchronization remain operational release steps.
 
 ## v2.1 release hardening
 

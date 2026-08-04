@@ -1,6 +1,6 @@
 import {
   brandIcons
-} from "../chunk-44AFBWBG.js";
+} from "../chunk-AGK62RJ7.js";
 export {
   brandIcons
 };

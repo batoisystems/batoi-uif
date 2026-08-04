@@ -41,7 +41,7 @@ Classic script usage:
 </script>
 ```
 
-For PHP, RAD, and other server-rendered pages, `BatoiUIF.autoStart()` initializes common `data-uif` components, forms, editors, tables, charts, icons, animations, event actions, RAD AJAX actions, realtime regions, push controls, mobile shells, AI actions, and MCP approval widgets without a bundler.
+For PHP, RAD, and other server-rendered pages, `BatoiUIF.autoStart()` initializes common `data-uif` components, forms, editors, tables, charts, icons, animations, typed text, event actions, RAD AJAX actions, realtime regions, push controls, mobile shells, AI actions, and MCP approval widgets without a bundler.
 
 The same distribution files can also power **Micro Apps**: self-contained, client-only applications built with static HTML, Batoi UIF CSS/JS, browser APIs, and optional local persistence. Import the ES module from `dist/uif.esm.js`, use `createMicroAppStore()` for local persistence, undo/redo, reset, and JSON import/export, and render charts/icons/components directly in static HTML.
 
@@ -189,7 +189,7 @@ Charts can also accept a Flint-compatible input shape at the specification bound
 ></div>
 ```
 
-Open `examples/index.html` for a landing page that links to every bundled example. See `examples/component-gallery/` for live component examples with copy-ready markup, including carousel sliders, lightboxes, masonry card/image layouts, grid and navbar patterns, and professional app patterns such as button matrices, toolbars, form sections, skeletons, metric rows, hero banners, summaries, inspectors, stat cards, empty states, filter builders, command palettes, notification panels, and native picker wrappers. See `examples/chart-gallery/` for one declarative example of every supported chart type, Flint-compatible examples, copy/export controls, and deferred advanced-chart guidance. See `examples/rich-editor/`, `examples/markdown-editor/`, `examples/animation-gallery/`, and `examples/event-actions/` for builder-style examples where users can tune options, preview behavior, and copy generated code. See `docs/layout-and-components.md` for grid, navbar, carousel, lightbox, and masonry usage guidance. See `examples/professional-showcase/` for a richer product-grade app surface with a fixed shell, KPI dashboard, CRM pipeline, governed AI approval desk, mobile field console, RAD admin table, and statistical analytics using the same lean JS/CSS library.
+Open `examples/index.html` for a landing page that links to every bundled example. See `examples/component-gallery/` for live component examples with complete copy-ready markup, including multi-image and testimonial sliders, typed text, lightboxes, masonry card/image layouts, grid and navbar patterns, and professional app patterns such as button matrices, toolbars, form sections, skeletons, metric rows, hero banners, summaries, inspectors, stat cards, empty states, filter builders, command palettes, notification panels, and native picker wrappers. See `examples/chart-gallery/` for one declarative example of every supported chart type, Flint-compatible examples, copy/export controls, and deferred advanced-chart guidance. See `examples/icon-gallery/` for searchable icons with declarative, JavaScript, CSS, and SVG usage. See `examples/rich-editor/`, `examples/markdown-editor/`, `examples/animation-gallery/`, and `examples/event-actions/` for builder-style examples where users can tune options, preview behavior, and copy generated code. See `docs/layout-and-components.md` for grid, navbar, carousel, lightbox, and masonry usage guidance. See `examples/professional-showcase/` for a richer product-grade app surface with a fixed shell, KPI dashboard, CRM pipeline, governed AI approval desk, mobile field console, RAD admin table, and statistical analytics using the same lean JS/CSS library.
 
 Reference docs:
 
@@ -267,6 +267,18 @@ The editor package is dependency-free and keeps the original form field synchron
 </button>
 
 <section id="panel" class="uif-card">Panel</section>
+```
+
+Typed text uses the same effects package and root lifecycle:
+
+```html
+<strong
+  data-uif="typed-text"
+  data-uif-strings='["server-rendered.","mobile-ready.","secure by design."]'
+  data-uif-type-speed="55"
+  data-uif-delete-speed="30"
+  data-uif-pause="1200"
+>server-rendered.</strong>
 ```
 
 ```html
@@ -383,7 +395,7 @@ Important attributes include:
 - `data-uif-icon-class`
 - `data-uif-icon-hidden`
 
-The v2 `data-uif` contract includes `button`, `modal`, `drawer`, `offcanvas`, `dropdown`, `tooltip`, `popover`, `tabs`, `toast`, `accordion`, `table`, `form`, `ajax`, `route`, `shell`, `nav`, `chart`, `realtime`, `push`, `mobile-shell`, `ai-action`, and `tool-approval`.
+The v2 `data-uif` contract includes `button`, `modal`, `drawer`, `offcanvas`, `dropdown`, `tooltip`, `popover`, `tabs`, `toast`, `accordion`, `table`, `form`, `ajax`, `route`, `shell`, `nav`, `chart`, `animate`, `typed-text`, `realtime`, `push`, `mobile-shell`, `ai-action`, and `tool-approval`.
 
 ## Development
 
@@ -402,7 +414,7 @@ If working before that migration is complete, use the currently available worksp
 
 ## Version 2
 
-The repository and framework packages are versioned `2.1.2`. Version 2 consolidates the npm workspace and TypeScript architecture, dependency-free browser distribution, RAD adapter, components, editors, SVG charts, realtime and mobile capabilities, and governed AI/MCP interface surfaces.
+The repository and framework packages are versioned `2.2.0`. Version 2 consolidates the npm workspace and TypeScript architecture, dependency-free browser distribution, RAD adapter, components, editors, SVG charts, realtime and mobile capabilities, and governed AI/MCP interface surfaces.
 
 The current status is active v2 hardening. Public release readiness requires the automated release gate plus real-browser editor, accessibility, CSP/Trusted Types, mobile viewport, and deployed-artifact verification described in [Compatibility and Release Policy](docs/compatibility-and-release-policy.md).
 

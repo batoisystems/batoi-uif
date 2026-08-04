@@ -22,6 +22,8 @@ const curatedAliases: Partial<Record<IconName, string[]>> = {
   'area-chart': ['area graph'],
   'bar-chart': ['bar graph'],
   batoi: ['batoi logo'],
+  facebook: ['facebook logo', 'social media'],
+  github: ['github logo', 'source code'],
   cart: ['shopping cart'],
   cash: ['money'],
   chart: ['trend', 'analytics'],
@@ -38,6 +40,8 @@ const curatedAliases: Partial<Record<IconName, string[]>> = {
   help: ['question'],
   home: ['house'],
   info: ['information'],
+  instagram: ['instagram logo', 'social media'],
+  linkedin: ['linkedin logo', 'social media'],
   list: ['bullets'],
   location: ['pin', 'marker'],
   mail: ['email'],
@@ -53,6 +57,8 @@ const curatedAliases: Partial<Record<IconName, string[]>> = {
   user: ['person', 'account'],
   users: ['team', 'people'],
   warning: ['alert'],
+  'x-twitter': ['twitter', 'x logo', 'social media'],
+  youtube: ['youtube logo', 'video'],
 };
 
 function categoryFor(name: string): IconCategory {

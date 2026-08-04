@@ -1,5 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
-import { animate, animationPresets, cancelAnimation, hide, initAnimation, initAnimationTriggers, observeMotion, show, toggle } from './index.js';
+import {
+  animate,
+  animationPresets,
+  cancelAnimation,
+  hide,
+  initAnimation,
+  initAnimationTriggers,
+  initTypedText,
+  observeMotion,
+  show,
+  toggle,
+} from './index.js';
 
 describe('effects', () => {
   it('shows, hides, and toggles with reduced motion', async () => {
@@ -47,5 +58,38 @@ describe('effects', () => {
     el.click();
     expect(el.classList.contains('uif-is-animating')).toBe(false);
     expect(initAnimation(el)).not.toBe(controller);
+  });
+
+  it('shows typed text immediately when reduced motion is preferred', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    const el = document.createElement('span');
+    el.dataset.uifStrings = '["Build faster","Ship safely"]';
+
+    const controller = initTypedText(el);
+
+    expect(el.textContent).toBe('Build faster');
+    expect(el.getAttribute('aria-label')).toBe('Build faster');
+    expect(initTypedText(el)).toBe(controller);
+    controller.destroy();
+    expect(initTypedText(el)).not.toBe(controller);
+  });
+
+  it('types, deletes, and advances declarative phrases', () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false })));
+    const el = document.createElement('span');
+    el.dataset.uifStrings = '["One","Two"]';
+
+    const controller = initTypedText(el, { typeSpeed: 1, deleteSpeed: 1, pause: 1 });
+    vi.advanceTimersByTime(3);
+    expect(el.textContent).toBe('One');
+    expect(el.getAttribute('aria-label')).toBe('One');
+    vi.advanceTimersByTime(8);
+    expect(el.textContent).toBe('Two');
+
+    controller.destroy();
+    vi.runOnlyPendingTimers();
+    expect(vi.getTimerCount()).toBe(0);
+    vi.useRealTimers();
   });
 });

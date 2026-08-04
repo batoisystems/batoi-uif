@@ -181,6 +181,97 @@ function initAnimationTriggers(root = document) {
   const controllers = [...root.querySelectorAll('[data-uif="animate"]')].map(initAnimation);
   return () => controllers.forEach((controller) => controller.destroy());
 }
+var typedTextControllers = /* @__PURE__ */ new WeakMap();
+function typedTextStrings(el, options) {
+  if (options.strings?.length) return options.strings.map(String).filter(Boolean);
+  const raw = el.dataset.uifStrings;
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean);
+    } catch {
+      return raw.split("|").map((value) => value.trim()).filter(Boolean);
+    }
+  }
+  return el.textContent ? [el.textContent] : [];
+}
+function nonNegative(value, fallback) {
+  return Number.isFinite(value) && value !== void 0 ? Math.max(0, value) : fallback;
+}
+function initTypedText(el, options = {}) {
+  const existing = typedTextControllers.get(el);
+  if (existing) return existing;
+  const strings = typedTextStrings(el, options);
+  const typeSpeed = nonNegative(options.typeSpeed ?? Number(el.dataset.uifTypeSpeed), 55);
+  const deleteSpeed = nonNegative(options.deleteSpeed ?? Number(el.dataset.uifDeleteSpeed), 30);
+  const pause = nonNegative(options.pause ?? Number(el.dataset.uifPause), 1200);
+  const startDelay = nonNegative(options.startDelay ?? Number(el.dataset.uifStartDelay), 0);
+  const loop = options.loop ?? el.dataset.uifLoop !== "false";
+  let phraseIndex = 0;
+  let characterIndex = 0;
+  let deleting = false;
+  let timer;
+  let destroyed = false;
+  el.classList.add("uif-typed-text");
+  el.setAttribute("aria-live", "off");
+  const schedule = (callback, delay) => {
+    timer = window.setTimeout(callback, delay);
+  };
+  const render = () => {
+    if (destroyed || !strings.length) return;
+    const phrase = strings[phraseIndex] ?? "";
+    el.textContent = phrase.slice(0, characterIndex);
+    if (!deleting && characterIndex < phrase.length) {
+      characterIndex += 1;
+      schedule(render, typeSpeed);
+      return;
+    }
+    if (!deleting) {
+      el.setAttribute("aria-label", phrase);
+      const isLastPhrase = phraseIndex === strings.length - 1;
+      if (!loop && isLastPhrase) return;
+      deleting = true;
+      schedule(render, pause);
+      return;
+    }
+    if (characterIndex > 0) {
+      characterIndex -= 1;
+      schedule(render, deleteSpeed);
+      return;
+    }
+    deleting = false;
+    phraseIndex = (phraseIndex + 1) % strings.length;
+    schedule(render, typeSpeed);
+  };
+  const restart = () => {
+    if (timer !== void 0) window.clearTimeout(timer);
+    destroyed = false;
+    phraseIndex = 0;
+    characterIndex = 0;
+    deleting = false;
+    if (!strings.length) return;
+    if (prefersReducedMotion()) {
+      el.textContent = strings[0] ?? "";
+      el.setAttribute("aria-label", strings[0] ?? "");
+      return;
+    }
+    schedule(render, startDelay);
+  };
+  const controller = {
+    refresh: restart,
+    destroy() {
+      destroyed = true;
+      if (timer !== void 0) window.clearTimeout(timer);
+      timer = void 0;
+      el.classList.remove("uif-typed-text");
+      el.removeAttribute("aria-live");
+      if (typedTextControllers.get(el) === controller) typedTextControllers.delete(el);
+    }
+  };
+  typedTextControllers.set(el, controller);
+  restart();
+  return controller;
+}
 function observeMotion(root = document.documentElement) {
   root.dataset.uifMotion = prefersReducedMotion() ? "reduce" : "safe";
 }
@@ -194,6 +285,7 @@ export {
   hide,
   initAnimation,
   initAnimationTriggers,
+  initTypedText,
   observeMotion,
   sequence,
   show,

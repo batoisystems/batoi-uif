@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.2.0
+
+- Added complete, copy-ready component gallery samples generated from each live preview.
+- Added multi-image and testimonial carousel examples using the existing accessible carousel contract.
+- Added dependency-free typed text with declarative options, lifecycle cleanup, and reduced-motion behavior.
+- Added visible, copyable per-icon CSS and first-party Facebook, GitHub, Instagram, LinkedIn, X/Twitter, and YouTube marks.
+- Added a stronger typography hierarchy, system-font fallbacks, semantic weights, text utilities, and semantic icon colors without a webfont dependency.
+- Added focused unit and cross-browser gallery regression coverage.
+
 ## 2.1.2
 
 - Corrected the npm lockfile so clean installs retain the published `fast-json-stable-stringify@2.1.0` artifact and original `punycode` range.

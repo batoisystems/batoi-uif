@@ -42,6 +42,7 @@ This registry documents the stable declarative surface for Batoi UIF. Attributes
 | `shell`          | `@batoi/uif-components`                 | Application shell container      | Workspace shell state, sidebar collapse, density preference, active nav, skip target, and nested section disclosure.          |
 | `chart`          | `@batoi/uif-charts`                     | `div`, chart host                | Dependency-free SVG chart rendering.                                                                                          |
 | `animate`        | `@batoi/uif-effects`                    | Any element                      | Declarative animation presets with reduced-motion support.                                                                    |
+| `typed-text`     | `@batoi/uif-effects`                    | Text element                     | Rotating typed text with reduced-motion behavior and lifecycle cleanup.                                                        |
 | `realtime`       | `@batoi/uif-realtime`                   | Region/controller                | SSE, WebSocket, or polling feed updates.                                                                                      |
 | `push`           | `@batoi/uif-push`                       | Button/control                   | Push subscription helpers.                                                                                                    |
 | `install-prompt` | `@batoi/uif-pwa`                        | Button/control                   | PWA install prompt.                                                                                                           |
@@ -308,6 +309,18 @@ Use `.uif-navbar-toggle` and `.uif-sidebar-mobile-toggle` for controls that appe
 | `data-uif-class`     | Class name used by class actions.                                                                                           |
 | `data-uif-attribute` | Attribute name used by attribute actions.                                                                                   |
 | `data-uif-key`       | Keyboard filter for declarative keyboard actions.                                                                           |
+
+### Typed text
+
+| Attribute               | Behavior                                                                                         |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+| `data-uif="typed-text"` | Initializes a rotating typed-text controller.                                                    |
+| `data-uif-strings`      | JSON string array, or a pipe-separated fallback list.                                            |
+| `data-uif-type-speed`   | Milliseconds between typed characters.                                                           |
+| `data-uif-delete-speed` | Milliseconds between deleted characters.                                                         |
+| `data-uif-pause`        | Milliseconds to retain each completed phrase.                                                    |
+| `data-uif-start-delay`  | Optional delay before typing starts.                                                             |
+| `data-uif-loop`         | Set to `false` to stop after the final phrase.                                                    |
 
 Supported event modifiers include `prevent`, `stop`, `once`, `self`, `outside`, `debounce:ms`, `throttle:ms`, and common keyboard filters such as `enter`, `escape`, and `space`.
 

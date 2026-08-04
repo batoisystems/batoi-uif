@@ -4,7 +4,7 @@ import { bindChartExports, initChart } from './packages/charts/src/index.js';
 import { initAll as initComponents } from './packages/components/src/index.js';
 import { initDashboard } from './packages/dashboard/src/index.js';
 import { initDesktopShell } from './packages/desktop/src/index.js';
-import { initAnimation } from './packages/effects/src/index.js';
+import { initAnimation, initTypedText } from './packages/effects/src/index.js';
 import { initEditor } from './packages/editor/src/index.js';
 import { initForm } from './packages/forms/src/index.js';
 import { mountIcons } from './packages/icons/src/index.js';
@@ -65,6 +65,10 @@ function hydrate(root: Document | HTMLElement, disposers: Set<() => void>): void
     if (type === 'form' && el.tagName === 'FORM') initForm(el as HTMLFormElement);
     if (type === 'editor') initEditor(el);
     if (type === 'animate') initAnimation(el);
+    if (type === 'typed-text') {
+      const controller = initTypedText(el);
+      disposers.add(() => controller.destroy());
+    }
     if (type === 'chart') initChart(el);
     if (type === 'dashboard') initDashboard(el);
     if (type === 'desktop-shell') disposers.add(initDesktopShell(el));

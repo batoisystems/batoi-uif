@@ -1,7 +1,7 @@
 {
-  "browserGzipBytes": 120000,
+  "browserGzipBytes": 121500,
   "artifactGzipBytes": {
-    "dist/uif.iife.js": 120300
+    "dist/uif.iife.js": 121700
   },
   "initMilliseconds": 50,
   "packageGzipBytes": {

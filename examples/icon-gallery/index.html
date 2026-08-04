@@ -36,7 +36,7 @@
       .icon-count {
         color: #667085;
         font-size: 0.86rem;
-        font-weight: 700;
+        font-weight: 600;
       }
 
       .icon-grid {
@@ -68,7 +68,7 @@
         background: #f4f9fd;
         color: #0b72bd;
         font-size: 0.72rem;
-        font-weight: 750;
+        font-weight: 600;
       }
 
       .icon-tags {
@@ -89,7 +89,7 @@
         background: #f8fafc;
         color: #667085;
         font-size: 0.68rem;
-        font-weight: 700;
+        font-weight: 600;
         line-height: 1.1;
       }
 
@@ -123,7 +123,7 @@
         margin: 0;
         color: #20252d;
         font-size: 0.98rem;
-        font-weight: 750;
+        font-weight: 600;
         line-height: 1.2;
       }
 
@@ -160,7 +160,7 @@
         color: #4b5563;
         font: inherit;
         font-size: 0.76rem;
-        font-weight: 750;
+        font-weight: 600;
         cursor: pointer;
       }
 
@@ -277,6 +277,10 @@
         return `import { icon } from 'batoi-uif';\nconst svg = icon('${name}', { title: '${titleFor(name)}' });`;
       }
 
+      function cssFor(name) {
+        return `[data-uif-icon="${name}"] .uif-icon {\n  inline-size: 1.5rem;\n  block-size: 1.5rem;\n  color: currentColor;\n}`;
+      }
+
       function chipsFor(metadata) {
         if (!metadata) return '';
         const aliases = metadata.aliases.slice(0, 2).map((alias) => `<span class="icon-tag is-alias">${escapeHtml(alias)}</span>`);
@@ -303,19 +307,22 @@
         grid.innerHTML = visible.map((name) => {
           const declarative = markupFor(name);
           const js = scriptFor(name);
+          const css = cssFor(name);
           const svg = icon(name, { title: titleFor(name) });
           const metadata = getIconMetadata(name);
           return `
             <article class="icon-card" data-icon-name="${escapeHtml(name)}">
-              <div class="icon-preview ${name === 'batoi' ? 'is-brand' : ''}" aria-hidden="true">${svg}</div>
+              <div class="icon-preview ${metadata?.category === 'brand' ? 'is-brand' : ''}" aria-hidden="true">${svg}</div>
               <h2>${escapeHtml(name)}</h2>
               <span class="icon-category">${escapeHtml(metadata?.category ?? 'uncategorized')}</span>
               <div class="icon-tags">${chipsFor(metadata)}</div>
               <pre class="icon-code"><code>${escapeHtml(declarative)}</code></pre>
+              <pre class="icon-code"><code>${escapeHtml(css)}</code></pre>
               <div class="icon-actions">
                 <button class="icon-copy" type="button" data-copy="${escapeHtml(name)}"><span data-uif-icon="copy"></span>Name</button>
                 <button class="icon-copy" type="button" data-copy="${escapeHtml(declarative)}"><span data-uif-icon="copy"></span>Markup</button>
                 <button class="icon-copy" type="button" data-copy="${escapeHtml(js)}"><span data-uif-icon="copy"></span>JS</button>
+                <button class="icon-copy" type="button" data-copy="${escapeHtml(css)}"><span data-uif-icon="copy"></span>CSS</button>
                 <button class="icon-copy" type="button" data-copy="${escapeHtml(svg)}"><span data-uif-icon="copy"></span>SVG</button>
               </div>
             </article>

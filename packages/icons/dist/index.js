@@ -1,6 +1,6 @@
 import {
   iconSets
-} from "./chunk-5LY33RJY.js";
+} from "./chunk-YNUNLNWN.js";
 import {
   deviceIcons
 } from "./chunk-5HU5KHID.js";
@@ -15,7 +15,7 @@ import {
 } from "./chunk-5GJBKAVV.js";
 import {
   brandIcons
-} from "./chunk-44AFBWBG.js";
+} from "./chunk-AGK62RJ7.js";
 import {
   chartIcons
 } from "./chunk-HAXDAJZR.js";
@@ -66,6 +66,8 @@ var curatedAliases = {
   "area-chart": ["area graph"],
   "bar-chart": ["bar graph"],
   batoi: ["batoi logo"],
+  facebook: ["facebook logo", "social media"],
+  github: ["github logo", "source code"],
   cart: ["shopping cart"],
   cash: ["money"],
   chart: ["trend", "analytics"],
@@ -82,6 +84,8 @@ var curatedAliases = {
   help: ["question"],
   home: ["house"],
   info: ["information"],
+  instagram: ["instagram logo", "social media"],
+  linkedin: ["linkedin logo", "social media"],
   list: ["bullets"],
   location: ["pin", "marker"],
   mail: ["email"],
@@ -96,7 +100,9 @@ var curatedAliases = {
   uif: ["batoi uif logo"],
   user: ["person", "account"],
   users: ["team", "people"],
-  warning: ["alert"]
+  warning: ["alert"],
+  "x-twitter": ["twitter", "x logo", "social media"],
+  youtube: ["youtube logo", "video"]
 };
 function categoryFor(name) {
   for (const [category, registry] of Object.entries(iconSets)) {

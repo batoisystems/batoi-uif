@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-net",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,7 +18,7 @@
     "build": "tsup src/index.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-core": "2.1.2"
+    "@batoi/uif-core": "2.2.0"
   },
   "license": "Apache-2.0"
 }

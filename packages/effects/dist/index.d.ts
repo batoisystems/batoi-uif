@@ -39,6 +39,19 @@ interface AnimationController {
 }
 declare function initAnimation(el: HTMLElement): AnimationController;
 declare function initAnimationTriggers(root?: ParentNode): () => void;
+interface TypedTextOptions {
+    strings?: string[];
+    typeSpeed?: number;
+    deleteSpeed?: number;
+    pause?: number;
+    startDelay?: number;
+    loop?: boolean;
+}
+interface TypedTextController {
+    refresh(): void;
+    destroy(): void;
+}
+declare function initTypedText(el: HTMLElement, options?: TypedTextOptions): TypedTextController;
 declare function observeMotion(root?: HTMLElement): void;
 
-export { type AnimationController, type AnimationPreset, type AnimationStep, type EffectOptions, animate, animateGroup, animationPresets, cancelAnimation, collapse, expand, hide, initAnimation, initAnimationTriggers, observeMotion, sequence, show, stagger, timeline, toggle, transition };
+export { type AnimationController, type AnimationPreset, type AnimationStep, type EffectOptions, type TypedTextController, type TypedTextOptions, animate, animateGroup, animationPresets, cancelAnimation, collapse, expand, hide, initAnimation, initAnimationTriggers, initTypedText, observeMotion, sequence, show, stagger, timeline, toggle, transition };

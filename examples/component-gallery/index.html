@@ -60,7 +60,7 @@
           </div>
           <div class="component-hero-panel" aria-label="Gallery summary">
             <div>
-              <strong>34</strong>
+              <strong id="component-count">0</strong>
               <span>Patterns</span>
             </div>
             <div>
@@ -285,14 +285,14 @@
 &lt;aside id="mobile-nav" class="uif-offcanvas uif-offcanvas-left" data-uif="offcanvas" hidden&gt;...&lt;/aside&gt;</code></pre>
               </article>
 
-              <article class="uif-card component-card">
+              <article id="multi-image-slider" class="uif-card component-card">
                 <div class="component-card-head">
                   <div>
                     <div class="example-eyebrow">Media</div>
-                    <h2>Carousel Slider</h2>
+                    <h2>Multi-image Slider</h2>
                     <p>
                       Keyboard-friendly previous/next controls, indicators, live status text, and
-                      responsive media slides.
+                      responsive image slides.
                     </p>
                   </div>
                   <button class="component-copy" type="button" data-copy-component>Copy</button>
@@ -310,43 +310,25 @@
                         data-uif-role="slide"
                         data-uif-state="active"
                       >
-                        <div
-                          class="uif-p-6"
-                          style="
-                            min-height: 16rem;
-                            background: linear-gradient(135deg, #2563eb, #7c3aed);
-                            color: white;
-                          "
-                        >
-                          <h3>Launch dashboard</h3>
-                          <p>Track adoption, revenue, and health in one responsive slide.</p>
-                        </div>
+                        <img
+                          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 675'%3E%3Crect width='1200' height='675' fill='%23e8f3fb'/%3E%3Crect x='72' y='64' width='1056' height='547' rx='20' fill='white' stroke='%23b7d7ec' stroke-width='4'/%3E%3Crect x='112' y='112' width='300' height='42' rx='8' fill='%230b72bd'/%3E%3Crect x='112' y='194' width='288' height='330' rx='14' fill='%23edf7f4'/%3E%3Crect x='440' y='194' width='648' height='142' rx='14' fill='%23f3f6f8'/%3E%3Crect x='440' y='370' width='310' height='154' rx='14' fill='%23e7faf6'/%3E%3Crect x='778' y='370' width='310' height='154' rx='14' fill='%23fff4e5'/%3E%3Ctext x='112' y='580' font-family='Arial' font-size='32' fill='%23344054'%3ELaunch dashboard%3C/text%3E%3C/svg%3E"
+                          alt="Responsive launch dashboard with navigation and metric panels"
+                        />
+                        <div class="uif-carousel-caption"><strong>Launch dashboard</strong><br />Track adoption, revenue, and health.</div>
                       </article>
                       <article class="uif-carousel-slide" data-uif-role="slide">
-                        <div
-                          class="uif-p-6"
-                          style="
-                            min-height: 16rem;
-                            background: linear-gradient(135deg, #059669, #0ea5e9);
-                            color: white;
-                          "
-                        >
-                          <h3>Field console</h3>
-                          <p>Bring mobile-first workflows into the same UIF component contract.</p>
-                        </div>
+                        <img
+                          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 675'%3E%3Crect width='1200' height='675' fill='%23e7faf6'/%3E%3Crect x='430' y='36' width='340' height='603' rx='44' fill='%2320252d'/%3E%3Crect x='450' y='70' width='300' height='530' rx='24' fill='white'/%3E%3Crect x='476' y='108' width='248' height='62' rx='12' fill='%2300a98f'/%3E%3Crect x='476' y='196' width='248' height='128' rx='12' fill='%23f3f6f8'/%3E%3Crect x='476' y='344' width='248' height='128' rx='12' fill='%23e8f3fb'/%3E%3Ccircle cx='520' cy='538' r='20' fill='%230b72bd'/%3E%3Crect x='558' y='522' width='136' height='32' rx='8' fill='%23d7dde3'/%3E%3Ctext x='72' y='594' font-family='Arial' font-size='32' fill='%23344054'%3EField console%3C/text%3E%3C/svg%3E"
+                          alt="Mobile field console showing compact workflow panels"
+                        />
+                        <div class="uif-carousel-caption"><strong>Field console</strong><br />Mobile-first workflows using the same contract.</div>
                       </article>
                       <article class="uif-carousel-slide" data-uif-role="slide">
-                        <div
-                          class="uif-p-6"
-                          style="
-                            min-height: 16rem;
-                            background: linear-gradient(135deg, #f97316, #be123c);
-                            color: white;
-                          "
-                        >
-                          <h3>Governed actions</h3>
-                          <p>Pair approvals, audit context, and next-best actions.</p>
-                        </div>
+                        <img
+                          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 675'%3E%3Crect width='1200' height='675' fill='%23fff4e5'/%3E%3Crect x='130' y='70' width='940' height='535' rx='18' fill='white' stroke='%23f3c98b' stroke-width='4'/%3E%3Ccircle cx='210' cy='154' r='34' fill='%23e24a3b'/%3E%3Crect x='270' y='128' width='370' height='26' rx='8' fill='%23344054'/%3E%3Crect x='270' y='170' width='620' height='18' rx='7' fill='%23d7dde3'/%3E%3Crect x='180' y='238' width='840' height='154' rx='14' fill='%23f8fafc'/%3E%3Crect x='180' y='430' width='190' height='58' rx='10' fill='%2300a98f'/%3E%3Crect x='394' y='430' width='190' height='58' rx='10' fill='white' stroke='%23d7dde3' stroke-width='3'/%3E%3Ctext x='180' y='554' font-family='Arial' font-size='32' fill='%23344054'%3EGoverned actions%3C/text%3E%3C/svg%3E"
+                          alt="Governed action approval with context and decision controls"
+                        />
+                        <div class="uif-carousel-caption"><strong>Governed actions</strong><br />Approvals, audit context, and next steps.</div>
                       </article>
                     </div>
                     <div class="uif-carousel-controls">
@@ -383,6 +365,65 @@
   &lt;button data-uif-action="next"&gt;Next&lt;/button&gt;
   &lt;button data-uif-slide-to="0"&gt;&lt;/button&gt;
 &lt;/section&gt;</code></pre>
+              </article>
+
+              <article id="typed-text" class="uif-card component-card">
+                <div class="component-card-head">
+                  <div>
+                    <div class="example-eyebrow">Content</div>
+                    <h2>Typed Text</h2>
+                    <p>Dependency-free rotating text with lifecycle cleanup and reduced-motion support.</p>
+                  </div>
+                  <button class="component-copy" type="button" data-copy-component>Copy</button>
+                </div>
+                <div class="component-demo">
+                  <p class="uif-typed-text-example">
+                    Build interfaces that are
+                    <strong
+                      data-uif="typed-text"
+                      data-uif-strings='["server-rendered.","mobile-ready.","secure by design."]'
+                      data-uif-type-speed="55"
+                      data-uif-delete-speed="30"
+                      data-uif-pause="1200"
+                    >server-rendered.</strong>
+                  </p>
+                </div>
+                <pre><code>Typed text example</code></pre>
+              </article>
+
+              <article id="testimonial-slider" class="uif-card component-card">
+                <div class="component-card-head">
+                  <div>
+                    <div class="example-eyebrow">Social proof</div>
+                    <h2>Testimonial Image Slider</h2>
+                    <p>Portrait-led testimonials using the same keyboard-accessible carousel contract.</p>
+                  </div>
+                  <button class="component-copy" type="button" data-copy-component>Copy</button>
+                </div>
+                <div class="component-demo">
+                  <section class="uif-carousel uif-testimonial-carousel" data-uif="carousel" aria-label="Customer testimonials" tabindex="0">
+                    <div class="uif-carousel-viewport">
+                      <figure class="uif-carousel-slide uif-testimonial-slide" data-uif-role="slide" data-uif-state="active">
+                        <img class="uif-testimonial-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect width='160' height='160' rx='80' fill='%23d8e9f7'/%3E%3Ccircle cx='80' cy='62' r='30' fill='%230b72bd'/%3E%3Cpath d='M30 154c5-39 25-58 50-58s45 19 50 58' fill='%2300a98f'/%3E%3C/svg%3E" alt="Portrait illustration of Maya Chen" />
+                        <figcaption><blockquote>“UIF gave our server-rendered product a consistent interaction model without adding a client framework.”</blockquote><strong>Maya Chen</strong><span>VP Product, Northstar</span></figcaption>
+                      </figure>
+                      <figure class="uif-carousel-slide uif-testimonial-slide" data-uif-role="slide">
+                        <img class="uif-testimonial-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect width='160' height='160' rx='80' fill='%23e7faf6'/%3E%3Ccircle cx='80' cy='62' r='30' fill='%23008772'/%3E%3Cpath d='M30 154c5-39 25-58 50-58s45 19 50 58' fill='%23f59e0b'/%3E%3C/svg%3E" alt="Portrait illustration of Arjun Mehta" />
+                        <figcaption><blockquote>“The declarative components let our team ship accessible workflows across desktop and mobile.”</blockquote><strong>Arjun Mehta</strong><span>Engineering Director, Meridian</span></figcaption>
+                      </figure>
+                    </div>
+                    <div class="uif-carousel-controls">
+                      <button class="uif-btn uif-btn-secondary" type="button" data-uif-action="previous">Previous</button>
+                      <span class="uif-text-sm uif-text-muted" data-uif-role="status" aria-live="polite"></span>
+                      <button class="uif-btn uif-btn-secondary" type="button" data-uif-action="next">Next</button>
+                    </div>
+                    <div class="uif-carousel-indicators" aria-label="Choose testimonial">
+                      <button type="button" data-uif-slide-to="0" aria-label="Testimonial 1"></button>
+                      <button type="button" data-uif-slide-to="1" aria-label="Testimonial 2"></button>
+                    </div>
+                  </section>
+                </div>
+                <pre><code>Testimonial slider example</code></pre>
               </article>
 
               <article class="uif-card component-card">
@@ -1964,6 +2005,17 @@
         }, 1200);
       }
 
+      function syncCompleteExamples() {
+        const cards = [...document.querySelectorAll('.component-card')];
+        cards.forEach((card) => {
+          const demo = card.querySelector('.component-demo');
+          const code = card.querySelector('pre code');
+          if (demo && code) code.textContent = demo.innerHTML.trim();
+        });
+        const count = document.querySelector('#component-count');
+        if (count) count.textContent = String(cards.length);
+      }
+
       function syncCategoryNav() {
         const links = [...document.querySelectorAll('.component-category-nav a[href^="#"]')];
         const sections = links
@@ -1993,6 +2045,7 @@
         });
       }
 
+      syncCompleteExamples();
       autoStart();
       syncCategoryNav();
 

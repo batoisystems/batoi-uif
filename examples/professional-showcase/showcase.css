@@ -1,27 +1,27 @@
 .showcase-shell {
-  --showcase-blue: #0b72bd;
+  --showcase-blue: var(--uif-color-primary);
   --showcase-cyan: #087ea4;
   --showcase-green: #148849;
   --showcase-amber: #b76100;
   --showcase-red: #c92a2a;
-  --showcase-line: #e2e5e9;
-  --showcase-muted: #667085;
-  --showcase-panel: #fff;
-  --showcase-soft: #f7f7f8;
-  --showcase-ink: #182033;
-  background: #f4f4f5;
+  --showcase-line: var(--uif-border);
+  --showcase-muted: var(--uif-text-muted);
+  --showcase-panel: var(--uif-surface-elevated);
+  --showcase-soft: var(--uif-surface);
+  --showcase-ink: var(--uif-text-strong);
+  background: var(--uif-bg);
   color: var(--showcase-ink);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--uif-font-sans);
   letter-spacing: 0;
   font-size: 16px;
-  line-height: 1.35;
+  line-height: var(--uif-leading-body);
 }
 
 body {
   margin: 0;
-  background: #f4f4f5;
-  color: #182033;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--uif-bg);
+  color: var(--uif-text);
+  font-family: var(--uif-font-sans);
   letter-spacing: 0;
 }
 
@@ -34,12 +34,12 @@ body {
 .showcase-shell input,
 .showcase-shell select,
 .showcase-shell textarea {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--uif-font-sans);
   letter-spacing: 0;
 }
 
 .showcase-shell strong {
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .showcase-shell p {
@@ -56,7 +56,7 @@ body {
 }
 
 .showcase-content {
-  background: #f4f4f5;
+  background: var(--uif-bg);
 }
 
 .showcase-topbar {
@@ -115,14 +115,14 @@ body {
   color: var(--showcase-blue);
   background: #e5f0fa;
   border-color: #e5f0fa;
-  font-weight: 650;
+  font-weight: 500;
 }
 
 .showcase-shell .uif-badge {
   border: 1px solid transparent;
   border-radius: 999px;
   padding: 0.16rem 0.5rem;
-  font-weight: 750;
+  font-weight: 600;
   line-height: 1.1;
 }
 
@@ -154,7 +154,7 @@ body {
 .showcase-shell .uif-avatar {
   background: var(--showcase-blue);
   color: #fff;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .showcase-shell .uif-sidebar-footer {
@@ -226,7 +226,7 @@ body {
   color: var(--showcase-ink);
   font-size: 1.25rem;
   line-height: 1.05;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .showcase-topbar-title p {
@@ -414,7 +414,7 @@ body {
   border: 1px solid transparent;
   border-radius: 0.5rem;
   font-size: 0.8125rem;
-  font-weight: 650;
+  font-weight: 500;
   line-height: 1.2;
   white-space: nowrap;
   box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
@@ -499,7 +499,7 @@ body {
 .showcase-command-head .uif-page-title h2 {
   font-size: 1.55rem;
   line-height: 1.2;
-  font-weight: 650;
+  font-weight: 500;
 }
 
 .showcase-command-head .uif-page-title p {
@@ -512,7 +512,7 @@ body {
 .showcase-eyebrow {
   color: var(--showcase-muted);
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -534,7 +534,7 @@ body {
 
 .showcase-kpi .uif-stat-meta {
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.15;
 }
 
@@ -561,7 +561,7 @@ body {
   background: color-mix(in srgb, var(--showcase-series), white 86%);
   color: color-mix(in srgb, var(--showcase-series), black 8%);
   font-size: 0.65rem;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.15;
 }
 
@@ -613,7 +613,7 @@ body {
 .showcase-shell .uif-card-head h2 {
   font-size: 0.98rem;
   line-height: 1.2;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .showcase-shell .uif-card-head p {
@@ -680,7 +680,7 @@ body {
   box-shadow: none;
   color: var(--showcase-muted);
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 600;
   gap: 0.35rem;
   padding: 0.35rem 0.15rem;
 }
@@ -722,7 +722,7 @@ body {
   gap: 0.22rem;
   color: var(--showcase-blue);
   font-size: 0.82rem;
-  font-weight: 750;
+  font-weight: 600;
   line-height: 1;
   text-decoration: none;
   white-space: nowrap;
@@ -847,7 +847,7 @@ body {
   background: transparent;
   color: var(--showcase-muted);
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 600;
   box-shadow: none;
 }
 
@@ -1220,7 +1220,7 @@ body {
 .showcase-shell .uif-field-label {
   color: #565e69;
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .showcase-shell .uif-field-label em {
@@ -1329,7 +1329,7 @@ body {
 .showcase-phone-hero h2 {
   font-size: 1.18rem;
   line-height: 1.12;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .showcase-phone-title p,
@@ -1388,7 +1388,7 @@ body {
 .showcase-phone-actions .uif-btn {
   min-height: 2.38rem;
   font-size: 0.84rem;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .showcase-phone-actions .uif-btn-secondary:first-child {
@@ -1415,7 +1415,7 @@ body {
 .showcase-phone-job strong {
   font-size: 0.8rem;
   line-height: 1.08;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .showcase-phone-job > div:nth-child(2) {
@@ -1476,7 +1476,7 @@ body {
 
 .showcase-bottom-nav a[aria-current="page"] {
   color: var(--showcase-blue);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .showcase-job-banner {
@@ -1627,7 +1627,7 @@ body {
 .showcase-sync-ring span {
   color: var(--showcase-ink);
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1;
 }
 
