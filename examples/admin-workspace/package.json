@@ -2,5 +2,5 @@
   "name": "@batoi/uif-example-admin-workspace",
   "private": true,
   "type": "module",
-  "version": "3.0.0-beta.1"
+  "version": "3.0.0"
 }

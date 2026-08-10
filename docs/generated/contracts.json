@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "frameworkVersion": "3.0.0-beta.1",
+  "frameworkVersion": "3.0.0",
   "contractVersion": 3,
   "profiles": {
     "all": {

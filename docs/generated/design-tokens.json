@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "frameworkVersion": "3.0.0-beta.1",
+  "frameworkVersion": "3.0.0",
   "tokenContractVersion": 3,
   "modes": [
     "compact",

@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-router",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,8 +18,8 @@
     "build": "tsup src/index.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-dom": "3.0.0-beta.1",
-    "@batoi/uif-net": "3.0.0-beta.1"
+    "@batoi/uif-dom": "3.0.0",
+    "@batoi/uif-net": "3.0.0"
   },
   "license": "Apache-2.0"
 }

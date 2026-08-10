@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.0
+
+- Released the consolidated Batoi Unified Interface Framework v3 contract for general availability after the complete alpha and beta release matrices passed locally and in GitHub Actions.
+- Standardized framework lifecycle, declarative contracts, configuration, diagnostics, security policy, localization, accessibility, responsive shells, component families, Micro Apps, PWA behavior, and RAD integration.
+- Added provider-neutral, browser-side AI and MCP interaction surfaces with governed same-origin transports, explicit approval, replay protection, progress, receipt, and audit contracts while preserving server-side authority.
+- Published generated API, contract, design-token, compatibility, migration, accessibility, security, SBOM, provenance, and artifact-integrity references with self-contained package-install and cross-browser release gates.
+
 ## 3.0.0-beta.1
 
 - Promoted the complete v3 contract and compatibility surface to beta after the alpha.4 build, release, security, packaging, and 68-journey browser gates passed locally and in GitHub Actions.

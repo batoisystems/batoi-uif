@@ -1,21 +1,21 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:b935f91f-0000-4000-8000-59c9b6708a43",
+  "serialNumber": "urn:uuid:7656f08f-0000-4000-8000-c9163ff21f1f",
   "version": 1,
   "metadata": {
     "component": {
       "type": "framework",
       "name": "batoi-uif",
-      "version": "3.0.0-beta.1"
+      "version": "3.0.0"
     }
   },
   "components": [
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-actions@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-actions@3.0.0",
       "name": "@batoi/uif-actions",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -32,9 +32,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-ai@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-ai@3.0.0",
       "name": "@batoi/uif-ai",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -51,9 +51,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-charts@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-charts@3.0.0",
       "name": "@batoi/uif-charts",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -70,9 +70,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-components@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-components@3.0.0",
       "name": "@batoi/uif-components",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -89,9 +89,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-core@3.0.0",
       "name": "@batoi/uif-core",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -108,9 +108,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-css@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-css@3.0.0",
       "name": "@batoi/uif-css",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -127,9 +127,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-dashboard@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-dashboard@3.0.0",
       "name": "@batoi/uif-dashboard",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -146,9 +146,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-desktop@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-desktop@3.0.0",
       "name": "@batoi/uif-desktop",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -165,9 +165,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
       "name": "@batoi/uif-dom",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -184,9 +184,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-editor@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-editor@3.0.0",
       "name": "@batoi/uif-editor",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -203,9 +203,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-effects@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-effects@3.0.0",
       "name": "@batoi/uif-effects",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -222,9 +222,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-extension-kit@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-extension-kit@3.0.0",
       "name": "@batoi/uif-extension-kit",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -241,9 +241,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-forms@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-forms@3.0.0",
       "name": "@batoi/uif-forms",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -260,9 +260,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-icons@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-icons@3.0.0",
       "name": "@batoi/uif-icons",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -279,9 +279,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-mcp@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-mcp@3.0.0",
       "name": "@batoi/uif-mcp",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -298,9 +298,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-mobile@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-mobile@3.0.0",
       "name": "@batoi/uif-mobile",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -317,9 +317,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-net@3.0.0",
       "name": "@batoi/uif-net",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -336,9 +336,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-overlays@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-overlays@3.0.0",
       "name": "@batoi/uif-overlays",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -355,9 +355,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-profiles@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-profiles@3.0.0",
       "name": "@batoi/uif-profiles",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -374,9 +374,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-push@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-push@3.0.0",
       "name": "@batoi/uif-push",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -393,9 +393,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-pwa@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-pwa@3.0.0",
       "name": "@batoi/uif-pwa",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -412,9 +412,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-query@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-query@3.0.0",
       "name": "@batoi/uif-query",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -431,9 +431,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-rad-adapter@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-rad-adapter@3.0.0",
       "name": "@batoi/uif-rad-adapter",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -450,9 +450,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-realtime@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-realtime@3.0.0",
       "name": "@batoi/uif-realtime",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -469,9 +469,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-router@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-router@3.0.0",
       "name": "@batoi/uif-router",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -488,9 +488,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-state@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-state@3.0.0",
       "name": "@batoi/uif-state",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -507,9 +507,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-table@3.0.0-beta.1",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-table@3.0.0",
       "name": "@batoi/uif-table",
-      "version": "3.0.0-beta.1",
+      "version": "3.0.0",
       "licenses": [
         {
           "license": {
@@ -527,204 +527,204 @@
   ],
   "dependencies": [
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-actions@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-actions@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-effects@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-effects@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-ai@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-ai@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-net@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-charts@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-charts@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-net@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-components@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-components@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-effects@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-overlays@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-effects@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-overlays@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-core@3.0.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-css@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-css@3.0.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-dashboard@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-dashboard@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-charts@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-charts@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-desktop@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-desktop@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-editor@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-editor@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-net@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-effects@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-effects@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-extension-kit@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-extension-kit@3.0.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-forms@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-forms@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-net@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-icons@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-icons@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-mcp@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-mcp@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-net@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-mobile@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-mobile@3.0.0",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-net@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-overlays@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-overlays@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-effects@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-effects@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-profiles@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-profiles@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-actions@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-ai@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-charts@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-components@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-dashboard@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-desktop@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-editor@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-effects@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-extension-kit@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-forms@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-icons@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-mcp@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-mobile@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-overlays@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-push@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-pwa@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-query@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-rad-adapter@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-realtime@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-router@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-state@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-table@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-actions@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-ai@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-charts@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-components@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-dashboard@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-desktop@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-editor@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-effects@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-extension-kit@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-forms@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-icons@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-mcp@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-mobile@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-net@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-overlays@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-push@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-pwa@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-query@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-rad-adapter@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-realtime@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-router@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-state@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-table@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-push@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-push@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-components@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-pwa@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-components@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-net@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-pwa@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-pwa@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-pwa@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-query@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-query@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-rad-adapter@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-rad-adapter@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-net@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-realtime@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-realtime@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-net@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-router@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-router@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-net@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-state@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-state@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-core@3.0.0"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-table@3.0.0-beta.1",
+      "ref": "pkg:npm/%40batoi%2Fuif-table@3.0.0",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-dom@3.0.0-beta.1",
-        "pkg:npm/%40batoi%2Fuif-net@3.0.0-beta.1"
+        "pkg:npm/%40batoi%2Fuif-dom@3.0.0",
+        "pkg:npm/%40batoi%2Fuif-net@3.0.0"
       ]
     }
   ]
