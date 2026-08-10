@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.0-alpha.4
+
+- Added production-shaped browser journeys for Micro App persistence and undo, principal-owned PWA retries and flushing, and one-shot governed tool decisions through a same-origin gateway.
+- Expanded the cross-browser matrix from 56 to 68 passing journeys across Chromium, Firefox, WebKit, and mobile Chromium.
+- Added a dedicated GitHub Actions browser job that installs the pinned Playwright browsers, runs deterministically with one CI worker, and retains failure traces.
+
 ## 3.0.0-alpha.3
 
 - Updated GitHub Actions to the Node 24 runtime with `actions/checkout@v6` and `actions/setup-node@v6`.

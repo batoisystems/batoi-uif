@@ -1,7 +1,7 @@
 {
   "name": "batoi-uif",
   "private": true,
-  "version": "3.0.0-alpha.3",
+  "version": "3.0.0-alpha.4",
   "description": "Batoi UIF — Unified Interface Framework",
   "license": "Apache-2.0",
   "packageManager": "npm@10.0.0",

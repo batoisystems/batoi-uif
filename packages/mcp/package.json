@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-mcp",
-  "version": "3.0.0-alpha.3",
+  "version": "3.0.0-alpha.4",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,9 +18,9 @@
     "build": "tsup src/index.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-core": "3.0.0-alpha.3",
-    "@batoi/uif-dom": "3.0.0-alpha.3",
-    "@batoi/uif-net": "3.0.0-alpha.3"
+    "@batoi/uif-core": "3.0.0-alpha.4",
+    "@batoi/uif-dom": "3.0.0-alpha.4",
+    "@batoi/uif-net": "3.0.0-alpha.4"
   },
   "license": "Apache-2.0"
 }
