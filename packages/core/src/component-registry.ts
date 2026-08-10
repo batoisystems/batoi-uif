@@ -25,12 +25,18 @@ export interface UIFComponentDefinition<
 > {
   name: string;
   version?: number;
+  package?: string;
   defaults?: Readonly<Partial<Options>>;
   optionKeys?: readonly (keyof Options & string)[];
+  attributes?: readonly string[];
   roles?: readonly string[];
   actions?: readonly string[];
   events?: readonly string[];
   states?: readonly string[];
+  errors?: readonly string[];
+  semanticFallback?: string;
+  accessibility?: readonly string[];
+  security?: readonly string[];
   limits?: UIFResourceLimits;
   mount(context: UIFMountContext<Options>): Controller | (() => void) | void;
 }

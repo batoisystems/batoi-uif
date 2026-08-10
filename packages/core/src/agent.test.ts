@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { parseAgentEnvelope, validateAgentEnvelope } from './agent.js';
+import { agentEnvelopeContract, parseAgentEnvelope, validateAgentEnvelope } from './agent.js';
 
 describe('agent interaction envelope', () => {
+  it('publishes a provider-neutral presentation-only contract', () => {
+    expect(agentEnvelopeContract).toMatchObject({ version: 3, authority: 'presentation-only', privilegedExecution: false });
+    expect(agentEnvelopeContract.kinds).toContain('tool-review');
+  });
   it('normalizes a provider-neutral message envelope', () => {
     const envelope = parseAgentEnvelope({
       version: 3,

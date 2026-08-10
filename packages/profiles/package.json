@@ -1,0 +1,72 @@
+{
+  "name": "@batoi/uif-profiles",
+  "version": "2.5.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./all": {
+      "types": "./dist/all.d.ts",
+      "import": "./dist/all.js"
+    },
+    "./rad": {
+      "types": "./dist/rad.d.ts",
+      "import": "./dist/rad.js"
+    },
+    "./dashboard": {
+      "types": "./dist/dashboard.d.ts",
+      "import": "./dist/dashboard.js"
+    },
+    "./mobile": {
+      "types": "./dist/mobile.d.ts",
+      "import": "./dist/mobile.js"
+    },
+    "./desktop": {
+      "types": "./dist/desktop.d.ts",
+      "import": "./dist/desktop.js"
+    },
+    "./agent": {
+      "types": "./dist/agent.d.ts",
+      "import": "./dist/agent.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts src/all.ts src/rad.ts src/dashboard.ts src/mobile.ts src/desktop.ts src/agent.ts --format esm --dts --clean"
+  },
+  "dependencies": {
+    "@batoi/uif-actions": "2.5.0",
+    "@batoi/uif-ai": "2.5.0",
+    "@batoi/uif-charts": "2.5.0",
+    "@batoi/uif-components": "2.5.0",
+    "@batoi/uif-core": "2.5.0",
+    "@batoi/uif-dashboard": "2.5.0",
+    "@batoi/uif-desktop": "2.5.0",
+    "@batoi/uif-dom": "2.5.0",
+    "@batoi/uif-editor": "2.5.0",
+    "@batoi/uif-effects": "2.5.0",
+    "@batoi/uif-extension-kit": "2.5.0",
+    "@batoi/uif-forms": "2.5.0",
+    "@batoi/uif-icons": "2.5.0",
+    "@batoi/uif-mcp": "2.5.0",
+    "@batoi/uif-mobile": "2.5.0",
+    "@batoi/uif-net": "2.5.0",
+    "@batoi/uif-overlays": "2.5.0",
+    "@batoi/uif-push": "2.5.0",
+    "@batoi/uif-pwa": "2.5.0",
+    "@batoi/uif-query": "2.5.0",
+    "@batoi/uif-rad-adapter": "2.5.0",
+    "@batoi/uif-realtime": "2.5.0",
+    "@batoi/uif-router": "2.5.0",
+    "@batoi/uif-state": "2.5.0",
+    "@batoi/uif-table": "2.5.0"
+  },
+  "license": "Apache-2.0"
+}

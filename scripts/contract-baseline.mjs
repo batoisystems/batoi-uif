@@ -82,22 +82,21 @@ export async function collectContractBaseline(root) {
         definition.name,
         {
           version: definition.version ?? 3,
+          package: definition.package,
+          attributes: sorted(definition.attributes ?? []),
           roles: sorted(definition.roles ?? []),
           actions: sorted(definition.actions ?? []),
           events: sorted(definition.events ?? []),
           states: sorted(definition.states ?? []),
+          errors: sorted(definition.errors ?? []),
+          semanticFallback: definition.semanticFallback,
           optionKeys: sorted(definition.optionKeys ?? []),
         },
       ]),
     ),
     envelopes: {
-      rad: {
-        versions: [1, 2],
-        fields: ['actions', 'errors', 'events', 'focus', 'html', 'message', 'ok', 'redirect', 'swap', 'target', 'version'],
-        actions: ['focus', 'redirect', 'toast'],
-        swapModes: ['after', 'append', 'before', 'inner', 'outer', 'prepend'],
-        limits: { htmlCharacters: 1_000_000, collectionItems: 100, messageCharacters: 10_000 },
-      },
+      agent: uif.agentEnvelopeContract,
+      rad: uif.radEnvelopeContract,
     },
     artifacts: Object.keys(JSON.parse(readFileSync(new URL('dist/integrity.json', root), 'utf8')).files ?? {}).sort(),
   };

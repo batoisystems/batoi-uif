@@ -12,6 +12,8 @@ import {
 } from './packages/components/src/index.js';
 import {
   createComponentRegistry,
+  createHydrationLifecycle,
+  getUIFComponentContract,
   type UIFComponentDefinition,
   type UIFController,
 } from './packages/core/src/index.js';
@@ -30,7 +32,8 @@ import { initInstallPrompt } from './packages/pwa/src/index.js';
 import { initPush } from './packages/push/src/index.js';
 import { bindRadActions } from './packages/rad-adapter/src/index.js';
 import { initRealtime } from './packages/realtime/src/index.js';
-import { initDeclarativeFilters, initTable } from './packages/table/src/index.js';
+import { initRouter } from './packages/router/src/index.js';
+import { bindDeclarativeFilters, initTable } from './packages/table/src/index.js';
 
 export * from './packages/core/src/index.js';
 export * from './packages/actions/src/index.js';
@@ -73,7 +76,8 @@ const apps = new WeakMap<Document | HTMLElement, BatoiUIFApp>();
 export const runtimeRegistry = createComponentRegistry();
 
 export function registerRuntimeComponent(definition: UIFComponentDefinition): () => void {
-  return runtimeRegistry.register(definition);
+  const contract = getUIFComponentContract(definition.name);
+  return runtimeRegistry.register(contract ? { ...contract, ...definition, version: 3 } : definition);
 }
 
 function controllerOrEmpty(controller: UIFController | null): UIFController {
@@ -154,16 +158,14 @@ registerRuntimeComponent({ name: 'ai-composer', mount: ({ element }) => renderAg
 registerRuntimeComponent({ name: 'tool-approval', mount: ({ element }) => renderToolApproval(element) });
 registerRuntimeComponent({ name: 'agent-tool', mount: ({ element }) => initAgentToolEnvelope(element) });
 registerRuntimeComponent({ name: 'install-prompt', mount: ({ element }) => initInstallPrompt(element) });
-
-function hydrate(root: Document | HTMLElement, disposers: Set<() => void>): void {
-  mountIcons(root);
-  disposers.add(bindActions(root));
-  disposers.add(bindComponentActions(root));
-  disposers.add(bindRadActions(root));
-  initDeclarativeFilters(root);
-  disposers.add(bindChartExports(root));
-  runtimeRegistry.refresh(root, 'rehydrate');
-}
+registerRuntimeComponent({ name: 'ajax', mount: () => undefined });
+registerRuntimeComponent({
+  name: 'route',
+  mount: ({ element }) => {
+    if (element instanceof HTMLAnchorElement && element.href === window.location.href) element.setAttribute('aria-current', 'page');
+    return () => element.removeAttribute('aria-current');
+  },
+});
 
 export function start(root: Document | HTMLElement = document): BatoiUIFApp {
   const existing = apps.get(root);
@@ -172,13 +174,22 @@ export function start(root: Document | HTMLElement = document): BatoiUIFApp {
     return existing;
   }
 
-  const disposers = new Set<() => void>();
+  const hydration = createHydrationLifecycle(root, [
+    { name: 'component-actions', scope: 'root', hydrate: bindComponentActions },
+    { name: 'rad-actions', scope: 'root', hydrate: bindRadActions },
+    { name: 'chart-exports', scope: 'root', hydrate: bindChartExports },
+    { name: 'router', scope: 'root', hydrate: initRouter },
+    { name: 'actions', scope: 'target', hydrate: bindActions },
+    { name: 'filters', scope: 'target', hydrate: bindDeclarativeFilters },
+    { name: 'icons', scope: 'refresh', hydrate: (target) => { mountIcons(target); } },
+    { name: 'components', scope: 'refresh', hydrate: (target) => runtimeRegistry.refresh(target, 'rehydrate') },
+  ]);
   const app: BatoiUIFApp = {
     root,
     destroyed: false,
     refresh(target: Document | HTMLElement = root) {
       if (app.destroyed) return;
-      hydrate(target, disposers);
+      hydration.refresh(target);
     },
     suspend(target: Document | HTMLElement = root) {
       if (!app.destroyed) runtimeRegistry.suspend(target);
@@ -189,8 +200,7 @@ export function start(root: Document | HTMLElement = document): BatoiUIFApp {
     destroy() {
       if (app.destroyed) return;
       runtimeRegistry.destroy(root);
-      disposers.forEach((dispose) => dispose());
-      disposers.clear();
+      hydration.destroy();
       app.destroyed = true;
       apps.delete(root);
     },

@@ -51,6 +51,7 @@ interface TableFilter {
 
 const tableControllers = new WeakMap<HTMLTableElement, TableController>();
 const initializedFilters = new WeakSet<HTMLInputElement | HTMLSelectElement>();
+const filterCleanups = new WeakMap<HTMLInputElement | HTMLSelectElement, () => void>();
 const tableRequestKeys = new WeakMap<HTMLTableElement, string>();
 let tableRequestSequence = 0;
 const DEFAULT_MAX_ROWS = 1_000;
@@ -396,16 +397,31 @@ export function filterElements(targetSelector: string, query: string, mode: 'con
   });
 }
 
-export function initDeclarativeFilters(root: Document | HTMLElement = document): void {
+export function bindDeclarativeFilters(root: Document | HTMLElement = document): () => void {
+  const cleanups: Array<() => void> = [];
   root.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-uif-filter-target]').forEach((filterInput) => {
     if (initializedFilters.has(filterInput)) return;
     initializedFilters.add(filterInput);
     const target = filterInput.dataset.uifFilterTarget;
     if (!target) return;
     const mode = (filterInput.dataset.uifFilterMode as 'contains' | 'startsWith' | 'token') || 'contains';
-    filterInput.addEventListener('input', () => filterElements(target, filterInput.value, mode));
-    filterInput.addEventListener('change', () => filterElements(target, filterInput.value, mode));
+    const apply = () => filterElements(target, filterInput.value, mode);
+    filterInput.addEventListener('input', apply);
+    filterInput.addEventListener('change', apply);
+    const cleanup = () => {
+      filterInput.removeEventListener('input', apply);
+      filterInput.removeEventListener('change', apply);
+      initializedFilters.delete(filterInput);
+      filterCleanups.delete(filterInput);
+    };
+    filterCleanups.set(filterInput, cleanup);
+    cleanups.push(cleanup);
   });
+  return () => cleanups.forEach((cleanup) => cleanup());
+}
+
+export function initDeclarativeFilters(root: Document | HTMLElement = document): void {
+  void bindDeclarativeFilters(root);
 }
 
 function updateSelectionState(table: HTMLTableElement): void {

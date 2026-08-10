@@ -127,33 +127,31 @@ export interface AgentEnvelopeResult {
   valid: boolean;
 }
 
-const kinds = new Set<AgentEnvelopeKind>([
-  'message',
-  'notice',
-  'stream-delta',
-  'stream-complete',
-  'tool-plan',
-  'tool-review',
-  'tool-progress',
-  'tool-result',
-  'receipt',
-  'error',
-]);
-const statuses = new Set<AgentEnvelopeStatus>([
-  'draft',
-  'pending',
-  'streaming',
-  'waiting-approval',
-  'approved',
-  'rejected',
-  'executing',
-  'completed',
-  'partial',
-  'failed',
-  'cancelled',
-  'expired',
-  'superseded',
-]);
+export const agentEnvelopeKinds = Object.freeze([
+  'message', 'notice', 'stream-delta', 'stream-complete', 'tool-plan', 'tool-review',
+  'tool-progress', 'tool-result', 'receipt', 'error',
+] satisfies AgentEnvelopeKind[]);
+
+export const agentEnvelopeStatuses = Object.freeze([
+  'draft', 'pending', 'streaming', 'waiting-approval', 'approved', 'rejected', 'executing',
+  'completed', 'partial', 'failed', 'cancelled', 'expired', 'superseded',
+] satisfies AgentEnvelopeStatus[]);
+
+export const agentContentPartTypes = Object.freeze(['text', 'source', 'artifact', 'data'] as const);
+
+export const agentEnvelopeContract = Object.freeze({
+  name: 'agent-interaction',
+  version: 3,
+  authority: 'presentation-only',
+  kinds: agentEnvelopeKinds,
+  statuses: agentEnvelopeStatuses,
+  contentPartTypes: agentContentPartTypes,
+  requiredFields: Object.freeze(['version', 'kind', 'id', 'status', 'content']),
+  privilegedExecution: false,
+});
+
+const kinds = new Set<AgentEnvelopeKind>(agentEnvelopeKinds);
+const statuses = new Set<AgentEnvelopeStatus>(agentEnvelopeStatuses);
 const actorRoles = new Set<AgentActorRole>(['user', 'assistant', 'system', 'tool', 'reviewer']);
 const risks = new Set<AgentRiskLevel>(['low', 'medium', 'high', 'critical']);
 const identifierPattern = /^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,199}$/;

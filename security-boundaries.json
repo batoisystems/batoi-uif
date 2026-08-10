@@ -20,6 +20,7 @@
     "mobile": { "boundaries": [], "policy": "Mobile shell behavior owns local DOM lifecycle without remote authority." },
     "net": { "boundaries": ["network"], "policy": "Fetch/upload cancellation, retries, errors, credentials, and connectors are governed." },
     "overlays": { "boundaries": ["selector"], "policy": "Overlay ownership and focus targets remain local DOM operations." },
+    "profiles": { "boundaries": [], "policy": "Profiles only re-export existing package namespaces and introduce no independent runtime authority." },
     "push": { "boundaries": ["network", "service-worker", "url"], "policy": "Subscription APIs require permission and server endpoints remain same-origin." },
     "pwa": { "boundaries": ["network", "service-worker", "storage", "url"], "policy": "Worker scope, cache eligibility, updates, and idempotent offline work are bounded." },
     "query": { "boundaries": ["html", "selector"], "policy": "String insertion is explicitly trusted; selector operations use DOM ownership rules." },

@@ -1,0 +1,726 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:1a95808d-0000-4000-8000-f0ea2fc99f3b",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "type": "framework",
+      "name": "batoi-uif",
+      "version": "2.5.0"
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-actions@2.5.0",
+      "name": "@batoi/uif-actions",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-ai@2.5.0",
+      "name": "@batoi/uif-ai",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-charts@2.5.0",
+      "name": "@batoi/uif-charts",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-components@2.5.0",
+      "name": "@batoi/uif-components",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-core@2.5.0",
+      "name": "@batoi/uif-core",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-css@2.5.0",
+      "name": "@batoi/uif-css",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-dashboard@2.5.0",
+      "name": "@batoi/uif-dashboard",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-desktop@2.5.0",
+      "name": "@batoi/uif-desktop",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+      "name": "@batoi/uif-dom",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-editor@2.5.0",
+      "name": "@batoi/uif-editor",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-effects@2.5.0",
+      "name": "@batoi/uif-effects",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-extension-kit@2.5.0",
+      "name": "@batoi/uif-extension-kit",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-forms@2.5.0",
+      "name": "@batoi/uif-forms",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-icons@2.5.0",
+      "name": "@batoi/uif-icons",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-mcp@2.5.0",
+      "name": "@batoi/uif-mcp",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-mobile@2.5.0",
+      "name": "@batoi/uif-mobile",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-net@2.5.0",
+      "name": "@batoi/uif-net",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-overlays@2.5.0",
+      "name": "@batoi/uif-overlays",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-profiles@2.5.0",
+      "name": "@batoi/uif-profiles",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "25"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-push@2.5.0",
+      "name": "@batoi/uif-push",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "4"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-pwa@2.5.0",
+      "name": "@batoi/uif-pwa",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-query@2.5.0",
+      "name": "@batoi/uif-query",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-rad-adapter@2.5.0",
+      "name": "@batoi/uif-rad-adapter",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-realtime@2.5.0",
+      "name": "@batoi/uif-realtime",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-router@2.5.0",
+      "name": "@batoi/uif-router",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-state@2.5.0",
+      "name": "@batoi/uif-state",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-table@2.5.0",
+      "name": "@batoi/uif-table",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "batoi:runtimeDependencies",
+          "value": "2"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-actions@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-core@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-effects@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-ai@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-core@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-net@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-charts@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-net@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-components@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-core@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-effects@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-overlays@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-core@2.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-css@2.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-dashboard@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-charts@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-desktop@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-editor@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-core@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-net@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-effects@2.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-extension-kit@2.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-forms@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-core@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-net@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-icons@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-mcp@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-core@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-net@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-mobile@2.5.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-net@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-core@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-overlays@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-effects@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-profiles@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-actions@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-ai@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-charts@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-components@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-core@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-dashboard@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-desktop@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-editor@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-effects@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-extension-kit@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-forms@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-icons@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-mcp@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-mobile@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-net@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-overlays@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-push@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-pwa@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-query@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-rad-adapter@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-realtime@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-router@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-state@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-table@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-push@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-components@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-net@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-pwa@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-pwa@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-query@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-rad-adapter@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-core@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-net@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-realtime@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-net@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-router@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-net@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-state@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-core@2.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40batoi%2Fuif-table@2.5.0",
+      "dependsOn": [
+        "pkg:npm/%40batoi%2Fuif-dom@2.5.0",
+        "pkg:npm/%40batoi%2Fuif-net@2.5.0"
+      ]
+    }
+  ]
+}

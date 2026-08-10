@@ -9,6 +9,8 @@ export type UIFOptions = Record<string, unknown>;
 export * from './agent.js';
 export * from './attributes.js';
 export * from './component-registry.js';
+export * from './hydration-lifecycle.js';
+export * from './component-contracts.js';
 export * from './compatibility.js';
 export * from './contracts.js';
 export * from './diagnostics.js';

@@ -1,0 +1,11 @@
+export * as charts from '@batoi/uif-charts';
+export * as components from '@batoi/uif-components';
+export * as core from '@batoi/uif-core';
+export * as dashboard from '@batoi/uif-dashboard';
+export * as dom from '@batoi/uif-dom';
+export * as icons from '@batoi/uif-icons';
+export * as net from '@batoi/uif-net';
+export * as realtime from '@batoi/uif-realtime';
+export * as state from '@batoi/uif-state';
+export * as table from '@batoi/uif-table';
+export { uifProfiles as profiles } from './index.js';

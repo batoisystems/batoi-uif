@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.5.0
+
+- Added curated All, RAD, Dashboard, Mobile, Desktop, and Agent package profiles without introducing a second runtime.
+- Added typed metadata for every declarative component and shared Agent/RAD envelope authorities, with generated JSON and Markdown contract references.
+- Unified root, target, and refresh hydration ownership; every documented `data-uif` component now participates in the runtime registry.
+- Added a versioned design-token inventory with compact-density, high-contrast, forced-colors, and reduced-motion modes.
+- Added deterministic CycloneDX SBOM and SLSA/in-toto-style provenance artifacts, covered by the release integrity manifest and reproducibility checks.
+
 ## 2.4.0
 
 - Added the v3-compatible component registry with idempotent mount/update/suspend/resume/destroy ownership and a single all-in-one hydration path.

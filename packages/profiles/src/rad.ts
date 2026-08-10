@@ -1,0 +1,13 @@
+export * as actions from '@batoi/uif-actions';
+export * as components from '@batoi/uif-components';
+export * as core from '@batoi/uif-core';
+export * as dom from '@batoi/uif-dom';
+export * as editor from '@batoi/uif-editor';
+export * as forms from '@batoi/uif-forms';
+export * as icons from '@batoi/uif-icons';
+export * as net from '@batoi/uif-net';
+export * as radAdapter from '@batoi/uif-rad-adapter';
+export * as router from '@batoi/uif-router';
+export * as state from '@batoi/uif-state';
+export * as table from '@batoi/uif-table';
+export { uifProfiles as profiles } from './index.js';

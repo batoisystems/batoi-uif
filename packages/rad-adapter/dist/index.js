@@ -12,6 +12,15 @@ var requestSequence = 0;
 var MAX_HTML_LENGTH = 1e6;
 var MAX_COLLECTION_ITEMS = 100;
 var MAX_MESSAGE_LENGTH = 1e4;
+var radEnvelopeContract = Object.freeze({
+  name: "rad-partial",
+  versions: Object.freeze([1, 2]),
+  fields: Object.freeze(["actions", "errors", "events", "focus", "html", "message", "ok", "redirect", "swap", "target", "version"]),
+  actions: Object.freeze(["focus", "redirect", "toast"]),
+  swapModes: Object.freeze(["after", "append", "before", "inner", "outer", "prepend"]),
+  authority: "governed-server-html",
+  limits: Object.freeze({ htmlCharacters: MAX_HTML_LENGTH, collectionItems: MAX_COLLECTION_ITEMS, messageCharacters: MAX_MESSAGE_LENGTH })
+});
 function normalizeSwapMode(mode) {
   return swapModes.has(mode ?? "") ? mode : "inner";
 }
@@ -158,6 +167,7 @@ function bindRadActions(root = document) {
 export {
   bindRadActions,
   loadPartial,
+  radEnvelopeContract,
   rehydrate,
   swapContent
 };

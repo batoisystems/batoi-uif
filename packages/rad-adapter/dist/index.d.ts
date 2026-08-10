@@ -19,9 +19,22 @@ interface RadResponse {
         [key: string]: unknown;
     }>;
 }
+declare const radEnvelopeContract: Readonly<{
+    name: "rad-partial";
+    versions: readonly [1, 2];
+    fields: readonly ["actions", "errors", "events", "focus", "html", "message", "ok", "redirect", "swap", "target", "version"];
+    actions: readonly ["focus", "redirect", "toast"];
+    swapModes: readonly ["after", "append", "before", "inner", "outer", "prepend"];
+    authority: "governed-server-html";
+    limits: Readonly<{
+        htmlCharacters: 1000000;
+        collectionItems: 100;
+        messageCharacters: 10000;
+    }>;
+}>;
 declare function swapContent(targetEl: HTMLElement, html: string, mode?: string): HTMLElement;
 declare function rehydrate(targetEl: HTMLElement): void;
 declare function loadPartial(sourceEl: HTMLElement): Promise<RadResponse | null>;
 declare function bindRadActions(root?: Document | HTMLElement): () => void;
 
-export { type RadResponse, type SwapMode, bindRadActions, loadPartial, rehydrate, swapContent };
+export { type RadResponse, type SwapMode, bindRadActions, loadPartial, radEnvelopeContract, rehydrate, swapContent };

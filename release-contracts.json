@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "2.4.0",
+  "version": "2.5.0",
   "packages": {
     "actions": {
       "name": "@batoi/uif-actions",
@@ -168,6 +168,45 @@
         "@batoi/uif-effects"
       ]
     },
+    "profiles": {
+      "name": "@batoi/uif-profiles",
+      "exports": [
+        ".",
+        "./agent",
+        "./all",
+        "./dashboard",
+        "./desktop",
+        "./mobile",
+        "./rad"
+      ],
+      "dependencies": [
+        "@batoi/uif-actions",
+        "@batoi/uif-ai",
+        "@batoi/uif-charts",
+        "@batoi/uif-components",
+        "@batoi/uif-core",
+        "@batoi/uif-dashboard",
+        "@batoi/uif-desktop",
+        "@batoi/uif-dom",
+        "@batoi/uif-editor",
+        "@batoi/uif-effects",
+        "@batoi/uif-extension-kit",
+        "@batoi/uif-forms",
+        "@batoi/uif-icons",
+        "@batoi/uif-mcp",
+        "@batoi/uif-mobile",
+        "@batoi/uif-net",
+        "@batoi/uif-overlays",
+        "@batoi/uif-push",
+        "@batoi/uif-pwa",
+        "@batoi/uif-query",
+        "@batoi/uif-rad-adapter",
+        "@batoi/uif-realtime",
+        "@batoi/uif-router",
+        "@batoi/uif-state",
+        "@batoi/uif-table"
+      ]
+    },
     "push": {
       "name": "@batoi/uif-push",
       "exports": [
@@ -282,6 +321,7 @@
       "data-uif-editor-command",
       "data-uif-editor-dialog-cancel",
       "data-uif-editor-input",
+      "data-uif-envelope",
       "data-uif-error",
       "data-uif-event",
       "data-uif-filter-target",
@@ -289,11 +329,13 @@
       "data-uif-html",
       "data-uif-icon",
       "data-uif-id",
+      "data-uif-interval",
       "data-uif-key",
       "data-uif-loading",
       "data-uif-md-line",
       "data-uif-md-line-end",
       "data-uif-message",
+      "data-uif-messages",
       "data-uif-method",
       "data-uif-mode",
       "data-uif-model",
@@ -452,6 +494,7 @@
     ]
   },
   "events": [
+    "uif:accordion-toggle",
     "uif:action",
     "uif:action-diagnostic",
     "uif:agent:cancel",
@@ -460,9 +503,12 @@
     "uif:agent:feedback",
     "uif:agent:retry",
     "uif:agent:submit",
+    "uif:ai-action",
     "uif:ai-error",
     "uif:ai-history-select",
     "uif:ai-stream-cancel",
+    "uif:animation-end",
+    "uif:animation-start",
     "uif:before-destroy",
     "uif:before-init",
     "uif:before-load",
@@ -476,9 +522,11 @@
     "uif:chart-refresh",
     "uif:chart-select",
     "uif:close",
+    "uif:combobox-change",
     "uif:complete",
     "uif:connector-error",
     "uif:dashboard-error",
+    "uif:desktop-change",
     "uif:desktop-error",
     "uif:destroy",
     "uif:diagnostic",
@@ -501,8 +549,11 @@
     "uif:editor-validate",
     "uif:error",
     "uif:field-errors",
+    "uif:file-select",
     "uif:form-dirty",
     "uif:form-error",
+    "uif:form-submit",
+    "uif:form-success",
     "uif:form-touched",
     "uif:init",
     "uif:lightbox-open",
@@ -516,8 +567,14 @@
     "uif:overlay-closed",
     "uif:overlay-open",
     "uif:overlay-opened",
+    "uif:pagination-change",
     "uif:presence",
+    "uif:push-change",
     "uif:push-error",
+    "uif:pwa-install",
+    "uif:rad-before",
+    "uif:rad-error",
+    "uif:rad-success",
     "uif:realtime-close",
     "uif:realtime-error",
     "uif:realtime-message",
@@ -526,6 +583,9 @@
     "uif:rehydrate",
     "uif:request",
     "uif:response",
+    "uif:route-before",
+    "uif:route-error",
+    "uif:route-success",
     "uif:router-error",
     "uif:runtime:diagnostic",
     "uif:runtime:error",
@@ -538,20 +598,25 @@
     "uif:table-bulk-action",
     "uif:table-error",
     "uif:table-filter",
+    "uif:table-load",
     "uif:table-loaded",
     "uif:table-page",
     "uif:table-page-size",
     "uif:table-reset",
     "uif:table-row-action",
+    "uif:table-select",
     "uif:table-selection",
     "uif:table-sort",
     "uif:table-state",
+    "uif:tabs-change",
     "uif:toast",
     "uif:tool-approve",
     "uif:tool-confirmation-required",
     "uif:tool-expired",
     "uif:tool-reject",
-    "uif:tool-replay-blocked"
+    "uif:tool-replay-blocked",
+    "uif:typed-text-complete",
+    "uif:wizard-change"
   ],
   "css": {
     "tokens": [
@@ -582,9 +647,15 @@
       "--uif-color-success",
       "--uif-color-warning",
       "--uif-container",
+      "--uif-control-min-block-size",
+      "--uif-control-padding-block",
+      "--uif-control-padding-inline",
       "--uif-dashboard-columns",
+      "--uif-density-factor",
       "--uif-ease-emphasized",
       "--uif-ease-standard",
+      "--uif-focus-color",
+      "--uif-focus-width",
       "--uif-font-family",
       "--uif-font-mono",
       "--uif-font-sans",
@@ -1345,391 +1416,1475 @@
   "componentDefinitions": {
     "accordion": {
       "version": 3,
-      "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "button",
+        "region"
+      ],
+      "actions": [
+        "toggle"
+      ],
+      "events": [
+        "uif:accordion-toggle"
+      ],
+      "states": [
+        "collapsed",
+        "disabled",
+        "expanded"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Headings with visible section content",
       "optionKeys": []
     },
     "agent-tool": {
       "version": 3,
+      "package": "mcp",
+      "attributes": [
+        "data-uif",
+        "data-uif-envelope",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
       "actions": [],
-      "events": [],
-      "states": [],
+      "events": [
+        "uif:agent:error",
+        "uif:tool-approve",
+        "uif:tool-reject"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Tool plan, review, progress, result, or receipt summary",
       "optionKeys": []
     },
     "ai-action": {
       "version": 3,
+      "package": "ai",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
       "actions": [],
-      "events": [],
-      "states": [],
+      "events": [
+        "uif:ai-action"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Button or form describing an assistant action",
       "optionKeys": []
     },
     "ai-composer": {
       "version": 3,
+      "package": "ai",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
       "actions": [],
-      "events": [],
-      "states": [],
+      "events": [
+        "uif:agent:cancel",
+        "uif:agent:submit"
+      ],
+      "states": [
+        "busy",
+        "disabled",
+        "idle"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Labelled textarea and submit button",
       "optionKeys": []
     },
     "ai-thread": {
       "version": 3,
-      "roles": [],
+      "package": "ai",
+      "attributes": [
+        "data-uif",
+        "data-uif-messages",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "log"
+      ],
       "actions": [],
-      "events": [],
-      "states": [],
+      "events": [
+        "uif:agent:copy",
+        "uif:agent:error",
+        "uif:agent:feedback",
+        "uif:agent:retry"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Ordered message transcript",
+      "optionKeys": []
+    },
+    "ajax": {
+      "version": 3,
+      "package": "rad-adapter",
+      "attributes": [
+        "data-uif",
+        "data-uif-method",
+        "data-uif-options",
+        "data-uif-src",
+        "data-uif-state",
+        "data-uif-swap",
+        "data-uif-target"
+      ],
+      "roles": [],
+      "actions": [
+        "load"
+      ],
+      "events": [
+        "uif:rad-before",
+        "uif:rad-error",
+        "uif:rad-success"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Link, button, or form with a normal server destination",
       "optionKeys": []
     },
     "alert": {
       "version": 3,
-      "roles": [],
-      "actions": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "alert"
+      ],
+      "actions": [
+        "close"
+      ],
       "events": [],
-      "states": [],
+      "states": [
+        "closed",
+        "open"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Inline alert content",
       "optionKeys": []
     },
     "animate": {
       "version": 3,
+      "package": "effects",
+      "attributes": [
+        "data-uif",
+        "data-uif-animation",
+        "data-uif-delay",
+        "data-uif-duration",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
       "actions": [],
-      "events": [],
-      "states": [],
+      "events": [
+        "uif:animation-end",
+        "uif:animation-start"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Static final visual state",
       "optionKeys": []
     },
     "badge": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Inline status text",
       "optionKeys": []
     },
     "breadcrumb": {
       "version": 3,
-      "roles": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "navigation"
+      ],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Navigation list",
       "optionKeys": []
     },
     "button": {
       "version": 3,
-      "roles": [],
-      "actions": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "button"
+      ],
+      "actions": [
+        "activate"
+      ],
       "events": [],
-      "states": [],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Native button or link",
       "optionKeys": []
     },
     "card": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Article or section",
       "optionKeys": []
     },
     "carousel": {
       "version": 3,
-      "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "region"
+      ],
+      "actions": [
+        "next",
+        "previous",
+        "select"
+      ],
+      "events": [
+        "uif:carousel-change"
+      ],
+      "states": [
+        "active",
+        "inactive"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Sequential figures or articles",
       "optionKeys": []
     },
     "chart": {
       "version": 3,
-      "roles": [],
+      "package": "charts",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-src",
+        "data-uif-state"
+      ],
+      "roles": [
+        "img"
+      ],
       "actions": [],
-      "events": [],
-      "states": [],
+      "events": [
+        "uif:chart-error",
+        "uif:chart-select"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Accessible data table or textual summary",
       "optionKeys": []
     },
     "collapse": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-action",
+        "data-uif-options",
+        "data-uif-state",
+        "data-uif-target"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "close",
+        "open",
+        "toggle"
+      ],
+      "events": [
+        "uif:collapse-close",
+        "uif:collapse-open"
+      ],
+      "states": [
+        "closed",
+        "disabled",
+        "open"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Visible collapsible content",
       "optionKeys": []
     },
     "combobox": {
       "version": 3,
-      "roles": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "combobox",
+        "listbox",
+        "option"
+      ],
       "actions": [],
-      "events": [],
-      "states": [],
+      "events": [
+        "uif:combobox-change"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Labelled native input and option list",
       "optionKeys": []
     },
     "command-menu": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-action",
+        "data-uif-options",
+        "data-uif-state",
+        "data-uif-target"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "close",
+        "open",
+        "toggle"
+      ],
+      "events": [
+        "uif:command-menu-close",
+        "uif:command-menu-open"
+      ],
+      "states": [
+        "closed",
+        "disabled",
+        "open"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Search input and command list",
       "optionKeys": []
     },
     "dashboard": {
       "version": 3,
+      "package": "dashboard",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
       "actions": [],
-      "events": [],
-      "states": [],
+      "events": [
+        "uif:dashboard-error"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Sections containing metrics, tables, and lists",
       "optionKeys": []
     },
     "desktop-shell": {
       "version": 3,
+      "package": "desktop",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "set-density",
+        "toggle-sidebar"
+      ],
+      "events": [
+        "uif:desktop-change"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Application landmarks and navigation",
       "optionKeys": []
     },
     "drawer": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-action",
+        "data-uif-options",
+        "data-uif-state",
+        "data-uif-target"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "close",
+        "open",
+        "toggle"
+      ],
+      "events": [
+        "uif:drawer-close",
+        "uif:drawer-open"
+      ],
+      "states": [
+        "closed",
+        "disabled",
+        "open"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Visible complementary region",
       "optionKeys": []
     },
     "dropdown": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-action",
+        "data-uif-options",
+        "data-uif-state",
+        "data-uif-target"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "close",
+        "open",
+        "toggle"
+      ],
+      "events": [
+        "uif:dropdown-close",
+        "uif:dropdown-open"
+      ],
+      "states": [
+        "closed",
+        "disabled",
+        "open"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Native button followed by a menu or link list",
       "optionKeys": []
     },
     "editor": {
       "version": 3,
+      "package": "editor",
+      "attributes": [
+        "data-uif",
+        "data-uif-mode",
+        "data-uif-options",
+        "data-uif-preview",
+        "data-uif-state",
+        "data-uif-toolbar"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "edit",
+        "preview",
+        "save"
+      ],
+      "events": [
+        "uif:editor-change",
+        "uif:editor-diagnostics"
+      ],
+      "states": [
+        "dirty",
+        "error",
+        "idle",
+        "saved",
+        "saving"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Textarea",
       "optionKeys": []
     },
     "file-upload": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
       "actions": [],
-      "events": [],
-      "states": [],
+      "events": [
+        "uif:file-select"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Native file input",
       "optionKeys": []
     },
     "form": {
       "version": 3,
+      "package": "forms",
+      "attributes": [
+        "data-uif",
+        "data-uif-method",
+        "data-uif-options",
+        "data-uif-rule",
+        "data-uif-src",
+        "data-uif-state",
+        "data-uif-validate"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "reset",
+        "submit"
+      ],
+      "events": [
+        "uif:form-error",
+        "uif:form-submit",
+        "uif:form-success"
+      ],
+      "states": [
+        "error",
+        "idle",
+        "submitting",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Native form and controls",
       "optionKeys": []
     },
     "install-prompt": {
       "version": 3,
+      "package": "pwa",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "install"
+      ],
+      "events": [
+        "uif:pwa-install"
+      ],
+      "states": [
+        "available",
+        "installed",
+        "unavailable"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Normal installation guidance",
       "optionKeys": []
     },
     "lightbox": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-action",
+        "data-uif-options",
+        "data-uif-state",
+        "data-uif-target"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "close",
+        "open",
+        "toggle"
+      ],
+      "events": [
+        "uif:lightbox-close",
+        "uif:lightbox-open"
+      ],
+      "states": [
+        "closed",
+        "disabled",
+        "open"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Linked image gallery",
       "optionKeys": []
     },
     "masonry": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Sequential card or figure list",
       "optionKeys": []
     },
     "mobile-shell": {
       "version": 3,
-      "roles": [],
+      "package": "mobile",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "main",
+        "navigation"
+      ],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "offline",
+        "online"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Mobile application landmarks and navigation",
       "optionKeys": []
     },
     "modal": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-action",
+        "data-uif-options",
+        "data-uif-state",
+        "data-uif-target"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "close",
+        "open",
+        "toggle"
+      ],
+      "events": [
+        "uif:modal-close",
+        "uif:modal-open"
+      ],
+      "states": [
+        "closed",
+        "disabled",
+        "open"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Visible dialog content",
       "optionKeys": []
     },
     "nav": {
       "version": 3,
-      "roles": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "navigation"
+      ],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Navigation region",
       "optionKeys": []
     },
     "navbar": {
       "version": 3,
-      "roles": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "navigation"
+      ],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Navigation region",
       "optionKeys": []
     },
     "offcanvas": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-action",
+        "data-uif-options",
+        "data-uif-state",
+        "data-uif-target"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "close",
+        "open",
+        "toggle"
+      ],
+      "events": [
+        "uif:offcanvas-close",
+        "uif:offcanvas-open"
+      ],
+      "states": [
+        "closed",
+        "disabled",
+        "open"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Visible complementary region",
       "optionKeys": []
     },
     "pagination": {
       "version": 3,
-      "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "navigation"
+      ],
+      "actions": [
+        "navigate"
+      ],
+      "events": [
+        "uif:pagination-change"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Navigation list",
       "optionKeys": []
     },
     "popover": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-action",
+        "data-uif-options",
+        "data-uif-state",
+        "data-uif-target"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "close",
+        "open",
+        "toggle"
+      ],
+      "events": [
+        "uif:popover-close",
+        "uif:popover-open"
+      ],
+      "states": [
+        "closed",
+        "disabled",
+        "open"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Inline contextual content",
       "optionKeys": []
     },
     "progress": {
       "version": 3,
-      "roles": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state",
+        "data-uif-value"
+      ],
+      "roles": [
+        "progressbar"
+      ],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Native progress element or textual status",
       "optionKeys": []
     },
     "push": {
       "version": 3,
+      "package": "push",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "subscribe",
+        "unsubscribe"
+      ],
+      "events": [
+        "uif:push-change",
+        "uif:push-error"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Notification preference control",
       "optionKeys": []
     },
     "realtime": {
       "version": 3,
+      "package": "realtime",
+      "attributes": [
+        "data-uif",
+        "data-uif-interval",
+        "data-uif-mode",
+        "data-uif-options",
+        "data-uif-src",
+        "data-uif-state"
+      ],
       "roles": [],
       "actions": [],
-      "events": [],
-      "states": [],
+      "events": [
+        "uif:realtime-error",
+        "uif:realtime-message",
+        "uif:realtime-state"
+      ],
+      "states": [
+        "connected",
+        "connecting",
+        "disconnected",
+        "failed"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Existing feed content",
+      "optionKeys": []
+    },
+    "route": {
+      "version": 3,
+      "package": "router",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-route",
+        "data-uif-state",
+        "data-uif-target"
+      ],
+      "roles": [],
+      "actions": [
+        "navigate"
+      ],
+      "events": [
+        "uif:route-before",
+        "uif:route-error",
+        "uif:route-success"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Native link navigation",
       "optionKeys": []
     },
     "shell": {
       "version": 3,
-      "roles": [],
-      "actions": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "banner",
+        "complementary",
+        "main",
+        "navigation"
+      ],
+      "actions": [
+        "set-density",
+        "toggle-sidebar"
+      ],
       "events": [],
-      "states": [],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Header, navigation, main, and complementary landmarks",
       "optionKeys": []
     },
     "sidebar": {
       "version": 3,
-      "roles": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "complementary",
+        "navigation"
+      ],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Complementary navigation region",
       "optionKeys": []
     },
     "skeleton": {
       "version": 3,
-      "roles": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "status"
+      ],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "loading"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Existing content or loading status",
       "optionKeys": []
     },
     "spinner": {
       "version": 3,
-      "roles": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "status"
+      ],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "loading"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Textual loading status",
       "optionKeys": []
     },
     "stepper": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "active",
+        "completed",
+        "disabled",
+        "error"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Ordered list of steps",
       "optionKeys": []
     },
     "table": {
       "version": 3,
+      "package": "table",
+      "attributes": [
+        "data-uif",
+        "data-uif-method",
+        "data-uif-options",
+        "data-uif-refresh",
+        "data-uif-src",
+        "data-uif-state"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "load",
+        "reload",
+        "select"
+      ],
+      "events": [
+        "uif:table-error",
+        "uif:table-load",
+        "uif:table-select"
+      ],
+      "states": [
+        "empty",
+        "error",
+        "idle",
+        "loaded",
+        "loading"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Semantic table",
       "optionKeys": []
     },
     "tabs": {
       "version": 3,
-      "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "tab",
+        "tablist",
+        "tabpanel"
+      ],
+      "actions": [
+        "activate"
+      ],
+      "events": [
+        "uif:tabs-change"
+      ],
+      "states": [
+        "active",
+        "disabled",
+        "inactive"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Headings and sequential content sections",
       "optionKeys": []
     },
     "toast": {
       "version": 3,
-      "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "alert",
+        "status"
+      ],
+      "actions": [
+        "close"
+      ],
+      "events": [
+        "uif:toast"
+      ],
+      "states": [
+        "closed",
+        "open"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Inline status message",
       "optionKeys": []
     },
     "tool-approval": {
       "version": 3,
+      "package": "mcp",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "approve",
+        "reject"
+      ],
+      "events": [
+        "uif:tool-approve",
+        "uif:tool-expired",
+        "uif:tool-reject"
+      ],
+      "states": [
+        "approved",
+        "decision-pending",
+        "expired",
+        "rejected",
+        "waiting-approval"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Review summary with explicit decision controls",
       "optionKeys": []
     },
     "tooltip": {
       "version": 3,
-      "roles": [],
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-message",
+        "data-uif-options",
+        "data-uif-state"
+      ],
+      "roles": [
+        "tooltip"
+      ],
       "actions": [],
       "events": [],
-      "states": [],
+      "states": [
+        "closed",
+        "open"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Adjacent help text",
       "optionKeys": []
     },
     "typed-text": {
       "version": 3,
+      "package": "effects",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
       "actions": [],
-      "events": [],
-      "states": [],
+      "events": [
+        "uif:typed-text-complete"
+      ],
+      "states": [
+        "disabled",
+        "error",
+        "idle",
+        "loading",
+        "success"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Complete static text",
       "optionKeys": []
     },
     "wizard": {
       "version": 3,
+      "package": "components",
+      "attributes": [
+        "data-uif",
+        "data-uif-options",
+        "data-uif-state"
+      ],
       "roles": [],
-      "actions": [],
-      "events": [],
-      "states": [],
+      "actions": [
+        "next",
+        "previous",
+        "submit"
+      ],
+      "events": [
+        "uif:wizard-change"
+      ],
+      "states": [
+        "active",
+        "completed",
+        "error"
+      ],
+      "errors": [
+        "UIF_COMPONENT_MOUNT"
+      ],
+      "semanticFallback": "Sequential fieldsets",
       "optionKeys": []
     }
   },
   "envelopes": {
+    "agent": {
+      "name": "agent-interaction",
+      "version": 3,
+      "authority": "presentation-only",
+      "kinds": [
+        "message",
+        "notice",
+        "stream-delta",
+        "stream-complete",
+        "tool-plan",
+        "tool-review",
+        "tool-progress",
+        "tool-result",
+        "receipt",
+        "error"
+      ],
+      "statuses": [
+        "draft",
+        "pending",
+        "streaming",
+        "waiting-approval",
+        "approved",
+        "rejected",
+        "executing",
+        "completed",
+        "partial",
+        "failed",
+        "cancelled",
+        "expired",
+        "superseded"
+      ],
+      "contentPartTypes": [
+        "text",
+        "source",
+        "artifact",
+        "data"
+      ],
+      "requiredFields": [
+        "version",
+        "kind",
+        "id",
+        "status",
+        "content"
+      ],
+      "privilegedExecution": false
+    },
     "rad": {
+      "name": "rad-partial",
       "versions": [
         1,
         2
@@ -1760,6 +2915,7 @@
         "outer",
         "prepend"
       ],
+      "authority": "governed-server-html",
       "limits": {
         "htmlCharacters": 1000000,
         "collectionItems": 100,
@@ -1771,6 +2927,8 @@
     "index.d.ts",
     "index.global.js",
     "index.js",
+    "provenance.json",
+    "sbom.cdx.json",
     "uif.css",
     "uif.esm.js",
     "uif.iife.js"

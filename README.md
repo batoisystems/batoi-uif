@@ -395,7 +395,7 @@ Important attributes include:
 - `data-uif-icon-class`
 - `data-uif-icon-hidden`
 
-The v2 `data-uif` contract includes `button`, `modal`, `drawer`, `offcanvas`, `dropdown`, `tooltip`, `popover`, `tabs`, `toast`, `accordion`, `table`, `form`, `ajax`, `route`, `shell`, `nav`, `chart`, `animate`, `typed-text`, `realtime`, `push`, `mobile-shell`, `ai-action`, and `tool-approval`.
+The canonical component, attribute, action, event, state, error, and envelope inventories are generated from the typed runtime definitions in [the contract reference](docs/generated/contracts.md). The versioned CSS contract is generated from the shipped stylesheet in [the design-token reference](docs/generated/design-tokens.md).
 
 ## Development
 
@@ -414,11 +414,13 @@ If working before that migration is complete, use the currently available worksp
 
 ## Version 2
 
-The repository and framework packages are versioned `2.4.0`. This compatible preparation release adds the shared v3 lifecycle and contract foundation, governed AI/MCP interaction envelopes and gateway adapters, IndexedDB Micro App storage, centralized URL capabilities, security gates, compatibility diagnostics, and privacy-safe observability while retaining the dependency-free v2 public surface.
+The repository and framework packages are versioned `2.5.0`. This compatible preparation release adds curated package profiles, complete typed component metadata, generated contract and token references, unified hydration ownership, and deterministic SBOM/provenance artifacts while retaining the dependency-free v2 public surface.
+
+Curated v3-compatible namespace profiles are available from `@batoi/uif-profiles/all`, `/rad`, `/dashboard`, `/mobile`, `/desktop`, and `/agent`. See [Package Profiles](docs/package-profiles.md).
 
 The current status is active v2 hardening. Public release readiness requires the automated release gate plus real-browser editor, accessibility, CSP/Trusted Types, mobile viewport, and deployed-artifact verification described in [Compatibility and Release Policy](docs/compatibility-and-release-policy.md).
 
-Release builds generate `dist/integrity.json` with checksums and SRI values for the root browser artifacts. `release-api.json` protects the established package export surface from accidental removals.
+Release builds generate `dist/integrity.json` with checksums and SRI values, `dist/sbom.cdx.json` with the runtime package inventory, and `dist/provenance.json` with reproducible browser-artifact subjects. `release-api.json` protects the established package export surface from accidental removals.
 
 Editor behavior and the supported Markdown profile are documented in [Editors](docs/editors.md). HTML, URL, CSP, Trusted Types, AI, and MCP boundaries are documented in [Security](docs/security.md).
 

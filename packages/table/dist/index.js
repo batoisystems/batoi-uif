@@ -3,6 +3,7 @@ import { isSafeURL, setTrustedHTML } from "@batoi/uif-dom";
 import { cancelRequest, request } from "@batoi/uif-net";
 var tableControllers = /* @__PURE__ */ new WeakMap();
 var initializedFilters = /* @__PURE__ */ new WeakSet();
+var filterCleanups = /* @__PURE__ */ new WeakMap();
 var tableRequestKeys = /* @__PURE__ */ new WeakMap();
 var tableRequestSequence = 0;
 var DEFAULT_MAX_ROWS = 1e3;
@@ -306,16 +307,30 @@ function filterElements(targetSelector, query, mode = "contains") {
     item.hidden = !matched;
   });
 }
-function initDeclarativeFilters(root = document) {
+function bindDeclarativeFilters(root = document) {
+  const cleanups = [];
   root.querySelectorAll("[data-uif-filter-target]").forEach((filterInput) => {
     if (initializedFilters.has(filterInput)) return;
     initializedFilters.add(filterInput);
     const target = filterInput.dataset.uifFilterTarget;
     if (!target) return;
     const mode = filterInput.dataset.uifFilterMode || "contains";
-    filterInput.addEventListener("input", () => filterElements(target, filterInput.value, mode));
-    filterInput.addEventListener("change", () => filterElements(target, filterInput.value, mode));
+    const apply = () => filterElements(target, filterInput.value, mode);
+    filterInput.addEventListener("input", apply);
+    filterInput.addEventListener("change", apply);
+    const cleanup = () => {
+      filterInput.removeEventListener("input", apply);
+      filterInput.removeEventListener("change", apply);
+      initializedFilters.delete(filterInput);
+      filterCleanups.delete(filterInput);
+    };
+    filterCleanups.set(filterInput, cleanup);
+    cleanups.push(cleanup);
   });
+  return () => cleanups.forEach((cleanup) => cleanup());
+}
+function initDeclarativeFilters(root = document) {
+  void bindDeclarativeFilters(root);
 }
 function updateSelectionState(table) {
   const selected = selectedRows(table);
@@ -532,6 +547,7 @@ function initTable(table, options = {}) {
 var dataTable = { name: "table", init: (el) => initTable(el) };
 export {
   applyResponsiveColumns,
+  bindDeclarativeFilters,
   dataTable,
   exportTable,
   filterElements,

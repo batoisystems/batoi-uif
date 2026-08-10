@@ -1,0 +1,66 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "dist/index.d.ts",
+      "digest": {
+        "sha256": "73d9f09c881b669fbce397b4f3030b1cb9272fac3b392a9d6aa965ad591f1ce1"
+      }
+    },
+    {
+      "name": "dist/index.js",
+      "digest": {
+        "sha256": "bc25f251f04e71d7313bac88f8e5cfa14520df906be7bd6918e8cfc92d1546ca"
+      }
+    },
+    {
+      "name": "dist/index.global.js",
+      "digest": {
+        "sha256": "7eec18408fe9da85296e1714fa54fc02ce2957d49959cdbc1ec140e415680cf1"
+      }
+    },
+    {
+      "name": "dist/uif.css",
+      "digest": {
+        "sha256": "90e156eadb01c4d033b3bbf9782fea36aecb344758dd0feeea42dea5c2f55539"
+      }
+    },
+    {
+      "name": "dist/uif.esm.js",
+      "digest": {
+        "sha256": "bc25f251f04e71d7313bac88f8e5cfa14520df906be7bd6918e8cfc92d1546ca"
+      }
+    },
+    {
+      "name": "dist/uif.iife.js",
+      "digest": {
+        "sha256": "7eec18408fe9da85296e1714fa54fc02ce2957d49959cdbc1ec140e415680cf1"
+      }
+    }
+  ],
+  "predicateType": "https://slsa.dev/provenance/v1",
+  "predicate": {
+    "buildDefinition": {
+      "buildType": "https://batoi.com/uif/npm-workspace-build/v1",
+      "externalParameters": {
+        "version": "2.5.0",
+        "command": "npm run build:dist"
+      },
+      "internalParameters": {
+        "runtimeDependencies": "workspace-only",
+        "sourceMaps": false
+      },
+      "resolvedDependencies": []
+    },
+    "runDetails": {
+      "builder": {
+        "id": "https://github.com/batoi/batoi-uif/.github/workflows/ci.yml"
+      },
+      "metadata": {
+        "invocationId": "batoi-uif-2.5.0",
+        "startedOn": null,
+        "finishedOn": null
+      }
+    }
+  }
+}

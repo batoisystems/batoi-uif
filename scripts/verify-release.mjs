@@ -8,6 +8,9 @@ import { URL } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { JSDOM } from 'jsdom';
 import { collectContractBaseline, removedContractEntries } from './contract-baseline.mjs';
+import { collectContractReference, renderContractReference } from './contract-reference.mjs';
+import { collectDesignTokenReference, renderDesignTokenReference } from './design-token-reference.mjs';
+import { collectReleaseMetadata } from './release-metadata.mjs';
 import { declarationAPI } from './release-api.mjs';
 
 const root = new URL('..', import.meta.url);
@@ -93,7 +96,7 @@ for (const name of readdirSync(new URL('examples/', root)).sort()) {
 
 const messagingFiles = ['README.md', 'apps/docs/index.html', 'examples/index.html', 'examples/desktop-shell/index.html', ...readdirSync(new URL('examples/professional-showcase/', root)).filter((name) => name.endsWith('.html')).map((name) => `examples/professional-showcase/${name}`)];
 const currentMessaging = messagingFiles.map((path) => readFileSync(new URL(path, root), 'utf8')).join('\n');
-for (const obsolete of ['Expected v1 `data-uif`', 'v0 moves from core foundation', 'Examples · v2.6', '"version":"v1.0"']) {
+for (const obsolete of ['Expected v1 `data-uif`', 'v0 moves from core foundation', 'Examples · v2.3', 'Examples · v2.4', '"version":"v1.0"']) {
   assert(!currentMessaging.includes(obsolete), `current release messaging still contains: ${obsolete}`);
 }
 
@@ -116,6 +119,27 @@ assert(contractBaseline.schemaVersion === 1, `contract baseline schema ${contrac
 const currentContracts = await collectContractBaseline(root);
 const removedContracts = removedContractEntries(contractBaseline, currentContracts);
 assert(!removedContracts.length, `public contracts were removed: ${removedContracts.join(', ')}`);
+
+const generatedContractJson = new URL('docs/generated/contracts.json', root);
+const generatedContractMarkdown = new URL('docs/generated/contracts.md', root);
+assert(existsSync(generatedContractJson), 'generated JSON contract reference is missing');
+assert(existsSync(generatedContractMarkdown), 'generated Markdown contract reference is missing');
+if (existsSync(generatedContractJson) && existsSync(generatedContractMarkdown)) {
+  const currentReference = await collectContractReference(root);
+  const generatedReference = JSON.parse(readFileSync(generatedContractJson, 'utf8'));
+  assert(JSON.stringify(generatedReference) === JSON.stringify(currentReference), 'generated JSON contract reference is stale');
+  assert(readFileSync(generatedContractMarkdown, 'utf8') === renderContractReference(currentReference), 'generated Markdown contract reference is stale');
+}
+
+const generatedTokenJson = new URL('docs/generated/design-tokens.json', root);
+const generatedTokenMarkdown = new URL('docs/generated/design-tokens.md', root);
+assert(existsSync(generatedTokenJson), 'generated JSON design-token reference is missing');
+assert(existsSync(generatedTokenMarkdown), 'generated Markdown design-token reference is missing');
+if (existsSync(generatedTokenJson) && existsSync(generatedTokenMarkdown)) {
+  const currentTokens = collectDesignTokenReference(root);
+  assert(JSON.stringify(JSON.parse(readFileSync(generatedTokenJson, 'utf8'))) === JSON.stringify(currentTokens), 'generated JSON design-token reference is stale');
+  assert(readFileSync(generatedTokenMarkdown, 'utf8') === renderDesignTokenReference(currentTokens), 'generated Markdown design-token reference is stale');
+}
 
 for (const file of ['dist/uif.esm.js', 'dist/uif.iife.js', 'dist/uif.css']) {
   const url = new URL(file, root);
@@ -146,6 +170,13 @@ if (existsSync(integrityPath)) {
     assert(entry?.sha256 === createHash('sha256').update(bytes).digest('hex'), `${name} SHA-256 checksum is stale`);
     assert(entry?.sri === `sha384-${createHash('sha384').update(bytes).digest('base64')}`, `${name} SRI checksum is stale`);
   }
+}
+
+const releaseMetadata = collectReleaseMetadata(root);
+for (const [name, expected] of Object.entries({ 'sbom.cdx.json': releaseMetadata.sbom, 'provenance.json': releaseMetadata.provenance })) {
+  const path = new URL(`dist/${name}`, root);
+  assert(existsSync(path), `${name} is missing`);
+  if (existsSync(path)) assert(JSON.stringify(JSON.parse(readFileSync(path, 'utf8'))) === JSON.stringify(expected), `${name} is stale or not reproducible`);
 }
 
 const uif = await import(new URL('dist/uif.esm.js', root).href);

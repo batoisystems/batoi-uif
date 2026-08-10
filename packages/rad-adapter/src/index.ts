@@ -29,6 +29,16 @@ const MAX_HTML_LENGTH = 1_000_000;
 const MAX_COLLECTION_ITEMS = 100;
 const MAX_MESSAGE_LENGTH = 10_000;
 
+export const radEnvelopeContract = Object.freeze({
+  name: 'rad-partial',
+  versions: Object.freeze([1, 2] as const),
+  fields: Object.freeze(['actions', 'errors', 'events', 'focus', 'html', 'message', 'ok', 'redirect', 'swap', 'target', 'version'] as const),
+  actions: Object.freeze(['focus', 'redirect', 'toast'] as const),
+  swapModes: Object.freeze(['after', 'append', 'before', 'inner', 'outer', 'prepend'] as const),
+  authority: 'governed-server-html',
+  limits: Object.freeze({ htmlCharacters: MAX_HTML_LENGTH, collectionItems: MAX_COLLECTION_ITEMS, messageCharacters: MAX_MESSAGE_LENGTH }),
+});
+
 function normalizeSwapMode(mode?: string): SwapMode {
   return swapModes.has(mode ?? '') ? (mode as SwapMode) : 'inner';
 }

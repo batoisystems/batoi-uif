@@ -53,6 +53,7 @@ declare function loadRemoteTable(table: HTMLTableElement, options?: TableOptions
 declare function goToPage(table: HTMLTableElement, page: number, options?: TableOptions): Promise<RemoteTableResponse | null>;
 declare function exportTable(table: HTMLTableElement, options?: TableOptions): unknown;
 declare function filterElements(targetSelector: string, query: string, mode?: 'contains' | 'startsWith' | 'token'): void;
+declare function bindDeclarativeFilters(root?: Document | HTMLElement): () => void;
 declare function initDeclarativeFilters(root?: Document | HTMLElement): void;
 declare function initTable(table: HTMLTableElement, options?: TableOptions): TableController;
 declare const dataTable: {
@@ -60,4 +61,4 @@ declare const dataTable: {
     init: (el: HTMLElement) => TableController;
 };
 
-export { type RemoteTableResponse, type TableController, type TableOptions, applyResponsiveColumns, dataTable, exportTable, filterElements, filterTable, goToPage, initDeclarativeFilters, initTable, loadRemoteTable, selectedRows, setTableState, sortTable };
+export { type RemoteTableResponse, type TableController, type TableOptions, applyResponsiveColumns, bindDeclarativeFilters, dataTable, exportTable, filterElements, filterTable, goToPage, initDeclarativeFilters, initTable, loadRemoteTable, selectedRows, setTableState, sortTable };
