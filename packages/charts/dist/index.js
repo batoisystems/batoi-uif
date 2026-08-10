@@ -1,4 +1,5 @@
 // src/index.ts
+import { parseUIFConfiguration, parseUIFJSON } from "@batoi/uif-core";
 import { request } from "@batoi/uif-net";
 import { isSafeURL, safeQuerySelector, setTrustedHTML } from "@batoi/uif-dom";
 
@@ -1208,7 +1209,9 @@ function parseChartData(el) {
   const raw = el.dataset.uifData;
   if (!raw) return [];
   try {
-    const parsed = JSON.parse(raw);
+    const result = parseUIFJSON(raw, { limits: { maxBytes: 5e6, maxCharacters: 5e6, maxItems: 5e4, maxKeys: 1e5, maxDepth: 16 } });
+    if (!result.valid) return [];
+    const parsed = result.value;
     if (Array.isArray(parsed)) return coerceData(parsed);
     if (parsed && typeof parsed === "object" && Array.isArray(parsed.data))
       return coerceData(parsed.data);
@@ -1221,11 +1224,8 @@ function parseChartData(el) {
 }
 function parseJsonValue(raw) {
   if (!raw) return void 0;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return void 0;
-  }
+  const result = parseUIFJSON(raw, { limits: { maxBytes: 5e6, maxCharacters: 5e6, maxItems: 5e4, maxKeys: 1e5, maxDepth: 16 } });
+  return result.valid ? result.value : void 0;
 }
 function flintInputFromElement(el, loaded) {
   const rawData = loaded ?? parseJsonValue(el.dataset.uifData);
@@ -1284,7 +1284,8 @@ async function loadChartData(el) {
     if (table) return adaptTable(table);
   }
   if (el.dataset.uifSrc) {
-    if (!isSafeURL(el.dataset.uifSrc, { context: "network", allowHash: false, sameOrigin: el.dataset.uifAllowCrossOrigin !== "true" })) throw new Error("Batoi UIF blocked an unsafe chart data URL");
+    const allowCrossOrigin = el.dataset.uifAllowCrossOrigin === "true";
+    if (!isSafeURL(el.dataset.uifSrc, { context: "network", allowHash: false, sameOrigin: !allowCrossOrigin, requireCapability: allowCrossOrigin })) throw new Error("Batoi UIF blocked an unsafe chart data URL");
     const response = await request(
       el.dataset.uifSrc,
       { method: "GET" }
@@ -1296,19 +1297,17 @@ async function loadChartData(el) {
 }
 async function loadFlintChart(el) {
   if (el.dataset.uifSrc) {
-    if (!isSafeURL(el.dataset.uifSrc, { context: "network", allowHash: false, sameOrigin: el.dataset.uifAllowCrossOrigin !== "true" })) throw new Error("Batoi UIF blocked an unsafe chart data URL");
+    const allowCrossOrigin = el.dataset.uifAllowCrossOrigin === "true";
+    if (!isSafeURL(el.dataset.uifSrc, { context: "network", allowHash: false, sameOrigin: !allowCrossOrigin, requireCapability: allowCrossOrigin })) throw new Error("Batoi UIF blocked an unsafe chart data URL");
     const response = await request(el.dataset.uifSrc, { method: "GET" });
     return adaptFlintChart(flintInputFromElement(el, response), optionsFromElement(el, false));
   }
   return adaptFlintChart(flintInputFromElement(el), optionsFromElement(el, false));
 }
 function optionsFromElement(el, defaultType = true) {
-  let parsed = {};
-  try {
-    parsed = JSON.parse(el.dataset.uifOptions || "{}");
-  } catch {
-    parsed = {};
-  }
+  const result = parseUIFConfiguration(el.dataset.uifOptions || "{}");
+  if (!result.valid) el.dispatchEvent(new CustomEvent("uif:chart-error", { bubbles: true, detail: { code: "chart-invalid-options", issues: result.issues } }));
+  const parsed = result.value;
   return {
     ...parsed,
     type: el.dataset.uifChart || parsed.type || (defaultType ? "bar" : void 0),
@@ -1395,7 +1394,7 @@ async function runDrilldown(el, detail, options) {
   if (options.action === "route" || options.action === "url" && !options.target) {
     if (options.url) {
       const url = resolveDrilldownUrl(options.url, detail, options.param || "label");
-      if (!isSafeURL(url, { context: "navigation", sameOrigin: !options.allowCrossOrigin })) {
+      if (!isSafeURL(url, { context: "navigation", sameOrigin: !options.allowCrossOrigin, requireCapability: options.allowCrossOrigin === true })) {
         el.dispatchEvent(new CustomEvent("uif:chart-drilldown-error", { detail: { error: new Error("Batoi UIF blocked an unsafe chart drilldown URL"), selection: detail, drilldown: options }, bubbles: true }));
         return;
       }
@@ -1409,7 +1408,7 @@ async function runDrilldown(el, detail, options) {
   target.dataset.uifState = "loading";
   try {
     const url = resolveDrilldownUrl(options.url, detail, options.param || "label");
-    if (!isSafeURL(url, { context: "network", allowHash: false, sameOrigin: !options.allowCrossOrigin })) throw new Error("Batoi UIF blocked an unsafe chart drilldown URL");
+    if (!isSafeURL(url, { context: "network", allowHash: false, sameOrigin: !options.allowCrossOrigin, requireCapability: options.allowCrossOrigin === true })) throw new Error("Batoi UIF blocked an unsafe chart drilldown URL");
     const html = await request(
       url,
       { method: "GET", parseAs: "text" }

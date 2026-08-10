@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { uifValues } from './attributes.js';
+import { uifActions, uifAttributes, uifErrors, uifEvents, uifStates, uifValues } from './attributes.js';
 import { getUIFComponentContract, uifComponentContracts } from './component-contracts.js';
 
 describe('component contracts', () => {
@@ -18,5 +18,20 @@ describe('component contracts', () => {
 
   it('returns undefined for extension-defined names', () => {
     expect(getUIFComponentContract('custom-widget')).toBeUndefined();
+  });
+
+  it('closes every component contract over the canonical registries', () => {
+    const registries = {
+      attributes: new Set<string>(uifAttributes),
+      actions: new Set<string>(uifActions),
+      events: new Set<string>(uifEvents),
+      states: new Set<string>(uifStates),
+      errors: new Set<string>(uifErrors),
+    };
+    Object.values(uifComponentContracts).forEach((contract) => {
+      (Object.keys(registries) as Array<keyof typeof registries>).forEach((field) => {
+        expect(contract[field].filter((value) => !registries[field].has(value)), `${contract.name}.${field}`).toEqual([]);
+      });
+    });
   });
 });

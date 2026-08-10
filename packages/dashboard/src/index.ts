@@ -1,4 +1,5 @@
 import { renderChart, type ChartDatum, type ChartOptions } from '@batoi/uif-charts';
+import { parseUIFConfiguration } from '@batoi/uif-core';
 import { setTrustedHTML } from '@batoi/uif-dom';
 
 export type DashboardWidgetType = 'metric' | 'chart' | 'table' | 'list' | 'custom';
@@ -155,7 +156,9 @@ export function initDashboard(el: HTMLElement): DashboardController | null {
     refresh(config) {
       if (destroyed) return;
       try {
-        const next = config ?? createDashboardConfig(JSON.parse(el.dataset.uifDashboard || el.dataset.uifOptions || raw) as DashboardConfig);
+        const parsed = parseUIFConfiguration(el.dataset.uifDashboard || el.dataset.uifOptions || raw);
+        if (!config && !parsed.valid) throw new Error(parsed.issues.map((issue) => issue.message).join(' '));
+        const next = config ?? createDashboardConfig(parsed.value as unknown as DashboardConfig);
         setTrustedHTML(el, renderDashboard(next), { trusted: true, context: 'dashboard render' });
       } catch (error) {
         el.dispatchEvent(new CustomEvent('uif:dashboard-error', { bubbles: true, detail: { code: 'dashboard-invalid-options', element: el, error } }));

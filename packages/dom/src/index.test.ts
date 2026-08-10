@@ -94,6 +94,19 @@ describe('dom', () => {
     configureURLCapabilities(null);
   });
 
+  it('requires an exact normalized capability path boundary when requested', () => {
+    configureURLCapabilities({
+      enforce: false,
+      capabilities: [{ origin: 'https://api.example.com', pathPrefix: '/v1', contexts: ['network'] }],
+    });
+    const policy = { context: 'network' as const, sameOrigin: false, requireCapability: true };
+    expect(isSafeURL('https://api.example.com/v1', policy)).toBe(true);
+    expect(isSafeURL('https://api.example.com/v1/records', policy)).toBe(true);
+    expect(isSafeURL('https://api.example.com/v10/records', policy)).toBe(false);
+    expect(isSafeURL('https://other.example.com/v1/records', policy)).toBe(false);
+    configureURLCapabilities(null);
+  });
+
   it('rejects malformed capability definitions', () => {
     expect(() =>
       configureURLCapabilities({ capabilities: [{ origin: 'https://user:secret@example.com' }] }),

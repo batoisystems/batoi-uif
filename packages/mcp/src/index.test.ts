@@ -1,9 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { configureCompatibility } from '@batoi/uif-core';
 import {
   createGovernedToolTransport,
   renderAgentToolEnvelope,
   renderApprovalPolicy,
   renderToolApproval,
+  renderToolDiscovery,
   renderToolPermissions,
   renderToolPlan,
   renderToolProgress,
@@ -11,6 +13,8 @@ import {
   renderToolResult,
   renderToolReviewFlow,
 } from './index.js';
+
+afterEach(() => configureCompatibility(null));
 
 describe('mcp', () => {
   it('renders approval and emits approve events', () => {
@@ -134,6 +138,32 @@ describe('mcp', () => {
       { name: 'records.write', state: 'missing', detail: 'Owner approval required' },
     ]);
     expect(permissions.querySelector('[data-uif-state="missing"]')?.textContent).toContain('Owner approval required');
+  });
+
+  it('renders bounded governed tool discovery metadata as text', () => {
+    const host = document.createElement('div');
+    renderToolDiscovery(host, [{
+      name: 'records.preview',
+      title: '<Preview records>',
+      description: '<img src=x onerror=alert(1)>',
+      risk: 'low',
+      approval: 'required',
+      scopes: ['records.read'],
+    }]);
+    expect(host.querySelector('img')).toBeNull();
+    expect(host.textContent).toContain('<img src=x onerror=alert(1)>');
+    expect(host.querySelector('[data-uif-tool="records.preview"]')?.getAttribute('data-uif-state')).toBe('available');
+  });
+
+  it('fails closed for incomplete v3 approval reviews', () => {
+    configureCompatibility({ mode: 'v3' });
+    const host = document.createElement('div');
+    const invalid = vi.fn();
+    host.addEventListener('uif:tool-invalid-review', invalid);
+    renderToolReviewFlow(host, { tool: 'deploy' });
+    expect((host.querySelector('[data-uif-action="approve"]') as HTMLButtonElement).disabled).toBe(true);
+    expect(host.querySelector('.uif-tool-review')?.getAttribute('data-uif-state')).toBe('unavailable');
+    expect(invalid).toHaveBeenCalledWith(expect.objectContaining({ detail: expect.objectContaining({ issues: ['missing-request-id', 'invalid-expiry'] }) }));
   });
 
   it('distinguishes server-reported and verified receipts', () => {

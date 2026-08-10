@@ -1,7 +1,7 @@
 {
-  "browserGzipBytes": 145000,
+  "browserGzipBytes": 147000,
   "artifactGzipBytes": {
-    "dist/uif.iife.js": 145000
+    "dist/uif.iife.js": 147000
   },
   "initMilliseconds": 50,
   "packageGzipBytes": {
@@ -9,7 +9,7 @@
     "ai": 5000,
     "charts": 24000,
     "components": 10000,
-    "core": 27000,
+    "core": 33000,
     "dashboard": 3000,
     "desktop": 5000,
     "dom": 4000,
@@ -33,6 +33,6 @@
     "table": 8000
   },
   "budgetNotes": {
-    "v3-foundation": "The additive v3 preparation layer includes complete typed component metadata, unified hydration ownership, package profiles, generated contracts, versioned token modes, SBOM/provenance, and the 2.4 security and agent foundations. The 2.5 compatibility bundle remains below 145 KB gzip; profile imports and internal splitting remain required before 3.0 stable."
+    "v3-foundation": "The additive v3 preparation layer includes complete typed component metadata, unified resource and hydration ownership, package profiles, generated contracts, versioned token and locale modes, SBOM/provenance, and the 2.6 security and agent foundations. Core remains below 33 KB gzip and the 2.6 compatibility bundle remains below 147 KB gzip; profile imports and internal splitting remain required before 3.0 stable."
   }
 }

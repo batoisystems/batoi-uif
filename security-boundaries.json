@@ -6,7 +6,7 @@
     "ai": { "boundaries": ["authority", "html"], "policy": "Model content renders as bounded text; privileged execution remains server-side." },
     "charts": { "boundaries": ["html", "network", "url"], "policy": "SVG output uses governed sinks and remote/drilldown URLs use centralized policy." },
     "components": { "boundaries": ["html", "selector"], "policy": "Components construct DOM or consume explicitly trusted server markup and safe targets." },
-    "core": { "boundaries": [], "policy": "Lifecycle and registry orchestration does not accept remote authority." },
+    "core": { "boundaries": ["storage"], "policy": "Lifecycle and registry orchestration does not accept remote authority; storage partition helpers only scope and clear application-owned keys." },
     "css": { "boundaries": [], "policy": "Static CSS distribution has no executable trust boundary." },
     "dashboard": { "boundaries": ["html"], "policy": "Custom widget HTML is explicitly caller-trusted; ordinary values render as text." },
     "desktop": { "boundaries": ["html", "storage", "url"], "policy": "Body HTML is caller-trusted; links and versioned preference storage are governed." },

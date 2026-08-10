@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.6.0
+
+- Closed the canonical declarative attribute, action, event, state, error, component, and envelope registries with generated references and contract tests.
+- Added exact path-boundary cross-origin capabilities, mandatory registered capabilities at remote call sites, partitioned application/tenant/principal storage, and expanded automated security-policy gates.
+- Added shared bounded JSON parsing and resource ownership primitives, then adopted them across configuration, actions, effects, charts, AI, MCP, and registry-managed component lifecycle paths.
+- Added locale, direction, number, currency, date, and message hooks; completed logical-direction CSS and RTL checks while retaining high-contrast, forced-colors, and density modes.
+- Added server-provided MCP tool discovery and fail-closed v3 approval review behavior for incomplete or expired requests.
+
 ## 2.5.0
 
 - Added curated All, RAD, Dashboard, Mobile, Desktop, and Agent package profiles without introducing a second runtime.

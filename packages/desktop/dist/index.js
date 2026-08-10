@@ -1,15 +1,13 @@
 // src/index.ts
 import { isSafeURL, setTrustedHTML } from "@batoi/uif-dom";
+import { parseUIFConfiguration } from "@batoi/uif-core";
 function esc(value) {
   return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
-function parseJSON(value) {
+function parseDeclarativeJSON(value) {
   if (!value) return void 0;
-  try {
-    return JSON.parse(value);
-  } catch {
-    return void 0;
-  }
+  const result = parseUIFConfiguration(value);
+  return result.valid ? result.value : void 0;
 }
 function safeStorage() {
   try {
@@ -48,7 +46,7 @@ function createDesktopManifest(input) {
   return normalizeManifest(input);
 }
 function parseDesktopManifestElement(element) {
-  const options = parseJSON(element.dataset.uifOptions || element.dataset.uifDesktop);
+  const options = parseDeclarativeJSON(element.dataset.uifOptions || element.dataset.uifDesktop);
   return createDesktopManifest({
     id: element.dataset.uifDesktopApp || options?.id || "desktop-app",
     name: options?.name || element.dataset.uifDesktopName || element.getAttribute("aria-label") || "Desktop App",
@@ -125,7 +123,7 @@ function setDesktopStatus(element, status) {
 function initDesktopShell(element) {
   const raw = element.dataset.uifOptions || element.dataset.uifDesktop;
   if (raw) {
-    const options = parseJSON(raw);
+    const options = parseDeclarativeJSON(raw);
     if (options) setTrustedHTML(element, renderDesktopShell(options), { trusted: true, context: "desktop shell" });
     else element.dispatchEvent(new CustomEvent("uif:desktop-error", { bubbles: true, detail: { code: "desktop-invalid-options", element } }));
   }

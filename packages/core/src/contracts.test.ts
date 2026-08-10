@@ -4,6 +4,7 @@ import {
   assertSafePropertyPath,
   findUnsafeObjectPaths,
   isSafePropertyPath,
+  parseUIFJSON,
   parseUIFConfiguration,
   UIFError,
 } from './contracts.js';
@@ -45,5 +46,27 @@ describe('shared contracts', () => {
   it('returns typed issues for malformed and non-object configuration', () => {
     expect(parseUIFConfiguration('{').issues[0]?.code).toBe('invalid-json');
     expect(parseUIFConfiguration('[]').issues[0]?.code).toBe('not-object');
+  });
+
+  it('rejects oversized configuration before parsing it', () => {
+    const result = parseUIFConfiguration(`{"value":"${'x'.repeat(20)}"}`, {
+      limits: { maxCharacters: 10, maxBytes: 10 },
+    });
+    expect(result.valid).toBe(false);
+    expect(result.issues).toEqual(expect.arrayContaining([expect.objectContaining({ code: 'limit' })]));
+    expect(result.value).toEqual({});
+  });
+
+  it('normalizes bounded JSON payloads without prototype-bearing records', () => {
+    const result = parseUIFJSON<Array<{ name: string }>>('[{"name":"demo","__proto__":{"polluted":true}}]', {
+      shape: 'array',
+      limits: { maxItems: 2, maxDepth: 4, maxKeys: 10 },
+    });
+    expect(result.valid).toBe(false);
+    expect(result.value?.[0]).toEqual({ name: 'demo' });
+    expect(Object.getPrototypeOf(result.value?.[0] as object)).toBeNull();
+    expect(result.issues[0]?.code).toBe('unsafe-key');
+    expect(parseUIFJSON('{}', { shape: 'array' }).issues[0]?.code).toBe('invalid-shape');
+    expect(parseUIFJSON('[1,2,3]', { shape: 'array', limits: { maxItems: 2 } }).issues[0]?.code).toBe('limit');
   });
 });

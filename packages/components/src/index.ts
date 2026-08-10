@@ -1,4 +1,4 @@
-import { emit } from '@batoi/uif-core';
+import { emit, partitionStorageKey } from '@batoi/uif-core';
 import { collapse, expand, hide, show } from '@batoi/uif-effects';
 import { closeOverlay, openOverlay, positionOverlay, toggleOverlay } from '@batoi/uif-overlays';
 
@@ -52,7 +52,7 @@ function eventElement(event: Event): HTMLElement | null {
 function storageGet(key: string | undefined): string | null {
   if (!key) return null;
   try {
-    return window.localStorage?.getItem(key) ?? null;
+    return window.localStorage?.getItem(partitionStorageKey(key)) ?? null;
   } catch {
     return null;
   }
@@ -61,7 +61,7 @@ function storageGet(key: string | undefined): string | null {
 function storageSet(key: string | undefined, value: string): void {
   if (!key) return;
   try {
-    window.localStorage?.setItem(key, value);
+    window.localStorage?.setItem(partitionStorageKey(key), value);
   } catch {
     // Persistence is optional; shell behavior must keep working without storage.
   }

@@ -1,5 +1,5 @@
 // src/index.ts
-import { emit } from "@batoi/uif-core";
+import { emit, partitionStorageKey } from "@batoi/uif-core";
 import { collapse, expand, hide, show } from "@batoi/uif-effects";
 import { closeOverlay, openOverlay, positionOverlay, toggleOverlay } from "@batoi/uif-overlays";
 var instances = /* @__PURE__ */ new WeakMap();
@@ -31,7 +31,7 @@ function eventElement(event) {
 function storageGet(key) {
   if (!key) return null;
   try {
-    return window.localStorage?.getItem(key) ?? null;
+    return window.localStorage?.getItem(partitionStorageKey(key)) ?? null;
   } catch {
     return null;
   }
@@ -39,7 +39,7 @@ function storageGet(key) {
 function storageSet(key, value) {
   if (!key) return;
   try {
-    window.localStorage?.setItem(key, value);
+    window.localStorage?.setItem(partitionStorageKey(key), value);
   } catch {
   }
 }

@@ -1,7 +1,9 @@
 // src/index.ts
 import {
   emit,
-  validateAgentEnvelope
+  parseUIFJSON,
+  validateAgentEnvelope,
+  getCompatibilityMode
 } from "@batoi/uif-core";
 import { appendTextElement, isSafeURL } from "@batoi/uif-dom";
 import { cancelRequest, request } from "@batoi/uif-net";
@@ -36,7 +38,8 @@ function createGovernedToolTransport(options) {
   if (!isSafeURL(options.src, {
     context: "network",
     allowHash: false,
-    sameOrigin: !options.allowCrossOrigin
+    sameOrigin: !options.allowCrossOrigin,
+    requireCapability: options.allowCrossOrigin === true
   })) {
     throw new Error("Batoi UIF blocked an unsafe governed tool gateway URL");
   }
@@ -102,6 +105,26 @@ function renderToolPlan(el, items, options = {}) {
     appendTextElement(item, "p", String(entry.summary ?? "").slice(0, 1e4));
     if (Array.isArray(entry.dependsOn) && entry.dependsOn.length) appendTextElement(item, "p", `Depends on: ${entry.dependsOn.slice(0, 100).map(String).join(", ")}`);
     if (entry.expectedOutput) appendTextElement(item, "p", `Expected output: ${String(entry.expectedOutput).slice(0, 1e4)}`);
+    list.append(item);
+  });
+  section.append(list);
+  el.replaceChildren(section);
+}
+function renderToolDiscovery(el, tools, options = {}) {
+  const section = document.createElement("section");
+  section.className = "uif-tool-discovery";
+  section.setAttribute("role", "region");
+  appendTextElement(section, "h3", "Available governed tools");
+  const list = document.createElement("ul");
+  boundedItems(tools, options).forEach((tool) => {
+    const item = document.createElement("li");
+    item.dataset.uifTool = String(tool.name ?? "").slice(0, 200);
+    item.dataset.uifRisk = tool.risk ?? "medium";
+    item.dataset.uifState = tool.available === false ? "unavailable" : "available";
+    item.dataset.uifApproval = tool.approval ?? "required";
+    appendTextElement(item, "strong", String(tool.title ?? tool.name ?? "").slice(0, 1e3));
+    if (tool.description) appendTextElement(item, "p", String(tool.description).slice(0, 1e4));
+    if (tool.scopes?.length) appendTextElement(item, "p", `Scopes: ${boundedItems(tool.scopes.map(String), options).join(", ")}`);
     list.append(item);
   });
   section.append(list);
@@ -200,7 +223,9 @@ function initAgentToolEnvelope(el) {
   const raw = el.dataset.uifEnvelope;
   if (!raw) return;
   try {
-    renderAgentToolEnvelope(el, JSON.parse(raw));
+    const result = parseUIFJSON(raw, { shape: "object", limits: { maxItems: 1e3, maxDepth: 16, maxKeys: 1e4 } });
+    if (!result.valid || !result.value) throw new Error("Invalid or oversized tool envelope JSON");
+    renderAgentToolEnvelope(el, result.value);
     return decisionControllers.get(el);
   } catch (error) {
     emit("uif:agent:error", { code: "AGENT_TOOL_ENVELOPE_JSON", error }, el);
@@ -341,13 +366,23 @@ function renderToolReviewFlow(el, request2, options = {}) {
     review.append(...Array.from(auditHost.childNodes));
   }
   const actions = document.createElement("footer");
+  const strictReview = getCompatibilityMode() === "v3";
+  const expiresAt = request2.expiresAt ? Date.parse(request2.expiresAt) : Number.NaN;
+  const reviewIssues = strictReview ? [!request2.requestId ? "missing-request-id" : "", !request2.expiresAt || Number.isNaN(expiresAt) ? "invalid-expiry" : ""].filter(Boolean) : [];
   ["approve", "reject"].forEach((action) => {
     const button = document.createElement("button");
     button.type = "button";
     button.dataset.uifAction = action;
     button.textContent = action.charAt(0).toUpperCase() + action.slice(1);
+    if (action === "approve" && reviewIssues.length) button.disabled = true;
     actions.append(button);
   });
+  if (reviewIssues.length) {
+    review.dataset.uifState = "unavailable";
+    const status = appendTextElement(actions, "p", "Approval is unavailable because the governed review is incomplete.");
+    status.setAttribute("role", "status");
+    emit("uif:tool-invalid-review", { tool: request2.tool, issues: reviewIssues }, el);
+  }
   review.append(actions);
   el.replaceChildren(review);
   let decided = false;
@@ -386,6 +421,7 @@ export {
   renderDiff,
   renderToolApproval,
   renderToolAuditTrail,
+  renderToolDiscovery,
   renderToolPermissions,
   renderToolPlan,
   renderToolProgress,

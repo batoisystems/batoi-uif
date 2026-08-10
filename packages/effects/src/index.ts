@@ -1,3 +1,5 @@
+import { getCompatibilityMode, parseUIFJSON } from '@batoi/uif-core';
+
 export interface EffectOptions {
   className?: string;
   duration?: number;
@@ -245,12 +247,9 @@ function typedTextStrings(el: HTMLElement, options: TypedTextOptions): string[] 
   if (options.strings?.length) return options.strings.map(String).filter(Boolean);
   const raw = el.dataset.uifStrings;
   if (raw) {
-    try {
-      const parsed = JSON.parse(raw) as unknown;
-      if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean);
-    } catch {
-      return raw.split('|').map((value) => value.trim()).filter(Boolean);
-    }
+    const result = parseUIFJSON<unknown[]>(raw, { shape: 'array', limits: { maxItems: 100, maxCharacters: 10_000, maxBytes: 20_000, maxDepth: 2, maxKeys: 100 } });
+    if (result.valid && result.value) return result.value.map(String).filter(Boolean);
+    if (getCompatibilityMode() !== 'v3') return raw.split('|').map((value) => value.trim()).filter(Boolean);
   }
   return el.textContent ? [el.textContent] : [];
 }

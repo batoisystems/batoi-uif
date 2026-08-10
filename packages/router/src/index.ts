@@ -17,7 +17,7 @@ let routerSequence = 0;
 
 async function loadRoute(url: string, target: HTMLElement | null, options: RouterOptions, key: string, isActive: () => boolean): Promise<void> {
   const source = options.routes?.[new URL(url, window.location.href).pathname] || url;
-  if (!isSafeURL(source, { context: 'network', allowHash: false, sameOrigin: !options.allowCrossOrigin })) throw new Error('Batoi UIF blocked an unsafe route URL');
+  if (!isSafeURL(source, { context: 'network', allowHash: false, sameOrigin: !options.allowCrossOrigin, requireCapability: options.allowCrossOrigin === true })) throw new Error('Batoi UIF blocked an unsafe route URL');
   const html = await request<string>(source, { key, method: 'GET', parseAs: 'text', credentials: 'same-origin', timeout: 15_000 });
   if (!isActive()) return;
   const maxHTMLLength = Math.max(1, Math.floor(options.maxHTMLLength ?? 1_000_000));

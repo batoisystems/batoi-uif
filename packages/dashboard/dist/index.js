@@ -1,5 +1,6 @@
 // src/index.ts
 import { renderChart } from "@batoi/uif-charts";
+import { parseUIFConfiguration } from "@batoi/uif-core";
 import { setTrustedHTML } from "@batoi/uif-dom";
 var dashboardControllers = /* @__PURE__ */ new WeakMap();
 function esc(value) {
@@ -86,7 +87,9 @@ function initDashboard(el) {
     refresh(config) {
       if (destroyed) return;
       try {
-        const next = config ?? createDashboardConfig(JSON.parse(el.dataset.uifDashboard || el.dataset.uifOptions || raw));
+        const parsed = parseUIFConfiguration(el.dataset.uifDashboard || el.dataset.uifOptions || raw);
+        if (!config && !parsed.valid) throw new Error(parsed.issues.map((issue) => issue.message).join(" "));
+        const next = config ?? createDashboardConfig(parsed.value);
         setTrustedHTML(el, renderDashboard(next), { trusted: true, context: "dashboard render" });
       } catch (error) {
         el.dispatchEvent(new CustomEvent("uif:dashboard-error", { bubbles: true, detail: { code: "dashboard-invalid-options", element: el, error } }));

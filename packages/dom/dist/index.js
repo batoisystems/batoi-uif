@@ -106,7 +106,7 @@ function getURLCapabilityPolicy() {
 }
 function isURLCapabilityAllowed(url, context) {
   return urlCapabilityPolicy.capabilities.some(
-    (capability) => capability.origin === url.origin && (capability.contexts?.includes(context) ?? false) && url.pathname.startsWith(capability.pathPrefix ?? "/")
+    (capability) => capability.origin === url.origin && (capability.contexts?.includes(context) ?? false) && ((capability.pathPrefix ?? "/") === "/" || url.pathname === (capability.pathPrefix ?? "/").replace(/\/$/, "") || url.pathname.startsWith((capability.pathPrefix ?? "/").endsWith("/") ? capability.pathPrefix ?? "/" : `${capability.pathPrefix}/`))
   );
 }
 function setHTMLSink(target, html) {
@@ -133,7 +133,7 @@ function isSafeURL(value, policy = {}) {
     if (!(policy.protocols ?? defaults[context]).includes(parsed.protocol.toLowerCase())) return false;
     if (!policy.sameOrigin || typeof window === "undefined") {
       if (typeof window === "undefined" || parsed.origin === new URL(base).origin) return true;
-      return !urlCapabilityPolicy.enforce || isURLCapabilityAllowed(parsed, context);
+      return !policy.requireCapability && !urlCapabilityPolicy.enforce || isURLCapabilityAllowed(parsed, context);
     }
     if (parsed.origin === window.location.origin) return true;
     const websocketEquivalent = parsed.host === window.location.host && (parsed.protocol === "ws:" && window.location.protocol === "http:" || parsed.protocol === "wss:" && window.location.protocol === "https:");

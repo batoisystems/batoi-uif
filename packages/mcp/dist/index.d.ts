@@ -44,6 +44,15 @@ interface ToolPlanItem {
     expectedOutput?: string;
     approval?: 'none' | 'required' | 'separate';
 }
+interface ToolDiscoveryItem {
+    name: string;
+    title?: string;
+    description?: string;
+    risk?: 'low' | 'medium' | 'high' | 'critical';
+    available?: boolean;
+    approval?: 'none' | 'required' | 'separate';
+    scopes?: string[];
+}
 interface ToolPermissionScope {
     name: string;
     state: 'requested' | 'granted' | 'missing' | 'denied' | 'expiring';
@@ -86,6 +95,7 @@ interface GovernedToolTransport {
 }
 declare function createGovernedToolTransport(options: GovernedToolTransportOptions): GovernedToolTransport;
 declare function renderToolPlan(el: HTMLElement, items: ToolPlanItem[], options?: ToolRenderOptions): void;
+declare function renderToolDiscovery(el: HTMLElement, tools: ToolDiscoveryItem[], options?: ToolRenderOptions): void;
 declare function renderToolPermissions(el: HTMLElement, scopes: ToolPermissionScope[], options?: ToolRenderOptions): void;
 declare function renderToolReceipt(el: HTMLElement, receipt: ToolExecutionReceipt, options?: ToolRenderOptions): void;
 declare function renderAgentToolEnvelope(el: HTMLElement, input: unknown, options?: ToolRenderOptions): AgentInteractionEnvelope | null;
@@ -114,4 +124,4 @@ declare const agentTool: {
     init: typeof initAgentToolEnvelope;
 };
 
-export { type GovernedToolDecision, type GovernedToolTransport, type GovernedToolTransportOptions, type ToolDecisionController, type ToolExecutionReceipt, type ToolPermissionScope, type ToolPlanItem, type ToolPolicyCheck, type ToolRenderOptions, type ToolReviewRequest, agentTool, createGovernedToolTransport, initAgentToolEnvelope, renderAgentToolEnvelope, renderApprovalPolicy, renderDiff, renderToolApproval, renderToolAuditTrail, renderToolPermissions, renderToolPlan, renderToolProgress, renderToolReceipt, renderToolResult, renderToolReviewFlow, renderToolTimeline, toolApproval };
+export { type GovernedToolDecision, type GovernedToolTransport, type GovernedToolTransportOptions, type ToolDecisionController, type ToolDiscoveryItem, type ToolExecutionReceipt, type ToolPermissionScope, type ToolPlanItem, type ToolPolicyCheck, type ToolRenderOptions, type ToolReviewRequest, agentTool, createGovernedToolTransport, initAgentToolEnvelope, renderAgentToolEnvelope, renderApprovalPolicy, renderDiff, renderToolApproval, renderToolAuditTrail, renderToolDiscovery, renderToolPermissions, renderToolPlan, renderToolProgress, renderToolReceipt, renderToolResult, renderToolReviewFlow, renderToolTimeline, toolApproval };

@@ -23,6 +23,7 @@ interface SafeURLPolicy {
     allowHash?: boolean;
     sameOrigin?: boolean;
     protocols?: string[];
+    requireCapability?: boolean;
 }
 interface UIFURLCapability {
     origin: string;

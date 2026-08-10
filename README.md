@@ -395,7 +395,7 @@ Important attributes include:
 - `data-uif-icon-class`
 - `data-uif-icon-hidden`
 
-The canonical component, attribute, action, event, state, error, and envelope inventories are generated from the typed runtime definitions in [the contract reference](docs/generated/contracts.md). The versioned CSS contract is generated from the shipped stylesheet in [the design-token reference](docs/generated/design-tokens.md).
+The canonical component, attribute, action, event, state, error, and envelope inventories are generated from the typed runtime definitions in [the contract reference](docs/generated/contracts.md). The versioned CSS contract is generated from the shipped stylesheet in [the design-token reference](docs/generated/design-tokens.md). Locale configuration, direction, formatting, and message hooks are documented in [Localization](docs/localization.md).
 
 ## Development
 
@@ -414,7 +414,7 @@ If working before that migration is complete, use the currently available worksp
 
 ## Version 2
 
-The repository and framework packages are versioned `2.5.0`. This compatible preparation release adds curated package profiles, complete typed component metadata, generated contract and token references, unified hydration ownership, and deterministic SBOM/provenance artifacts while retaining the dependency-free v2 public surface.
+The repository and framework packages are versioned `2.6.0`. This compatible preparation release closes the typed registries, standardizes bounded configuration and resource ownership, hardens cross-origin and partitioned-storage policy, adds localization/RTL hooks, and completes advanced AI/MCP review surfaces while retaining the dependency-free v2 public surface.
 
 Curated v3-compatible namespace profiles are available from `@batoi/uif-profiles/all`, `/rad`, `/dashboard`, `/mobile`, `/desktop`, and `/agent`. See [Package Profiles](docs/package-profiles.md).
 

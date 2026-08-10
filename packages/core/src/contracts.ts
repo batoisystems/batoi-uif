@@ -152,7 +152,97 @@ export interface UIFConfigurationResult<T extends Record<string, unknown>> {
 export interface UIFConfigurationOptions {
   allowedKeys?: readonly string[];
   allowUnknown?: boolean;
-  limits?: UIFObjectInspectionOptions;
+  limits?: UIFResourceLimits;
+}
+
+export type UIFJSONShape = 'any' | 'array' | 'object';
+
+export interface UIFJSONParseOptions {
+  shape?: UIFJSONShape;
+  limits?: UIFResourceLimits;
+}
+
+export interface UIFJSONIssue {
+  path: string;
+  code: 'invalid-json' | 'invalid-shape' | 'unsafe-key' | 'limit';
+  message: string;
+}
+
+export interface UIFJSONResult<T = unknown> {
+  value: T | undefined;
+  issues: UIFJSONIssue[];
+  valid: boolean;
+}
+
+export function parseUIFJSON<T = unknown>(input: string, options: UIFJSONParseOptions = {}): UIFJSONResult<T> {
+  const limits = { ...defaultUIFResourceLimits, ...options.limits };
+  const bytes = typeof TextEncoder === 'undefined' ? input.length : new TextEncoder().encode(input).byteLength;
+  if (input.length > limits.maxCharacters || bytes > limits.maxBytes) {
+    return { value: undefined, issues: [{ path: '$', code: 'limit', message: 'JSON exceeds the allowed size.' }], valid: false };
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(input) as unknown;
+  } catch {
+    return { value: undefined, issues: [{ path: '$', code: 'invalid-json', message: 'Value must be valid JSON.' }], valid: false };
+  }
+  if ((options.shape === 'array' && !Array.isArray(parsed))
+    || (options.shape === 'object' && (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)))) {
+    return { value: undefined, issues: [{ path: '$', code: 'invalid-shape', message: `JSON must be a ${options.shape}.` }], valid: false };
+  }
+
+  const issues: UIFJSONIssue[] = [];
+  const seen = new WeakMap<object, unknown>();
+  let itemCount = 0;
+  let keyCount = 0;
+  const normalize = (value: unknown, path: string, depth: number): unknown => {
+    if (typeof value === 'string') {
+      if (value.length > limits.maxCharacters) {
+        issues.push({ path, code: 'limit', message: 'String exceeds the allowed length.' });
+        return value.slice(0, limits.maxCharacters);
+      }
+      return value;
+    }
+    if (!value || typeof value !== 'object') return value;
+    if (depth > limits.maxDepth) {
+      issues.push({ path, code: 'limit', message: 'JSON exceeds the allowed nesting depth.' });
+      return undefined;
+    }
+    const existing = seen.get(value);
+    if (existing !== undefined) return existing;
+    if (Array.isArray(value)) {
+      const output: unknown[] = [];
+      seen.set(value, output);
+      value.forEach((item, index) => {
+        itemCount += 1;
+        if (itemCount > limits.maxItems) {
+          if (itemCount === limits.maxItems + 1) issues.push({ path, code: 'limit', message: 'JSON exceeds the allowed item count.' });
+          return;
+        }
+        output.push(normalize(item, `${path}[${index}]`, depth + 1));
+      });
+      return output;
+    }
+    const output = Object.create(null) as Record<string, unknown>;
+    seen.set(value, output);
+    Object.entries(value).forEach(([key, item]) => {
+      keyCount += 1;
+      const itemPath = path === '$' ? `$.${key}` : `${path}.${key}`;
+      if (keyCount > limits.maxKeys) {
+        if (keyCount === limits.maxKeys + 1) issues.push({ path: itemPath, code: 'limit', message: 'JSON exceeds the allowed key count.' });
+        return;
+      }
+      if (!isSafeObjectKey(key)) {
+        issues.push({ path: itemPath, code: 'unsafe-key', message: `Unsafe JSON key: ${key}` });
+        return;
+      }
+      output[key] = normalize(item, itemPath, depth + 1);
+    });
+    return output;
+  };
+
+  const value = normalize(parsed, '$', 0) as T;
+  return { value, issues, valid: issues.length === 0 };
 }
 
 export function parseUIFConfiguration<T extends Record<string, unknown> = Record<string, unknown>>(
@@ -162,11 +252,19 @@ export function parseUIFConfiguration<T extends Record<string, unknown> = Record
   const issues: UIFConfigurationIssue[] = [];
   let parsed: unknown = input;
   if (typeof input === 'string') {
-    try {
-      parsed = JSON.parse(input) as unknown;
-    } catch {
-      issues.push({ path: '$', code: 'invalid-json', message: 'Configuration must be valid JSON.' });
+    const maxCharacters = Math.max(1, Math.floor(options.limits?.maxCharacters ?? defaultUIFResourceLimits.maxCharacters));
+    const maxBytes = Math.max(1, Math.floor(options.limits?.maxBytes ?? defaultUIFResourceLimits.maxBytes));
+    const bytes = typeof TextEncoder === 'undefined' ? input.length : new TextEncoder().encode(input).byteLength;
+    if (input.length > maxCharacters || bytes > maxBytes) {
+      issues.push({ path: '$', code: 'limit', message: 'Configuration exceeds the allowed size.' });
       parsed = {};
+    } else {
+      try {
+        parsed = JSON.parse(input) as unknown;
+      } catch {
+        issues.push({ path: '$', code: 'invalid-json', message: 'Configuration must be valid JSON.' });
+        parsed = {};
+      }
     }
   }
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
@@ -174,7 +272,7 @@ export function parseUIFConfiguration<T extends Record<string, unknown> = Record
     parsed = {};
   }
 
-  const unsafe = findUnsafeObjectPaths(parsed, options.limits);
+  const unsafe = findUnsafeObjectPaths(parsed, { maxDepth: options.limits?.maxDepth, maxKeys: options.limits?.maxKeys });
   unsafe.forEach((path) => {
     issues.push({ path, code: 'unsafe-key', message: `Unsafe or excessively complex configuration path: ${path}` });
   });

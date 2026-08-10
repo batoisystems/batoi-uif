@@ -37,7 +37,7 @@ Malformed target selectors resolve to no target instead of stopping framework in
 
 RAD, router, chart, realtime, table, form, push, and service-worker network/navigation URLs are same-origin by default. Approved cross-origin chart, realtime, table, form, and RAD sources require `data-uif-allow-cross-origin="true"`; programmatic router, chart, and table options expose the equivalent explicit flag. Push and service-worker endpoints remain same-origin. WebSocket `ws:`/`wss:` origins are compared with their HTTP/HTTPS page equivalents.
 
-For v3-compatible applications, register cross-origin capabilities centrally and enable enforcement. Capabilities bind an exact origin to a path prefix and one or more contexts; wildcard origins and credential-bearing URLs are rejected:
+Register cross-origin capabilities centrally before enabling a cross-origin package option or declarative flag. Capabilities bind an exact origin to a normalized path boundary and one or more contexts; wildcard origins and credential-bearing URLs are rejected:
 
 ```ts
 configureURLCapabilities({
@@ -46,7 +46,7 @@ configureURLCapabilities({
 });
 ```
 
-Legacy per-element cross-origin flags remain a compatibility path, but cannot bypass an enforced application capability policy.
+Per-element and programmatic cross-origin flags express intent only. They cannot grant access by themselves: the requested origin, path boundary, and URL context must match a registered capability even when global capability enforcement is disabled. Global `enforce: true` additionally applies capability checks to callers that request a permissive URL policy without an explicit package flag.
 
 ## Trusted Types and CSP
 
@@ -101,6 +101,8 @@ Periodic data connectors never overlap their own polling work, use a minimum 250
 `createLocalStore()` namespaces data, records a schema version, validates keys, bounds individual values/import size and entry count, reports malformed persisted JSON explicitly, and validates imports before replacing existing data. Its `indexeddb` driver uses a versioned database, transactional migration callback, atomic imports, and explicit failure when IndexedDB is unavailable. `createAdvancedStore()` and Micro App persistence use versioned envelopes, retain version-one legacy-object compatibility, bound serialized payload size, and expose `onPersistError` so inaccessible, malformed, mismatched, circular, or quota-failed storage does not abort in-memory state updates.
 
 Local and session storage are application convenience stores, not secure credential stores. Do not persist access tokens, secrets, regulated records, private tool payloads, or authorization state there. Server authorization remains authoritative, and applications own migration decisions when changing `version` or `persistVersion`.
+
+Applications with authenticated preferences should call `configureStoragePartition({ applicationId, tenantId, principalId })` before mounting components. UIF then prefixes component preference keys by application, tenant, and principal. Call `clearStoragePartition()` during sign-out, and configure the new partition before mounting after an account or tenant change. With no configured partition, legacy v2 keys remain unchanged for compatibility. Partition identifiers and stored values are still untrusted browser data and never confer authorization.
 
 Desktop preference storage falls back to process-memory preferences when local storage is unavailable, malformed, or full. Malformed dashboard and desktop declarative JSON leaves server-rendered fallback content intact and emits `uif:dashboard-error` or `uif:desktop-error`.
 

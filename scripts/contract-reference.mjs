@@ -39,6 +39,7 @@ export async function collectContractReference(root) {
       actions: [...uif.uifActions],
       states: [...uif.uifStates],
       events: [...uif.uifEvents],
+      errors: [...uif.uifErrors],
     },
     components,
     envelopes: {

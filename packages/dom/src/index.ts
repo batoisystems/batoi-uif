@@ -29,6 +29,7 @@ export interface SafeURLPolicy {
   allowHash?: boolean;
   sameOrigin?: boolean;
   protocols?: string[];
+  requireCapability?: boolean;
 }
 
 export interface UIFURLCapability {
@@ -177,7 +178,9 @@ export function isURLCapabilityAllowed(url: URL, context: SafeURLContext): boole
   return urlCapabilityPolicy.capabilities.some((capability) =>
     capability.origin === url.origin &&
     (capability.contexts?.includes(context) ?? false) &&
-    url.pathname.startsWith(capability.pathPrefix ?? '/'),
+    ((capability.pathPrefix ?? '/') === '/' ||
+      url.pathname === (capability.pathPrefix ?? '/').replace(/\/$/, '') ||
+      url.pathname.startsWith((capability.pathPrefix ?? '/').endsWith('/') ? (capability.pathPrefix ?? '/') : `${capability.pathPrefix}/`)),
   );
 }
 
@@ -203,7 +206,7 @@ export function isSafeURL(value: string, policy: SafeURLPolicy = {}): boolean {
     if (!(policy.protocols ?? defaults[context]).includes(parsed.protocol.toLowerCase())) return false;
     if (!policy.sameOrigin || typeof window === 'undefined') {
       if (typeof window === 'undefined' || parsed.origin === new URL(base).origin) return true;
-      return !urlCapabilityPolicy.enforce || isURLCapabilityAllowed(parsed, context);
+      return (!policy.requireCapability && !urlCapabilityPolicy.enforce) || isURLCapabilityAllowed(parsed, context);
     }
     if (parsed.origin === window.location.origin) return true;
     const websocketEquivalent = parsed.host === window.location.host && ((parsed.protocol === 'ws:' && window.location.protocol === 'http:') || (parsed.protocol === 'wss:' && window.location.protocol === 'https:'));

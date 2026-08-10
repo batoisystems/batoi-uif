@@ -325,7 +325,8 @@ function appendTableQuery(url: URL, table: HTMLTableElement, options: TableOptio
 export async function loadRemoteTable(table: HTMLTableElement, options: TableOptions = {}): Promise<RemoteTableResponse | null> {
   const src = options.src || table.dataset.uifSrc;
   if (!src) return null;
-  if (!isSafeURL(src, { context: 'network', allowHash: false, sameOrigin: !(options.allowCrossOrigin ?? table.dataset.uifAllowCrossOrigin === 'true') })) {
+  const allowCrossOrigin = options.allowCrossOrigin ?? table.dataset.uifAllowCrossOrigin === 'true';
+  if (!isSafeURL(src, { context: 'network', allowHash: false, sameOrigin: !allowCrossOrigin, requireCapability: allowCrossOrigin })) {
     const error = new Error('Batoi UIF blocked an unsafe table data URL');
     setTableState(table, 'error');
     table.dispatchEvent(new CustomEvent('uif:table-error', { detail: { table, error }, bubbles: true }));

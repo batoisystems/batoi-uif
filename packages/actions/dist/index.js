@@ -1,5 +1,5 @@
 // src/index.ts
-import { emit } from "@batoi/uif-core";
+import { emit, parseUIFJSON } from "@batoi/uif-core";
 import { setSafeHTML, setText } from "@batoi/uif-dom";
 import { animate, hide, show, toggle } from "@batoi/uif-effects";
 var handlers = /* @__PURE__ */ new Map();
@@ -87,9 +87,9 @@ function parseActionSpec(el) {
   if (rawActions) {
     const [event, ...mods] = (el.dataset.uifEvent || "click").split(".");
     let parsed = [];
-    try {
-      parsed = JSON.parse(rawActions);
-    } catch {
+    const result = parseUIFJSON(rawActions, { shape: "array", limits: { maxItems: 100, maxDepth: 8, maxKeys: 1e3 } });
+    if (result.valid && result.value) parsed = result.value;
+    else {
       reportDiagnostic({ level: "error", message: "Invalid data-uif-actions JSON.", source: el });
     }
     specs.push({
@@ -119,9 +119,9 @@ function parseActionSpec(el) {
   const raw = el.dataset.uifOn;
   if (raw) {
     let parsed = {};
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
+    const result = parseUIFJSON(raw, { shape: "object", limits: { maxItems: 100, maxDepth: 8, maxKeys: 1e3 } });
+    if (result.valid && result.value) parsed = result.value;
+    else {
       reportDiagnostic({ level: "error", message: "Invalid data-uif-on JSON.", source: el });
     }
     Object.entries(parsed).forEach(([eventSpec, value]) => {

@@ -102,6 +102,12 @@ function parseJSON<T>(value: string | undefined): T | undefined {
   }
 }
 
+function parseDeclarativeJSON<T>(value: string | undefined): T | undefined {
+  if (!value) return undefined;
+  const result = parseUIFConfiguration(value);
+  return result.valid ? result.value as T : undefined;
+}
+
 function safeStorage(): Storage | undefined {
   try {
     return typeof window !== 'undefined' ? window.localStorage : undefined;
@@ -147,7 +153,7 @@ export function createDesktopManifest(input: DesktopAppManifest): DesktopAppMani
 }
 
 export function parseDesktopManifestElement(element: HTMLElement): DesktopAppManifest {
-  const options = parseJSON<Partial<DesktopAppManifest>>(element.dataset.uifOptions || element.dataset.uifDesktop);
+  const options = parseDeclarativeJSON<Partial<DesktopAppManifest>>(element.dataset.uifOptions || element.dataset.uifDesktop);
   return createDesktopManifest({
     id: element.dataset.uifDesktopApp || options?.id || 'desktop-app',
     name: options?.name || element.dataset.uifDesktopName || element.getAttribute('aria-label') || 'Desktop App',
@@ -235,7 +241,7 @@ export function setDesktopStatus(element: HTMLElement, status: DesktopShellStatu
 export function initDesktopShell(element: HTMLElement): () => void {
   const raw = element.dataset.uifOptions || element.dataset.uifDesktop;
   if (raw) {
-    const options = parseJSON<DesktopShellOptions>(raw);
+    const options = parseDeclarativeJSON<DesktopShellOptions>(raw);
     if (options) setTrustedHTML(element, renderDesktopShell(options), { trusted: true, context: 'desktop shell' });
     else element.dispatchEvent(new CustomEvent('uif:desktop-error', { bubbles: true, detail: { code: 'desktop-invalid-options', element } }));
   }
@@ -389,3 +395,4 @@ export function bindDesktopOfflineIndicator(element: HTMLElement, options: { off
   };
 }
 import { isSafeURL, setTrustedHTML } from '@batoi/uif-dom';
+import { parseUIFConfiguration } from '@batoi/uif-core';

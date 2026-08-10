@@ -1,4 +1,5 @@
 // src/index.ts
+import { getCompatibilityMode, parseUIFJSON } from "@batoi/uif-core";
 var animationPresets = [
   { name: "fade-in", category: "entrance", duration: 180, description: "Fade content into view." },
   { name: "fade-out", category: "exit", duration: 180, description: "Fade content out of view." },
@@ -186,12 +187,9 @@ function typedTextStrings(el, options) {
   if (options.strings?.length) return options.strings.map(String).filter(Boolean);
   const raw = el.dataset.uifStrings;
   if (raw) {
-    try {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean);
-    } catch {
-      return raw.split("|").map((value) => value.trim()).filter(Boolean);
-    }
+    const result = parseUIFJSON(raw, { shape: "array", limits: { maxItems: 100, maxCharacters: 1e4, maxBytes: 2e4, maxDepth: 2, maxKeys: 100 } });
+    if (result.valid && result.value) return result.value.map(String).filter(Boolean);
+    if (getCompatibilityMode() !== "v3") return raw.split("|").map((value) => value.trim()).filter(Boolean);
   }
   return el.textContent ? [el.textContent] : [];
 }

@@ -30,7 +30,7 @@ Stateless decorators may return `void` when repeated application only sets the s
 
 `release-budgets.json` is enforced by `npm run verify:release`.
 
-- Root ESM JavaScript, IIFE JavaScript, and CSS artifacts must remain below 145,000 gzip bytes. The 2.5.0 increase covers complete typed component metadata and unified lifecycle/profile preparation; production applications should prefer package or profile imports over the compatibility all-in-one bundle.
+- Root ESM JavaScript, IIFE JavaScript, and CSS artifacts must remain below 147,000 gzip bytes. The 2.6.0 increase covers closed typed registries, shared bounded parsing/resource ownership, localization, storage partitioning, and cross-origin capability enforcement; production applications should prefer package or profile imports over the compatibility all-in-one bundle.
 - Package JavaScript budgets include every emitted `.js` chunk in that package.
 - The jsdom component initialization smoke path must complete within 50 ms on at least one of three runs.
 - Framework packages must have no third-party runtime dependencies.

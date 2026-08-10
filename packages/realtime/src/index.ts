@@ -171,7 +171,7 @@ export function connect(options: RealtimeOptions): void {
   const mode = options.mode ?? 'poll';
   closeConnection(options.channel, false);
   const protocols = mode === 'websocket' ? ['ws:', 'wss:'] : ['http:', 'https:'];
-  if (options.src && !isSafeURL(options.src, { context: 'network', allowHash: false, sameOrigin: !options.allowCrossOrigin, protocols })) {
+  if (options.src && !isSafeURL(options.src, { context: 'network', allowHash: false, sameOrigin: !options.allowCrossOrigin, protocols, requireCapability: options.allowCrossOrigin === true })) {
     const error = new Error('Batoi UIF blocked an unsafe realtime URL');
     setState(options.channel, 'failed');
     dispatchRealtimeEvent('uif:realtime-error', { channel: options.channel, error });

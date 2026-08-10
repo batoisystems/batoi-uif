@@ -4,37 +4,37 @@
     {
       "name": "dist/index.d.ts",
       "digest": {
-        "sha256": "73d9f09c881b669fbce397b4f3030b1cb9272fac3b392a9d6aa965ad591f1ce1"
+        "sha256": "d7dd17ef8b36300ffbcf2eb0065fea3dadd4261cdb900a0392f70c7ee21e539b"
       }
     },
     {
       "name": "dist/index.js",
       "digest": {
-        "sha256": "bc25f251f04e71d7313bac88f8e5cfa14520df906be7bd6918e8cfc92d1546ca"
+        "sha256": "f377d27694561bc485eb539033eec1630a5dee41bbce7428e39eec03bd46a65a"
       }
     },
     {
       "name": "dist/index.global.js",
       "digest": {
-        "sha256": "7eec18408fe9da85296e1714fa54fc02ce2957d49959cdbc1ec140e415680cf1"
+        "sha256": "85710971c5691052ec4900721b6bb5842cbb7693988e5ff33bacbff4e93bee4a"
       }
     },
     {
       "name": "dist/uif.css",
       "digest": {
-        "sha256": "90e156eadb01c4d033b3bbf9782fea36aecb344758dd0feeea42dea5c2f55539"
+        "sha256": "a5cdccee2d2da7150e6c86a37960fad20e2a402a81677be3f6544e007a983c33"
       }
     },
     {
       "name": "dist/uif.esm.js",
       "digest": {
-        "sha256": "bc25f251f04e71d7313bac88f8e5cfa14520df906be7bd6918e8cfc92d1546ca"
+        "sha256": "f377d27694561bc485eb539033eec1630a5dee41bbce7428e39eec03bd46a65a"
       }
     },
     {
       "name": "dist/uif.iife.js",
       "digest": {
-        "sha256": "7eec18408fe9da85296e1714fa54fc02ce2957d49959cdbc1ec140e415680cf1"
+        "sha256": "85710971c5691052ec4900721b6bb5842cbb7693988e5ff33bacbff4e93bee4a"
       }
     }
   ],
@@ -43,7 +43,7 @@
     "buildDefinition": {
       "buildType": "https://batoi.com/uif/npm-workspace-build/v1",
       "externalParameters": {
-        "version": "2.5.0",
+        "version": "2.6.0",
         "command": "npm run build:dist"
       },
       "internalParameters": {
@@ -57,7 +57,7 @@
         "id": "https://github.com/batoi/batoi-uif/.github/workflows/ci.yml"
       },
       "metadata": {
-        "invocationId": "batoi-uif-2.5.0",
+        "invocationId": "batoi-uif-2.6.0",
         "startedOn": null,
         "finishedOn": null
       }

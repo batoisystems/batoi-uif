@@ -1,5 +1,6 @@
 // src/index.ts
 import {
+  parseUIFJSON,
   validateAgentEnvelope
 } from "@batoi/uif-core";
 import { appendTextElement, isSafeURL } from "@batoi/uif-dom";
@@ -358,7 +359,8 @@ function createGovernedAgentTransport(options) {
   if (!isSafeURL(options.src, {
     context: "network",
     allowHash: false,
-    sameOrigin: !options.allowCrossOrigin
+    sameOrigin: !options.allowCrossOrigin,
+    requireCapability: options.allowCrossOrigin === true
   })) {
     throw new Error("Batoi UIF blocked an unsafe governed agent gateway URL");
   }
@@ -407,8 +409,9 @@ function initAssistantThread(el) {
   const raw = el.dataset.uifMessages;
   if (!raw) return;
   try {
-    const input = JSON.parse(raw);
-    renderAssistantThread(el, Array.isArray(input) ? input : []);
+    const result = parseUIFJSON(raw, { shape: "array", limits: { maxItems: 1e3, maxDepth: 16, maxKeys: 1e4 } });
+    if (!result.valid || !result.value) throw new Error("Invalid or oversized assistant thread JSON");
+    renderAssistantThread(el, result.value);
   } catch (error) {
     el.dispatchEvent(new CustomEvent("uif:agent:error", { bubbles: true, detail: { code: "AGENT_THREAD_JSON", error } }));
   }

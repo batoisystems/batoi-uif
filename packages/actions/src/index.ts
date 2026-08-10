@@ -1,4 +1,4 @@
-import { emit } from '@batoi/uif-core';
+import { emit, parseUIFJSON } from '@batoi/uif-core';
 import { setSafeHTML, setText } from '@batoi/uif-dom';
 import { animate, hide, show, toggle } from '@batoi/uif-effects';
 
@@ -136,9 +136,9 @@ export function parseActionSpec(el: HTMLElement): ParsedAction[] {
   if (rawActions) {
     const [event, ...mods] = (el.dataset.uifEvent || 'click').split('.');
     let parsed: Array<{ action: string; target?: string; value?: string; class?: string; attribute?: string; confirm?: string; if?: string; params?: Record<string, unknown> }> = [];
-    try {
-      parsed = JSON.parse(rawActions) as typeof parsed;
-    } catch {
+    const result = parseUIFJSON<typeof parsed>(rawActions, { shape: 'array', limits: { maxItems: 100, maxDepth: 8, maxKeys: 1_000 } });
+    if (result.valid && result.value) parsed = result.value;
+    else {
       reportDiagnostic({ level: 'error', message: 'Invalid data-uif-actions JSON.', source: el });
     }
     specs.push({
@@ -168,9 +168,9 @@ export function parseActionSpec(el: HTMLElement): ParsedAction[] {
   const raw = el.dataset.uifOn;
   if (raw) {
     let parsed: Record<string, { action: string; target?: string; prevent?: boolean; stop?: boolean; once?: boolean; value?: string; class?: string; attribute?: string; confirm?: string; if?: string; params?: Record<string, unknown> }> = {};
-    try {
-      parsed = JSON.parse(raw) as typeof parsed;
-    } catch {
+    const result = parseUIFJSON<typeof parsed>(raw, { shape: 'object', limits: { maxItems: 100, maxDepth: 8, maxKeys: 1_000 } });
+    if (result.valid && result.value) parsed = result.value;
+    else {
       reportDiagnostic({ level: 'error', message: 'Invalid data-uif-on JSON.', source: el });
     }
     Object.entries(parsed).forEach(([eventSpec, value]) => {

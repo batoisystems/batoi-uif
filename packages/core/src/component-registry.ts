@@ -1,5 +1,6 @@
 import { emit } from './index.js';
 import { parseUIFConfiguration, UIFError, type UIFErrorDetail, type UIFResourceLimits } from './contracts.js';
+import { createResourceScope, type UIFResourceScope } from './resource-scope.js';
 
 export interface UIFController {
   update?(reason: UIFUpdateReason): void | Promise<void>;
@@ -15,6 +16,7 @@ export interface UIFMountContext<Options extends Record<string, unknown>> {
   root: Document | HTMLElement;
   options: Readonly<Options>;
   signal: AbortSignal;
+  resources: UIFResourceScope;
   emit<T = unknown>(name: string, detail?: T): void;
   error(message: string, detail: Omit<UIFErrorDetail, 'package' | 'component'>): UIFError;
 }
@@ -53,7 +55,7 @@ export interface UIFComponentRegistry {
 
 interface MountedComponent {
   controller: UIFController;
-  abortController: AbortController;
+  resources: UIFResourceScope;
 }
 
 const componentNamePattern = /^[a-z][a-z0-9-]*$/;
@@ -80,7 +82,7 @@ export function createComponentRegistry(): UIFComponentRegistry {
     const targets = name ? [[name, entries.get(name)] as const] : Array.from(entries.entries());
     targets.forEach(([componentName, entry]) => {
       if (!entry) return;
-      entry.abortController.abort();
+      entry.resources.destroy();
       try {
         entry.controller.destroy();
       } catch (cause) {
@@ -157,22 +159,23 @@ export function createComponentRegistry(): UIFComponentRegistry {
           emit('uif:runtime:diagnostic', { component: name, issues: parsed.issues }, element);
         }
         const options = Object.freeze({ ...(definition.defaults ?? {}), ...parsed.value });
-        const abortController = new AbortController();
+        const resources = createResourceScope();
         try {
           const controller = normalizeController(definition.mount({
             element,
             root,
             options,
-            signal: abortController.signal,
+            signal: resources.signal,
+            resources,
             emit: (eventName, detail) => emit(eventName, detail, element),
             error: (message, detail) => new UIFError(message, { ...detail, package: 'core', component: name }),
           }));
-          entries.set(name, { controller, abortController });
+          entries.set(name, { controller, resources });
           mounted.set(element, entries);
           ownedElements.add(element);
           emit('uif:runtime:mounted', { component: name, version: definition.version ?? 3 }, element);
         } catch (cause) {
-          abortController.abort();
+          resources.destroy();
           emit('uif:runtime:error', {
             code: 'UIF_COMPONENT_MOUNT',
             category: 'internal',

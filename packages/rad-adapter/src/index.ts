@@ -75,7 +75,7 @@ function getAttr(sourceEl: HTMLElement, name: string): string | null {
 
 function requestUrl(src: string, sourceEl: HTMLElement, method: string): string {
   const allowCrossOrigin = sourceEl.dataset.uifAllowCrossOrigin === 'true';
-  if (!isSafeURL(src, { context: 'network', allowHash: false, sameOrigin: !allowCrossOrigin })) throw new Error('Batoi UIF blocked an unsafe RAD request URL');
+  if (!isSafeURL(src, { context: 'network', allowHash: false, sameOrigin: !allowCrossOrigin, requireCapability: allowCrossOrigin })) throw new Error('Batoi UIF blocked an unsafe RAD request URL');
   if (!(sourceEl instanceof HTMLFormElement) || !bodylessMethods.has(method)) return src;
   const url = new URL(src, window.location.href);
   new FormData(sourceEl).forEach((value, key) => {

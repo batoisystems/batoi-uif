@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "2.5.0",
+  "version": "2.6.0",
   "packages": {
     "actions": {
       "name": "@batoi/uif-actions",
@@ -30,6 +30,7 @@
         "."
       ],
       "dependencies": [
+        "@batoi/uif-core",
         "@batoi/uif-dom",
         "@batoi/uif-net"
       ]
@@ -66,6 +67,7 @@
       ],
       "dependencies": [
         "@batoi/uif-charts",
+        "@batoi/uif-core",
         "@batoi/uif-dom"
       ]
     },
@@ -75,6 +77,7 @@
         "."
       ],
       "dependencies": [
+        "@batoi/uif-core",
         "@batoi/uif-dom"
       ]
     },
@@ -101,7 +104,9 @@
       "exports": [
         "."
       ],
-      "dependencies": []
+      "dependencies": [
+        "@batoi/uif-core"
+      ]
     },
     "extension-kit": {
       "name": "@batoi/uif-extension-kit",
@@ -445,12 +450,17 @@
       "deactivate",
       "delete",
       "disconnect",
+      "edit",
       "emit",
       "focus",
+      "install",
       "load",
       "navigate",
+      "next",
       "open",
       "prepend",
+      "preview",
+      "previous",
       "reject",
       "reload",
       "remove",
@@ -470,27 +480,45 @@
       "toggle",
       "toggle-class",
       "toggle-section",
-      "toggle-sidebar"
+      "toggle-sidebar",
+      "unsubscribe"
     ],
     "states": [
       "active",
       "approved",
+      "available",
+      "busy",
       "closed",
       "collapsed",
+      "completed",
       "connected",
+      "connecting",
+      "decision-pending",
+      "dirty",
       "disabled",
       "disconnected",
+      "empty",
       "error",
       "expanded",
+      "expired",
+      "failed",
       "idle",
       "inactive",
+      "installed",
       "loaded",
       "loading",
+      "offline",
+      "online",
       "open",
       "pending",
       "rejected",
+      "saved",
+      "saving",
       "selected",
-      "success"
+      "submitting",
+      "success",
+      "unavailable",
+      "waiting-approval"
     ]
   },
   "events": [
@@ -522,7 +550,11 @@
     "uif:chart-refresh",
     "uif:chart-select",
     "uif:close",
+    "uif:collapse-close",
+    "uif:collapse-open",
     "uif:combobox-change",
+    "uif:command-menu-close",
+    "uif:command-menu-open",
     "uif:complete",
     "uif:connector-error",
     "uif:dashboard-error",
@@ -530,6 +562,10 @@
     "uif:desktop-error",
     "uif:destroy",
     "uif:diagnostic",
+    "uif:drawer-close",
+    "uif:drawer-open",
+    "uif:dropdown-close",
+    "uif:dropdown-open",
     "uif:editor-autosave",
     "uif:editor-autosave-error",
     "uif:editor-blur",
@@ -556,9 +592,14 @@
     "uif:form-success",
     "uif:form-touched",
     "uif:init",
+    "uif:lightbox-close",
     "uif:lightbox-open",
     "uif:load",
+    "uif:modal-close",
+    "uif:modal-open",
     "uif:notification",
+    "uif:offcanvas-close",
+    "uif:offcanvas-open",
     "uif:offline-error",
     "uif:offline-queued",
     "uif:offline-synced",
@@ -568,6 +609,8 @@
     "uif:overlay-open",
     "uif:overlay-opened",
     "uif:pagination-change",
+    "uif:popover-close",
+    "uif:popover-open",
     "uif:presence",
     "uif:push-change",
     "uif:push-error",
@@ -613,6 +656,7 @@
     "uif:tool-approve",
     "uif:tool-confirmation-required",
     "uif:tool-expired",
+    "uif:tool-invalid-review",
     "uif:tool-reject",
     "uif:tool-replay-blocked",
     "uif:typed-text-complete",
@@ -1357,6 +1401,7 @@
       "uif-text-4xl",
       "uif-text-center",
       "uif-text-danger",
+      "uif-text-end",
       "uif-text-info",
       "uif-text-left",
       "uif-text-lg",
@@ -1365,6 +1410,7 @@
       "uif-text-primary",
       "uif-text-right",
       "uif-text-sm",
+      "uif-text-start",
       "uif-text-subtle",
       "uif-text-success",
       "uif-text-swatch",
@@ -2742,6 +2788,7 @@
       "events": [
         "uif:tool-approve",
         "uif:tool-expired",
+        "uif:tool-invalid-review",
         "uif:tool-reject"
       ],
       "states": [

@@ -26,17 +26,29 @@ var BatoiUIF = (() => {
     agentEnvelopeContract: () => agentEnvelopeContract,
     agentEnvelopeKinds: () => agentEnvelopeKinds,
     agentEnvelopeStatuses: () => agentEnvelopeStatuses,
+    applyLocale: () => applyLocale,
     assertSafeObject: () => assertSafeObject,
     assertSafePropertyPath: () => assertSafePropertyPath,
+    clearStoragePartition: () => clearStoragePartition,
     configureCompatibility: () => configureCompatibility,
     configureDiagnostics: () => configureDiagnostics,
+    configureLocale: () => configureLocale,
+    configureStoragePartition: () => configureStoragePartition,
     createComponentRegistry: () => createComponentRegistry,
     createHydrationLifecycle: () => createHydrationLifecycle,
+    createResourceScope: () => createResourceScope,
     defaultUIFResourceLimits: () => defaultUIFResourceLimits,
     diagnosticDurationBucket: () => diagnosticDurationBucket,
     emit: () => emit,
     findUnsafeObjectPaths: () => findUnsafeObjectPaths,
+    formatUIFCurrency: () => formatUIFCurrency,
+    formatUIFDate: () => formatUIFDate,
+    formatUIFNumber: () => formatUIFNumber,
     getCompatibilityMode: () => getCompatibilityMode,
+    getLocaleConfiguration: () => getLocaleConfiguration,
+    getLocaleDirection: () => getLocaleDirection,
+    getStoragePartition: () => getStoragePartition,
+    getStoragePartitionPrefix: () => getStoragePartitionPrefix,
     getUIFComponentContract: () => getUIFComponentContract,
     init: () => init,
     isSafeObjectKey: () => isSafeObjectKey,
@@ -47,14 +59,18 @@ var BatoiUIF = (() => {
     parseMicroAppManifest: () => parseMicroAppManifest,
     parseOptions: () => parseOptions,
     parseUIFConfiguration: () => parseUIFConfiguration,
+    parseUIFJSON: () => parseUIFJSON,
+    partitionStorageKey: () => partitionStorageKey,
     registerPlugin: () => registerPlugin,
     reportDiagnostic: () => reportDiagnostic,
     setAccent: () => setAccent,
     setDensity: () => setDensity,
+    translateUIFMessage: () => translateUIFMessage,
     uifActions: () => uifActions,
     uifAttributes: () => uifAttributes,
     uifComponentContracts: () => uifComponentContracts,
     uifContractRegistry: () => uifContractRegistry,
+    uifErrors: () => uifErrors,
     uifEvents: () => uifEvents,
     uifStates: () => uifStates,
     uifValues: () => uifValues,
@@ -154,22 +170,97 @@ var BatoiUIF = (() => {
       });
     }
   }
+  function parseUIFJSON(input, options = {}) {
+    const limits = { ...defaultUIFResourceLimits, ...options.limits };
+    const bytes = typeof TextEncoder === "undefined" ? input.length : new TextEncoder().encode(input).byteLength;
+    if (input.length > limits.maxCharacters || bytes > limits.maxBytes) {
+      return { value: void 0, issues: [{ path: "$", code: "limit", message: "JSON exceeds the allowed size." }], valid: false };
+    }
+    let parsed;
+    try {
+      parsed = JSON.parse(input);
+    } catch {
+      return { value: void 0, issues: [{ path: "$", code: "invalid-json", message: "Value must be valid JSON." }], valid: false };
+    }
+    if (options.shape === "array" && !Array.isArray(parsed) || options.shape === "object" && (!parsed || typeof parsed !== "object" || Array.isArray(parsed))) {
+      return { value: void 0, issues: [{ path: "$", code: "invalid-shape", message: `JSON must be a ${options.shape}.` }], valid: false };
+    }
+    const issues = [];
+    const seen = /* @__PURE__ */ new WeakMap();
+    let itemCount = 0;
+    let keyCount = 0;
+    const normalize = (value2, path, depth) => {
+      if (typeof value2 === "string") {
+        if (value2.length > limits.maxCharacters) {
+          issues.push({ path, code: "limit", message: "String exceeds the allowed length." });
+          return value2.slice(0, limits.maxCharacters);
+        }
+        return value2;
+      }
+      if (!value2 || typeof value2 !== "object") return value2;
+      if (depth > limits.maxDepth) {
+        issues.push({ path, code: "limit", message: "JSON exceeds the allowed nesting depth." });
+        return void 0;
+      }
+      const existing = seen.get(value2);
+      if (existing !== void 0) return existing;
+      if (Array.isArray(value2)) {
+        const output2 = [];
+        seen.set(value2, output2);
+        value2.forEach((item, index) => {
+          itemCount += 1;
+          if (itemCount > limits.maxItems) {
+            if (itemCount === limits.maxItems + 1) issues.push({ path, code: "limit", message: "JSON exceeds the allowed item count." });
+            return;
+          }
+          output2.push(normalize(item, `${path}[${index}]`, depth + 1));
+        });
+        return output2;
+      }
+      const output = /* @__PURE__ */ Object.create(null);
+      seen.set(value2, output);
+      Object.entries(value2).forEach(([key, item]) => {
+        keyCount += 1;
+        const itemPath = path === "$" ? `$.${key}` : `${path}.${key}`;
+        if (keyCount > limits.maxKeys) {
+          if (keyCount === limits.maxKeys + 1) issues.push({ path: itemPath, code: "limit", message: "JSON exceeds the allowed key count." });
+          return;
+        }
+        if (!isSafeObjectKey(key)) {
+          issues.push({ path: itemPath, code: "unsafe-key", message: `Unsafe JSON key: ${key}` });
+          return;
+        }
+        output[key] = normalize(item, itemPath, depth + 1);
+      });
+      return output;
+    };
+    const value = normalize(parsed, "$", 0);
+    return { value, issues, valid: issues.length === 0 };
+  }
   function parseUIFConfiguration(input, options = {}) {
     const issues = [];
     let parsed = input;
     if (typeof input === "string") {
-      try {
-        parsed = JSON.parse(input);
-      } catch {
-        issues.push({ path: "$", code: "invalid-json", message: "Configuration must be valid JSON." });
+      const maxCharacters = Math.max(1, Math.floor(options.limits?.maxCharacters ?? defaultUIFResourceLimits.maxCharacters));
+      const maxBytes = Math.max(1, Math.floor(options.limits?.maxBytes ?? defaultUIFResourceLimits.maxBytes));
+      const bytes = typeof TextEncoder === "undefined" ? input.length : new TextEncoder().encode(input).byteLength;
+      if (input.length > maxCharacters || bytes > maxBytes) {
+        issues.push({ path: "$", code: "limit", message: "Configuration exceeds the allowed size." });
         parsed = {};
+      } else {
+        try {
+          parsed = JSON.parse(input);
+        } catch {
+          issues.push({ path: "$", code: "invalid-json", message: "Configuration must be valid JSON." });
+          parsed = {};
+        }
       }
     }
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
       issues.push({ path: "$", code: "not-object", message: "Configuration must be a JSON object." });
       parsed = {};
     }
-    const unsafe = findUnsafeObjectPaths(parsed, options.limits);
+    const unsafe = findUnsafeObjectPaths(parsed, { maxDepth: options.limits?.maxDepth, maxKeys: options.limits?.maxKeys });
     unsafe.forEach((path) => {
       issues.push({ path, code: "unsafe-key", message: `Unsafe or excessively complex configuration path: ${path}` });
     });
@@ -468,7 +559,11 @@ var BatoiUIF = (() => {
     "data-uif-breakpoint",
     "data-uif-class",
     "data-uif-attribute",
-    "data-uif-key"
+    "data-uif-key",
+    "data-uif-envelope",
+    "data-uif-interval",
+    "data-uif-message",
+    "data-uif-messages"
   ];
   var uifValues = [
     "button",
@@ -560,7 +655,13 @@ var BatoiUIF = (() => {
     "connect",
     "disconnect",
     "approve",
-    "reject"
+    "reject",
+    "edit",
+    "install",
+    "next",
+    "preview",
+    "previous",
+    "unsubscribe"
   ];
   var uifStates = [
     "idle",
@@ -580,7 +681,24 @@ var BatoiUIF = (() => {
     "disconnected",
     "pending",
     "approved",
-    "rejected"
+    "rejected",
+    "available",
+    "busy",
+    "completed",
+    "connecting",
+    "decision-pending",
+    "dirty",
+    "empty",
+    "expired",
+    "failed",
+    "installed",
+    "offline",
+    "online",
+    "saved",
+    "saving",
+    "submitting",
+    "unavailable",
+    "waiting-approval"
   ];
   var uifEvents = [
     "uif:before-init",
@@ -601,7 +719,127 @@ var BatoiUIF = (() => {
     "uif:tool-approve",
     "uif:tool-reject",
     "uif:tool-expired",
-    "uif:tool-replay-blocked"
+    "uif:tool-invalid-review",
+    "uif:tool-replay-blocked",
+    "uif:accordion-toggle",
+    "uif:action-diagnostic",
+    "uif:ai-action",
+    "uif:ai-error",
+    "uif:ai-history-select",
+    "uif:ai-stream-cancel",
+    "uif:animation-end",
+    "uif:animation-start",
+    "uif:before-load",
+    "uif:carousel-change",
+    "uif:chart-drilldown",
+    "uif:chart-drilldown-error",
+    "uif:chart-error",
+    "uif:chart-export",
+    "uif:chart-refresh",
+    "uif:chart-select",
+    "uif:collapse-close",
+    "uif:collapse-open",
+    "uif:combobox-change",
+    "uif:command-menu-close",
+    "uif:command-menu-open",
+    "uif:complete",
+    "uif:connector-error",
+    "uif:dashboard-error",
+    "uif:desktop-change",
+    "uif:desktop-error",
+    "uif:drawer-close",
+    "uif:drawer-open",
+    "uif:dropdown-close",
+    "uif:dropdown-open",
+    "uif:editor-autosave",
+    "uif:editor-autosave-error",
+    "uif:editor-blur",
+    "uif:editor-change",
+    "uif:editor-command",
+    "uif:editor-destroy",
+    "uif:editor-diagnostics",
+    "uif:editor-error",
+    "uif:editor-focus",
+    "uif:editor-init",
+    "uif:editor-layout-change",
+    "uif:editor-mode-change",
+    "uif:editor-normalize",
+    "uif:editor-preview",
+    "uif:editor-reset",
+    "uif:editor-upload-error",
+    "uif:editor-validate",
+    "uif:field-errors",
+    "uif:file-select",
+    "uif:form-dirty",
+    "uif:form-error",
+    "uif:form-submit",
+    "uif:form-success",
+    "uif:form-touched",
+    "uif:lightbox-close",
+    "uif:lightbox-open",
+    "uif:load",
+    "uif:modal-close",
+    "uif:modal-open",
+    "uif:notification",
+    "uif:offcanvas-close",
+    "uif:offcanvas-open",
+    "uif:offline-error",
+    "uif:offline-queued",
+    "uif:offline-synced",
+    "uif:pagination-change",
+    "uif:popover-close",
+    "uif:popover-open",
+    "uif:presence",
+    "uif:push-change",
+    "uif:push-error",
+    "uif:pwa-install",
+    "uif:rad-before",
+    "uif:rad-error",
+    "uif:rad-success",
+    "uif:realtime-error",
+    "uif:realtime-message",
+    "uif:realtime-state",
+    "uif:rehydrate",
+    "uif:request",
+    "uif:response",
+    "uif:route-before",
+    "uif:route-error",
+    "uif:route-success",
+    "uif:router-error",
+    "uif:segment-change",
+    "uif:select",
+    "uif:shell-density",
+    "uif:table-before-load",
+    "uif:table-bulk-action",
+    "uif:table-error",
+    "uif:table-filter",
+    "uif:table-load",
+    "uif:table-loaded",
+    "uif:table-page",
+    "uif:table-page-size",
+    "uif:table-reset",
+    "uif:table-row-action",
+    "uif:table-select",
+    "uif:table-selection",
+    "uif:table-sort",
+    "uif:table-state",
+    "uif:tabs-change",
+    "uif:toast",
+    "uif:tool-confirmation-required",
+    "uif:typed-text-complete",
+    "uif:wizard-change"
+  ];
+  var uifErrors = [
+    "UIF_COMPONENT_DESTROY",
+    "UIF_COMPONENT_DUPLICATE",
+    "UIF_COMPONENT_MOUNT",
+    "UIF_COMPONENT_NAME",
+    "UIF_INVALID_ACCENT",
+    "UIF_LOCALE_CONFIG",
+    "UIF_STORAGE_KEY",
+    "UIF_STORAGE_PARTITION",
+    "UIF_UNSAFE_OBJECT",
+    "UIF_UNSAFE_PROPERTY_PATH"
   ];
   function contractEntries(values) {
     return Object.freeze(values.map((name) => Object.freeze({ name, version: 3, status: "stable" })));
@@ -611,8 +849,62 @@ var BatoiUIF = (() => {
     components: contractEntries(uifValues),
     actions: contractEntries(uifActions),
     states: contractEntries(uifStates),
-    events: contractEntries(uifEvents)
+    events: contractEntries(uifEvents),
+    errors: contractEntries(uifErrors)
   });
+
+  // src/resource-scope.ts
+  function createResourceScope() {
+    const controller = new AbortController();
+    const disposers = /* @__PURE__ */ new Set();
+    let destroyed = false;
+    const add = (dispose) => {
+      if (destroyed) {
+        dispose();
+        return () => void 0;
+      }
+      let active = true;
+      const ownedDispose = () => {
+        if (!active) return;
+        active = false;
+        disposers.delete(ownedDispose);
+        dispose();
+      };
+      disposers.add(ownedDispose);
+      return ownedDispose;
+    };
+    return {
+      signal: controller.signal,
+      get destroyed() {
+        return destroyed;
+      },
+      add,
+      listen(target, type, listener, options) {
+        target.addEventListener(type, listener, options);
+        return add(() => target.removeEventListener(type, listener, options));
+      },
+      timeout(callback, delay) {
+        const id = globalThis.setTimeout(callback, Math.max(0, delay));
+        add(() => globalThis.clearTimeout(id));
+        return Number(id);
+      },
+      interval(callback, delay) {
+        const id = globalThis.setInterval(callback, Math.max(1, delay));
+        add(() => globalThis.clearInterval(id));
+        return Number(id);
+      },
+      observe(observer) {
+        add(() => observer.disconnect());
+      },
+      destroy() {
+        if (destroyed) return;
+        destroyed = true;
+        controller.abort();
+        Array.from(disposers).reverse().forEach((dispose) => dispose());
+        disposers.clear();
+      }
+    };
+  }
 
   // src/component-registry.ts
   var componentNamePattern = /^[a-z][a-z0-9-]*$/;
@@ -635,7 +927,7 @@ var BatoiUIF = (() => {
       const targets = name ? [[name, entries.get(name)]] : Array.from(entries.entries());
       targets.forEach(([componentName, entry]) => {
         if (!entry) return;
-        entry.abortController.abort();
+        entry.resources.destroy();
         try {
           entry.controller.destroy();
         } catch (cause) {
@@ -710,22 +1002,23 @@ var BatoiUIF = (() => {
             emit("uif:runtime:diagnostic", { component: name, issues: parsed.issues }, element);
           }
           const options = Object.freeze({ ...definition.defaults ?? {}, ...parsed.value });
-          const abortController = new AbortController();
+          const resources = createResourceScope();
           try {
             const controller = normalizeController(definition.mount({
               element,
               root,
               options,
-              signal: abortController.signal,
+              signal: resources.signal,
+              resources,
               emit: (eventName, detail) => emit(eventName, detail, element),
               error: (message, detail) => new UIFError(message, { ...detail, package: "core", component: name })
             }));
-            entries.set(name, { controller, abortController });
+            entries.set(name, { controller, resources });
             mounted.set(element, entries);
             ownedElements.add(element);
             emit("uif:runtime:mounted", { component: name, version: definition.version ?? 3 }, element);
           } catch (cause) {
-            abortController.abort();
+            resources.destroy();
             emit("uif:runtime:error", {
               code: "UIF_COMPONENT_MOUNT",
               category: "internal",
@@ -795,6 +1088,152 @@ var BatoiUIF = (() => {
         destroyed = true;
       }
     };
+  }
+
+  // src/storage-partition.ts
+  var activeStoragePartition = null;
+  var identifierPattern2 = /^[a-zA-Z0-9._-]{1,128}$/;
+  function validateIdentifier(value, field) {
+    const normalized = value.trim();
+    if (!identifierPattern2.test(normalized)) {
+      throw new UIFError(`Invalid UIF storage partition ${field}`, {
+        code: "UIF_STORAGE_PARTITION",
+        category: "security",
+        package: "core",
+        phase: "storage",
+        recoverable: false
+      });
+    }
+    return normalized;
+  }
+  function configureStoragePartition(partition) {
+    if (!partition) {
+      activeStoragePartition = null;
+      return;
+    }
+    activeStoragePartition = Object.freeze({
+      applicationId: validateIdentifier(partition.applicationId, "applicationId"),
+      tenantId: validateIdentifier(partition.tenantId ?? "default", "tenantId"),
+      principalId: validateIdentifier(partition.principalId, "principalId")
+    });
+  }
+  function getStoragePartition() {
+    return activeStoragePartition;
+  }
+  function getStoragePartitionPrefix(partition = activeStoragePartition) {
+    if (!partition) return null;
+    return `uif:${partition.applicationId}:${partition.tenantId ?? "default"}:${partition.principalId}:`;
+  }
+  function partitionStorageKey(key, partition = activeStoragePartition) {
+    const normalized = key.trim();
+    if (!normalized || normalized.length > 256 || /[\u0000-\u001f\u007f]/.test(normalized)) {
+      throw new UIFError("Invalid UIF storage key", {
+        code: "UIF_STORAGE_KEY",
+        category: "security",
+        package: "core",
+        phase: "storage",
+        recoverable: false
+      });
+    }
+    const prefix = getStoragePartitionPrefix(partition);
+    return prefix ? `${prefix}${encodeURIComponent(normalized)}` : normalized;
+  }
+  function clearStoragePartition(storage, partition = activeStoragePartition) {
+    try {
+      const target = storage ?? (typeof window === "undefined" ? void 0 : window.localStorage);
+      const prefix = getStoragePartitionPrefix(partition);
+      if (!target || !prefix) return 0;
+      const keys = [];
+      for (let index = 0; index < target.length; index += 1) {
+        const key = target.key(index);
+        if (key?.startsWith(prefix)) keys.push(key);
+      }
+      keys.forEach((key) => target.removeItem(key));
+      return keys.length;
+    } catch {
+      return 0;
+    }
+  }
+
+  // src/localization.ts
+  var defaultLocales = Object.freeze(["en"]);
+  var localeConfiguration = Object.freeze({
+    locales: defaultLocales,
+    messages: Object.freeze({})
+  });
+  function localeError(message, cause) {
+    return new UIFError(message, {
+      code: "UIF_LOCALE_CONFIG",
+      category: "config",
+      package: "core",
+      phase: "localization",
+      recoverable: true,
+      cause
+    });
+  }
+  function configureLocale(options) {
+    if (!options) {
+      localeConfiguration = Object.freeze({ locales: defaultLocales, messages: Object.freeze({}) });
+      return;
+    }
+    try {
+      const requested = typeof options.locales === "string" ? [options.locales] : [...options.locales ?? defaultLocales];
+      const locales = Object.freeze(Intl.getCanonicalLocales(requested));
+      if (!locales.length) throw new Error("At least one locale is required.");
+      if (options.currency && !/^[A-Z]{3}$/.test(options.currency)) throw new Error("Currency must be an uppercase ISO 4217 code.");
+      if (options.timeZone) new Intl.DateTimeFormat(locales, { timeZone: options.timeZone }).format(0);
+      const messages = /* @__PURE__ */ Object.create(null);
+      Object.entries(options.messages ?? {}).forEach(([key, value]) => {
+        if (!isSafeObjectKey(key) || key.length > 200 || value.length > 1e4) throw new Error(`Invalid locale message: ${key}`);
+        messages[key] = value;
+      });
+      localeConfiguration = Object.freeze({
+        locales,
+        timeZone: options.timeZone,
+        currency: options.currency,
+        messages: Object.freeze(messages)
+      });
+    } catch (cause) {
+      throw localeError("Invalid UIF locale configuration", cause);
+    }
+  }
+  function getLocaleConfiguration() {
+    return localeConfiguration;
+  }
+  function getLocaleDirection(locale = localeConfiguration.locales[0]) {
+    try {
+      const localeInfo = new Intl.Locale(locale);
+      const direction = localeInfo.textInfo?.direction;
+      return direction === "rtl" ? "rtl" : "ltr";
+    } catch {
+      return "ltr";
+    }
+  }
+  function applyLocale(target = document.documentElement) {
+    target.lang = localeConfiguration.locales[0];
+    target.dir = getLocaleDirection();
+  }
+  function formatUIFNumber(value, options = {}) {
+    return new Intl.NumberFormat(localeConfiguration.locales, options).format(value);
+  }
+  function formatUIFCurrency(value, currency = localeConfiguration.currency) {
+    if (!currency) throw localeError("A currency is required for currency formatting");
+    return formatUIFNumber(value, { style: "currency", currency });
+  }
+  function formatUIFDate(value, options = {}) {
+    const date2 = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date2.getTime())) return "";
+    return new Intl.DateTimeFormat(localeConfiguration.locales, {
+      ...localeConfiguration.timeZone ? { timeZone: localeConfiguration.timeZone } : {},
+      ...options
+    }).format(date2);
+  }
+  function translateUIFMessage(key, fallback = key, values = {}) {
+    const template = localeConfiguration.messages[key] ?? fallback;
+    return template.replace(
+      /\{([a-zA-Z0-9._-]+)\}/g,
+      (match, name) => Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match
+    );
   }
 
   // src/component-contracts.ts
@@ -871,7 +1310,7 @@ var BatoiUIF = (() => {
     "ai-action": contract("ai-action", "ai", "Button or form describing an assistant action", { events: ["uif:ai-action"], security: ["Browser UI never holds provider credentials."] }),
     "ai-thread": contract("ai-thread", "ai", "Ordered message transcript", { attributes: [...commonAttributes, "data-uif-messages"], roles: ["log"], events: ["uif:agent:feedback", "uif:agent:retry", "uif:agent:copy", "uif:agent:error"], security: ["Agent content uses validated versioned envelopes and text-safe rendering."] }),
     "ai-composer": contract("ai-composer", "ai", "Labelled textarea and submit button", { events: ["uif:agent:submit", "uif:agent:cancel"], states: ["idle", "busy", "disabled"], security: ["Composer emits events and does not invoke a model provider directly."] }),
-    "tool-approval": contract("tool-approval", "mcp", "Review summary with explicit decision controls", { actions: ["approve", "reject"], events: ["uif:tool-approve", "uif:tool-reject", "uif:tool-expired"], states: ["waiting-approval", "decision-pending", "approved", "rejected", "expired"], security: ["Browser confirmation is not authorization or execution."] }),
+    "tool-approval": contract("tool-approval", "mcp", "Review summary with explicit decision controls", { actions: ["approve", "reject"], events: ["uif:tool-approve", "uif:tool-reject", "uif:tool-expired", "uif:tool-invalid-review"], states: ["waiting-approval", "decision-pending", "approved", "rejected", "expired"], security: ["Browser confirmation is not authorization or execution."] }),
     "agent-tool": contract("agent-tool", "mcp", "Tool plan, review, progress, result, or receipt summary", { attributes: [...commonAttributes, "data-uif-envelope"], events: ["uif:agent:error", "uif:tool-approve", "uif:tool-reject"], security: ["MCP invocation, permissions, and authoritative audit remain server-side."] }),
     "install-prompt": contract("install-prompt", "pwa", "Normal installation guidance", { actions: ["install"], events: ["uif:pwa-install"], states: ["available", "unavailable", "installed"] })
   });

@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { configureCompatibility } from '@batoi/uif-core';
 import {
   animate,
   animationPresets,
@@ -11,6 +12,8 @@ import {
   show,
   toggle,
 } from './index.js';
+
+afterEach(() => configureCompatibility(null));
 
 describe('effects', () => {
   it('shows, hides, and toggles with reduced motion', async () => {
@@ -72,6 +75,16 @@ describe('effects', () => {
     expect(initTypedText(el)).toBe(controller);
     controller.destroy();
     expect(initTypedText(el)).not.toBe(controller);
+  });
+
+  it('rejects legacy typed-text lists in strict v3 mode', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    configureCompatibility({ mode: 'v3' });
+    const el = document.createElement('span');
+    el.dataset.uifStrings = 'First|Second';
+    const controller = initTypedText(el);
+    expect(el.textContent).toBe('');
+    controller.destroy();
   });
 
   it('types, deletes, and advances declarative phrases', () => {
