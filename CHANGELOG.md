@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.0-beta.1
+
+- Promoted the complete v3 contract and compatibility surface to beta after the alpha.4 build, release, security, packaging, and 68-journey browser gates passed locally and in GitHub Actions.
+- Froze the public v3 package, lifecycle, declarative, design-token, Micro App, AI/MCP, security, and migration contracts for release-candidate validation.
+- Retained the diagnostic v2 compatibility entry while making the verified v3 contract the general-availability candidate.
+
 ## 3.0.0-alpha.4
 
 - Added production-shaped browser journeys for Micro App persistence and undo, principal-owned PWA retries and flushing, and one-shot governed tool decisions through a same-origin gateway.

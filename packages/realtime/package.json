@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-realtime",
-  "version": "3.0.0-alpha.4",
+  "version": "3.0.0-beta.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,8 +18,8 @@
     "build": "tsup src/index.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-dom": "3.0.0-alpha.4",
-    "@batoi/uif-net": "3.0.0-alpha.4"
+    "@batoi/uif-dom": "3.0.0-beta.1",
+    "@batoi/uif-net": "3.0.0-beta.1"
   },
   "license": "Apache-2.0"
 }

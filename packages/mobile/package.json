@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-mobile",
-  "version": "3.0.0-alpha.4",
+  "version": "3.0.0-beta.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",

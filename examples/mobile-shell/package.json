@@ -2,5 +2,5 @@
   "name": "@batoi/uif-example-mobile-shell",
   "private": true,
   "type": "module",
-  "version": "3.0.0-alpha.4"
+  "version": "3.0.0-beta.1"
 }

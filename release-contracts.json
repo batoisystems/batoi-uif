@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "3.0.0-alpha.4",
+  "version": "3.0.0-beta.1",
   "packages": {
     "actions": {
       "name": "@batoi/uif-actions",

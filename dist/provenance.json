@@ -43,7 +43,7 @@
     "buildDefinition": {
       "buildType": "https://batoi.com/uif/npm-workspace-build/v1",
       "externalParameters": {
-        "version": "3.0.0-alpha.4",
+        "version": "3.0.0-beta.1",
         "command": "npm run build:dist"
       },
       "internalParameters": {
@@ -57,7 +57,7 @@
         "id": "https://github.com/batoi/batoi-uif/.github/workflows/ci.yml"
       },
       "metadata": {
-        "invocationId": "batoi-uif-3.0.0-alpha.4",
+        "invocationId": "batoi-uif-3.0.0-beta.1",
         "startedOn": null,
         "finishedOn": null
       }
