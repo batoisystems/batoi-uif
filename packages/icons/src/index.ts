@@ -16,4 +16,4 @@ export {
   workflowIcons,
   type IconCategory,
 } from './sets/index.js';
-export type { IconDefinition, IconMetadata, IconOptions, IconRegistry, IconSearchOptions, IconStatus } from './types.js';
+export type { IconDefinition, IconMetadata, IconMetadataRegistry, IconOptions, IconRegistry, IconSearchOptions, IconStatus } from './types.js';

@@ -414,7 +414,7 @@ If working before that migration is complete, use the currently available worksp
 
 ## Version 2
 
-The repository and framework packages are versioned `3.0.0-alpha.2`. This first v3 prerelease consolidates the typed lifecycle, registries, bounded configuration, capability security, localization/RTL, Micro App synchronization, provider-neutral AI/MCP UI, generated references, and canonical application journeys while retaining the dependency-free browser runtime.
+The repository and framework packages are versioned `3.0.0-alpha.3`. This v3 prerelease consolidates the typed lifecycle, registries, bounded configuration, capability security, localization/RTL, Micro App synchronization, provider-neutral AI/MCP UI, generated references, and canonical application journeys while retaining the dependency-free browser runtime.
 
 Curated v3-compatible namespace profiles are available from `@batoi/uif-profiles/all`, `/rad`, `/dashboard`, `/mobile`, `/desktop`, and `/agent`. See [Package Profiles](docs/package-profiles.md).
 

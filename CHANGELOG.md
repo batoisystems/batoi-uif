@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.0-alpha.3
+
+- Updated GitHub Actions to the Node 24 runtime with `actions/checkout@v6` and `actions/setup-node@v6`.
+- Stabilized the public icon metadata declaration behind the typed `IconMetadataRegistry` alias so macOS and Linux builds produce the same API signature.
+- Added regression coverage for platform-independent named-registry API signatures and validated the alpha bundle in an isolated Batoi RAD integration pilot.
+
 ## 3.0.0-alpha.2
 
 - Corrected the prerelease lockfile after the alpha.1 version bump unintentionally rewrote the third-party `mz@2.7.0` lock entry and tarball URL.

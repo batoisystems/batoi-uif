@@ -1,6 +1,6 @@
 import { icons, type IconName } from './icons.js';
 import { iconSets, type IconCategory } from './sets/index.js';
-import type { IconMetadata, IconSearchOptions } from './types.js';
+import type { IconMetadata, IconMetadataRegistry, IconSearchOptions } from './types.js';
 
 const categoryTags: Record<IconCategory, string[]> = {
   'admin-security': ['admin', 'security', 'access', 'identity', 'compliance'],
@@ -77,7 +77,7 @@ function generatedTags(name: string, category: IconCategory): string[] {
   return unique([...name.split('-'), category, ...categoryTags[category]]);
 }
 
-export const iconMetadata = Object.keys(icons).reduce(
+const generatedIconMetadata = Object.keys(icons).reduce(
   (metadata, name) => {
     const iconName = name as IconName;
     const category = categoryFor(iconName);
@@ -92,6 +92,8 @@ export const iconMetadata = Object.keys(icons).reduce(
   },
   {} as Record<IconName, IconMetadata>,
 );
+
+export const iconMetadata: IconMetadataRegistry<IconName> = generatedIconMetadata;
 
 export function getIconMetadata(name: IconName | string): IconMetadata | undefined {
   return iconMetadata[name as IconName];

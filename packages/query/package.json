@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-query",
-  "version": "3.0.0-alpha.2",
+  "version": "3.0.0-alpha.3",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,7 +18,7 @@
     "build": "tsup src/index.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-dom": "3.0.0-alpha.2"
+    "@batoi/uif-dom": "3.0.0-alpha.3"
   },
   "license": "Apache-2.0"
 }

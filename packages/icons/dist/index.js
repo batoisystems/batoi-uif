@@ -116,7 +116,7 @@ function unique(values) {
 function generatedTags(name, category) {
   return unique([...name.split("-"), category, ...categoryTags[category]]);
 }
-var iconMetadata = Object.keys(icons).reduce(
+var generatedIconMetadata = Object.keys(icons).reduce(
   (metadata, name) => {
     const iconName = name;
     const category = categoryFor(iconName);
@@ -131,6 +131,7 @@ var iconMetadata = Object.keys(icons).reduce(
   },
   {}
 );
+var iconMetadata = generatedIconMetadata;
 function getIconMetadata(name) {
   return iconMetadata[name];
 }

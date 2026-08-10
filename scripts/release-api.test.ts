@@ -29,4 +29,14 @@ describe('release API declarations', () => {
     expect(api.exports).toEqual(['publicName']);
     expect(api.signatures.publicName).toMatch(/^[a-f0-9]{64}$/);
   });
+
+  it('keeps registry signatures stable behind a named public type', () => {
+    const first = declarationAPIFromText(
+      "type IconName = 'search' | 'home';\ntype IconMetadataRegistry<Name extends string> = Readonly<Record<Name, object>>;\ndeclare const iconMetadata: IconMetadataRegistry<IconName>;\nexport { iconMetadata };",
+    );
+    const reordered = declarationAPIFromText(
+      "type IconName = 'home' | 'search';\ntype IconMetadataRegistry<Name extends string> = Readonly<Record<Name, object>>;\ndeclare const iconMetadata: IconMetadataRegistry<IconName>;\nexport { iconMetadata };",
+    );
+    expect(reordered.signatures.iconMetadata).toBe(first.signatures.iconMetadata);
+  });
 });

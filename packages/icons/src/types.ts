@@ -23,6 +23,8 @@ export interface IconMetadata {
   tags: string[];
 }
 
+export type IconMetadataRegistry<Name extends string = string> = Readonly<Record<Name, IconMetadata>>;
+
 export interface IconSearchOptions {
   category?: string;
   includeDeprecated?: boolean;

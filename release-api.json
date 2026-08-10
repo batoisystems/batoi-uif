@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "version": "3.0.0-alpha.2",
+  "version": "3.0.0-alpha.3",
   "packages": {
     "actions": {
       "exports": [
@@ -907,6 +907,7 @@
         "IconCategory",
         "IconDefinition",
         "IconMetadata",
+        "IconMetadataRegistry",
         "IconName",
         "IconOptions",
         "IconRegistry",
@@ -939,6 +940,7 @@
         "IconCategory": "c9cf42784141b77ac0f7c5a44d73d1e3e008d37b6004df9c7a962791d76c17ff",
         "IconDefinition": "10670fe56fc90abf3806b982cf3587b79def716fa92eb9e4bb76d4fd59a0f34d",
         "IconMetadata": "5687455bc8dfb149a534595098b84b6171d35dde5769ea948fd71672aeb0d63e",
+        "IconMetadataRegistry": "256ef3527b3b1a73ac57c737d540e9bc13ade1d37b2bd362056b6312d022fe15",
         "IconName": "63409c6f8e8bd957a5a5329b292afb084b80dbd2dac703bf253ad32e97fbbf10",
         "IconOptions": "c1af7cb961c112f0a69eebb595a663ac888861f7261759c23f2ff95f0ab6b629",
         "IconRegistry": "63e1e76b62212ec12cd19ccda1679c77a2676ff0666109aa6c271f64b7409aa8",
@@ -958,7 +960,7 @@
         "hasIcon": "cc81ab8dc99d0d6fc8771df2a60f08098b755e4c0f1fded8240c78653731c4a4",
         "icon": "e68018d883e9a4141df32a64d16e8382f7c4262dd469228fd6e68519e9c2e5ba",
         "iconElement": "3c085f8c67cb823e8ff084db340a569c8f50fd4cd3c64fa415b88248be4ff86b",
-        "iconMetadata": "75435014d4c9ba19192b9361a08d0ab78197d80f20f48200c6b6912991483844",
+        "iconMetadata": "cb8b48c0fb1e664c36f93085d43613146a078bb91640c84bc29c71e1467eeb45",
         "iconSets": "7cc2958f4eba987c516eadb15e26bc4ba4934cc409c7ee6d4100613ca467f19e",
         "icons": "466bd0f915f838d6da17b5bcad8f149cf12ae678a076c3e1dd1dfdf299589fdd",
         "iconsByCategory": "bc0835f94c893435232798341fd8ece320f1f0c3f3e5173be431f719924820f8",
