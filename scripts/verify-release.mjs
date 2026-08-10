@@ -7,6 +7,7 @@ import { performance } from 'node:perf_hooks';
 import { URL } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { JSDOM } from 'jsdom';
+import { collectContractBaseline, removedContractEntries } from './contract-baseline.mjs';
 import { declarationAPI } from './release-api.mjs';
 
 const root = new URL('..', import.meta.url);
@@ -15,6 +16,7 @@ const budgets = readJson('release-budgets.json');
 const rootPackage = readJson('package.json');
 const lockfile = readJson('package-lock.json');
 const apiBaseline = readJson('release-api.json');
+const contractBaseline = readJson('release-contracts.json');
 const securityBoundaries = readJson('security-boundaries.json');
 
 function readJson(path) {
@@ -108,6 +110,12 @@ for (const [name, expected] of Object.entries(apiBaseline.packages ?? {})) {
   assert(!removed.length, `${name} removed public exports: ${removed.join(', ')}`);
   assert(!changed.length, `${name} changed public signatures: ${changed.join(', ')}`);
 }
+
+assert(contractBaseline.version === rootPackage.version, `contract baseline version ${contractBaseline.version} does not match ${rootPackage.version}`);
+assert(contractBaseline.schemaVersion === 1, `contract baseline schema ${contractBaseline.schemaVersion ?? 'missing'} is not supported`);
+const currentContracts = await collectContractBaseline(root);
+const removedContracts = removedContractEntries(contractBaseline, currentContracts);
+assert(!removedContracts.length, `public contracts were removed: ${removedContracts.join(', ')}`);
 
 for (const file of ['dist/uif.esm.js', 'dist/uif.iife.js', 'dist/uif.css']) {
   const url = new URL(file, root);

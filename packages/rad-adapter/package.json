@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-rad-adapter",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,9 +18,9 @@
     "build": "tsup src/index.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-core": "2.3.0",
-    "@batoi/uif-dom": "2.3.0",
-    "@batoi/uif-net": "2.3.0"
+    "@batoi/uif-core": "2.4.0",
+    "@batoi/uif-dom": "2.4.0",
+    "@batoi/uif-net": "2.4.0"
   },
   "license": "Apache-2.0"
 }

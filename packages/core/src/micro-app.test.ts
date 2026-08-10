@@ -48,4 +48,34 @@ describe('Micro App manifest', () => {
       { path: 'connectors.2.src', message: 'Connector source is not listed in permissions.network.' },
     ]);
   });
+
+  it('rejects unsafe manifest keys and wildcard network permissions', () => {
+    const input = JSON.parse(
+      '{"name":"Unsafe","type":"micro-app","permissions":{"network":["*"]},"nested":{"__proto__":{"polluted":true}}}',
+    ) as unknown;
+    const result = validateMicroAppManifest(input);
+    expect(result.valid).toBe(false);
+    expect(result.issues.map((issue) => issue.path)).toContain('nested.__proto__');
+    expect(result.issues.map((issue) => issue.path)).toContain('permissions.network.0');
+    expect(result.manifest.permissions.network).toEqual([]);
+    expect((result.manifest as Record<string, unknown>).nested).toBeUndefined();
+  });
+
+  it('allows exact origin and path-prefix capabilities without credentials', () => {
+    const manifest = parseMicroAppManifest({
+      name: 'Scoped Connector App',
+      type: 'micro-app',
+      connectors: [
+        { type: 'api', src: 'https://api.example.com/v1/records' },
+        { type: 'api', src: 'https://api.example.com/private/records' },
+        { type: 'api', src: 'https://user:secret@api.example.com/v1/records' },
+      ],
+      permissions: { network: ['https://api.example.com/v1/'] },
+    });
+    expect(listMicroAppConnectorWorkflows(manifest).map((workflow) => workflow.permission)).toEqual([
+      'allowed',
+      'blocked',
+      'blocked',
+    ]);
+  });
 });

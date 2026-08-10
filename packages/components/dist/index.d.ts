@@ -34,6 +34,7 @@ declare function initLightbox(el: HTMLElement): ComponentInstance;
 declare function initComponent(el: HTMLElement): void;
 declare function destroyComponent(el: HTMLElement): void;
 declare function initAll(root?: Document | HTMLElement): () => void;
+declare function bindComponentActions(root?: Document | HTMLElement): () => void;
 declare function showToast(message: string, options?: ToastOptions): HTMLElement;
 declare const button: {
     name: string;
@@ -196,4 +197,4 @@ declare const table: {
     destroy: typeof destroyComponent;
 };
 
-export { type ComponentInstance, accordion, alert, badge, breadcrumb, button, card, carousel, collapseComponent, combobox, commandMenu, destroyComponent, drawer, dropdown, fileUpload, initAll, initComponent, lightbox, masonry, modal, nav, navbar, offcanvas, pagination, popover, progress, shell, showToast, sidebar, skeleton, spinner, stepper, table, tabs, toast, tooltip, wizard };
+export { type ComponentInstance, accordion, alert, badge, bindComponentActions, breadcrumb, button, card, carousel, collapseComponent, combobox, commandMenu, destroyComponent, drawer, dropdown, fileUpload, initAll, initComponent, lightbox, masonry, modal, nav, navbar, offcanvas, pagination, popover, progress, shell, showToast, sidebar, skeleton, spinner, stepper, table, tabs, toast, tooltip, wizard };

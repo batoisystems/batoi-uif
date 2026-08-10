@@ -16,9 +16,13 @@ Public package exports, documented `data-uif-*` attributes, lifecycle events, an
 - Removal or incompatible signature, event, attribute, or markup-contract changes require a major release.
 - Internal source modules, generated chunk names, editor-private source markers, and undocumented CSS internals are not stable APIs.
 
+`configureCompatibility({ mode })` supports staged v3 preparation. The default `v2` mode preserves compact semicolon `data-uif-options` while emitting a migration diagnostic. `diagnostic` has the same runtime behavior for explicit audit runs. Strict `v3` mode rejects compact options and requires a JSON object. New registry-mounted component configuration is parsed with the strict bounded parser in every mode.
+
+`release-contracts.json` freezes package entry points, declarative attributes/components/actions/states, events, CSS tokens/classes, component-definition metadata, response envelopes, and browser artifacts. `npm run release:contract-baseline` regenerates it only after compatibility review; release verification rejects removed baseline entries.
+
 ## Lifecycle Contract
 
-Stateful initializers own their listeners, timers, observers, subscriptions, and requests. They return either a controller with `refresh()` and `destroy()` or an explicit disposer. Repeated initialization returns or replaces existing ownership without stacking behavior. `destroy()` is idempotent and cancels pending work.
+Stateful initializers own their listeners, timers, observers, subscriptions, and requests. Registry-mounted v3-compatible components return a controller with optional `update()`, `suspend()`, and `resume()` plus required `destroy()`, or an explicit disposer. Repeated refresh updates existing ownership without stacking behavior. `destroy()` is idempotent and cancels pending work. The all-in-one runtime and package adapters use the same component registry; root hydration no longer performs a second component initialization scan.
 
 Stateless decorators may return `void` when repeated application only sets the same classes or ARIA attributes and creates no retained listener, observer, timer, subscription, or request.
 

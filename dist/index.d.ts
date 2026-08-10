@@ -1,13 +1,245 @@
 import { ChartDatum as ChartDatum$1, ChartOptions as ChartOptions$1 } from '@batoi/uif-charts';
+import { AgentInteractionEnvelope as AgentInteractionEnvelope$1 } from '@batoi/uif-core';
+
+type UIFErrorCategory = 'config' | 'security' | 'network' | 'limit' | 'state' | 'compatibility' | 'internal';
+interface UIFErrorDetail {
+    code: string;
+    category: UIFErrorCategory;
+    package: string;
+    component?: string;
+    phase?: string;
+    recoverable: boolean;
+    retryable?: boolean;
+    correlationId?: string;
+    cause?: unknown;
+}
+declare class UIFError extends Error implements UIFErrorDetail {
+    readonly code: string;
+    readonly category: UIFErrorCategory;
+    readonly package: string;
+    readonly component?: string;
+    readonly phase?: string;
+    readonly recoverable: boolean;
+    readonly retryable?: boolean;
+    readonly correlationId?: string;
+    constructor(message: string, detail: UIFErrorDetail);
+}
+interface UIFResourceLimits {
+    maxBytes?: number;
+    maxCharacters?: number;
+    maxItems?: number;
+    maxKeys?: number;
+    maxDepth?: number;
+}
+declare const defaultUIFResourceLimits: Readonly<Required<UIFResourceLimits>>;
+declare function isSafeObjectKey(key: string): boolean;
+declare function isSafePropertyPath(path: string): boolean;
+declare function assertSafePropertyPath(path: string): void;
+interface UIFObjectInspectionOptions {
+    maxDepth?: number;
+    maxKeys?: number;
+    maxIssues?: number;
+}
+declare function findUnsafeObjectPaths(value: unknown, options?: UIFObjectInspectionOptions): string[];
+declare function assertSafeObject(value: unknown, options?: UIFObjectInspectionOptions): void;
+interface UIFConfigurationIssue {
+    path: string;
+    code: 'invalid-json' | 'not-object' | 'unknown-key' | 'unsafe-key' | 'limit';
+    message: string;
+}
+interface UIFConfigurationResult<T extends Record<string, unknown>> {
+    value: T;
+    issues: UIFConfigurationIssue[];
+    valid: boolean;
+}
+interface UIFConfigurationOptions {
+    allowedKeys?: readonly string[];
+    allowUnknown?: boolean;
+    limits?: UIFObjectInspectionOptions;
+}
+declare function parseUIFConfiguration<T extends Record<string, unknown> = Record<string, unknown>>(input: string | unknown, options?: UIFConfigurationOptions): UIFConfigurationResult<T>;
+
+interface UIFController {
+    update?(reason: UIFUpdateReason): void | Promise<void>;
+    suspend?(): void;
+    resume?(): void;
+    destroy(): void;
+}
+type UIFUpdateReason = 'refresh' | 'attribute' | 'content' | 'rehydrate';
+interface UIFMountContext<Options extends Record<string, unknown>> {
+    element: HTMLElement;
+    root: Document | HTMLElement;
+    options: Readonly<Options>;
+    signal: AbortSignal;
+    emit<T = unknown>(name: string, detail?: T): void;
+    error(message: string, detail: Omit<UIFErrorDetail, 'package' | 'component'>): UIFError;
+}
+interface UIFComponentDefinition<Options extends Record<string, unknown> = Record<string, unknown>, Controller extends UIFController = UIFController> {
+    name: string;
+    version?: number;
+    defaults?: Readonly<Partial<Options>>;
+    optionKeys?: readonly (keyof Options & string)[];
+    roles?: readonly string[];
+    actions?: readonly string[];
+    events?: readonly string[];
+    states?: readonly string[];
+    limits?: UIFResourceLimits;
+    mount(context: UIFMountContext<Options>): Controller | (() => void) | void;
+}
+interface UIFComponentRegistry {
+    register(definition: UIFComponentDefinition): () => void;
+    get(name: string): UIFComponentDefinition | undefined;
+    definitions(): UIFComponentDefinition[];
+    refresh(root?: Document | HTMLElement, reason?: UIFUpdateReason): void;
+    suspend(root?: Document | HTMLElement): void;
+    resume(root?: Document | HTMLElement): void;
+    destroy(root?: Document | HTMLElement): void;
+}
+declare function createComponentRegistry(): UIFComponentRegistry;
+
+type AgentEnvelopeKind = 'message' | 'notice' | 'stream-delta' | 'stream-complete' | 'tool-plan' | 'tool-review' | 'tool-progress' | 'tool-result' | 'receipt' | 'error';
+type AgentEnvelopeStatus = 'draft' | 'pending' | 'streaming' | 'waiting-approval' | 'approved' | 'rejected' | 'executing' | 'completed' | 'partial' | 'failed' | 'cancelled' | 'expired' | 'superseded';
+type AgentActorRole = 'user' | 'assistant' | 'system' | 'tool' | 'reviewer';
+type AgentRiskLevel = 'low' | 'medium' | 'high' | 'critical';
+interface AgentActor {
+    role: AgentActorRole;
+    label?: string;
+}
+interface AgentTextPart {
+    type: 'text';
+    text: string;
+}
+interface AgentSourcePart {
+    type: 'source';
+    id: string;
+    label: string;
+    url?: string;
+    retrievedAt?: string;
+    unavailable?: boolean;
+}
+interface AgentArtifactPart {
+    type: 'artifact';
+    id: string;
+    label: string;
+    mediaType?: string;
+    url?: string;
+    checksum?: string;
+}
+interface AgentDataPart {
+    type: 'data';
+    label?: string;
+    value: unknown;
+}
+type AgentContentPart = AgentTextPart | AgentSourcePart | AgentArtifactPart | AgentDataPart;
+interface AgentUsageDisclosure {
+    model?: string;
+    route?: string;
+    inputTokens?: number;
+    outputTokens?: number;
+    cost?: number;
+    currency?: string;
+    latencyMilliseconds?: number;
+    retention?: string;
+}
+interface AgentRiskDisclosure {
+    level: AgentRiskLevel;
+    reversible?: boolean;
+    summary?: string;
+    affectedResources?: string[];
+    externalRecipients?: string[];
+    dataClassification?: string;
+}
+interface AgentInteractionEnvelope {
+    version: 3;
+    kind: AgentEnvelopeKind;
+    id: string;
+    threadId?: string;
+    turnId?: string;
+    parentId?: string;
+    requestId?: string;
+    correlationId?: string;
+    auditRef?: string;
+    sequence?: number;
+    createdAt?: string;
+    expiresAt?: string;
+    status: AgentEnvelopeStatus;
+    actor?: AgentActor;
+    content: AgentContentPart[];
+    usage?: AgentUsageDisclosure;
+    risk?: AgentRiskDisclosure;
+    error?: {
+        code: string;
+        message: string;
+        retryable?: boolean;
+    };
+}
+interface AgentEnvelopeIssue {
+    path: string;
+    code: 'invalid' | 'unsupported' | 'unsafe' | 'limit' | 'truncated';
+    message: string;
+}
+interface AgentEnvelopeResult {
+    envelope: AgentInteractionEnvelope;
+    issues: AgentEnvelopeIssue[];
+    valid: boolean;
+}
+declare function validateAgentEnvelope(input: unknown, limits?: UIFResourceLimits): AgentEnvelopeResult;
+declare function parseAgentEnvelope(input: unknown, limits?: UIFResourceLimits): AgentInteractionEnvelope;
 
 declare const uifAttributes: readonly ["data-uif", "data-uif-id", "data-uif-role", "data-uif-action", "data-uif-target", "data-uif-src", "data-uif-method", "data-uif-trigger", "data-uif-state", "data-uif-bind", "data-uif-model", "data-uif-value", "data-uif-route", "data-uif-mode", "data-uif-options", "data-uif-confirm", "data-uif-disabled", "data-uif-loading", "data-uif-success", "data-uif-error", "data-uif-swap", "data-uif-cache", "data-uif-validate", "data-uif-rule", "data-uif-event", "data-uif-on", "data-uif-refresh", "data-uif-persist", "data-uif-density", "data-uif-sidebar-key", "data-uif-density-key", "data-uif-toolbar", "data-uif-preview", "data-uif-animation", "data-uif-duration", "data-uif-delay", "data-uif-placement", "data-uif-container", "data-uif-html", "data-uif-backdrop", "data-uif-scroll", "data-uif-breakpoint", "data-uif-class", "data-uif-attribute", "data-uif-key"];
-declare const uifValues: readonly ["button", "modal", "drawer", "offcanvas", "dropdown", "tabs", "toast", "accordion", "tooltip", "popover", "table", "form", "editor", "ajax", "route", "shell", "nav", "chart", "animate", "realtime", "push", "mobile-shell", "ai-action", "tool-approval"];
+declare const uifValues: readonly ["button", "modal", "drawer", "offcanvas", "dropdown", "tabs", "toast", "accordion", "tooltip", "popover", "table", "form", "editor", "ajax", "route", "shell", "nav", "chart", "animate", "realtime", "push", "mobile-shell", "ai-action", "ai-thread", "ai-composer", "agent-tool", "tool-approval"];
 declare const uifActions: readonly ["open", "close", "toggle", "toggle-sidebar", "toggle-section", "submit", "load", "reload", "delete", "save", "reset", "clear", "select", "activate", "deactivate", "navigate", "swap", "append", "prepend", "remove", "toast", "set-density", "animate", "add-class", "remove-class", "toggle-class", "set-attribute", "remove-attribute", "set-value", "copy", "scroll-to", "focus", "emit", "subscribe", "connect", "disconnect", "approve", "reject"];
 declare const uifStates: readonly ["idle", "loading", "loaded", "error", "success", "active", "inactive", "open", "closed", "disabled", "selected", "expanded", "collapsed", "connected", "disconnected", "pending", "approved", "rejected"];
+declare const uifEvents: readonly ["uif:before-init", "uif:init", "uif:before-destroy", "uif:destroy", "uif:error", "uif:runtime:mounted", "uif:runtime:error", "uif:runtime:diagnostic", "uif:diagnostic", "uif:agent:submit", "uif:agent:cancel", "uif:agent:error", "uif:agent:feedback", "uif:agent:retry", "uif:agent:copy", "uif:tool-approve", "uif:tool-reject", "uif:tool-expired", "uif:tool-replay-blocked"];
+interface UIFContractEntry<Name extends string = string> {
+    name: Name;
+    version: 3;
+    status: 'stable' | 'compatibility';
+}
+declare const uifContractRegistry: Readonly<{
+    attributes: readonly UIFContractEntry<"data-uif" | "data-uif-id" | "data-uif-role" | "data-uif-action" | "data-uif-target" | "data-uif-src" | "data-uif-method" | "data-uif-trigger" | "data-uif-state" | "data-uif-bind" | "data-uif-model" | "data-uif-value" | "data-uif-route" | "data-uif-mode" | "data-uif-options" | "data-uif-confirm" | "data-uif-disabled" | "data-uif-loading" | "data-uif-success" | "data-uif-error" | "data-uif-swap" | "data-uif-cache" | "data-uif-validate" | "data-uif-rule" | "data-uif-event" | "data-uif-on" | "data-uif-refresh" | "data-uif-persist" | "data-uif-density" | "data-uif-sidebar-key" | "data-uif-density-key" | "data-uif-toolbar" | "data-uif-preview" | "data-uif-animation" | "data-uif-duration" | "data-uif-delay" | "data-uif-placement" | "data-uif-container" | "data-uif-html" | "data-uif-backdrop" | "data-uif-scroll" | "data-uif-breakpoint" | "data-uif-class" | "data-uif-attribute" | "data-uif-key">[];
+    components: readonly UIFContractEntry<"modal" | "drawer" | "offcanvas" | "dropdown" | "tabs" | "toast" | "accordion" | "tooltip" | "popover" | "shell" | "button" | "nav" | "table" | "form" | "editor" | "animate" | "chart" | "realtime" | "push" | "mobile-shell" | "ai-action" | "ai-thread" | "ai-composer" | "tool-approval" | "agent-tool" | "route" | "ajax">[];
+    actions: readonly UIFContractEntry<"toast" | "animate" | "close" | "copy" | "focus" | "load" | "reset" | "select" | "submit" | "toggle" | "add-class" | "remove-class" | "toggle-class" | "set-attribute" | "remove-attribute" | "set-value" | "scroll-to" | "emit" | "open" | "reject" | "toggle-sidebar" | "toggle-section" | "reload" | "delete" | "save" | "clear" | "activate" | "deactivate" | "navigate" | "swap" | "append" | "prepend" | "remove" | "set-density" | "subscribe" | "connect" | "disconnect" | "approve">[];
+    states: readonly UIFContractEntry<"loading" | "error" | "success" | "active" | "idle" | "open" | "pending" | "approved" | "rejected" | "loaded" | "closed" | "expanded" | "collapsed" | "disabled" | "inactive" | "selected" | "connected" | "disconnected">[];
+    events: readonly UIFContractEntry<"uif:agent:error" | "uif:agent:feedback" | "uif:agent:submit" | "uif:agent:cancel" | "uif:init" | "uif:destroy" | "uif:before-init" | "uif:before-destroy" | "uif:error" | "uif:runtime:mounted" | "uif:runtime:error" | "uif:runtime:diagnostic" | "uif:diagnostic" | "uif:agent:retry" | "uif:agent:copy" | "uif:tool-approve" | "uif:tool-reject" | "uif:tool-expired" | "uif:tool-replay-blocked">[];
+}>;
 type UIFAttribute = (typeof uifAttributes)[number];
 type UIFValue = (typeof uifValues)[number];
 type UIFAction = (typeof uifActions)[number];
 type UIFState = (typeof uifStates)[number];
+type UIFEvent = (typeof uifEvents)[number];
+
+type UIFCompatibilityMode = 'v2' | 'diagnostic' | 'v3';
+interface UIFCompatibilityOptions {
+    mode?: UIFCompatibilityMode;
+}
+declare function configureCompatibility(options: UIFCompatibilityOptions | null): void;
+declare function getCompatibilityMode(): UIFCompatibilityMode;
+
+type UIFDiagnosticDurationBucket = '<1ms' | '1-15ms' | '16-50ms' | '51-250ms' | '251-1000ms' | '>1000ms';
+interface UIFDiagnostic {
+    version: 3;
+    package: string;
+    component?: string;
+    code: string;
+    phase?: string;
+    recoverable: boolean;
+    durationBucket?: UIFDiagnosticDurationBucket;
+    correlationRef?: string;
+    timestamp: string;
+}
+interface UIFDiagnosticInput extends Omit<UIFDiagnostic, 'version' | 'timestamp'> {
+    durationMilliseconds?: number;
+}
+interface UIFDiagnosticsOptions {
+    enabled?: boolean;
+    target?: EventTarget;
+    handle?: (diagnostic: Readonly<UIFDiagnostic>) => void;
+    redact?: (diagnostic: Readonly<UIFDiagnostic>) => Partial<UIFDiagnostic> | void;
+}
+declare function diagnosticDurationBucket(milliseconds: number): UIFDiagnosticDurationBucket;
+declare function configureDiagnostics(options: UIFDiagnosticsOptions | null): void;
+declare function reportDiagnostic(input: UIFDiagnosticInput): Readonly<UIFDiagnostic> | null;
 
 type MicroAppStorageMode = 'local-only' | 'local-first' | 'sync-optional' | 'connected' | 'shared';
 type MicroAppLocalStore = 'indexeddb' | 'localstorage' | 'memory' | 'none';
@@ -186,6 +418,15 @@ interface SafeURLPolicy {
     sameOrigin?: boolean;
     protocols?: string[];
 }
+interface UIFURLCapability {
+    origin: string;
+    pathPrefix?: string;
+    contexts?: readonly SafeURLContext[];
+}
+interface UIFURLCapabilityPolicy {
+    enforce?: boolean;
+    capabilities?: readonly UIFURLCapability[];
+}
 declare function registerComponent(name: string, component: Omit<UIFDomComponent, 'name'>): void;
 declare function registerComponent(component: UIFDomComponent): void;
 declare function qs<T extends Element = Element>(selector: string, root?: ParentNode): T | null;
@@ -197,6 +438,9 @@ declare function setText(target: Element | null, value: unknown): void;
 declare function appendTextElement<K extends keyof HTMLElementTagNameMap>(parent: Element, tagName: K, text: unknown, className?: string): HTMLElementTagNameMap[K];
 declare function configureTrustedTypes(policy: UIFTrustedTypesPolicy | null): void;
 declare function getTrustedTypesPolicy(): UIFTrustedTypesPolicy | null;
+declare function configureURLCapabilities(policy: UIFURLCapabilityPolicy | null): void;
+declare function getURLCapabilityPolicy(): Readonly<Required<UIFURLCapabilityPolicy>>;
+declare function isURLCapabilityAllowed(url: URL, context: SafeURLContext): boolean;
 declare function isSafeURL(value: string, policy?: SafeURLPolicy): boolean;
 declare function sanitizeHTML(html: string, options?: SafeHTMLRenderOptions): DocumentFragment;
 declare function setSafeHTML(target: Element | null, html: string, options?: SafeHTMLRenderOptions): void;
@@ -9766,7 +10010,7 @@ interface IconSearchOptions {
     includeDeprecated?: boolean;
 }
 
-declare const iconMetadata: Record<"code" | "hr" | "input" | "link" | "map" | "menu" | "meter" | "search" | "select" | "table" | "textarea" | "video" | "circle" | "filter" | "image" | "stop" | "annotation" | "loading" | "close" | "copy" | "drag" | "error" | "pause" | "play" | "uif" | "chart" | "dashboard" | "tool-approval" | "warning" | "target" | "success" | "offline" | "billing" | "organization" | "home" | "prompt" | "role" | "grid" | "palette" | "id" | "regression" | "shift" | "keys" | "sparkline" | "timeline" | "heatmap" | "histogram" | "box-plot" | "control-chart" | "treemap" | "area-chart" | "bar-chart" | "donut-chart" | "gauge-chart" | "funnel-chart" | "line-chart" | "pie-chart" | "radar-chart" | "scatter-chart" | "bubble-chart" | "waterfall-chart" | "route" | "network" | "alert" | "list" | "info" | "badge" | "breadcrumb" | "skeleton" | "sidebar" | "stepper" | "wizard" | "card" | "message" | "cache" | "queue" | "approval" | "browser" | "workspace" | "version" | "desktop-app" | "sync" | "storage" | "checkbox" | "repeat" | "document" | "command" | "undo" | "redo" | "markdown" | "quote" | "code-block" | "indent" | "image-edit" | "columns" | "signal" | "file" | "key" | "anchor" | "draft" | "batoi" | "facebook" | "github" | "instagram" | "linkedin" | "x-twitter" | "youtube" | "arrow-down" | "arrow-left" | "arrow-right" | "arrow-up" | "bot" | "check" | "check-circle" | "chevron-down" | "chevron-left" | "chevron-right" | "chevron-up" | "circle-dot" | "external-link" | "hash" | "maximize" | "minus" | "moon" | "more-horizontal" | "more-vertical" | "plus" | "settings" | "spark" | "star" | "sun" | "terminal" | "theme" | "arrow-down-left" | "arrow-down-right" | "arrow-up-left" | "arrow-up-right" | "chevrons-down" | "chevrons-left" | "chevrons-right" | "chevrons-up" | "corner-down-left" | "corner-down-right" | "corner-up-left" | "corner-up-right" | "layout-dashboard" | "layout-list" | "layout-panel-left" | "layout-panel-top" | "panel-bottom" | "panel-left" | "panel-right" | "panel-top" | "play-circle" | "plus-circle" | "plus-square" | "power" | "rotate-clockwise" | "search-check" | "search-x" | "square-dot" | "square-stack" | "stop-circle" | "arrow-left-right" | "arrow-up-down" | "ban" | "check-check" | "circle-alert" | "circle-help" | "ellipsis" | "ellipsis-vertical" | "maximize2" | "minimize" | "minimize2" | "move" | "move-horizontal" | "move-vertical" | "panel-close" | "panel-open" | "pin" | "pin-off" | "rotate-counter-clockwise" | "scan" | "scan-line" | "toggle-left" | "toggle-right" | "checkbox-checked" | "checkbox-minus" | "field-required" | "input-error" | "input-password" | "input-search" | "radio-checked" | "radio-unchecked" | "validation-error" | "command-palette" | "density-comfortable" | "density-compact" | "empty-box" | "empty-search" | "empty-state" | "focus-mode" | "nav-back" | "nav-forward" | "quick-action" | "sidebar-collapse" | "sidebar-expand" | "shortcut" | "split-view" | "spotlight" | "state-error" | "state-success" | "state-warning" | "tour" | "app-launcher" | "app-shell" | "bottom-sheet" | "command-key" | "dock" | "floating-action" | "gesture" | "inspector" | "launcher" | "navigator" | "onboarding" | "resizer" | "shell-command" | "status-bar" | "touch-target" | "workspace-switcher" | "action-bar" | "context-panel" | "filter-chip" | "keyboard-shortcut" | "side-panel" | "top-bar" | "x-square" | "zoom-in" | "zoom-out" | "chart-candlestick" | "chart-column" | "chart-no-axes" | "chart-stacked" | "axis-x" | "axis-y" | "chart-combo" | "chart-network" | "chart-spline" | "chart-step" | "conversion-funnel" | "dial" | "forecast" | "horizontal-bar-chart" | "kpi" | "progress-ring" | "scorecard" | "stacked-area-chart" | "table-chart" | "trend-down" | "trend-up" | "ab-test" | "cohort" | "experiment" | "goal-chart" | "growth-loop" | "retention" | "segment" | "target-metric" | "activation" | "benchmark" | "churn" | "expansion-revenue" | "forecast-band" | "ltv" | "mrr" | "nps" | "revenue-chart" | "roi" | "session-chart" | "win-rate" | "adoption-chart" | "capacity-chart" | "cohort-grid" | "contribution-chart" | "dependency-chart" | "error-rate" | "latency" | "percentile" | "saturation" | "throughput-chart" | "vertical-bar-chart" | "anomaly-chart" | "baseline-chart" | "burndown-chart" | "burnup-chart" | "distribution-chart" | "gantt-chart" | "health-score" | "leaderboard-chart" | "map-chart" | "matrix-chart" | "pareto-chart" | "sankey-chart" | "bullet-chart" | "funnel-stage" | "metric-card" | "pivot-chart" | "variance-chart" | "bank" | "cart" | "cash" | "credit-card" | "receipt" | "badge-dollar" | "badge-percent" | "barcode" | "gift" | "invoice" | "landmark" | "shopping-bag" | "store" | "ticket" | "truck" | "vault" | "wallet" | "coins" | "coupon" | "dollar-sign" | "hand-coins" | "package-check" | "package-open" | "package-plus" | "package-x" | "percent" | "refund" | "scale" | "ship" | "shopping-cart-check" | "shopping-cart-plus" | "warehouse" | "billable" | "checkout" | "dispute" | "dunning" | "estimate" | "payment-failed" | "payment-link" | "payment-method" | "payout" | "price-tag" | "subscription" | "tax-receipt" | "usage" | "cart-abandoned" | "discount-code" | "fulfillment" | "inventory" | "inventory-alert" | "order-cancelled" | "order-check" | "order-pending" | "pos-terminal" | "procurement" | "purchase-order" | "return" | "shipment-track" | "shipping-label" | "account-payable" | "account-receivable" | "bill-pay" | "card-terminal" | "cash-register" | "chargeback" | "credit-note" | "debit-note" | "delivery-note" | "payment-scheduled" | "pricing-table" | "revenue-recognition" | "sales-order" | "vendor" | "billing-cycle" | "collection-case" | "contract-value" | "payment-gateway" | "remittance" | "revenue-ledger" | "sku" | "supplier" | "tax-id" | "till" | "trial" | "wholesale" | "at-sign" | "bell" | "mail" | "mic" | "paperclip" | "send" | "share" | "bell-off" | "megaphone" | "phone-call" | "broadcast" | "chat-check" | "chat-plus" | "chat-x" | "inbox-mail" | "mail-check" | "mail-open" | "mail-plus" | "mail-x" | "message-circle" | "message-square" | "mic-off" | "notification-dot" | "phone-forwarded" | "phone-incoming" | "phone-missed" | "phone-off" | "phone-outgoing" | "rss-feed" | "share-2" | "announcement" | "comment-check" | "comment-x" | "feedback" | "inbox-alert" | "mention" | "message-lock" | "thread" | "channel" | "channel-lock" | "channel-plus" | "collaboration" | "conversation" | "meeting" | "moderation" | "notification-check" | "notification-snooze" | "presence-away" | "presence-busy" | "presence-online" | "reaction" | "thread-resolved" | "call-muted" | "call-transfer" | "comment-thread" | "conversation-star" | "escalation-message" | "meeting-cancelled" | "meeting-check" | "mention-alert" | "notification-priority" | "presence-offline" | "support-inbox" | "survey" | "targeted-broadcast" | "transcript" | "voicemail" | "call-incoming" | "call-recording" | "chat-bot" | "chat-error" | "chat-resolved" | "contact-card" | "email-bounce" | "email-template" | "notification-digest" | "webhook-event" | "auto-reply" | "call-queue" | "campaign" | "chat-typing" | "email-opened" | "email-sent" | "inbox-priority" | "live-chat" | "message-draft" | "notification-muted" | "sms" | "support-agent" | "archive" | "camera" | "edit" | "folder" | "printer" | "save" | "align-center" | "align-left" | "align-right" | "book-open" | "bookmark" | "camera-off" | "clipboard" | "clipboard-check" | "clipboard-list" | "copy-check" | "file-check" | "file-code" | "file-down" | "file-minus" | "file-plus" | "file-text" | "file-up" | "file-x" | "folder-open" | "folder-plus" | "folder-sync" | "image-plus" | "pencil" | "scissors" | "sticky" | "clipboard-copy" | "clipboard-x" | "crop" | "eraser" | "file-archive" | "file-audio" | "file-image" | "file-json" | "file-lock" | "file-spreadsheet" | "file-video" | "folder-check" | "folder-down" | "folder-lock" | "folder-up" | "folder-x" | "newspaper" | "paintbrush" | "document-import" | "document-export" | "document-search" | "document-signature" | "file-csv" | "file-pdf" | "file-template" | "image-check" | "scan-document" | "template-plus" | "asset" | "asset-library" | "collection" | "content-calendar" | "empty-file" | "empty-folder" | "file-diff" | "file-history" | "knowledge-base" | "media-library" | "citation" | "glossary" | "publish" | "redact" | "review-changes" | "rich-text" | "translation" | "web-page" | "video-off" | "approval-document" | "content-block" | "document-merge" | "document-split" | "file-xml" | "folder-shared" | "image-crop" | "media-playlist" | "page-break" | "seo" | "snippet" | "style-guide" | "alt-text" | "content-approval" | "form-template" | "media-caption" | "version-compare" | "battery" | "bluetooth" | "cloud" | "cpu" | "database" | "desktop" | "laptop" | "phone" | "server" | "chip" | "cloud-download" | "cloud-upload" | "database-backup" | "database-zap" | "device-tablet" | "hard-drive" | "headphones" | "keyboard" | "monitor" | "plug-zap" | "server-cog" | "wifi-off" | "bluetooth-connected" | "cloud-check" | "cloud-x" | "database-check" | "database-lock" | "mouse" | "monitor-smartphone" | "router" | "router-wifi" | "smartphone" | "tablet" | "usb" | "barcode-scanner" | "battery-charging" | "battery-full" | "battery-low" | "nfc" | "printer-check" | "server-check" | "server-lock" | "signal-low" | "smartwatch" | "watch" | "wifi" | "app-window" | "mobile-camera" | "mobile-check" | "mobile-home" | "mobile-nav" | "mobile-rotate" | "mobile-scan" | "mobile-tab" | "mobile-vibrate" | "mobile-x" | "offline-sync" | "pwa-install" | "edge-device" | "kiosk" | "local-storage" | "platform-desktop" | "platform-mobile" | "platform-web" | "push-device" | "push-subscription" | "service-worker" | "biometric" | "camera-capture" | "geolocation" | "mobile-bottom-sheet" | "mobile-drawer" | "mobile-gesture" | "mobile-offline" | "mobile-permission" | "mobile-sheet" | "orientation-lock" | "passkey" | "sensor-alert" | "vibration-off" | "wearable" | "airplay" | "beacon" | "bluetooth-off" | "camera-switch" | "device-hub" | "display-check" | "firmware" | "gpu" | "iot-device" | "mobile-hotspot" | "printer-error" | "qr-scanner" | "audit" | "award" | "brain" | "briefcase" | "building" | "calculator" | "eye" | "eye-off" | "help" | "lock" | "policy" | "shield" | "accessibility" | "check-square" | "fingerprint" | "life-buoy" | "scale-balanced" | "shield-check" | "shield-lock" | "shield-x" | "user-check" | "user-cog" | "user-minus" | "user-plus" | "user-x" | "users-round" | "unlock" | "user" | "users" | "badge-alert" | "badge-check" | "certificate" | "key-round" | "lock-keyhole" | "lock-open" | "permission" | "scan-face" | "shield-alert" | "shield-user" | "user-round" | "user-round-check" | "users-plus" | "agent" | "agent-check" | "agent-x" | "ai-spark" | "audit-log" | "consent" | "model" | "prompt-lock" | "risk-score" | "tool-denied" | "api-key" | "credential" | "org-chart" | "secret" | "service-account" | "session" | "session-expired" | "tenant" | "token" | "workspace-lock" | "access-request" | "approval-policy" | "audit-trail" | "data-residency" | "governance" | "policy-lock" | "data-retention" | "scim" | "sso" | "trust-center" | "user-invite" | "user-provision" | "aria" | "assistive-mode" | "compliance-evidence" | "consent-record" | "incident-response" | "keyboard-access" | "permission-review" | "privacy" | "screen-reader" | "voice-access" | "access-expiry" | "audit-event" | "data-classification" | "device-policy" | "encryption-key" | "identity-provider" | "ip-allowlist" | "legal-hold" | "tls-certificate" | "zero-trust" | "x-circle" | "activity" | "calendar" | "clock" | "download" | "flag" | "inbox" | "layers" | "package" | "qr-code" | "refresh" | "rocket" | "sliders" | "tag" | "tool" | "trash" | "branch" | "bug" | "calendar-check" | "calendar-clock" | "calendar-days" | "calendar-plus" | "calendar-x" | "grab" | "history" | "kanban" | "list-check" | "list-filter" | "loader-circle" | "log-in" | "log-out" | "project" | "puzzle" | "reply-all" | "reply" | "sliders-horizontal" | "sliders-vertical" | "sort-asc" | "sort-desc" | "stamp" | "step" | "timer" | "wrench" | "upload" | "automation" | "backlog" | "dependency" | "git-branch" | "git-commit" | "git-merge" | "git-pull-request" | "milestone" | "route-turn" | "status-dot" | "task-check" | "task-clock" | "task-x" | "webhook" | "column-add" | "column-delete" | "data-join" | "data-split" | "data-transform" | "filter-check" | "filter-x" | "row-add" | "row-delete" | "table-export" | "table-import" | "table-search" | "table-settings" | "workflow-branch" | "approval-pending" | "approval-rejected" | "approval-request" | "escalation" | "handoff" | "queue-next" | "retry" | "rollback" | "runbook" | "sla" | "task-priority" | "ai-run" | "event-stream" | "html-partial" | "hydrate" | "job" | "job-failed" | "job-running" | "mcp-call" | "mcp-result" | "orchestration" | "partial-swap" | "polling" | "rehydrate" | "revalidate" | "sse" | "websocket" | "appointment" | "booking" | "checklist-clock" | "dispatch-board" | "incident-alert" | "maintenance" | "process-loop" | "recurrence" | "repair" | "rota" | "service-window" | "triage-queue" | "work-order" | "workflow" | "batch-job" | "blocked-task" | "calendar-sync" | "change-request" | "decision-node" | "event-trigger" | "form-approval" | "job-queue" | "manual-step" | "process-map" | "release" | "rule-engine" | "task-delegated" | "workflow-template" | "box" | "compass" | "globe" | "heart" | "location" | "flask" | "heart-pulse" | "magnet" | "presentation" | "school" | "sitemap" | "suitcase" | "train" | "wand" | "ambulance" | "bed" | "bus" | "car" | "clinic" | "dna" | "factory" | "flag-triangle" | "globe-lock" | "graduation-cap" | "leaf" | "library" | "map-pin-check" | "map-pin-plus" | "map-pin-x" | "microscope" | "plane" | "pill" | "recycle" | "stethoscope" | "syringe" | "traffic-light" | "wheelchair" | "wind-turbine" | "blood-drop" | "campus" | "cargo-ship" | "classroom" | "container" | "currency-dollar" | "currency-rupee" | "exam" | "first-aid" | "forklift" | "insurance" | "investment" | "lab-report" | "ledger" | "loan" | "medical-chart" | "parcel-location" | "patient" | "tax" | "vaccine" | "building-hospital" | "delivery-bike" | "drone" | "fleet-vehicle" | "geo-fence" | "map-route" | "route-off" | "route-plus" | "satellite" | "traffic-cone" | "agriculture" | "case-management" | "crm" | "energy" | "hospitality" | "legal" | "manufacturing" | "public-sector" | "quality-control" | "real-estate" | "recruiting" | "service-desk" | "support-case" | "ticket-queue" | "tourism" | "asset-maintenance" | "care-team" | "dispatch" | "facilities" | "field-service" | "fleet-route" | "patient-portal" | "repair-order" | "site-visit" | "triage" | "claims" | "construction" | "hotel-room" | "insurance-policy" | "lab" | "meter-reading" | "mining" | "pharmacy" | "radiology" | "restaurant" | "telemedicine" | "utility-pole" | "airport" | "branch-office" | "call-center" | "data-center" | "emergency-room" | "government-office" | "insurance-claim" | "inventory-site" | "logistics-hub" | "power-grid", IconMetadata>;
+declare const iconMetadata: Record<"alert" | "badge" | "breadcrumb" | "skeleton" | "sidebar" | "stepper" | "wizard" | "card" | "table" | "refresh" | "rehydrate" | "chart" | "dashboard" | "tool-approval" | "loading" | "close" | "copy" | "drag" | "error" | "input" | "pause" | "play" | "select" | "warning" | "code" | "hr" | "link" | "map" | "menu" | "meter" | "search" | "textarea" | "video" | "circle" | "filter" | "image" | "stop" | "annotation" | "target" | "success" | "offline" | "billing" | "organization" | "home" | "prompt" | "role" | "network" | "message" | "receipt" | "draft" | "user" | "tool" | "retry" | "shift" | "keys" | "signal" | "grid" | "palette" | "id" | "regression" | "sparkline" | "timeline" | "heatmap" | "histogram" | "box-plot" | "control-chart" | "treemap" | "area-chart" | "bar-chart" | "donut-chart" | "gauge-chart" | "funnel-chart" | "line-chart" | "pie-chart" | "radar-chart" | "scatter-chart" | "bubble-chart" | "waterfall-chart" | "route" | "uif" | "list" | "info" | "key" | "version" | "usage" | "model" | "retention" | "save" | "package" | "redact" | "websocket" | "sse" | "polling" | "storage" | "channel" | "theme" | "cache" | "queue" | "approval" | "browser" | "workspace" | "desktop-app" | "sync" | "checkbox" | "repeat" | "document" | "command" | "undo" | "redo" | "markdown" | "quote" | "code-block" | "indent" | "image-edit" | "columns" | "file" | "anchor" | "batoi" | "facebook" | "github" | "instagram" | "linkedin" | "x-twitter" | "youtube" | "arrow-down" | "arrow-left" | "arrow-right" | "arrow-up" | "bot" | "check" | "check-circle" | "chevron-down" | "chevron-left" | "chevron-right" | "chevron-up" | "circle-dot" | "external-link" | "hash" | "maximize" | "minus" | "moon" | "more-horizontal" | "more-vertical" | "plus" | "settings" | "spark" | "star" | "sun" | "terminal" | "arrow-down-left" | "arrow-down-right" | "arrow-up-left" | "arrow-up-right" | "chevrons-down" | "chevrons-left" | "chevrons-right" | "chevrons-up" | "corner-down-left" | "corner-down-right" | "corner-up-left" | "corner-up-right" | "layout-dashboard" | "layout-list" | "layout-panel-left" | "layout-panel-top" | "panel-bottom" | "panel-left" | "panel-right" | "panel-top" | "play-circle" | "plus-circle" | "plus-square" | "power" | "rotate-clockwise" | "search-check" | "search-x" | "square-dot" | "square-stack" | "stop-circle" | "arrow-left-right" | "arrow-up-down" | "ban" | "check-check" | "circle-alert" | "circle-help" | "ellipsis" | "ellipsis-vertical" | "maximize2" | "minimize" | "minimize2" | "move" | "move-horizontal" | "move-vertical" | "panel-close" | "panel-open" | "pin" | "pin-off" | "rotate-counter-clockwise" | "scan" | "scan-line" | "toggle-left" | "toggle-right" | "checkbox-checked" | "checkbox-minus" | "field-required" | "input-error" | "input-password" | "input-search" | "radio-checked" | "radio-unchecked" | "validation-error" | "command-palette" | "density-comfortable" | "density-compact" | "empty-box" | "empty-search" | "empty-state" | "focus-mode" | "nav-back" | "nav-forward" | "quick-action" | "sidebar-collapse" | "sidebar-expand" | "shortcut" | "split-view" | "spotlight" | "state-error" | "state-success" | "state-warning" | "tour" | "app-launcher" | "app-shell" | "bottom-sheet" | "command-key" | "dock" | "floating-action" | "gesture" | "inspector" | "launcher" | "navigator" | "onboarding" | "resizer" | "shell-command" | "status-bar" | "touch-target" | "workspace-switcher" | "action-bar" | "context-panel" | "filter-chip" | "keyboard-shortcut" | "side-panel" | "top-bar" | "x-square" | "zoom-in" | "zoom-out" | "chart-candlestick" | "chart-column" | "chart-no-axes" | "chart-stacked" | "axis-x" | "axis-y" | "chart-combo" | "chart-network" | "chart-spline" | "chart-step" | "conversion-funnel" | "dial" | "forecast" | "horizontal-bar-chart" | "kpi" | "progress-ring" | "scorecard" | "stacked-area-chart" | "table-chart" | "trend-down" | "trend-up" | "ab-test" | "cohort" | "experiment" | "goal-chart" | "growth-loop" | "segment" | "target-metric" | "activation" | "benchmark" | "churn" | "expansion-revenue" | "forecast-band" | "ltv" | "mrr" | "nps" | "revenue-chart" | "roi" | "session-chart" | "win-rate" | "adoption-chart" | "capacity-chart" | "cohort-grid" | "contribution-chart" | "dependency-chart" | "error-rate" | "latency" | "percentile" | "saturation" | "throughput-chart" | "vertical-bar-chart" | "anomaly-chart" | "baseline-chart" | "burndown-chart" | "burnup-chart" | "distribution-chart" | "gantt-chart" | "health-score" | "leaderboard-chart" | "map-chart" | "matrix-chart" | "pareto-chart" | "sankey-chart" | "bullet-chart" | "funnel-stage" | "metric-card" | "pivot-chart" | "variance-chart" | "bank" | "cart" | "cash" | "credit-card" | "badge-dollar" | "badge-percent" | "barcode" | "gift" | "invoice" | "landmark" | "shopping-bag" | "store" | "ticket" | "truck" | "vault" | "wallet" | "coins" | "coupon" | "dollar-sign" | "hand-coins" | "package-check" | "package-open" | "package-plus" | "package-x" | "percent" | "refund" | "scale" | "ship" | "shopping-cart-check" | "shopping-cart-plus" | "warehouse" | "billable" | "checkout" | "dispute" | "dunning" | "estimate" | "payment-failed" | "payment-link" | "payment-method" | "payout" | "price-tag" | "subscription" | "tax-receipt" | "cart-abandoned" | "discount-code" | "fulfillment" | "inventory" | "inventory-alert" | "order-cancelled" | "order-check" | "order-pending" | "pos-terminal" | "procurement" | "purchase-order" | "return" | "shipment-track" | "shipping-label" | "account-payable" | "account-receivable" | "bill-pay" | "card-terminal" | "cash-register" | "chargeback" | "credit-note" | "debit-note" | "delivery-note" | "payment-scheduled" | "pricing-table" | "revenue-recognition" | "sales-order" | "vendor" | "billing-cycle" | "collection-case" | "contract-value" | "payment-gateway" | "remittance" | "revenue-ledger" | "sku" | "supplier" | "tax-id" | "till" | "trial" | "wholesale" | "at-sign" | "bell" | "mail" | "mic" | "paperclip" | "send" | "share" | "bell-off" | "megaphone" | "phone-call" | "broadcast" | "chat-check" | "chat-plus" | "chat-x" | "inbox-mail" | "mail-check" | "mail-open" | "mail-plus" | "mail-x" | "message-circle" | "message-square" | "mic-off" | "notification-dot" | "phone-forwarded" | "phone-incoming" | "phone-missed" | "phone-off" | "phone-outgoing" | "rss-feed" | "share-2" | "announcement" | "comment-check" | "comment-x" | "feedback" | "inbox-alert" | "mention" | "message-lock" | "thread" | "channel-lock" | "channel-plus" | "collaboration" | "conversation" | "meeting" | "moderation" | "notification-check" | "notification-snooze" | "presence-away" | "presence-busy" | "presence-online" | "reaction" | "thread-resolved" | "call-muted" | "call-transfer" | "comment-thread" | "conversation-star" | "escalation-message" | "meeting-cancelled" | "meeting-check" | "mention-alert" | "notification-priority" | "presence-offline" | "support-inbox" | "survey" | "targeted-broadcast" | "transcript" | "voicemail" | "call-incoming" | "call-recording" | "chat-bot" | "chat-error" | "chat-resolved" | "contact-card" | "email-bounce" | "email-template" | "notification-digest" | "webhook-event" | "auto-reply" | "call-queue" | "campaign" | "chat-typing" | "email-opened" | "email-sent" | "inbox-priority" | "live-chat" | "message-draft" | "notification-muted" | "sms" | "support-agent" | "archive" | "camera" | "edit" | "folder" | "printer" | "align-center" | "align-left" | "align-right" | "book-open" | "bookmark" | "camera-off" | "clipboard" | "clipboard-check" | "clipboard-list" | "copy-check" | "file-check" | "file-code" | "file-down" | "file-minus" | "file-plus" | "file-text" | "file-up" | "file-x" | "folder-open" | "folder-plus" | "folder-sync" | "image-plus" | "pencil" | "scissors" | "sticky" | "clipboard-copy" | "clipboard-x" | "crop" | "eraser" | "file-archive" | "file-audio" | "file-image" | "file-json" | "file-lock" | "file-spreadsheet" | "file-video" | "folder-check" | "folder-down" | "folder-lock" | "folder-up" | "folder-x" | "newspaper" | "paintbrush" | "document-import" | "document-export" | "document-search" | "document-signature" | "file-csv" | "file-pdf" | "file-template" | "image-check" | "scan-document" | "template-plus" | "asset" | "asset-library" | "collection" | "content-calendar" | "empty-file" | "empty-folder" | "file-diff" | "file-history" | "knowledge-base" | "media-library" | "citation" | "glossary" | "publish" | "review-changes" | "rich-text" | "translation" | "web-page" | "video-off" | "approval-document" | "content-block" | "document-merge" | "document-split" | "file-xml" | "folder-shared" | "image-crop" | "media-playlist" | "page-break" | "seo" | "snippet" | "style-guide" | "alt-text" | "content-approval" | "form-template" | "media-caption" | "version-compare" | "battery" | "bluetooth" | "cloud" | "cpu" | "database" | "desktop" | "laptop" | "phone" | "server" | "chip" | "cloud-download" | "cloud-upload" | "database-backup" | "database-zap" | "device-tablet" | "hard-drive" | "headphones" | "keyboard" | "monitor" | "plug-zap" | "server-cog" | "wifi-off" | "bluetooth-connected" | "cloud-check" | "cloud-x" | "database-check" | "database-lock" | "mouse" | "monitor-smartphone" | "router" | "router-wifi" | "smartphone" | "tablet" | "usb" | "barcode-scanner" | "battery-charging" | "battery-full" | "battery-low" | "nfc" | "printer-check" | "server-check" | "server-lock" | "signal-low" | "smartwatch" | "watch" | "wifi" | "app-window" | "mobile-camera" | "mobile-check" | "mobile-home" | "mobile-nav" | "mobile-rotate" | "mobile-scan" | "mobile-tab" | "mobile-vibrate" | "mobile-x" | "offline-sync" | "pwa-install" | "edge-device" | "kiosk" | "local-storage" | "platform-desktop" | "platform-mobile" | "platform-web" | "push-device" | "push-subscription" | "service-worker" | "biometric" | "camera-capture" | "geolocation" | "mobile-bottom-sheet" | "mobile-drawer" | "mobile-gesture" | "mobile-offline" | "mobile-permission" | "mobile-sheet" | "orientation-lock" | "passkey" | "sensor-alert" | "vibration-off" | "wearable" | "airplay" | "beacon" | "bluetooth-off" | "camera-switch" | "device-hub" | "display-check" | "firmware" | "gpu" | "iot-device" | "mobile-hotspot" | "printer-error" | "qr-scanner" | "audit" | "award" | "brain" | "briefcase" | "building" | "calculator" | "eye" | "eye-off" | "help" | "lock" | "policy" | "shield" | "accessibility" | "check-square" | "fingerprint" | "life-buoy" | "scale-balanced" | "shield-check" | "shield-lock" | "shield-x" | "user-check" | "user-cog" | "user-minus" | "user-plus" | "user-x" | "users-round" | "unlock" | "users" | "badge-alert" | "badge-check" | "certificate" | "key-round" | "lock-keyhole" | "lock-open" | "permission" | "scan-face" | "shield-alert" | "shield-user" | "user-round" | "user-round-check" | "users-plus" | "agent" | "agent-check" | "agent-x" | "ai-spark" | "audit-log" | "consent" | "prompt-lock" | "risk-score" | "tool-denied" | "api-key" | "credential" | "org-chart" | "secret" | "service-account" | "session" | "session-expired" | "tenant" | "token" | "workspace-lock" | "access-request" | "approval-policy" | "audit-trail" | "data-residency" | "governance" | "policy-lock" | "data-retention" | "scim" | "sso" | "trust-center" | "user-invite" | "user-provision" | "aria" | "assistive-mode" | "compliance-evidence" | "consent-record" | "incident-response" | "keyboard-access" | "permission-review" | "privacy" | "screen-reader" | "voice-access" | "access-expiry" | "audit-event" | "data-classification" | "device-policy" | "encryption-key" | "identity-provider" | "ip-allowlist" | "legal-hold" | "tls-certificate" | "zero-trust" | "x-circle" | "activity" | "calendar" | "clock" | "download" | "flag" | "inbox" | "layers" | "qr-code" | "rocket" | "sliders" | "tag" | "trash" | "branch" | "bug" | "calendar-check" | "calendar-clock" | "calendar-days" | "calendar-plus" | "calendar-x" | "grab" | "history" | "kanban" | "list-check" | "list-filter" | "loader-circle" | "log-in" | "log-out" | "project" | "puzzle" | "reply-all" | "reply" | "sliders-horizontal" | "sliders-vertical" | "sort-asc" | "sort-desc" | "stamp" | "step" | "timer" | "wrench" | "upload" | "automation" | "backlog" | "dependency" | "git-branch" | "git-commit" | "git-merge" | "git-pull-request" | "milestone" | "route-turn" | "status-dot" | "task-check" | "task-clock" | "task-x" | "webhook" | "column-add" | "column-delete" | "data-join" | "data-split" | "data-transform" | "filter-check" | "filter-x" | "row-add" | "row-delete" | "table-export" | "table-import" | "table-search" | "table-settings" | "workflow-branch" | "approval-pending" | "approval-rejected" | "approval-request" | "escalation" | "handoff" | "queue-next" | "rollback" | "runbook" | "sla" | "task-priority" | "ai-run" | "event-stream" | "html-partial" | "hydrate" | "job" | "job-failed" | "job-running" | "mcp-call" | "mcp-result" | "orchestration" | "partial-swap" | "revalidate" | "appointment" | "booking" | "checklist-clock" | "dispatch-board" | "incident-alert" | "maintenance" | "process-loop" | "recurrence" | "repair" | "rota" | "service-window" | "triage-queue" | "work-order" | "workflow" | "batch-job" | "blocked-task" | "calendar-sync" | "change-request" | "decision-node" | "event-trigger" | "form-approval" | "job-queue" | "manual-step" | "process-map" | "release" | "rule-engine" | "task-delegated" | "workflow-template" | "box" | "compass" | "globe" | "heart" | "location" | "flask" | "heart-pulse" | "magnet" | "presentation" | "school" | "sitemap" | "suitcase" | "train" | "wand" | "ambulance" | "bed" | "bus" | "car" | "clinic" | "dna" | "factory" | "flag-triangle" | "globe-lock" | "graduation-cap" | "leaf" | "library" | "map-pin-check" | "map-pin-plus" | "map-pin-x" | "microscope" | "plane" | "pill" | "recycle" | "stethoscope" | "syringe" | "traffic-light" | "wheelchair" | "wind-turbine" | "blood-drop" | "campus" | "cargo-ship" | "classroom" | "container" | "currency-dollar" | "currency-rupee" | "exam" | "first-aid" | "forklift" | "insurance" | "investment" | "lab-report" | "ledger" | "loan" | "medical-chart" | "parcel-location" | "patient" | "tax" | "vaccine" | "building-hospital" | "delivery-bike" | "drone" | "fleet-vehicle" | "geo-fence" | "map-route" | "route-off" | "route-plus" | "satellite" | "traffic-cone" | "agriculture" | "case-management" | "crm" | "energy" | "hospitality" | "legal" | "manufacturing" | "public-sector" | "quality-control" | "real-estate" | "recruiting" | "service-desk" | "support-case" | "ticket-queue" | "tourism" | "asset-maintenance" | "care-team" | "dispatch" | "facilities" | "field-service" | "fleet-route" | "patient-portal" | "repair-order" | "site-visit" | "triage" | "claims" | "construction" | "hotel-room" | "insurance-policy" | "lab" | "meter-reading" | "mining" | "pharmacy" | "radiology" | "restaurant" | "telemedicine" | "utility-pole" | "airport" | "branch-office" | "call-center" | "data-center" | "emergency-room" | "government-office" | "insurance-claim" | "inventory-site" | "logistics-hub" | "power-grid", IconMetadata>;
 declare function getIconMetadata(name: IconName | string): IconMetadata | undefined;
 declare function iconsByCategory(category: IconCategory | string): IconName[];
 declare function searchIcons(query?: string, options?: IconSearchOptions): IconName[];
@@ -9817,6 +10061,7 @@ declare function initLightbox(el: HTMLElement): ComponentInstance;
 declare function initComponent(el: HTMLElement): void;
 declare function destroyComponent(el: HTMLElement): void;
 declare function initAll(root?: Document | HTMLElement): () => void;
+declare function bindComponentActions(root?: Document | HTMLElement): () => void;
 declare function showToast(message: string, options?: ToastOptions): HTMLElement;
 declare const button: {
     name: string;
@@ -10278,10 +10523,20 @@ interface MicroAppStoreOptions extends StoreOptions {
 type ArtifactStoreOptions = MicroAppStoreOptions;
 interface LocalStoreOptions {
     namespace?: string;
-    driver?: 'localstorage' | 'memory';
+    driver?: 'indexeddb' | 'localstorage' | 'memory';
     maxBytes?: number;
     maxEntries?: number;
     version?: number;
+    databaseName?: string;
+    storeName?: string;
+    migrate?: (context: IndexedDBMigrationContext) => void;
+}
+interface IndexedDBMigrationContext {
+    database: IDBDatabase;
+    transaction: IDBTransaction;
+    store: IDBObjectStore;
+    oldVersion: number;
+    newVersion: number;
 }
 interface LocalStore {
     namespace: string;
@@ -10374,6 +10629,7 @@ declare function createArtifactStore<T extends State>(initialState: T, options?:
     bind(root?: ParentNode): void;
     destroy(): void;
 };
+declare function createIndexedDBLocalStore(options?: LocalStoreOptions): LocalStore;
 declare function createLocalStore(options?: LocalStoreOptions): LocalStore;
 declare function createSyncQueue<T = unknown>(store: LocalStore, key?: string): SyncQueue<T>;
 
@@ -10680,6 +10936,39 @@ declare const mobileShell: {
 
 interface AIRenderOptions {
     maxCharacters?: number;
+    maxItems?: number;
+    showActions?: boolean;
+}
+interface AgentComposerOptions extends AIRenderOptions {
+    label?: string;
+    placeholder?: string;
+    submitLabel?: string;
+    stopLabel?: string;
+    templates?: string[];
+}
+interface AgentComposerController {
+    setBusy(busy: boolean): void;
+    destroy(): void;
+}
+interface AgentStreamController {
+    append(input: unknown): boolean;
+    complete(input?: unknown): void;
+    cancel(): void;
+    destroy(): void;
+}
+interface GovernedAgentTransportOptions {
+    src: string;
+    allowCrossOrigin?: boolean;
+    timeout?: number;
+    csrfToken?: string;
+    csrfHeader?: string;
+    credentials?: RequestCredentials;
+    key?: string;
+}
+interface GovernedAgentTransport {
+    send(input: unknown): Promise<AgentInteractionEnvelope$1>;
+    poll(requestId: string): Promise<AgentInteractionEnvelope$1>;
+    cancel(): void;
 }
 declare function renderAIAction(el: HTMLElement): void;
 declare function renderPromptPanel(el: HTMLElement, history?: string[], options?: AIRenderOptions): void;
@@ -10690,9 +10979,23 @@ declare function createStreamSurface(el: HTMLElement, options?: AIRenderOptions)
     cancel(): void;
 };
 declare function renderAIResultCard(el: HTMLElement, content: string, options?: AIRenderOptions): void;
+declare function renderAgentMessage(parent: HTMLElement, envelope: AgentInteractionEnvelope$1, options?: AIRenderOptions): HTMLElement;
+declare function renderAssistantThread(el: HTMLElement, input: unknown[], options?: AIRenderOptions): void;
+declare function renderAgentComposer(el: HTMLElement, options?: AgentComposerOptions): AgentComposerController;
+declare function createAgentStreamSurface(el: HTMLElement, options?: AIRenderOptions): AgentStreamController;
+declare function createGovernedAgentTransport(options: GovernedAgentTransportOptions): GovernedAgentTransport;
+declare function initAssistantThread(el: HTMLElement): void;
 declare const aiAction: {
     name: string;
     init: typeof renderAIAction;
+};
+declare const aiThread: {
+    name: string;
+    init: typeof initAssistantThread;
+};
+declare const aiComposer: {
+    name: string;
+    init: typeof renderAgentComposer;
 };
 
 interface ToolPolicyCheck {
@@ -10728,7 +11031,64 @@ interface ToolRenderOptions {
     maxCharacters?: number;
     maxItems?: number;
 }
-declare function renderToolApproval(el: HTMLElement): void;
+interface ToolDecisionController {
+    destroy(): void;
+}
+interface ToolPlanItem {
+    id: string;
+    tool: string;
+    summary: string;
+    dependsOn?: string[];
+    expectedOutput?: string;
+    approval?: 'none' | 'required' | 'separate';
+}
+interface ToolPermissionScope {
+    name: string;
+    state: 'requested' | 'granted' | 'missing' | 'denied' | 'expiring';
+    detail?: string;
+    expiresAt?: string;
+}
+interface ToolExecutionReceipt {
+    id: string;
+    requestId?: string;
+    status: 'completed' | 'partial' | 'failed' | 'cancelled';
+    issuedAt?: string;
+    auditRef?: string;
+    verified?: boolean;
+    summary: string;
+    artifacts?: Array<{
+        label: string;
+        reference: string;
+        checksum?: string;
+    }>;
+}
+interface GovernedToolTransportOptions {
+    src: string;
+    allowCrossOrigin?: boolean;
+    timeout?: number;
+    csrfToken?: string;
+    csrfHeader?: string;
+    credentials?: RequestCredentials;
+    key?: string;
+}
+interface GovernedToolDecision {
+    requestId: string;
+    decision: 'approve' | 'reject';
+    envelopeId?: string;
+    reason?: string;
+}
+interface GovernedToolTransport {
+    submitDecision(decision: GovernedToolDecision): Promise<AgentInteractionEnvelope$1>;
+    poll(requestId: string): Promise<AgentInteractionEnvelope$1>;
+    cancel(): void;
+}
+declare function createGovernedToolTransport(options: GovernedToolTransportOptions): GovernedToolTransport;
+declare function renderToolPlan(el: HTMLElement, items: ToolPlanItem[], options?: ToolRenderOptions): void;
+declare function renderToolPermissions(el: HTMLElement, scopes: ToolPermissionScope[], options?: ToolRenderOptions): void;
+declare function renderToolReceipt(el: HTMLElement, receipt: ToolExecutionReceipt, options?: ToolRenderOptions): void;
+declare function renderAgentToolEnvelope(el: HTMLElement, input: unknown, options?: ToolRenderOptions): AgentInteractionEnvelope$1 | null;
+declare function initAgentToolEnvelope(el: HTMLElement): ToolDecisionController | void;
+declare function renderToolApproval(el: HTMLElement): ToolDecisionController;
 declare function renderApprovalPolicy(el: HTMLElement, checks: ToolPolicyCheck[], options?: ToolRenderOptions): void;
 declare function renderToolProgress(el: HTMLElement, message: string): void;
 declare function renderToolTimeline(el: HTMLElement, steps: Array<{
@@ -10742,20 +11102,28 @@ declare function renderToolAuditTrail(el: HTMLElement, entries: Array<{
 }>, options?: ToolRenderOptions): void;
 declare function renderDiff(el: HTMLElement, before: string, after: string): void;
 declare function renderToolResult(el: HTMLElement, result: unknown, options?: ToolRenderOptions): void;
-declare function renderToolReviewFlow(el: HTMLElement, request: ToolReviewRequest, options?: ToolRenderOptions): void;
+declare function renderToolReviewFlow(el: HTMLElement, request: ToolReviewRequest, options?: ToolRenderOptions): ToolDecisionController;
 declare const toolApproval: {
     name: string;
     init: typeof renderToolApproval;
+};
+declare const agentTool: {
+    name: string;
+    init: typeof initAgentToolEnvelope;
 };
 
 interface BatoiUIFApp {
     root: Document | HTMLElement;
     destroyed: boolean;
     refresh(root?: Document | HTMLElement): void;
+    suspend(root?: Document | HTMLElement): void;
+    resume(root?: Document | HTMLElement): void;
     destroy(): void;
     restart(): BatoiUIFApp;
 }
+declare const runtimeRegistry: UIFComponentRegistry;
+declare function registerRuntimeComponent(definition: UIFComponentDefinition): () => void;
 declare function start(root?: Document | HTMLElement): BatoiUIFApp;
 declare function autoStart(root?: Document | HTMLElement): void;
 
-export { type AIRenderOptions, type ActionContext, type ActionDiagnostic, type ActionHandler, type AnimationController, type AnimationPreset, type AnimationStep, type ArtifactStoreOptions, type BatoiUIFApp, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type ConnectorBindingOptions, type ConnectorMode, type ConnectorType, type DashboardConfig, type DashboardController, type DashboardFilter, type DashboardFilterOperator, type DashboardRenderOptions, type DashboardWidget, type DashboardWidgetType, type DataConnector, type DesktopAiMode, type DesktopAppManifest, type DesktopCapability, type DesktopNavigationItem, type DesktopOfflineMode, type DesktopPlatform, type DesktopSettingsStore, type DesktopShellOptions, type DesktopShellStatus, type DesktopSyncQueueItem, type DesktopSyncState, type DesktopSyncStatus, type DesktopValidationResult, type DesktopWorkspaceMode, type DesktopWorkspaceSession, type DrilldownOptions, type EditorCodeBlockValue, type EditorCommand, type EditorCommandContext, type EditorCommandHandler, type EditorHookContext, type EditorHookHandler, type EditorHookName, type EditorImageValue, type EditorInstance, type EditorLayout, type EditorLinkValue, type EditorMode, type EditorOptions, type EditorPreviewMode, type EditorTableValue, type EffectOptions, type ExtensionManifestOptions, type ExtensionMessage, type ExtensionSurface, type FlintChartAdapterResult, type FlintChartEncoding, type FlintChartInput, type FlintChartSpec, type FormController, type FormErrors, type HTMLSwapMode, type HistogramBin, type HistogramOptions, type IconCategory, type IconDefinition, type IconMetadata, type IconName, type IconOptions, type IconRegistry, type IconSearchOptions, type IconStatus, type LocalStore, type LocalStoreOptions, type MarkdownBlockNode, type MarkdownDiagnostic, type MarkdownDiagnosticSeverity, type MarkdownDocument, type MarkdownInlineNode, type MarkdownListItem, type MarkdownListNode, type MarkdownParseOptions, type MarkdownRenderOptions, type MarkdownSourcePosition, type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppConnectorWorkflow, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type MicroAppStoreOptions, type MobileController, type MountIconsOptions, type NotificationItem, type OfflineTaskOptions, type OverlayOptions, type ParsedAction, type PresenceUser, type PushController, type QueryHandler, type QueryInput, type RadResponse, type RealtimeBindingOptions, type RealtimeController, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RepeatableController, type RequestOptions, type RouterOptions, type SafeHTMLRenderOptions, type SafeURLContext, type SafeURLPolicy, type ServiceWorkerOptions, type StoreOptions, type SummaryStats, type SwapMode, type SyncQueue, type SyncQueueItem, type TableAdapterOptions, type TableController, type TableOptions, type ToolPolicyCheck, type ToolRenderOptions, type ToolReviewRequest, type TrustedHTMLRenderOptions, type TypedTextController, type TypedTextOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFComponent, type UIFDomComponent, type UIFLifecycleEvent, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFState, type UIFTrustedTypesPolicy, type UIFValue, accordion, adaptFlintChart, adaptRecords, adaptTable, addNotification, adminSecurityIcons, aiAction, alert, animate, animateGroup, animationPresets, appendStreamingChunk, appendTextElement, applyDashboardFilters, applyPermissionNavigation, applyResponsiveColumns, autoInit, autoStart, badge, bindActions, bindChartExports, bindConnector, bindDesktopOfflineIndicator, bindDesktopSettings, bindRadActions, bindRealtime, brandIcons, breadcrumb, button, cacheStrategies, canUseDesktopAction, cancelAnimation, cancelRequest, card, carousel, chart, chartIcons, cleanEditorHtml, clearActionDiagnostics, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, commerceIcons, communicationIcons, configureTrustedTypes, connect, contentIcons, coreUiIcons, correlation, createAdvancedStore, createArtifactStore, createCacheStrategy, createDashboardConfig, createDesktopManifest, createDesktopShell, createDesktopSyncStatus, createEditor, createExtensionManifest, createExtensionMessage, createLocalSettingsStore, createLocalStore, createMemorySettingsStore, createMicroAppStore, createStore, createStreamSurface, createSyncQueue, createWorkspaceSession, csvToObjects, cumulativeSum, dataTable, delegate, destroyChart, destroyComponent, detectDesktopPlatform, deviceIcons, disconnect, dispatchAction, dispatchActions, domainIcons, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, escapeHtml, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, flushOfflineQueue, form, formatEditor, fragment, get, getActionDiagnostics, getConnectionState, getEditorValue, getIconMetadata, getNotifications, getOverlayStack, getPresence, getPushSubscription, getTrustedTypesPolicy, goToPage, hasDesktopCapability, hasIcon, hide, hideOfflineBanner, histogramBins, htmlToMarkdown, icon, iconElement, iconMetadata, iconSets, icons, iconsByCategory, init, initAll, initAnimation, initAnimationTriggers, initChart, initComponent, initDashboard, initDeclarativeFilters, initDesktopShell, initEditor, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, initTypedText, isCacheableRequest, isCacheableResponse, isExtensionRuntime, isInitialized, isSafeURL, lightbox, linearRegression, listMicroAppConnectorWorkflows, loadConnector, loadPartial, loadRemoteTable, markNotificationsRead, markdownDiagnostics, markdownToHtml, masonry, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, observeMotion, offcanvas, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseActionSpec, parseCSV, parseChartData, parseDesktopManifestElement, parseMarkdown, parseMarkdownInline, parseMicroAppManifest, parseOptions, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queryEditorCommand, queueOfflineTask, ready, realtime, refreshChart, registerAction, registerAsyncRule, registerComponent, registerEditorCommand, registerEditorHook, registerFieldAdapter, registerIcon, registerPlugin, registerPushServiceWorker, registerServiceWorker, registerValidationMessage, rehydrate, removePresence, renderAIAction, renderAIResultCard, renderApprovalPolicy, renderAssistantResponse, renderChart, renderDashboard, renderDashboardWidget, renderDesktopShell, renderDesktopSyncStatus, renderDiff, renderFlintChart, renderMarkdown, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolProgress, renderToolResult, renderToolReviewFlow, renderToolTimeline, renderWorkspaceIdentity, request, requestNotificationPermission, resolveActionTarget, resolveTarget, runEditorCommand, safeQuerySelector, sanitizeHTML, searchIcons, selectedRows, sequence, serialize, setAccent, setDensity, setDesktopStatus, setEditorPreviewLayout, setEditorValue, setSafeHTML, setTableState, setText, setTrustedHTML, setupInstallPrompt, shell, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, stagger, start, stepper, submitForm, subscribe, subscribeToPush, summarizeDashboard, summarizeDesktopQueue, summaryStats, swapContent, swapTrustedHTML, table, tabs, timeline, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifStates, uifValues, unmount, unreadCount, unregisterAction, unregisterEditorCommand, unregisterServiceWorker, unsubscribeFromPush, updatePresence, upload, useRequestInterceptor, useResponseInterceptor, validateDesktopManifest, validateEditor, validateField, validateForm, validateFormAsync, validateMicroAppConnectorWorkflows, validateMicroAppManifest, wizard, workflowIcons, zScores };
+export { type AIRenderOptions, type ActionContext, type ActionDiagnostic, type ActionHandler, type AgentActor, type AgentActorRole, type AgentArtifactPart, type AgentComposerController, type AgentComposerOptions, type AgentContentPart, type AgentDataPart, type AgentEnvelopeIssue, type AgentEnvelopeKind, type AgentEnvelopeResult, type AgentEnvelopeStatus, type AgentInteractionEnvelope, type AgentRiskDisclosure, type AgentRiskLevel, type AgentSourcePart, type AgentStreamController, type AgentTextPart, type AgentUsageDisclosure, type AnimationController, type AnimationPreset, type AnimationStep, type ArtifactStoreOptions, type BatoiUIFApp, type ChartController, type ChartDatum, type ChartExportOptions, type ChartMargin, type ChartOptions, type ChartPaletteName, type ChartSelectionDetail, type ChartType, type ComponentInstance, type ConnectorBindingOptions, type ConnectorMode, type ConnectorType, type DashboardConfig, type DashboardController, type DashboardFilter, type DashboardFilterOperator, type DashboardRenderOptions, type DashboardWidget, type DashboardWidgetType, type DataConnector, type DesktopAiMode, type DesktopAppManifest, type DesktopCapability, type DesktopNavigationItem, type DesktopOfflineMode, type DesktopPlatform, type DesktopSettingsStore, type DesktopShellOptions, type DesktopShellStatus, type DesktopSyncQueueItem, type DesktopSyncState, type DesktopSyncStatus, type DesktopValidationResult, type DesktopWorkspaceMode, type DesktopWorkspaceSession, type DrilldownOptions, type EditorCodeBlockValue, type EditorCommand, type EditorCommandContext, type EditorCommandHandler, type EditorHookContext, type EditorHookHandler, type EditorHookName, type EditorImageValue, type EditorInstance, type EditorLayout, type EditorLinkValue, type EditorMode, type EditorOptions, type EditorPreviewMode, type EditorTableValue, type EffectOptions, type ExtensionManifestOptions, type ExtensionMessage, type ExtensionSurface, type FlintChartAdapterResult, type FlintChartEncoding, type FlintChartInput, type FlintChartSpec, type FormController, type FormErrors, type GovernedAgentTransport, type GovernedAgentTransportOptions, type GovernedToolDecision, type GovernedToolTransport, type GovernedToolTransportOptions, type HTMLSwapMode, type HistogramBin, type HistogramOptions, type IconCategory, type IconDefinition, type IconMetadata, type IconName, type IconOptions, type IconRegistry, type IconSearchOptions, type IconStatus, type IndexedDBMigrationContext, type LocalStore, type LocalStoreOptions, type MarkdownBlockNode, type MarkdownDiagnostic, type MarkdownDiagnosticSeverity, type MarkdownDocument, type MarkdownInlineNode, type MarkdownListItem, type MarkdownListNode, type MarkdownParseOptions, type MarkdownRenderOptions, type MarkdownSourcePosition, type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppConnectorWorkflow, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type MicroAppStoreOptions, type MobileController, type MountIconsOptions, type NotificationItem, type OfflineTaskOptions, type OverlayOptions, type ParsedAction, type PresenceUser, type PushController, type QueryHandler, type QueryInput, type RadResponse, type RealtimeBindingOptions, type RealtimeController, type RealtimeHandler, type RealtimeMode, type RealtimeOptions, type RealtimeState, type RecordAdapterOptions, type RegressionPoint, type RegressionResult, type RemoteTableResponse, type RepeatableController, type RequestOptions, type RouterOptions, type SafeHTMLRenderOptions, type SafeURLContext, type SafeURLPolicy, type ServiceWorkerOptions, type StoreOptions, type SummaryStats, type SwapMode, type SyncQueue, type SyncQueueItem, type TableAdapterOptions, type TableController, type TableOptions, type ToolDecisionController, type ToolExecutionReceipt, type ToolPermissionScope, type ToolPlanItem, type ToolPolicyCheck, type ToolRenderOptions, type ToolReviewRequest, type TrustedHTMLRenderOptions, type TypedTextController, type TypedTextOptions, type UIFAction, type UIFApp, type UIFAttribute, type UIFCompatibilityMode, type UIFCompatibilityOptions, type UIFComponent, type UIFComponentDefinition, type UIFComponentRegistry, type UIFConfigurationIssue, type UIFConfigurationOptions, type UIFConfigurationResult, type UIFContractEntry, type UIFController, type UIFDiagnostic, type UIFDiagnosticDurationBucket, type UIFDiagnosticInput, type UIFDiagnosticsOptions, type UIFDomComponent, UIFError, type UIFErrorCategory, type UIFErrorDetail, type UIFEvent, type UIFLifecycleEvent, type UIFMountContext, type UIFObjectInspectionOptions, type UIFOptions, type UIFPlugin, UIFQuery, type UIFRequestError, type UIFResourceLimits, type UIFState, type UIFTrustedTypesPolicy, type UIFURLCapability, type UIFURLCapabilityPolicy, type UIFUpdateReason, type UIFValue, accordion, adaptFlintChart, adaptRecords, adaptTable, addNotification, adminSecurityIcons, agentTool, aiAction, aiComposer, aiThread, alert, animate, animateGroup, animationPresets, appendStreamingChunk, appendTextElement, applyDashboardFilters, applyPermissionNavigation, applyResponsiveColumns, assertSafeObject, assertSafePropertyPath, autoInit, autoStart, badge, bindActions, bindChartExports, bindComponentActions, bindConnector, bindDesktopOfflineIndicator, bindDesktopSettings, bindRadActions, bindRealtime, brandIcons, breadcrumb, button, cacheStrategies, canUseDesktopAction, cancelAnimation, cancelRequest, card, carousel, chart, chartIcons, cleanEditorHtml, clearActionDiagnostics, clearErrors, closeOverlay, closest, collapse, collapseComponent, combobox, commandMenu, commerceIcons, communicationIcons, configureCompatibility, configureDiagnostics, configureTrustedTypes, configureURLCapabilities, connect, contentIcons, coreUiIcons, correlation, createAdvancedStore, createAgentStreamSurface, createArtifactStore, createCacheStrategy, createComponentRegistry, createDashboardConfig, createDesktopManifest, createDesktopShell, createDesktopSyncStatus, createEditor, createExtensionManifest, createExtensionMessage, createGovernedAgentTransport, createGovernedToolTransport, createIndexedDBLocalStore, createLocalSettingsStore, createLocalStore, createMemorySettingsStore, createMicroAppStore, createStore, createStreamSurface, createSyncQueue, createWorkspaceSession, csvToObjects, cumulativeSum, dataTable, defaultUIFResourceLimits, delegate, destroyChart, destroyComponent, detectDesktopPlatform, deviceIcons, diagnosticDurationBucket, disconnect, dispatchAction, dispatchActions, domainIcons, downloadChartPng, downloadChartSvg, drawer, dropdown, emit, escapeHtml, expand, exportChartData, exportChartPng, exportChartSvg, exportTable, fileUpload, filterElements, filterTable, findUnsafeObjectPaths, flushOfflineQueue, form, formatEditor, fragment, get, getActionDiagnostics, getCompatibilityMode, getConnectionState, getEditorValue, getIconMetadata, getNotifications, getOverlayStack, getPresence, getPushSubscription, getTrustedTypesPolicy, getURLCapabilityPolicy, goToPage, hasDesktopCapability, hasIcon, hide, hideOfflineBanner, histogramBins, htmlToMarkdown, icon, iconElement, iconMetadata, iconSets, icons, iconsByCategory, init, initAgentToolEnvelope, initAll, initAnimation, initAnimationTriggers, initAssistantThread, initChart, initComponent, initDashboard, initDeclarativeFilters, initDesktopShell, initEditor, initForm, initInstallPrompt, initMobileShell, initOfflineQueue, initPullToRefresh, initPush, initRealtime, initRepeatableGroup, initRouter, initSegmentedControl, initSheetModal, initSwipeAction, initTable, initTypedText, isCacheableRequest, isCacheableResponse, isExtensionRuntime, isInitialized, isSafeObjectKey, isSafePropertyPath, isSafeURL, isURLCapabilityAllowed, lightbox, linearRegression, listMicroAppConnectorWorkflows, loadConnector, loadPartial, loadRemoteTable, markNotificationsRead, markdownDiagnostics, markdownToHtml, masonry, mobileShell, modal, mount, mountIcons, movingAverage, nav, navbar, observe, observeMotion, offcanvas, on, onAppUpdate, onNetworkChange, onOffline, onOnline, openOverlay, pagination, parseActionSpec, parseAgentEnvelope, parseCSV, parseChartData, parseDesktopManifestElement, parseMarkdown, parseMarkdownInline, parseMicroAppManifest, parseOptions, parseUIFConfiguration, percentChange, popover, positionOverlay, post, progress, publishBatched, publishLocal, push, qs, qsa, quantile, queryEditorCommand, queueOfflineTask, ready, realtime, refreshChart, registerAction, registerAsyncRule, registerComponent, registerEditorCommand, registerEditorHook, registerFieldAdapter, registerIcon, registerPlugin, registerPushServiceWorker, registerRuntimeComponent, registerServiceWorker, registerValidationMessage, rehydrate, removePresence, renderAIAction, renderAIResultCard, renderAgentComposer, renderAgentMessage, renderAgentToolEnvelope, renderApprovalPolicy, renderAssistantResponse, renderAssistantThread, renderChart, renderDashboard, renderDashboardWidget, renderDesktopShell, renderDesktopSyncStatus, renderDiff, renderFlintChart, renderMarkdown, renderPromptPanel, renderToolApproval, renderToolAuditTrail, renderToolPermissions, renderToolPlan, renderToolProgress, renderToolReceipt, renderToolResult, renderToolReviewFlow, renderToolTimeline, renderWorkspaceIdentity, reportDiagnostic, request, requestNotificationPermission, resolveActionTarget, resolveTarget, runEditorCommand, runtimeRegistry, safeQuerySelector, sanitizeHTML, searchIcons, selectedRows, sequence, serialize, setAccent, setDensity, setDesktopStatus, setEditorPreviewLayout, setEditorValue, setSafeHTML, setTableState, setText, setTrustedHTML, setupInstallPrompt, shell, show, showErrorSummary, showErrors, showInAppNotification, showOfflineBanner, showToast, sidebar, skeleton, sortTable, spinner, stagger, start, stepper, submitForm, subscribe, subscribeToPush, summarizeDashboard, summarizeDesktopQueue, summaryStats, swapContent, swapTrustedHTML, table, tabs, timeline, toast, toggle, toggleOverlay, toolApproval, tooltip, transition, trigger, uif, uifActions, uifAttributes, uifContractRegistry, uifEvents, uifStates, uifValues, unmount, unreadCount, unregisterAction, unregisterEditorCommand, unregisterServiceWorker, unsubscribeFromPush, updatePresence, upload, useRequestInterceptor, useResponseInterceptor, validateAgentEnvelope, validateDesktopManifest, validateEditor, validateField, validateForm, validateFormAsync, validateMicroAppConnectorWorkflows, validateMicroAppManifest, wizard, workflowIcons, zScores };

@@ -1,7 +1,7 @@
 {
   "name": "batoi-uif",
   "private": true,
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Batoi UIF — Unified Interface Framework",
   "license": "Apache-2.0",
   "packageManager": "npm@10.0.0",
@@ -23,11 +23,13 @@
     "format": "prettier --check .",
     "test": "vitest run",
     "test:browser": "playwright test",
+    "test:security": "vitest run scripts/security-policy.test.ts",
     "audit:security": "npm audit --audit-level=moderate",
     "release:api-baseline": "node scripts/generate-api-baseline.mjs",
+    "release:contract-baseline": "node scripts/generate-contract-baseline.mjs",
     "verify:packages": "node scripts/verify-package-contents.mjs",
     "verify:packed-install": "node scripts/smoke-packed-install.mjs",
-    "verify:release": "npm run verify:packages && npm run verify:packed-install && node scripts/verify-release.mjs"
+    "verify:release": "npm run test:security && npm run verify:packages && npm run verify:packed-install && node scripts/verify-release.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

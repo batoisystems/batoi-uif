@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.4.0
+
+- Added the v3-compatible component registry with idempotent mount/update/suspend/resume/destroy ownership and a single all-in-one hydration path.
+- Added typed errors, bounded configuration parsing, safe object/path handling, URL capability policies, strict compatibility diagnostics, and privacy-safe opt-in diagnostics.
+- Added a machine-readable compatibility baseline and CI security-policy checks for dangerous sinks and third-party runtime dependencies.
+- Added a provider-neutral Agent Interaction Envelope, assistant threads/composer/stream/actions, governed AI gateway transport, and fail-closed compatibility notices.
+- Added tool plans, permissions, reviews, one-shot decisions, progress, results, receipts, and a governed tool gateway transport while retaining server authority.
+- Added a bounded, versioned, transactional IndexedDB Micro App store with atomic imports and browser coverage.
+
 ## 2.3.0
 
 - Added searchable example navigation covering every example and component-gallery pattern.

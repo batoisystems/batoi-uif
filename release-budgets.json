@@ -1,15 +1,15 @@
 {
-  "browserGzipBytes": 121500,
+  "browserGzipBytes": 140000,
   "artifactGzipBytes": {
-    "dist/uif.iife.js": 121700
+    "dist/uif.iife.js": 140000
   },
   "initMilliseconds": 50,
   "packageGzipBytes": {
     "actions": 5000,
-    "ai": 2500,
+    "ai": 5000,
     "charts": 24000,
     "components": 10000,
-    "core": 7000,
+    "core": 21000,
     "dashboard": 3000,
     "desktop": 5000,
     "dom": 4000,
@@ -18,7 +18,7 @@
     "extension-kit": 2000,
     "forms": 5000,
     "icons": 38000,
-    "mcp": 3000,
+    "mcp": 5000,
     "mobile": 2000,
     "net": 4000,
     "overlays": 3000,
@@ -28,7 +28,10 @@
     "rad-adapter": 3000,
     "realtime": 4000,
     "router": 2500,
-    "state": 4000,
+    "state": 5500,
     "table": 8000
+  },
+  "budgetNotes": {
+    "v3-foundation": "The additive v3 preparation layer includes the shared controller registry, typed errors and agent envelopes, bounded configuration and storage, IndexedDB, governed AI/MCP transports, privacy-safe diagnostics, compatibility diagnostics, and security policy gates. The 2.4 compatibility bundle measures about 133.8 KB gzip; profile bundles and internal splitting are required before 3.0 stable."
   }
 }

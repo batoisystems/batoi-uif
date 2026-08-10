@@ -902,6 +902,9 @@ function destroyComponent(el) {
 }
 function initAll(root = document) {
   root.querySelectorAll("[data-uif]").forEach(initComponent);
+  return bindComponentActions(root);
+}
+function bindComponentActions(root = document) {
   const existing = actionBindings.get(root);
   if (existing) return existing;
   root.addEventListener("click", handleAction);
@@ -1042,6 +1045,7 @@ export {
   accordion,
   alert,
   badge,
+  bindComponentActions,
   breadcrumb,
   button,
   card,

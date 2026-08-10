@@ -31,9 +31,24 @@ export interface SafeURLPolicy {
   protocols?: string[];
 }
 
+export interface UIFURLCapability {
+  origin: string;
+  pathPrefix?: string;
+  contexts?: readonly SafeURLContext[];
+}
+
+export interface UIFURLCapabilityPolicy {
+  enforce?: boolean;
+  capabilities?: readonly UIFURLCapability[];
+}
+
 const initialized = new WeakMap<HTMLElement, UIFDomComponent>();
 const registry = new Map<string, UIFDomComponent>();
 let trustedTypesPolicy: UIFTrustedTypesPolicy | null = null;
+let urlCapabilityPolicy: Readonly<Required<UIFURLCapabilityPolicy>> = Object.freeze({
+  enforce: false,
+  capabilities: Object.freeze([]),
+});
 const blockedSafeHTMLTags = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'LINK', 'META', 'BASE']);
 const defaultSafeHTMLAttributes = new Set([
   'aria-describedby',
@@ -128,6 +143,44 @@ export function getTrustedTypesPolicy(): UIFTrustedTypesPolicy | null {
   return trustedTypesPolicy;
 }
 
+export function configureURLCapabilities(policy: UIFURLCapabilityPolicy | null): void {
+  if (!policy) {
+    urlCapabilityPolicy = Object.freeze({ enforce: false, capabilities: Object.freeze([]) });
+    return;
+  }
+  const capabilities = (policy.capabilities ?? []).map((capability) => {
+    const parsed = new URL(capability.origin);
+    if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password || parsed.pathname !== '/' || parsed.search || parsed.hash) {
+      throw new Error(`Invalid UIF URL capability origin: ${capability.origin}`);
+    }
+    const pathPrefix = capability.pathPrefix ?? '/';
+    if (!pathPrefix.startsWith('/') || pathPrefix.includes('\\') || /[\u0000-\u001f\u007f]/.test(pathPrefix)) {
+      throw new Error(`Invalid UIF URL capability path prefix: ${pathPrefix}`);
+    }
+    return Object.freeze({
+      origin: parsed.origin,
+      pathPrefix,
+      contexts: Object.freeze([...(capability.contexts ?? ['network'])]),
+    });
+  });
+  urlCapabilityPolicy = Object.freeze({
+    enforce: policy.enforce ?? true,
+    capabilities: Object.freeze(capabilities),
+  });
+}
+
+export function getURLCapabilityPolicy(): Readonly<Required<UIFURLCapabilityPolicy>> {
+  return urlCapabilityPolicy;
+}
+
+export function isURLCapabilityAllowed(url: URL, context: SafeURLContext): boolean {
+  return urlCapabilityPolicy.capabilities.some((capability) =>
+    capability.origin === url.origin &&
+    (capability.contexts?.includes(context) ?? false) &&
+    url.pathname.startsWith(capability.pathPrefix ?? '/'),
+  );
+}
+
 function setHTMLSink(target: Element, html: string): void {
   const value = trustedTypesPolicy?.createHTML(html) ?? html;
   (target as unknown as { innerHTML: unknown }).innerHTML = value;
@@ -148,7 +201,10 @@ export function isSafeURL(value: string, policy: SafeURLPolicy = {}): boolean {
     const base = typeof window === 'undefined' ? 'http://localhost/' : window.location.href;
     const parsed = new URL(candidate, base);
     if (!(policy.protocols ?? defaults[context]).includes(parsed.protocol.toLowerCase())) return false;
-    if (!policy.sameOrigin || typeof window === 'undefined') return true;
+    if (!policy.sameOrigin || typeof window === 'undefined') {
+      if (typeof window === 'undefined' || parsed.origin === new URL(base).origin) return true;
+      return !urlCapabilityPolicy.enforce || isURLCapabilityAllowed(parsed, context);
+    }
     if (parsed.origin === window.location.origin) return true;
     const websocketEquivalent = parsed.host === window.location.host && ((parsed.protocol === 'ws:' && window.location.protocol === 'http:') || (parsed.protocol === 'wss:' && window.location.protocol === 'https:'));
     return websocketEquivalent;

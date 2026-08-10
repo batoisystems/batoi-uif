@@ -110,16 +110,21 @@ Realtime feeds render payloads as text by default. Reconnect uses capped exponen
 | API or attribute           | Purpose                                                                                                 |
 | -------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `data-uif="ai-action"`     | Renders a browser-side AI action card.                                                                  |
+| `data-uif="ai-thread"`     | Renders validated Agent Interaction Envelope messages, sources, artifacts, usage, errors, and actions. |
+| `data-uif="ai-composer"`   | Renders an accessible prompt composer that emits submit/cancel events without invoking a provider.     |
 | `data-uif-agent`           | Agent label shown in the AI card.                                                                       |
 | `data-uif-tool`            | Tool/action label shown in AI and MCP cards.                                                            |
 | `renderPromptPanel()`      | Renders prompt input and selectable prompt history.                                                     |
 | `createStreamSurface()`    | Creates a text-safe streaming surface with cancellation state.                                          |
 | `renderAIResultCard()`     | Renders accept/reject/copy/insert result actions.                                                       |
 | `data-uif="tool-approval"` | Renders a server-mediated MCP-style approval card.                                                      |
+| `data-uif="agent-tool"`    | Renders validated plan, review, progress, result, and receipt envelopes.                                |
 | `data-uif-risk`            | Risk label, commonly `low`, `medium`, or `high`.                                                        |
 | `data-uif-irreversible`    | Requires explicit `APPROVE` confirmation when set to `true`.                                            |
 | `renderApprovalPolicy()`   | Renders policy checks with pass/warn/fail/pending state markers.                                        |
 | `renderToolReviewFlow()`   | Renders payload preview, policy checks, timeline, diff, result, audit trail, and approve/reject events. |
+| `createGovernedAgentTransport()` | Sends requests to a governed application AI gateway and validates returned envelopes.             |
+| `createGovernedToolTransport()` | Submits correlated approval decisions to a governed application tool gateway.                       |
 
 AI/MCP APIs are UI-only. Approval events are emitted for a governed backend to handle; browser code must not execute privileged tools directly.
 

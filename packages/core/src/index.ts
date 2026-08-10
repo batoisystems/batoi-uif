@@ -1,5 +1,17 @@
+import {
+  isSafeObjectKey,
+  parseUIFConfiguration,
+  UIFError,
+} from './contracts.js';
+import { getCompatibilityMode } from './compatibility.js';
+
 export type UIFOptions = Record<string, unknown>;
+export * from './agent.js';
 export * from './attributes.js';
+export * from './component-registry.js';
+export * from './compatibility.js';
+export * from './contracts.js';
+export * from './diagnostics.js';
 export * from './micro-app.js';
 
 export interface UIFApp {
@@ -41,13 +53,30 @@ export function parseOptions(el: HTMLElement): UIFOptions {
   if (!raw) return {};
 
   try {
-    const parsed = JSON.parse(raw) as unknown;
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? (parsed as UIFOptions) : {};
+    JSON.parse(raw);
+    const result = parseUIFConfiguration(raw);
+    if (!result.valid) emit('uif:runtime:diagnostic', { component: el.dataset.uif, issues: result.issues }, el);
+    return result.value;
   } catch {
+    const compatibilityMode = getCompatibilityMode();
+    emit('uif:runtime:diagnostic', {
+      component: el.dataset.uif,
+      issues: [{
+        path: 'data-uif-options',
+        code: compatibilityMode === 'v3' ? 'legacy-options-rejected' : 'legacy-options',
+        message: compatibilityMode === 'v3'
+          ? 'Legacy semicolon options are rejected in v3 mode; use a JSON object.'
+          : 'Legacy semicolon options are deprecated; migrate to a JSON object before v3.',
+      }],
+    }, el);
+    if (compatibilityMode === 'v3') return {};
     return raw.split(';').reduce<UIFOptions>((acc, pair) => {
       const [key, ...rest] = pair.split(':');
       const name = key?.trim();
-      if (!name) return acc;
+      if (!name || !isSafeObjectKey(name)) {
+        if (name) emit('uif:runtime:diagnostic', { component: el.dataset.uif, issues: [{ path: name, code: 'unsafe-key', message: `Unsafe option key: ${name}` }] }, el);
+        return acc;
+      }
       const value = rest.join(':').trim();
       acc[name] = value === '' ? true : coerceValue(value);
       return acc;
@@ -73,8 +102,25 @@ export function setDensity(density: 'compact' | 'default' | 'roomy', target: HTM
 }
 
 export function setAccent(color: string, target: HTMLElement = document.documentElement): void {
-  target.style.setProperty('--uif-accent', color);
-  target.style.setProperty('--uif-color-primary', color);
+  const value = color.trim();
+  const supported = typeof CSS !== 'undefined' && typeof CSS.supports === 'function'
+    ? CSS.supports('color', value)
+    : (() => {
+        const probe = document.createElement('span');
+        probe.style.color = value;
+        return Boolean(probe.style.color);
+      })();
+  if (!supported) {
+    throw new UIFError('Batoi UIF refused an invalid accent color', {
+      code: 'UIF_INVALID_ACCENT',
+      category: 'security',
+      package: 'core',
+      phase: 'theme',
+      recoverable: true,
+    });
+  }
+  target.style.setProperty('--uif-accent', value);
+  target.style.setProperty('--uif-color-primary', value);
 }
 
 export function init(root: Document | HTMLElement = document, options: UIFOptions = {}): UIFApp {

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { configureTrustedTypes, getTrustedTypesPolicy, isInitialized, isSafeURL, mount, registerComponent, resolveTarget, safeQuerySelector, setSafeHTML, setText, setTrustedHTML, swapTrustedHTML, unmount } from './index.js';
+import { configureTrustedTypes, configureURLCapabilities, getTrustedTypesPolicy, isInitialized, isSafeURL, mount, registerComponent, resolveTarget, safeQuerySelector, setSafeHTML, setText, setTrustedHTML, swapTrustedHTML, unmount } from './index.js';
 
 describe('dom', () => {
   it('resolves target expressions', () => {
@@ -65,6 +65,44 @@ describe('dom', () => {
     expect(isSafeURL('//evil.example/path', { context: 'network' })).toBe(false);
     expect(isSafeURL('data:image/svg+xml,<svg/>', { context: 'image' })).toBe(false);
     expect(isSafeURL('https://evil.example/path', { context: 'network', sameOrigin: true })).toBe(false);
+  });
+
+  it('enforces registered cross-origin capabilities when enabled', () => {
+    configureURLCapabilities({
+      capabilities: [
+        { origin: 'https://api.example.com', pathPrefix: '/v1/', contexts: ['network'] },
+      ],
+    });
+    expect(
+      isSafeURL('https://api.example.com/v1/records', {
+        context: 'network',
+        sameOrigin: false,
+      }),
+    ).toBe(true);
+    expect(
+      isSafeURL('https://api.example.com/private/records', {
+        context: 'network',
+        sameOrigin: false,
+      }),
+    ).toBe(false);
+    expect(
+      isSafeURL('https://api.example.com/v1/records', {
+        context: 'navigation',
+        sameOrigin: false,
+      }),
+    ).toBe(false);
+    configureURLCapabilities(null);
+  });
+
+  it('rejects malformed capability definitions', () => {
+    expect(() =>
+      configureURLCapabilities({ capabilities: [{ origin: 'https://user:secret@example.com' }] }),
+    ).toThrow(/invalid UIF URL capability origin/i);
+    expect(() =>
+      configureURLCapabilities({
+        capabilities: [{ origin: 'https://api.example.com', pathPrefix: 'v1' }],
+      }),
+    ).toThrow(/path prefix/i);
   });
 
   it('swaps trusted HTML and returns the updated element', () => {

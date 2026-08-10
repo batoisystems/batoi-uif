@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from 'vitest';
-import { emit, init, on, parseOptions, registerPlugin, setAccent, setDensity } from './index.js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { configureCompatibility, emit, init, on, parseOptions, registerPlugin, setAccent, setDensity } from './index.js';
 
 describe('core', () => {
+  afterEach(() => configureCompatibility(null));
   it('parses json options', () => {
     const el = document.createElement('div');
     el.setAttribute('data-uif-options', '{"open":true}');
@@ -12,6 +13,30 @@ describe('core', () => {
     const el = document.createElement('div');
     el.setAttribute('data-uif-options', 'delay:20;enabled:true;name:demo');
     expect(parseOptions(el)).toEqual({ delay: 20, enabled: true, name: 'demo' });
+  });
+
+  it('diagnoses legacy options and rejects them in strict v3 mode', () => {
+    const el = document.createElement('div');
+    el.dataset.uif = 'sample';
+    el.dataset.uifOptions = 'loading:true;delay:50';
+    const diagnostic = vi.fn();
+    el.addEventListener('uif:runtime:diagnostic', diagnostic);
+    expect(parseOptions(el)).toEqual({ loading: true, delay: 50 });
+    configureCompatibility({ mode: 'v3' });
+    expect(parseOptions(el)).toEqual({});
+    expect(diagnostic).toHaveBeenLastCalledWith(expect.objectContaining({
+      detail: expect.objectContaining({ issues: [expect.objectContaining({ code: 'legacy-options-rejected' })] }),
+    }));
+  });
+
+  it('strips unsafe option keys from JSON and compatibility syntax', () => {
+    const json = document.createElement('div');
+    json.setAttribute('data-uif-options', '{"safe":true,"__proto__":{"polluted":true}}');
+    const legacy = document.createElement('div');
+    legacy.setAttribute('data-uif-options', 'safe:true;constructor:blocked');
+    expect(parseOptions(json)).toEqual({ safe: true });
+    expect(parseOptions(legacy)).toEqual({ safe: true });
+    expect(({} as { polluted?: boolean }).polluted).toBeUndefined();
   });
 
   it('emits and listens', () => {
@@ -57,5 +82,11 @@ describe('core', () => {
     setAccent('#123456');
     expect(document.documentElement.dataset.uifDensity).toBe('compact');
     expect(document.documentElement.style.getPropertyValue('--uif-accent')).toBe('#123456');
+  });
+
+  it('rejects invalid accent values', () => {
+    expect(() => setAccent('not a color; background: url(https://evil.example)')).toThrow(
+      /invalid accent color/i,
+    );
   });
 });

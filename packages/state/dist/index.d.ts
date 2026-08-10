@@ -17,10 +17,20 @@ interface MicroAppStoreOptions extends StoreOptions {
 type ArtifactStoreOptions = MicroAppStoreOptions;
 interface LocalStoreOptions {
     namespace?: string;
-    driver?: 'localstorage' | 'memory';
+    driver?: 'indexeddb' | 'localstorage' | 'memory';
     maxBytes?: number;
     maxEntries?: number;
     version?: number;
+    databaseName?: string;
+    storeName?: string;
+    migrate?: (context: IndexedDBMigrationContext) => void;
+}
+interface IndexedDBMigrationContext {
+    database: IDBDatabase;
+    transaction: IDBTransaction;
+    store: IDBObjectStore;
+    oldVersion: number;
+    newVersion: number;
 }
 interface LocalStore {
     namespace: string;
@@ -113,7 +123,8 @@ declare function createArtifactStore<T extends State>(initialState: T, options?:
     bind(root?: ParentNode): void;
     destroy(): void;
 };
+declare function createIndexedDBLocalStore(options?: LocalStoreOptions): LocalStore;
 declare function createLocalStore(options?: LocalStoreOptions): LocalStore;
 declare function createSyncQueue<T = unknown>(store: LocalStore, key?: string): SyncQueue<T>;
 
-export { type ArtifactStoreOptions, type LocalStore, type LocalStoreOptions, type MicroAppStoreOptions, type StoreOptions, type SyncQueue, type SyncQueueItem, createAdvancedStore, createArtifactStore, createLocalStore, createMicroAppStore, createStore, createSyncQueue };
+export { type ArtifactStoreOptions, type IndexedDBMigrationContext, type LocalStore, type LocalStoreOptions, type MicroAppStoreOptions, type StoreOptions, type SyncQueue, type SyncQueueItem, createAdvancedStore, createArtifactStore, createIndexedDBLocalStore, createLocalStore, createMicroAppStore, createStore, createSyncQueue };

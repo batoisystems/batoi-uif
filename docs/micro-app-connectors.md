@@ -10,7 +10,7 @@ import { listMicroAppConnectorWorkflows, parseMicroAppManifest } from './dist/ui
 const manifest = parseMicroAppManifest({
   name: 'Operations Board',
   type: 'micro-app',
-  storage: { mode: 'local-first', localStore: 'localstorage' },
+  storage: { mode: 'local-first', localStore: 'indexeddb', namespace: 'operations-board' },
   realtime: { enabled: false },
   connectors: [
     { type: 'static', name: 'Seed data', mode: 'readonly' },
@@ -21,6 +21,25 @@ const manifest = parseMicroAppManifest({
 
 const workflows = listMicroAppConnectorWorkflows(manifest);
 ```
+
+The matching storage driver is versioned and transactional:
+
+```js
+import { createLocalStore } from './dist/uif.esm.js';
+
+const store = createLocalStore({
+  namespace: manifest.storage.namespace,
+  driver: manifest.storage.localStore,
+  version: 2,
+  maxEntries: 1000,
+  maxBytes: 1_000_000,
+  migrate({ store, oldVersion }) {
+    if (oldVersion < 2) store.put(JSON.stringify({ migrated: true }), 'migration-status');
+  },
+});
+```
+
+IndexedDB upgrades run in the browser's upgrade transaction. Imports validate all keys and values before atomically replacing an object store. Use these stores only for bounded, non-sensitive convenience data; they are not credential or authorization stores.
 
 ## Runtime Loading
 
@@ -37,4 +56,5 @@ const rows = taskFeed ? await loadConnector(taskFeed) : [];
 - Remote connectors are marked `allowed` only when their source matches `permissions.network`.
 - Use `self` for same-origin connector URLs.
 - Use explicit origins such as `https://data.example.com` for remote APIs.
+- Wildcard network permissions are rejected. Applications may additionally enforce centrally registered origin, path-prefix, and context capabilities with `configureURLCapabilities()`.
 - Treat connector data as untrusted input until the app validates it.

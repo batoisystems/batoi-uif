@@ -37,6 +37,17 @@ Malformed target selectors resolve to no target instead of stopping framework in
 
 RAD, router, chart, realtime, table, form, push, and service-worker network/navigation URLs are same-origin by default. Approved cross-origin chart, realtime, table, form, and RAD sources require `data-uif-allow-cross-origin="true"`; programmatic router, chart, and table options expose the equivalent explicit flag. Push and service-worker endpoints remain same-origin. WebSocket `ws:`/`wss:` origins are compared with their HTTP/HTTPS page equivalents.
 
+For v3-compatible applications, register cross-origin capabilities centrally and enable enforcement. Capabilities bind an exact origin to a path prefix and one or more contexts; wildcard origins and credential-bearing URLs are rejected:
+
+```ts
+configureURLCapabilities({
+  enforce: true,
+  capabilities: [{ origin: 'https://data.example.com', pathPrefix: '/public/', contexts: ['network'] }],
+});
+```
+
+Legacy per-element cross-origin flags remain a compatibility path, but cannot bypass an enforced application capability policy.
+
 ## Trusted Types and CSP
 
 Applications that enforce Trusted Types can register their governed policy once. UIF routes shared safe and trusted HTML sinks through that policy:
@@ -87,7 +98,7 @@ Periodic data connectors never overlap their own polling work, use a minimum 250
 
 ## Local Persistence
 
-`createLocalStore()` namespaces data, records a schema version, validates keys, bounds individual values/import size and entry count, reports malformed persisted JSON explicitly, and validates imports before replacing existing data. `createAdvancedStore()` and Micro App persistence use versioned envelopes, retain version-one legacy-object compatibility, bound serialized payload size, and expose `onPersistError` so inaccessible, malformed, mismatched, circular, or quota-failed storage does not abort in-memory state updates.
+`createLocalStore()` namespaces data, records a schema version, validates keys, bounds individual values/import size and entry count, reports malformed persisted JSON explicitly, and validates imports before replacing existing data. Its `indexeddb` driver uses a versioned database, transactional migration callback, atomic imports, and explicit failure when IndexedDB is unavailable. `createAdvancedStore()` and Micro App persistence use versioned envelopes, retain version-one legacy-object compatibility, bound serialized payload size, and expose `onPersistError` so inaccessible, malformed, mismatched, circular, or quota-failed storage does not abort in-memory state updates.
 
 Local and session storage are application convenience stores, not secure credential stores. Do not persist access tokens, secrets, regulated records, private tool payloads, or authorization state there. Server authorization remains authoritative, and applications own migration decisions when changing `version` or `persistVersion`.
 
@@ -106,9 +117,15 @@ Desktop preference storage falls back to process-memory preferences when local s
 
 ## AI and MCP UI Limits
 
-AI response, result, history, and streaming surfaces accept configurable character limits and emit `uif:ai-error` when content is truncated. A limited stream stops accepting chunks. MCP review rendering bounds list items and serialized payload/result previews, handles circular data as text, and never interprets model or tool content as HTML.
+AI response, result, history, assistant-thread, source, artifact, feedback, retry, usage, and streaming surfaces accept configurable character/item limits and render content as text. Agent envelopes are provider-neutral and versioned; unknown versions fail closed with a compatibility notice. A limited stream stops accepting chunks and rejects duplicate or out-of-order sequence numbers. MCP review rendering bounds list items and serialized payload/result previews, handles circular data as text, and never interprets model or tool content as HTML.
 
 Governed tool reviews may carry `requestId`, `expiresAt`, and `auditRef`. Expired approvals emit `uif:tool-expired`; accepted/rejected review decisions become one-shot in the UI and include correlation metadata in the server-mediated event. These are browser indicators only. The server must independently enforce request identity, expiry, nonce/replay protection, permissions, confirmation policy, execution status, and authoritative audit references.
+
+`createGovernedAgentTransport()` and `createGovernedToolTransport()` communicate only with an application gateway, default to same-origin credentials, support CSRF headers and cancellation, disable automatic mutation retries, and validate every returned agent envelope. They do not connect to model providers or MCP servers and carry no credentials for those systems.
+
+## Privacy-Safe Diagnostics
+
+Diagnostics are disabled by default. `configureDiagnostics()` enables local `uif:diagnostic` events or an application callback with a fixed metadata-only shape: package, component, version, code, phase, recoverability, duration bucket, correlation reference, and timestamp. UIF does not transmit diagnostics. Prompt text, model output, tool payloads/results, editor/form content, identities, workspace names, storage values, and secret-bearing URLs are not fields in the diagnostic contract.
 
 ## AI and MCP Boundaries
 

@@ -1,3 +1,9 @@
+import {
+  assertSafeObject,
+  assertSafePropertyPath,
+  isSafeObjectKey,
+} from '@batoi/uif-core';
+
 type State = Record<string, unknown>;
 type Subscriber = (value: unknown) => void;
 type Computed = (state: State) => unknown;
@@ -21,10 +27,21 @@ export type ArtifactStoreOptions = MicroAppStoreOptions;
 
 export interface LocalStoreOptions {
   namespace?: string;
-  driver?: 'localstorage' | 'memory';
+  driver?: 'indexeddb' | 'localstorage' | 'memory';
   maxBytes?: number;
   maxEntries?: number;
   version?: number;
+  databaseName?: string;
+  storeName?: string;
+  migrate?: (context: IndexedDBMigrationContext) => void;
+}
+
+export interface IndexedDBMigrationContext {
+  database: IDBDatabase;
+  transaction: IDBTransaction;
+  store: IDBObjectStore;
+  oldVersion: number;
+  newVersion: number;
 }
 
 export interface LocalStore {
@@ -61,6 +78,7 @@ export interface SyncQueue<T = unknown> {
 }
 
 function getByPath(obj: State, path: string): unknown {
+  assertSafePropertyPath(path);
   return path.split('.').reduce<unknown>((acc, part) => {
     if (acc && typeof acc === 'object') return (acc as State)[part];
     return undefined;
@@ -68,6 +86,8 @@ function getByPath(obj: State, path: string): unknown {
 }
 
 function setByPath(obj: State, path: string, value: unknown): void {
+  assertSafePropertyPath(path);
+  assertSafeObject(value);
   const parts = path.split('.');
   const leaf = parts.pop();
   if (!leaf) return;
@@ -84,6 +104,7 @@ export function createStore<T extends State>(initialState: T) {
 }
 
 export function createAdvancedStore<T extends State>(initialState: T, options: StoreOptions = {}) {
+  assertSafeObject(initialState);
   const persistVersion = Math.max(1, Math.floor(options.persistVersion ?? 1));
   const maxPersistBytes = Math.max(1, Math.floor(options.maxPersistBytes ?? 1_000_000));
   const reportPersistError = (operation: string, error: unknown) => {
@@ -103,6 +124,7 @@ export function createAdvancedStore<T extends State>(initialState: T, options: S
       if (persisted !== null) {
         if (byteLength(persisted) > maxPersistBytes) throw new Error(`payload exceeds the ${maxPersistBytes} byte limit`);
         const parsed = JSON.parse(persisted) as unknown;
+        assertSafeObject(parsed);
         if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('payload must be a JSON object');
         if ('__uifStateVersion' in parsed) {
           const envelope = parsed as { __uifStateVersion?: unknown; state?: unknown };
@@ -140,6 +162,7 @@ export function createAdvancedStore<T extends State>(initialState: T, options: S
       return path ? getByPath(state, path) : state;
     },
     replace(next: State): void {
+      assertSafeObject(next);
       state = structuredClone(next);
       notify('*');
     },
@@ -233,6 +256,7 @@ export function createMicroAppStore<T extends State>(initialState: T, options: M
     importJSON(json: string): void {
       const parsed = JSON.parse(json) as State;
       if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Micro App state must be a JSON object');
+      assertSafeObject(parsed);
       remember();
       base.replace(parsed);
     },
@@ -279,7 +303,13 @@ function localStoreError(operation: string, error: unknown): Error {
 }
 
 function validateLocalStoreKey(key: string): void {
-  if (!key || key.length > 200 || key === localStoreMetadataKey) throw new Error('Local store key must be 1-200 characters and not reserved');
+  if (!key || key.length > 200 || key === localStoreMetadataKey || !isSafeObjectKey(key)) throw new Error('Local store key must be 1-200 characters and not reserved');
+}
+
+function validateStorageIdentifier(value: string, label: string): void {
+  if (!value || value.length > 200 || !isSafeObjectKey(value) || /[\u0000-\u001f]/.test(value)) {
+    throw new Error(`${label} must be 1-200 safe characters`);
+  }
 }
 
 function byteLength(value: string): number {
@@ -310,11 +340,178 @@ function makeMemoryStorage(): Storage {
   };
 }
 
-export function createLocalStore(options: LocalStoreOptions = {}): LocalStore {
+function idbRequest<T>(request: IDBRequest<T>): Promise<T> {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error ?? new Error('IndexedDB request failed'));
+  });
+}
+
+function idbTransactionDone(transaction: IDBTransaction): Promise<void> {
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = () => resolve();
+    transaction.onabort = () => reject(transaction.error ?? new Error('IndexedDB transaction aborted'));
+    transaction.onerror = () => reject(transaction.error ?? new Error('IndexedDB transaction failed'));
+  });
+}
+
+export function createIndexedDBLocalStore(options: LocalStoreOptions = {}): LocalStore {
   const namespace = options.namespace || 'uif';
   const version = Math.max(1, Math.floor(options.version ?? 1));
   const maxBytes = Math.max(1, Math.floor(options.maxBytes ?? 1_000_000));
   const maxEntries = Math.max(1, Math.floor(options.maxEntries ?? 1_000));
+  const databaseName = options.databaseName || `batoi-uif:${namespace}`;
+  const storeName = options.storeName || 'records';
+  validateStorageIdentifier(namespace, 'Local store namespace');
+  validateStorageIdentifier(databaseName, 'IndexedDB database name');
+  validateStorageIdentifier(storeName, 'IndexedDB object store name');
+  if (typeof indexedDB === 'undefined') throw new Error('Local store initialization failed: IndexedDB is unavailable');
+
+  const database = new Promise<IDBDatabase>((resolve, reject) => {
+    const open = indexedDB.open(databaseName, version);
+    open.onupgradeneeded = (event) => {
+      const db = open.result;
+      const transaction = open.transaction;
+      if (!transaction) return;
+      const store = db.objectStoreNames.contains(storeName)
+        ? transaction.objectStore(storeName)
+        : db.createObjectStore(storeName);
+      options.migrate?.({
+        database: db,
+        transaction,
+        store,
+        oldVersion: event.oldVersion,
+        newVersion: event.newVersion ?? version,
+      });
+    };
+    open.onsuccess = () => {
+      open.result.onversionchange = () => open.result.close();
+      resolve(open.result);
+    };
+    open.onerror = () => reject(localStoreError('initialization', open.error));
+    open.onblocked = () => reject(localStoreError('initialization', new Error('IndexedDB upgrade is blocked by another open page')));
+  });
+
+  const serialize = (value: unknown): string => {
+    assertSafeObject(value);
+    let serialized: string | undefined;
+    try {
+      serialized = JSON.stringify(value);
+    } catch (error) {
+      throw localStoreError('serialization', error);
+    }
+    if (serialized === undefined) throw new Error('Local store values must be JSON-serializable');
+    if (byteLength(serialized) > maxBytes) throw new Error(`Local store value exceeds the ${maxBytes} byte limit`);
+    return serialized;
+  };
+
+  const api: LocalStore = {
+    namespace,
+    version,
+    async get<T = unknown>(key: string): Promise<T | undefined> {
+      validateLocalStoreKey(key);
+      try {
+        const db = await database;
+        const raw = await idbRequest(db.transaction(storeName).objectStore(storeName).get(key)) as unknown;
+        return typeof raw === 'string' ? JSON.parse(raw) as T : undefined;
+      } catch (error) {
+        throw localStoreError(`read for ${key}`, error);
+      }
+    },
+    async set<T = unknown>(key: string, value: T): Promise<void> {
+      validateLocalStoreKey(key);
+      const raw = serialize(value);
+      try {
+        const db = await database;
+        const transaction = db.transaction(storeName, 'readwrite');
+        const store = transaction.objectStore(storeName);
+        const [existing, count] = await Promise.all([
+          idbRequest(store.getKey(key)),
+          idbRequest(store.count()),
+        ]);
+        if (existing === undefined && count >= maxEntries) {
+          transaction.abort();
+          throw new Error(`Local store exceeds the ${maxEntries} entry limit`);
+        }
+        store.put(raw, key);
+        await idbTransactionDone(transaction);
+      } catch (error) {
+        if (error instanceof Error && error.message.startsWith('Local store ')) throw error;
+        throw localStoreError(`write for ${key}`, error);
+      }
+    },
+    async delete(key: string): Promise<void> {
+      validateLocalStoreKey(key);
+      try {
+        const db = await database;
+        const transaction = db.transaction(storeName, 'readwrite');
+        transaction.objectStore(storeName).delete(key);
+        await idbTransactionDone(transaction);
+      } catch (error) {
+        throw localStoreError(`delete for ${key}`, error);
+      }
+    },
+    async list<T = unknown>(): Promise<Array<{ key: string; value: T }>> {
+      try {
+        const db = await database;
+        const transaction = db.transaction(storeName);
+        const store = transaction.objectStore(storeName);
+        const [keys, values] = await Promise.all([idbRequest(store.getAllKeys()), idbRequest(store.getAll())]);
+        return keys.map((key, index) => ({ key: String(key), value: JSON.parse(String(values[index])) as T }));
+      } catch (error) {
+        throw localStoreError('list', error);
+      }
+    },
+    async clear(): Promise<void> {
+      try {
+        const db = await database;
+        const transaction = db.transaction(storeName, 'readwrite');
+        transaction.objectStore(storeName).clear();
+        await idbTransactionDone(transaction);
+      } catch (error) {
+        throw localStoreError('clear', error);
+      }
+    },
+    async exportJSON(space = 2): Promise<string> {
+      const entries = await api.list();
+      return JSON.stringify(entries.reduce<Record<string, unknown>>((output, entry) => {
+        output[entry.key] = entry.value;
+        return output;
+      }, Object.create(null) as Record<string, unknown>), null, space);
+    },
+    async importJSON(json: string): Promise<void> {
+      if (byteLength(json) > maxBytes * maxEntries) throw new Error('Local store import exceeds the aggregate byte limit');
+      const parsed = JSON.parse(json) as unknown;
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Local store import must be a JSON object');
+      assertSafeObject(parsed);
+      const entries = Object.entries(parsed);
+      if (entries.length > maxEntries) throw new Error(`Local store import exceeds the ${maxEntries} entry limit`);
+      const serialized = entries.map(([key, value]) => {
+        validateLocalStoreKey(key);
+        return [key, serialize(value)] as const;
+      });
+      try {
+        const db = await database;
+        const transaction = db.transaction(storeName, 'readwrite');
+        const store = transaction.objectStore(storeName);
+        store.clear();
+        serialized.forEach(([key, raw]) => store.put(raw, key));
+        await idbTransactionDone(transaction);
+      } catch (error) {
+        throw localStoreError('import', error);
+      }
+    },
+  };
+  return api;
+}
+
+export function createLocalStore(options: LocalStoreOptions = {}): LocalStore {
+  if (options.driver === 'indexeddb') return createIndexedDBLocalStore(options);
+  const namespace = options.namespace || 'uif';
+  const version = Math.max(1, Math.floor(options.version ?? 1));
+  const maxBytes = Math.max(1, Math.floor(options.maxBytes ?? 1_000_000));
+  const maxEntries = Math.max(1, Math.floor(options.maxEntries ?? 1_000));
+  validateStorageIdentifier(namespace, 'Local store namespace');
   let storage: Storage;
   try {
     storage = options.driver === 'memory' ? makeMemoryStorage() : window.localStorage;
@@ -329,6 +526,7 @@ export function createLocalStore(options: LocalStoreOptions = {}): LocalStore {
   }
 
   const serialize = (value: unknown): string => {
+    assertSafeObject(value);
     let serialized: string | undefined;
     try {
       serialized = JSON.stringify(value);
@@ -404,7 +602,7 @@ export function createLocalStore(options: LocalStoreOptions = {}): LocalStore {
         entries.reduce<Record<string, unknown>>((acc, item) => {
           acc[item.key] = item.value;
           return acc;
-        }, {}),
+        }, Object.create(null) as Record<string, unknown>),
         null,
         space,
       );
@@ -413,6 +611,7 @@ export function createLocalStore(options: LocalStoreOptions = {}): LocalStore {
       if (byteLength(json) > maxBytes) throw new Error(`Local store import exceeds the ${maxBytes} byte limit`);
       const parsed = JSON.parse(json) as unknown;
       if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Local store import must be a JSON object');
+      assertSafeObject(parsed);
       const next = Object.entries(parsed);
       if (next.length > maxEntries) throw new Error(`Local store import exceeds the ${maxEntries} entry limit`);
       const serialized = next.map(([key, value]) => {
@@ -453,6 +652,7 @@ export function createSyncQueue<T = unknown>(store: LocalStore, key = 'sync-queu
       return status ? items.filter((item) => item.status === status) : items;
     },
     async update(itemId: string, patch: Partial<Omit<SyncQueueItem<T>, 'id' | 'createdAt'>>): Promise<SyncQueueItem<T>> {
+      assertSafeObject(patch);
       const items = await read();
       const index = items.findIndex((item) => item.id === itemId);
       if (index < 0) throw new Error(`Sync queue item not found: ${itemId}`);
@@ -473,6 +673,7 @@ export function createSyncQueue<T = unknown>(store: LocalStore, key = 'sync-queu
     async importJSON(json: string): Promise<void> {
       const parsed = JSON.parse(json) as unknown;
       if (!Array.isArray(parsed)) throw new Error('Sync queue import must be a JSON array');
+      assertSafeObject(parsed);
       await write(parsed as SyncQueueItem<T>[]);
     },
   };

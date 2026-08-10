@@ -66,4 +66,8 @@ describe('local Micro App storage', () => {
     await expect(store.set('circular', circular)).rejects.toThrow('Local store serialization failed');
     await expect(store.set('undefined', undefined)).rejects.toThrow('JSON-serializable');
   });
+
+  it('fails explicitly when the requested IndexedDB capability is unavailable', () => {
+    expect(() => createLocalStore({ namespace: 'indexed', driver: 'indexeddb' })).toThrow('IndexedDB is unavailable');
+  });
 });

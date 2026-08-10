@@ -85,4 +85,16 @@ describe('state', () => {
     expect(errors.at(-1)?.message).toContain('Quota exceeded');
     setItem.mockRestore();
   });
+
+  it('rejects prototype-bearing paths and imported state', () => {
+    const store = createAdvancedStore({ safe: true });
+    expect(() => store.set('__proto__.polluted', true)).toThrow(/unsafe property path/i);
+    expect(() => store.set('constructor.prototype.polluted', true)).toThrow(/unsafe property path/i);
+    expect(() =>
+      createMicroAppStore({ safe: true }).importJSON(
+        '{"nested":{"__proto__":{"polluted":true}}}',
+      ),
+    ).toThrow(/unsafe/i);
+    expect(({} as { polluted?: boolean }).polluted).toBeUndefined();
+  });
 });

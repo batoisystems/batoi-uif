@@ -414,7 +414,7 @@ If working before that migration is complete, use the currently available worksp
 
 ## Version 2
 
-The repository and framework packages are versioned `2.3.0`. Version 2 consolidates the npm workspace and TypeScript architecture, dependency-free browser distribution, RAD adapter, components, editors, SVG charts, realtime and mobile capabilities, and governed AI/MCP interface surfaces.
+The repository and framework packages are versioned `2.4.0`. This compatible preparation release adds the shared v3 lifecycle and contract foundation, governed AI/MCP interaction envelopes and gateway adapters, IndexedDB Micro App storage, centralized URL capabilities, security gates, compatibility diagnostics, and privacy-safe observability while retaining the dependency-free v2 public surface.
 
 The current status is active v2 hardening. Public release readiness requires the automated release gate plus real-browser editor, accessibility, CSP/Trusted Types, mobile viewport, and deployed-artifact verification described in [Compatibility and Release Policy](docs/compatibility-and-release-policy.md).
 

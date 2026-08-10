@@ -146,10 +146,21 @@ function normalizeConnector(raw: unknown, index: number, issues: MicroAppManifes
   };
 }
 
-function normalizePermissions(raw: unknown): MicroAppPermissionsManifest {
+function normalizePermissions(raw: unknown, issues: MicroAppManifestIssue[]): MicroAppPermissionsManifest {
   const source = isRecord(raw) ? raw : {};
+  const network = Array.isArray(source.network)
+    ? source.network.filter((item): item is string => typeof item === 'string')
+    : [];
+  network.forEach((entry, index) => {
+    if (entry === '*' || entry.includes('*')) {
+      issues.push({
+        path: `permissions.network.${index}`,
+        message: 'Wildcard network permissions are not supported; register an exact origin or path prefix.',
+      });
+    }
+  });
   return {
-    network: Array.isArray(source.network) ? source.network.filter((item): item is string => typeof item === 'string') : [],
+    network: network.filter((entry) => !entry.includes('*')),
     storage: booleanValue(source.storage, true),
     realtime: booleanValue(source.realtime, false),
     ai: booleanValue(source.ai, false),
@@ -159,7 +170,14 @@ function normalizePermissions(raw: unknown): MicroAppPermissionsManifest {
 
 export function validateMicroAppManifest(input: unknown): MicroAppManifestResult {
   const issues: MicroAppManifestIssue[] = [];
-  const source = isRecord(input) ? input : {};
+  const rawSource = isRecord(input) ? input : {};
+  findUnsafeObjectPaths(rawSource).forEach((path) => {
+    issues.push({ path, message: `Unsafe or excessively complex manifest path: ${path}` });
+  });
+  const source = Object.entries(rawSource).reduce<Record<string, unknown>>((safe, [key, value]) => {
+    if (isSafeObjectKey(key) && findUnsafeObjectPaths(value).length === 0) safe[key] = value;
+    return safe;
+  }, Object.create(null) as Record<string, unknown>);
   if (!isRecord(input)) issues.push({ path: '$', message: 'Manifest must be an object' });
   const name = stringValue(source.name);
   if (!name) issues.push({ path: 'name', message: 'Micro App name is required' });
@@ -176,7 +194,7 @@ export function validateMicroAppManifest(input: unknown): MicroAppManifestResult
     storage: normalizeStorage(source.storage, issues),
     realtime: normalizeRealtime(source.realtime, issues),
     connectors,
-    permissions: normalizePermissions(source.permissions),
+    permissions: normalizePermissions(source.permissions, issues),
     build: isRecord(source.build) ? { upgradeable: booleanValue(source.build.upgradeable, false), appType: stringValue(source.build.appType) } : undefined,
     ui: isRecord(source.ui) ? { mount: stringValue(source.ui.mount), title: stringValue(source.ui.title), icon: stringValue(source.ui.icon) } : undefined,
   };
@@ -205,13 +223,21 @@ function sameOrigin(src: string): boolean {
 function sourceAllowed(src: string | undefined, permissions: MicroAppPermissionsManifest): boolean {
   if (!src) return false;
   const network = permissions.network ?? [];
-  if (network.includes('*')) return true;
   if (network.includes('self') && sameOrigin(src)) return true;
   try {
     const url = new URL(src, typeof window === 'undefined' ? 'http://localhost/' : window.location.href);
-    return network.some((entry) => entry === src || entry === url.origin || (entry.endsWith('*') && src.startsWith(entry.slice(0, -1))));
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) return false;
+    return network.some((entry) => {
+      if (entry === src || entry === url.origin) return true;
+      try {
+        const capability = new URL(entry, typeof window === 'undefined' ? 'http://localhost/' : window.location.href);
+        return capability.protocol === url.protocol && capability.origin === url.origin && entry.endsWith('/') && url.href.startsWith(capability.href);
+      } catch {
+        return false;
+      }
+    });
   } catch {
-    return network.includes(src);
+    return false;
   }
 }
 
@@ -258,3 +284,4 @@ export function validateMicroAppConnectorWorkflows(manifest: MicroAppManifest): 
     )
     .filter((issue): issue is MicroAppManifestIssue => Boolean(issue));
 }
+import { findUnsafeObjectPaths, isSafeObjectKey } from './contracts.js';

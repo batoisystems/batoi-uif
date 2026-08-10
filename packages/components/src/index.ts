@@ -990,6 +990,10 @@ export function destroyComponent(el: HTMLElement): void {
 
 export function initAll(root: Document | HTMLElement = document): () => void {
   root.querySelectorAll<HTMLElement>('[data-uif]').forEach(initComponent);
+  return bindComponentActions(root);
+}
+
+export function bindComponentActions(root: Document | HTMLElement = document): () => void {
   const existing = actionBindings.get(root);
   if (existing) return existing;
   root.addEventListener('click', handleAction);

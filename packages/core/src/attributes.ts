@@ -70,6 +70,9 @@ export const uifValues = [
   'push',
   'mobile-shell',
   'ai-action',
+  'ai-thread',
+  'ai-composer',
+  'agent-tool',
   'tool-approval',
 ] as const;
 
@@ -135,7 +138,48 @@ export const uifStates = [
   'rejected',
 ] as const;
 
+export const uifEvents = [
+  'uif:before-init',
+  'uif:init',
+  'uif:before-destroy',
+  'uif:destroy',
+  'uif:error',
+  'uif:runtime:mounted',
+  'uif:runtime:error',
+  'uif:runtime:diagnostic',
+  'uif:diagnostic',
+  'uif:agent:submit',
+  'uif:agent:cancel',
+  'uif:agent:error',
+  'uif:agent:feedback',
+  'uif:agent:retry',
+  'uif:agent:copy',
+  'uif:tool-approve',
+  'uif:tool-reject',
+  'uif:tool-expired',
+  'uif:tool-replay-blocked',
+] as const;
+
+export interface UIFContractEntry<Name extends string = string> {
+  name: Name;
+  version: 3;
+  status: 'stable' | 'compatibility';
+}
+
+function contractEntries<const Values extends readonly string[]>(values: Values): ReadonlyArray<UIFContractEntry<Values[number]>> {
+  return Object.freeze(values.map((name) => Object.freeze({ name, version: 3 as const, status: 'stable' as const })));
+}
+
+export const uifContractRegistry = Object.freeze({
+  attributes: contractEntries(uifAttributes),
+  components: contractEntries(uifValues),
+  actions: contractEntries(uifActions),
+  states: contractEntries(uifStates),
+  events: contractEntries(uifEvents),
+});
+
 export type UIFAttribute = (typeof uifAttributes)[number];
 export type UIFValue = (typeof uifValues)[number];
 export type UIFAction = (typeof uifActions)[number];
 export type UIFState = (typeof uifStates)[number];
+export type UIFEvent = (typeof uifEvents)[number];

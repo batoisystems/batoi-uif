@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { registerAction, start, unregisterAction } from '../../../index.js';
+import {
+  registerAction,
+  registerRuntimeComponent,
+  runtimeRegistry,
+  start,
+  unregisterAction,
+} from '../../../index.js';
 
 describe('root start lifecycle', () => {
   it('returns the active app for repeated starts without duplicating action handlers', () => {
@@ -45,5 +51,28 @@ describe('root start lifecycle', () => {
     expect(typed.classList.contains('uif-typed-text')).toBe(true);
     app.destroy();
     expect(typed.classList.contains('uif-typed-text')).toBe(false);
+  });
+
+  it('mounts newly added registered components during a partial refresh', () => {
+    document.body.innerHTML = '<main id="target"></main>';
+    const mount = vi.fn();
+    const destroy = vi.fn();
+    const unregister = registerRuntimeComponent({
+      name: 'runtime-test',
+      mount({ element }) {
+        mount(element);
+        return { destroy };
+      },
+    });
+    const app = start(document.body);
+    const target = document.querySelector<HTMLElement>('#target')!;
+    target.innerHTML = '<section data-uif="runtime-test"></section>';
+    app.refresh(target);
+    app.refresh(target);
+    expect(mount).toHaveBeenCalledTimes(1);
+    expect(runtimeRegistry.get('runtime-test')).toBeDefined();
+    app.destroy();
+    expect(destroy).toHaveBeenCalledTimes(1);
+    unregister();
   });
 });
