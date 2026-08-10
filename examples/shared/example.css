@@ -798,6 +798,72 @@
   gap: 0.4rem;
 }
 
+.component-generator {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.component-generator-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.component-generator-output {
+  min-height: 4rem;
+  margin: 0;
+  padding: 0.75rem;
+  overflow: auto;
+  border: 1px solid var(--uif-border);
+  border-radius: 0.5rem;
+  background: var(--uif-surface-elevated);
+  color: var(--uif-text);
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+}
+
+.component-counter {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.component-counter output {
+  min-width: 4ch;
+  color: var(--uif-text-strong);
+  font-size: var(--uif-text-2xl);
+  font-weight: var(--uif-weight-semibold);
+  text-align: center;
+}
+
+[data-theme='dark'] .component-gallery-page,
+[data-theme='dark'] .component-gallery-page .example-shell {
+  background: var(--uif-bg);
+}
+
+[data-theme='dark'] .component-gallery-page .example-topbar,
+[data-theme='dark'] .component-card,
+[data-theme='dark'] .component-main-head,
+[data-theme='dark'] .component-sidebar-card,
+[data-theme='dark'] .component-demo,
+[data-theme='dark'] .component-tabs [data-uif-role='tabpanel'] {
+  border-color: var(--uif-border);
+  background: var(--uif-surface-elevated);
+  color: var(--uif-text);
+}
+
+[data-theme='dark'] .component-card-head h2,
+[data-theme='dark'] .component-main-head h2,
+[data-theme='dark'] .component-sidebar-card h2 {
+  color: var(--uif-text-strong);
+}
+
+@media (max-width: 40rem) {
+  .component-generator-controls {
+    grid-template-columns: 1fr;
+  }
+}
+
 .component-accordion {
   border: 1px solid #dfe3e8;
   border-radius: 0.65rem;

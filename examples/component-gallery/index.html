@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Batoi UIF Component Gallery</title>
+    <script>
+      document.documentElement.dataset.theme =
+        localStorage.getItem('batoi-uif-example-theme') === 'dark' ? 'dark' : 'light';
+    </script>
     <link rel="stylesheet" href="../../packages/css/index.css" />
     <link rel="stylesheet" href="../shared/example.css" />
   </head>
@@ -12,7 +16,13 @@
       <div class="example-frame">
         <header class="example-topbar">
           <a class="example-brand" href="../">
-            <img class="example-uif-logo" src="../../docs/assets/logo/uif-color.svg" alt="Batoi UIF" width="32" height="32">
+            <img
+              class="example-uif-logo"
+              src="../../docs/assets/logo/uif-color.svg"
+              alt="Batoi UIF"
+              width="32"
+              height="32"
+            />
             <span><strong>Batoi UIF</strong><span>Examples</span></span>
           </a>
           <div class="example-actions">
@@ -314,21 +324,30 @@
                           src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 675'%3E%3Crect width='1200' height='675' fill='%23e8f3fb'/%3E%3Crect x='72' y='64' width='1056' height='547' rx='20' fill='white' stroke='%23b7d7ec' stroke-width='4'/%3E%3Crect x='112' y='112' width='300' height='42' rx='8' fill='%230b72bd'/%3E%3Crect x='112' y='194' width='288' height='330' rx='14' fill='%23edf7f4'/%3E%3Crect x='440' y='194' width='648' height='142' rx='14' fill='%23f3f6f8'/%3E%3Crect x='440' y='370' width='310' height='154' rx='14' fill='%23e7faf6'/%3E%3Crect x='778' y='370' width='310' height='154' rx='14' fill='%23fff4e5'/%3E%3Ctext x='112' y='580' font-family='Arial' font-size='32' fill='%23344054'%3ELaunch dashboard%3C/text%3E%3C/svg%3E"
                           alt="Responsive launch dashboard with navigation and metric panels"
                         />
-                        <div class="uif-carousel-caption"><strong>Launch dashboard</strong><br />Track adoption, revenue, and health.</div>
+                        <div class="uif-carousel-caption">
+                          <strong>Launch dashboard</strong><br />Track adoption, revenue, and
+                          health.
+                        </div>
                       </article>
                       <article class="uif-carousel-slide" data-uif-role="slide">
                         <img
                           src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 675'%3E%3Crect width='1200' height='675' fill='%23e7faf6'/%3E%3Crect x='430' y='36' width='340' height='603' rx='44' fill='%2320252d'/%3E%3Crect x='450' y='70' width='300' height='530' rx='24' fill='white'/%3E%3Crect x='476' y='108' width='248' height='62' rx='12' fill='%2300a98f'/%3E%3Crect x='476' y='196' width='248' height='128' rx='12' fill='%23f3f6f8'/%3E%3Crect x='476' y='344' width='248' height='128' rx='12' fill='%23e8f3fb'/%3E%3Ccircle cx='520' cy='538' r='20' fill='%230b72bd'/%3E%3Crect x='558' y='522' width='136' height='32' rx='8' fill='%23d7dde3'/%3E%3Ctext x='72' y='594' font-family='Arial' font-size='32' fill='%23344054'%3EField console%3C/text%3E%3C/svg%3E"
                           alt="Mobile field console showing compact workflow panels"
                         />
-                        <div class="uif-carousel-caption"><strong>Field console</strong><br />Mobile-first workflows using the same contract.</div>
+                        <div class="uif-carousel-caption">
+                          <strong>Field console</strong><br />Mobile-first workflows using the same
+                          contract.
+                        </div>
                       </article>
                       <article class="uif-carousel-slide" data-uif-role="slide">
                         <img
                           src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 675'%3E%3Crect width='1200' height='675' fill='%23fff4e5'/%3E%3Crect x='130' y='70' width='940' height='535' rx='18' fill='white' stroke='%23f3c98b' stroke-width='4'/%3E%3Ccircle cx='210' cy='154' r='34' fill='%23e24a3b'/%3E%3Crect x='270' y='128' width='370' height='26' rx='8' fill='%23344054'/%3E%3Crect x='270' y='170' width='620' height='18' rx='7' fill='%23d7dde3'/%3E%3Crect x='180' y='238' width='840' height='154' rx='14' fill='%23f8fafc'/%3E%3Crect x='180' y='430' width='190' height='58' rx='10' fill='%2300a98f'/%3E%3Crect x='394' y='430' width='190' height='58' rx='10' fill='white' stroke='%23d7dde3' stroke-width='3'/%3E%3Ctext x='180' y='554' font-family='Arial' font-size='32' fill='%23344054'%3EGoverned actions%3C/text%3E%3C/svg%3E"
                           alt="Governed action approval with context and decision controls"
                         />
-                        <div class="uif-carousel-caption"><strong>Governed actions</strong><br />Approvals, audit context, and next steps.</div>
+                        <div class="uif-carousel-caption">
+                          <strong>Governed actions</strong><br />Approvals, audit context, and next
+                          steps.
+                        </div>
                       </article>
                     </div>
                     <div class="uif-carousel-controls">
@@ -372,7 +391,10 @@
                   <div>
                     <div class="example-eyebrow">Content</div>
                     <h2>Typed Text</h2>
-                    <p>Dependency-free rotating text with lifecycle cleanup and reduced-motion support.</p>
+                    <p>
+                      Dependency-free rotating text with lifecycle cleanup and reduced-motion
+                      support.
+                    </p>
                   </div>
                   <button class="component-copy" type="button" data-copy-component>Copy</button>
                 </div>
@@ -385,7 +407,8 @@
                       data-uif-type-speed="55"
                       data-uif-delete-speed="30"
                       data-uif-pause="1200"
-                    >server-rendered.</strong>
+                      >server-rendered.</strong
+                    >
                   </p>
                 </div>
                 <pre><code>Typed text example</code></pre>
@@ -396,30 +419,89 @@
                   <div>
                     <div class="example-eyebrow">Social proof</div>
                     <h2>Testimonial Image Slider</h2>
-                    <p>Portrait-led testimonials using the same keyboard-accessible carousel contract.</p>
+                    <p>
+                      Portrait-led testimonials using the same keyboard-accessible carousel
+                      contract.
+                    </p>
                   </div>
                   <button class="component-copy" type="button" data-copy-component>Copy</button>
                 </div>
                 <div class="component-demo">
-                  <section class="uif-carousel uif-testimonial-carousel" data-uif="carousel" aria-label="Customer testimonials" tabindex="0">
+                  <section
+                    class="uif-carousel uif-testimonial-carousel"
+                    data-uif="carousel"
+                    aria-label="Customer testimonials"
+                    tabindex="0"
+                  >
                     <div class="uif-carousel-viewport">
-                      <figure class="uif-carousel-slide uif-testimonial-slide" data-uif-role="slide" data-uif-state="active">
-                        <img class="uif-testimonial-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect width='160' height='160' rx='80' fill='%23d8e9f7'/%3E%3Ccircle cx='80' cy='62' r='30' fill='%230b72bd'/%3E%3Cpath d='M30 154c5-39 25-58 50-58s45 19 50 58' fill='%2300a98f'/%3E%3C/svg%3E" alt="Portrait illustration of Maya Chen" />
-                        <figcaption><blockquote>“UIF gave our server-rendered product a consistent interaction model without adding a client framework.”</blockquote><strong>Maya Chen</strong><span>VP Product, Northstar</span></figcaption>
+                      <figure
+                        class="uif-carousel-slide uif-testimonial-slide"
+                        data-uif-role="slide"
+                        data-uif-state="active"
+                      >
+                        <img
+                          class="uif-testimonial-avatar"
+                          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect width='160' height='160' rx='80' fill='%23d8e9f7'/%3E%3Ccircle cx='80' cy='62' r='30' fill='%230b72bd'/%3E%3Cpath d='M30 154c5-39 25-58 50-58s45 19 50 58' fill='%2300a98f'/%3E%3C/svg%3E"
+                          alt="Portrait illustration of Maya Chen"
+                        />
+                        <figcaption>
+                          <blockquote>
+                            “UIF gave our server-rendered product a consistent interaction model
+                            without adding a client framework.”
+                          </blockquote>
+                          <strong>Maya Chen</strong><span>VP Product, Northstar</span>
+                        </figcaption>
                       </figure>
-                      <figure class="uif-carousel-slide uif-testimonial-slide" data-uif-role="slide">
-                        <img class="uif-testimonial-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect width='160' height='160' rx='80' fill='%23e7faf6'/%3E%3Ccircle cx='80' cy='62' r='30' fill='%23008772'/%3E%3Cpath d='M30 154c5-39 25-58 50-58s45 19 50 58' fill='%23f59e0b'/%3E%3C/svg%3E" alt="Portrait illustration of Arjun Mehta" />
-                        <figcaption><blockquote>“The declarative components let our team ship accessible workflows across desktop and mobile.”</blockquote><strong>Arjun Mehta</strong><span>Engineering Director, Meridian</span></figcaption>
+                      <figure
+                        class="uif-carousel-slide uif-testimonial-slide"
+                        data-uif-role="slide"
+                      >
+                        <img
+                          class="uif-testimonial-avatar"
+                          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect width='160' height='160' rx='80' fill='%23e7faf6'/%3E%3Ccircle cx='80' cy='62' r='30' fill='%23008772'/%3E%3Cpath d='M30 154c5-39 25-58 50-58s45 19 50 58' fill='%23f59e0b'/%3E%3C/svg%3E"
+                          alt="Portrait illustration of Arjun Mehta"
+                        />
+                        <figcaption>
+                          <blockquote>
+                            “The declarative components let our team ship accessible workflows
+                            across desktop and mobile.”
+                          </blockquote>
+                          <strong>Arjun Mehta</strong><span>Engineering Director, Meridian</span>
+                        </figcaption>
                       </figure>
                     </div>
                     <div class="uif-carousel-controls">
-                      <button class="uif-btn uif-btn-secondary" type="button" data-uif-action="previous">Previous</button>
-                      <span class="uif-text-sm uif-text-muted" data-uif-role="status" aria-live="polite"></span>
-                      <button class="uif-btn uif-btn-secondary" type="button" data-uif-action="next">Next</button>
+                      <button
+                        class="uif-btn uif-btn-secondary"
+                        type="button"
+                        data-uif-action="previous"
+                      >
+                        Previous
+                      </button>
+                      <span
+                        class="uif-text-sm uif-text-muted"
+                        data-uif-role="status"
+                        aria-live="polite"
+                      ></span>
+                      <button
+                        class="uif-btn uif-btn-secondary"
+                        type="button"
+                        data-uif-action="next"
+                      >
+                        Next
+                      </button>
                     </div>
                     <div class="uif-carousel-indicators" aria-label="Choose testimonial">
-                      <button type="button" data-uif-slide-to="0" aria-label="Testimonial 1"></button>
-                      <button type="button" data-uif-slide-to="1" aria-label="Testimonial 2"></button>
+                      <button
+                        type="button"
+                        data-uif-slide-to="0"
+                        aria-label="Testimonial 1"
+                      ></button>
+                      <button
+                        type="button"
+                        data-uif-slide-to="1"
+                        aria-label="Testimonial 2"
+                      ></button>
                     </div>
                   </section>
                 </div>
@@ -1918,9 +2000,9 @@
                 </div>
                 <div class="component-demo">
                   <div class="uif-class-list">
-                    <code>m-0 ... m-4</code><code>mt-*</code><code>mb-*</code
-                    ><code>p-0 ... p-6</code><code>px-*</code><code>py-*</code><code>uif-gap-*</code
-                    ><code>uif-grid-*</code>
+                    <code>m-0 ... m-5</code><code>mt/mb/ms/me-*</code><code>mx/my-*</code
+                    ><code>p-0 ... p-6</code><code>pt/pb/ps/pe-*</code><code>px/py-*</code
+                    ><code>uif-gap-*</code><code>uif-grid-*</code>
                   </div>
                   <div class="uif-bg-surface uif-rounded uif-p-4 uif-mt-3">
                     <div class="uif-bg-elevated uif-border uif-rounded uif-py-3 uif-px-4">
@@ -1962,6 +2044,293 @@
                 </div>
                 <pre><code>&lt;section class="uif-alert uif-alert-success"&gt;Saved&lt;/section&gt;
 &lt;section class="uif-alert uif-alert-danger"&gt;Blocked&lt;/section&gt;</code></pre>
+              </article>
+
+              <article class="uif-card component-card">
+                <div class="component-card-head">
+                  <div>
+                    <div class="example-eyebrow">Utilities</div>
+                    <h2>Typography</h2>
+                    <p>Display, page, section, component, body, label, and caption roles.</p>
+                  </div>
+                  <button class="component-copy" type="button" data-copy-component>Copy</button>
+                </div>
+                <div class="component-demo">
+                  <div class="uif-stack">
+                    <div class="uif-label">Product overview</div>
+                    <h1 class="uif-page-title">Unified interfaces for serious web apps</h1>
+                    <h2 class="uif-section-title">A clear section heading</h2>
+                    <h3 class="uif-component-title">A compact component title</h3>
+                    <p class="uif-prose">
+                      Readable body copy uses the shared measure, line height, color, and responsive
+                      system font stack.
+                    </p>
+                    <small class="uif-caption">Supporting caption and metadata</small>
+                  </div>
+                </div>
+                <pre><code></code></pre>
+              </article>
+
+              <article class="uif-card component-card">
+                <div class="component-card-head">
+                  <div>
+                    <div class="example-eyebrow">Layout</div>
+                    <h2>Grid and Spacing Utilities</h2>
+                    <p>All 12 column spans plus margin and padding helpers for values 0–5.</p>
+                  </div>
+                  <button class="component-copy" type="button" data-copy-component>Copy</button>
+                </div>
+                <div class="component-demo">
+                  <div class="uif-form-grid-12">
+                    <div class="uif-col-1 uif-p-2 uif-bg-muted">1</div>
+                    <div class="uif-col-2 uif-p-2 uif-bg-muted">2</div>
+                    <div class="uif-col-3 uif-p-2 uif-bg-muted">3</div>
+                    <div class="uif-col-6 uif-p-2 uif-bg-muted">6</div>
+                    <div class="uif-col-4 uif-p-2 uif-bg-muted">4</div>
+                    <div class="uif-col-5 uif-p-2 uif-bg-muted">5</div>
+                    <div class="uif-col-3 uif-p-2 uif-bg-muted">3</div>
+                    <div class="uif-col-7 uif-p-2 uif-bg-muted">7</div>
+                    <div class="uif-col-5 uif-p-2 uif-bg-muted">5</div>
+                    <div class="uif-col-8 uif-p-2 uif-bg-muted">8</div>
+                    <div class="uif-col-4 uif-p-2 uif-bg-muted">4</div>
+                    <div class="uif-col-9 uif-p-2 uif-bg-muted">9</div>
+                    <div class="uif-col-3 uif-p-2 uif-bg-muted">3</div>
+                    <div class="uif-col-10 uif-p-2 uif-bg-muted">10</div>
+                    <div class="uif-col-2 uif-p-2 uif-bg-muted">2</div>
+                    <div class="uif-col-11 uif-p-2 uif-bg-muted">11</div>
+                    <div class="uif-col-1 uif-p-2 uif-bg-muted">1</div>
+                    <div class="uif-col-12 uif-p-2 uif-bg-muted">12</div>
+                  </div>
+                  <div class="uif-class-list uif-mt-3">
+                    <code>uif-p[t|b|s|e|x|y]-0…5</code><code>uif-m[t|b|s|e|x|y]-0…5</code>
+                  </div>
+                </div>
+                <pre><code></code></pre>
+              </article>
+
+              <article class="uif-card component-card">
+                <div class="component-card-head">
+                  <div>
+                    <div class="example-eyebrow">Content</div>
+                    <h2>List Groups</h2>
+                    <p>Static, linked, and status-bearing lists with one accessible contract.</p>
+                  </div>
+                  <button class="component-copy" type="button" data-copy-component>Copy</button>
+                </div>
+                <div class="component-demo">
+                  <ul class="uif-list-group" aria-label="Deployment environments">
+                    <li class="uif-list-group-item">
+                      <span
+                        ><strong>Production</strong><br /><small class="uif-text-muted"
+                          >Primary customer traffic</small
+                        ></span
+                      ><span class="uif-badge uif-badge-success">Healthy</span>
+                    </li>
+                    <li class="uif-list-group-item">
+                      <span
+                        ><strong>Staging</strong><br /><small class="uif-text-muted"
+                          >Release candidate validation</small
+                        ></span
+                      ><span class="uif-badge uif-badge-warning">Review</span>
+                    </li>
+                    <li class="uif-list-group-item">
+                      <span
+                        ><strong>Development</strong><br /><small class="uif-text-muted"
+                          >Active engineering work</small
+                        ></span
+                      ><span class="uif-badge">Open</span>
+                    </li>
+                  </ul>
+                </div>
+                <pre><code></code></pre>
+              </article>
+
+              <article class="uif-card component-card">
+                <div class="component-card-head">
+                  <div>
+                    <div class="example-eyebrow">JavaScript</div>
+                    <h2>Counter</h2>
+                    <p>
+                      A dependency-free quantity counter with limits and an accessible live value.
+                    </p>
+                  </div>
+                  <button class="component-copy" type="button" data-copy-component>Copy</button>
+                </div>
+                <div class="component-demo">
+                  <div class="component-counter" data-counter data-min="0" data-max="10">
+                    <button
+                      class="uif-btn uif-btn-secondary"
+                      type="button"
+                      data-counter-change="-1"
+                      aria-label="Decrease"
+                    >
+                      −
+                    </button>
+                    <output aria-live="polite">1</output>
+                    <button
+                      class="uif-btn uif-btn-secondary"
+                      type="button"
+                      data-counter-change="1"
+                      aria-label="Increase"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <pre><code></code></pre>
+              </article>
+
+              <article class="uif-card component-card">
+                <div class="component-card-head">
+                  <div>
+                    <div class="example-eyebrow">Navigation</div>
+                    <h2>Horizontal Tabs</h2>
+                    <p>Automatic horizontal tab activation with keyboard navigation and panels.</p>
+                  </div>
+                  <button class="component-copy" type="button" data-copy-component>Copy</button>
+                </div>
+                <div class="component-demo">
+                  <div
+                    class="component-tabs uif-tabs"
+                    data-uif="tabs"
+                    data-uif-orientation="horizontal"
+                  >
+                    <button data-uif-role="tab">Overview</button
+                    ><button data-uif-role="tab">Activity</button
+                    ><button data-uif-role="tab">Access</button>
+                    <div data-uif-role="tabpanel">Workspace health is within target.</div>
+                    <div data-uif-role="tabpanel">12 changes this week.</div>
+                    <div data-uif-role="tabpanel">4 roles configured.</div>
+                  </div>
+                </div>
+                <pre><code></code></pre>
+              </article>
+
+              <article class="uif-card component-card">
+                <div class="component-card-head">
+                  <div>
+                    <div class="example-eyebrow">Navigation</div>
+                    <h2>Breadcrumbs and Button Groups</h2>
+                    <p>
+                      Location context and grouped actions with logical-direction border handling.
+                    </p>
+                  </div>
+                  <button class="component-copy" type="button" data-copy-component>Copy</button>
+                </div>
+                <div class="component-demo component-stack">
+                  <nav class="uif-breadcrumbs" aria-label="Breadcrumb">
+                    <a href="#">Workspaces</a><span aria-hidden="true">/</span
+                    ><a href="#">Northstar</a><span aria-hidden="true">/</span
+                    ><span aria-current="page">Settings</span>
+                  </nav>
+                  <div class="uif-button-group" role="group" aria-label="Text alignment">
+                    <button class="uif-btn uif-btn-secondary" type="button">Left</button
+                    ><button class="uif-btn uif-btn-secondary" type="button">Center</button
+                    ><button class="uif-btn uif-btn-secondary" type="button">Right</button>
+                  </div>
+                </div>
+                <pre><code></code></pre>
+              </article>
+
+              <article id="slider-generator" class="uif-card component-card">
+                <div class="component-card-head">
+                  <div>
+                    <div class="example-eyebrow">Generator</div>
+                    <h2>Image Slider Generator</h2>
+                    <p>Generate single- or multi-image carousel markup and choose the step size.</p>
+                  </div>
+                  <button class="component-copy" type="button" data-copy-component>Copy</button>
+                </div>
+                <div class="component-demo component-generator" data-slider-generator>
+                  <div class="component-generator-controls">
+                    <label class="uif-field"
+                      >Layout<select class="uif-input" name="layout">
+                        <option value="single">Single image</option>
+                        <option value="multiple">Multiple images</option>
+                      </select></label
+                    >
+                    <label class="uif-field"
+                      >Images per slide<input
+                        class="uif-input"
+                        name="perSlide"
+                        type="number"
+                        min="1"
+                        max="4"
+                        value="3"
+                    /></label>
+                    <label class="uif-field"
+                      >Images per click<input
+                        class="uif-input"
+                        name="step"
+                        type="number"
+                        min="1"
+                        max="4"
+                        value="1"
+                    /></label>
+                  </div>
+                  <pre class="component-generator-output" aria-live="polite"></pre>
+                </div>
+                <pre><code></code></pre>
+              </article>
+
+              <article id="widget-generator" class="uif-card component-card">
+                <div class="component-card-head">
+                  <div>
+                    <div class="example-eyebrow">Generator</div>
+                    <h2>Widget Generator</h2>
+                    <p>
+                      Configure and copy a framework-native metric widget without runtime
+                      dependencies.
+                    </p>
+                  </div>
+                  <button class="component-copy" type="button" data-copy-component>Copy</button>
+                </div>
+                <div class="component-demo component-generator" data-widget-generator>
+                  <div class="component-generator-controls">
+                    <label class="uif-field"
+                      >Label<input class="uif-input" name="label" value="Monthly revenue"
+                    /></label>
+                    <label class="uif-field"
+                      >Value<input class="uif-input" name="value" value="$128k"
+                    /></label>
+                    <label class="uif-field"
+                      >Status<select class="uif-input" name="status">
+                        <option value="success">On target</option>
+                        <option value="warning">Needs review</option>
+                        <option value="danger">At risk</option>
+                      </select></label
+                    >
+                  </div>
+                  <div class="uif-stat-card" data-widget-preview>
+                    <div class="uif-stat-card-label">Monthly revenue</div>
+                    <div class="uif-stat-card-value">$128k</div>
+                    <span class="uif-badge uif-badge-success">On target</span>
+                  </div>
+                  <pre class="component-generator-output" aria-live="polite"></pre>
+                </div>
+                <pre><code></code></pre>
+              </article>
+
+              <article class="uif-card component-card">
+                <div class="component-card-head">
+                  <div>
+                    <div class="example-eyebrow">Theming</div>
+                    <h2>Light and Dark Themes</h2>
+                    <p>
+                      The navbar switch persists the selected theme, updates its label and icon, and
+                      swaps the UIF logo without a page-load flash.
+                    </p>
+                  </div>
+                  <button class="component-copy" type="button" data-copy-component>Copy</button>
+                </div>
+                <div class="component-demo">
+                  <div class="uif-cluster">
+                    <span class="uif-badge">data-theme="light"</span
+                    ><span class="uif-badge">data-theme="dark"</span
+                    ><span class="uif-text-muted">Try the theme switch in the navbar.</span>
+                  </div>
+                </div>
+                <pre><code></code></pre>
               </article>
             </div>
           </section>
@@ -2045,9 +2414,98 @@
         });
       }
 
+      function initializeCounters() {
+        document.querySelectorAll('[data-counter]').forEach((counter) => {
+          const output = counter.querySelector('output');
+          const min = Number(counter.dataset.min || 0);
+          const max = Number(counter.dataset.max || Number.MAX_SAFE_INTEGER);
+          counter.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-counter-change]');
+            if (!button || !output) return;
+            const next =
+              Number(output.value || output.textContent || 0) +
+              Number(button.dataset.counterChange);
+            output.value = String(Math.max(min, Math.min(max, next)));
+          });
+        });
+      }
+
+      function sliderMarkup(layout, perSlide, step) {
+        const items = layout === 'multiple' ? perSlide : 1;
+        return `<section class="uif-carousel" data-uif="carousel" data-uif-items-per-slide="${items}" data-uif-step="${step}" tabindex="0">
+  <div class="uif-carousel-viewport">
+    <article class="uif-carousel-slide" data-uif-role="slide" data-uif-state="active"><img src="image-1.jpg" alt="Describe image 1"></article>
+    <article class="uif-carousel-slide" data-uif-role="slide"><img src="image-2.jpg" alt="Describe image 2"></article>
+    <article class="uif-carousel-slide" data-uif-role="slide"><img src="image-3.jpg" alt="Describe image 3"></article>
+  </div>
+  <div class="uif-carousel-controls">
+    <button type="button" data-uif-action="previous">Previous</button>
+    <span data-uif-role="status" aria-live="polite"></span>
+    <button type="button" data-uif-action="next">Next</button>
+  </div>
+</section>`;
+      }
+
+      function initializeSliderGenerator() {
+        const generator = document.querySelector('[data-slider-generator]');
+        if (!generator) return;
+        const layout = generator.querySelector('[name="layout"]');
+        const perSlide = generator.querySelector('[name="perSlide"]');
+        const step = generator.querySelector('[name="step"]');
+        const output = generator.querySelector('.component-generator-output');
+        const cardCode = generator.closest('.component-card').querySelector(':scope > pre code');
+        const render = () => {
+          perSlide.disabled = layout.value === 'single';
+          const markup = sliderMarkup(
+            layout.value,
+            Math.max(1, Number(perSlide.value)),
+            Math.max(1, Number(step.value)),
+          );
+          output.textContent = markup;
+          cardCode.textContent = markup;
+        };
+        generator.addEventListener('input', render);
+        generator.addEventListener('change', render);
+        render();
+      }
+
+      function initializeWidgetGenerator() {
+        const generator = document.querySelector('[data-widget-generator]');
+        if (!generator) return;
+        const label = generator.querySelector('[name="label"]');
+        const value = generator.querySelector('[name="value"]');
+        const status = generator.querySelector('[name="status"]');
+        const preview = generator.querySelector('[data-widget-preview]');
+        const output = generator.querySelector('.component-generator-output');
+        const cardCode = generator.closest('.component-card').querySelector(':scope > pre code');
+        const statusText = { success: 'On target', warning: 'Needs review', danger: 'At risk' };
+        const escapeMarkup = (value) =>
+          value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        const render = () => {
+          preview.querySelector('.uif-stat-card-label').textContent = label.value;
+          preview.querySelector('.uif-stat-card-value').textContent = value.value;
+          const badge = preview.querySelector('.uif-badge');
+          badge.className = `uif-badge uif-badge-${status.value}`;
+          badge.textContent = statusText[status.value];
+          const markup = `<article class="uif-stat-card">
+  <div class="uif-stat-card-label">${escapeMarkup(label.value)}</div>
+  <div class="uif-stat-card-value">${escapeMarkup(value.value)}</div>
+  <span class="uif-badge uif-badge-${status.value}">${statusText[status.value]}</span>
+</article>`;
+          output.textContent = markup;
+          cardCode.textContent = markup;
+        };
+        generator.addEventListener('input', render);
+        generator.addEventListener('change', render);
+        render();
+      }
+
       syncCompleteExamples();
       autoStart();
       syncCategoryNav();
+      initializeCounters();
+      initializeSliderGenerator();
+      initializeWidgetGenerator();
 
       document.addEventListener('click', async (event) => {
         const button = event.target.closest('[data-copy-component]');
@@ -2058,6 +2516,6 @@
         markCopied(button);
       });
     </script>
-      <script type="module" src="../shared/example-nav.js"></script>
+    <script type="module" src="../shared/example-nav.js"></script>
   </body>
 </html>

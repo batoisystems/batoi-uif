@@ -483,6 +483,30 @@ describe('components', () => {
     expect(two?.hidden).toBe(true);
   });
 
+  it('supports multiple visible carousel items and configurable step sizes', () => {
+    document.body.innerHTML = `
+      <section data-uif="carousel" data-uif-items-per-slide="2" data-uif-step="2">
+        <article id="one" data-uif-role="slide" data-uif-state="active">One</article>
+        <article id="two" data-uif-role="slide">Two</article>
+        <article id="three" data-uif-role="slide">Three</article>
+        <article id="four" data-uif-role="slide">Four</article>
+        <button id="next" data-uif-action="next">Next</button>
+        <span id="status" data-uif-role="status"></span>
+      </section>`;
+    initAll(document);
+
+    expect(document.querySelector<HTMLElement>('#one')?.hidden).toBe(false);
+    expect(document.querySelector<HTMLElement>('#two')?.hidden).toBe(false);
+    expect(document.querySelector<HTMLElement>('#three')?.hidden).toBe(true);
+    expect(document.querySelector('#status')?.textContent).toBe('Items 1–2 of 4');
+
+    document.querySelector('#next')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(document.querySelector<HTMLElement>('#one')?.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>('#three')?.hidden).toBe(false);
+    expect(document.querySelector<HTMLElement>('#four')?.hidden).toBe(false);
+    expect(document.querySelector('#status')?.textContent).toBe('Items 3–4 of 4');
+  });
+
   it('opens lightbox items and updates image and caption', () => {
     vi.stubGlobal(
       'matchMedia',

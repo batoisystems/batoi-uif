@@ -757,6 +757,14 @@ function initCarousel(el: HTMLElement): ComponentInstance {
   const slides = Array.from(el.querySelectorAll<HTMLElement>('[data-uif-role="slide"]'));
   const indicators = Array.from(el.querySelectorAll<HTMLElement>('[data-uif-slide-to]'));
   const live = el.querySelector<HTMLElement>('[data-uif-role="status"]');
+  const requestedItems = Number.parseInt(el.dataset.uifItemsPerSlide || '1', 10);
+  const requestedStep = Number.parseInt(el.dataset.uifStep || '1', 10);
+  const itemsPerSlide = Math.max(
+    1,
+    Math.min(slides.length || 1, Number.isFinite(requestedItems) ? requestedItems : 1),
+  );
+  const step = Math.max(1, Number.isFinite(requestedStep) ? requestedStep : 1);
+  el.style.setProperty('--uif-carousel-items', String(itemsPerSlide));
   let index = Math.max(
     0,
     slides.findIndex((slide) => slide.dataset.uifState === 'active'),
@@ -764,7 +772,8 @@ function initCarousel(el: HTMLElement): ComponentInstance {
   if (index < 0) index = 0;
   const sync = () => {
     slides.forEach((slide, i) => {
-      const active = i === index;
+      const offset = (i - index + slides.length) % slides.length;
+      const active = offset < itemsPerSlide;
       slide.dataset.uifState = active ? 'active' : 'inactive';
       slide.toggleAttribute('hidden', !active);
       slide.setAttribute('aria-hidden', String(!active));
@@ -774,7 +783,12 @@ function initCarousel(el: HTMLElement): ComponentInstance {
       indicator.dataset.uifState = active ? 'active' : 'inactive';
       indicator.setAttribute('aria-current', active ? 'true' : 'false');
     });
-    if (live) live.textContent = `Slide ${index + 1} of ${slides.length}`;
+    if (live) {
+      live.textContent =
+        itemsPerSlide === 1
+          ? `Slide ${index + 1} of ${slides.length}`
+          : `Items ${index + 1}–${Math.min(index + itemsPerSlide, slides.length)} of ${slides.length}`;
+    }
     emit('uif:carousel-change', { index, slide: slides[index], el }, el);
   };
   const goTo = (nextIndex: number) => {
@@ -782,8 +796,8 @@ function initCarousel(el: HTMLElement): ComponentInstance {
     index = (nextIndex + slides.length) % slides.length;
     sync();
   };
-  const next = () => goTo(index + 1);
-  const previous = () => goTo(index - 1);
+  const next = () => goTo(index + step);
+  const previous = () => goTo(index - step);
   const onClick = (event: MouseEvent) => {
     const target = eventElement(event)?.closest<HTMLElement>(
       '[data-uif-action], [data-uif-slide-to]',

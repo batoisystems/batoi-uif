@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.3.0
+
+- Added searchable example navigation covering every example and component-gallery pattern.
+- Added complete 12-column and logical margin/padding utility matrices with values from zero through five.
+- Added copy-ready typography, list-group, counter, horizontal-tab, breadcrumb, button-group, theme, image-slider-generator, and widget-generator examples.
+- Extended the dependency-free carousel with configurable visible-item and navigation-step counts, including accessible status updates and regression coverage.
+- Added persisted light/dark example theming with an early theme application and matching UIF logo variants.
+- Corrected typed-text and testimonial code samples and ensured inactive testimonial slides remain hidden.
+- Kept arbitrary website crawling/XML export on the governed server side; the browser framework does not bypass CORS, credential, SSRF, or content-permission controls.
+
 ## 2.2.0
 
 - Added complete, copy-ready component gallery samples generated from each live preview.
