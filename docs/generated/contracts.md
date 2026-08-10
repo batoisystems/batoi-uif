@@ -1,6 +1,6 @@
 # Generated Batoi UIF Contract Reference
 
-Framework 3.0.0-alpha.1; contract version 3. This file is generated from typed source definitions.
+Framework 3.0.0-alpha.2; contract version 3. This file is generated from typed source definitions.
 
 ## Profiles
 

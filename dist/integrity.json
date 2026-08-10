@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-alpha.1",
+  "version": "3.0.0-alpha.2",
   "files": {
     "index.d.ts": {
       "bytes": 809884,
@@ -22,14 +22,14 @@
     "provenance.json": {
       "bytes": 1712,
       "gzipBytes": 633,
-      "sha256": "9eee6fc0a93c6b9456a1938f4bb75382b4d8daecd458aba708ee4859613cdd63",
-      "sri": "sha384-0HGmdM4jPOsUBLksrlaHOIC4Ye+IMRqREnXTxb8Bx+yBweE+LZ+YGX14hTlsMbDT"
+      "sha256": "62e12277e39ce2b49428ea363cd8fb5878b7ccedfa65142aa6ceac15e743e425",
+      "sri": "sha384-OHy3usB7H6f7xqySJA/g8+414Ybh4/x5RJ5cXEnViUp7W3MgwBvThJaIe4liw9q+"
     },
     "sbom.cdx.json": {
       "bytes": 17785,
       "gzipBytes": 1032,
-      "sha256": "1717c18328f1ccd68d0e357af5c5c229f6b2ba33ab30d3da27b8d4100c92e849",
-      "sri": "sha384-rjX8If0S4yi6SX2bQVMBEgk0hfKYS9AmqK1Xv5cq/jqyh4rL1gdQwkTQJXHagIb/"
+      "sha256": "fbb9c686a29fbb3a829d5e92e85bfb5cd52e3b293a29ccdbfee62ffa43dc03a2",
+      "sri": "sha384-6zr6EO5HmZwsapqBHGphqhIwraxJp2hkNdiiOY1pJLxM8kscS8ts0B2jrN71dYF/"
     },
     "uif.css": {
       "bytes": 105173,

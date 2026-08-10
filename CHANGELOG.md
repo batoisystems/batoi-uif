@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.0-alpha.2
+
+- Corrected the prerelease lockfile after the alpha.1 version bump unintentionally rewrote the third-party `mz@2.7.0` lock entry and tarball URL.
+- Re-ran clean dependency installation and all release gates before publishing the replacement alpha.
+
 ## 3.0.0-alpha.1
 
 - Published the first v3 prerelease after the complete lifecycle, registry, configuration, capability, localization, security, Micro App, AI/MCP, documentation, reference-application, and compatibility gates passed.
