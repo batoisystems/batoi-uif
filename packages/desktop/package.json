@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-desktop",
-  "version": "2.7.0",
+  "version": "3.0.0-alpha.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -19,8 +19,8 @@
     "build": "tsup src/index.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-core": "2.7.0",
-    "@batoi/uif-dom": "2.7.0"
+    "@batoi/uif-core": "3.0.0-alpha.1",
+    "@batoi/uif-dom": "3.0.0-alpha.1"
   },
   "license": "Apache-2.0"
 }

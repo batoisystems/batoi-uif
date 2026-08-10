@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.0-alpha.1
+
+- Published the first v3 prerelease after the complete lifecycle, registry, configuration, capability, localization, security, Micro App, AI/MCP, documentation, reference-application, and compatibility gates passed.
+- Retains the diagnostic compatibility entry for v2 behavior during migration; strict v3 behavior remains opt-in through `configureCompatibility({ mode: 'v3' })` during the alpha cycle.
+- Establishes the alpha acceptance baseline for real RAD, Micro App, PWA, and governed agent integrations before beta promotion.
+
 ## 2.7.0
 
 - Added governed Micro App sync and PWA offline work with principal ownership, expiry, conflict recovery, retry/capacity bounds, and owner-scoped cleanup.

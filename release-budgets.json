@@ -33,6 +33,6 @@
     "table": 8000
   },
   "budgetNotes": {
-    "v3-foundation": "The additive v3 preparation layer includes complete typed component metadata, unified resource and hydration ownership, capability groups, a diagnostic compatibility build, generated contracts, versioned token and locale modes, SBOM/provenance, and the 2.7 security and agent foundations. Core remains below 33 KB gzip and the 2.7 compatibility bundle remains below 148 KB gzip; profile imports and internal splitting remain required before 3.0 stable."
+    "v3-foundation": "The v3 alpha includes complete typed component metadata, unified resource and hydration ownership, capability groups, a diagnostic compatibility build, generated contracts, versioned token and locale modes, SBOM/provenance, and the completed security and agent foundations. Core remains below 33 KB gzip and the alpha compatibility bundle remains below 148 KB gzip; profile imports remain the production recommendation."
   }
 }
