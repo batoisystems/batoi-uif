@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-profiles",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -33,40 +33,44 @@
     "./agent": {
       "types": "./dist/agent.d.ts",
       "import": "./dist/agent.js"
+    },
+    "./compatibility": {
+      "types": "./dist/compatibility.d.ts",
+      "import": "./dist/compatibility.js"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/all.ts src/rad.ts src/dashboard.ts src/mobile.ts src/desktop.ts src/agent.ts --format esm --dts --clean"
+    "build": "tsup src/index.ts src/all.ts src/rad.ts src/dashboard.ts src/mobile.ts src/desktop.ts src/agent.ts src/compatibility.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-actions": "2.6.0",
-    "@batoi/uif-ai": "2.6.0",
-    "@batoi/uif-charts": "2.6.0",
-    "@batoi/uif-components": "2.6.0",
-    "@batoi/uif-core": "2.6.0",
-    "@batoi/uif-dashboard": "2.6.0",
-    "@batoi/uif-desktop": "2.6.0",
-    "@batoi/uif-dom": "2.6.0",
-    "@batoi/uif-editor": "2.6.0",
-    "@batoi/uif-effects": "2.6.0",
-    "@batoi/uif-extension-kit": "2.6.0",
-    "@batoi/uif-forms": "2.6.0",
-    "@batoi/uif-icons": "2.6.0",
-    "@batoi/uif-mcp": "2.6.0",
-    "@batoi/uif-mobile": "2.6.0",
-    "@batoi/uif-net": "2.6.0",
-    "@batoi/uif-overlays": "2.6.0",
-    "@batoi/uif-push": "2.6.0",
-    "@batoi/uif-pwa": "2.6.0",
-    "@batoi/uif-query": "2.6.0",
-    "@batoi/uif-rad-adapter": "2.6.0",
-    "@batoi/uif-realtime": "2.6.0",
-    "@batoi/uif-router": "2.6.0",
-    "@batoi/uif-state": "2.6.0",
-    "@batoi/uif-table": "2.6.0"
+    "@batoi/uif-actions": "2.7.0",
+    "@batoi/uif-ai": "2.7.0",
+    "@batoi/uif-charts": "2.7.0",
+    "@batoi/uif-components": "2.7.0",
+    "@batoi/uif-core": "2.7.0",
+    "@batoi/uif-dashboard": "2.7.0",
+    "@batoi/uif-desktop": "2.7.0",
+    "@batoi/uif-dom": "2.7.0",
+    "@batoi/uif-editor": "2.7.0",
+    "@batoi/uif-effects": "2.7.0",
+    "@batoi/uif-extension-kit": "2.7.0",
+    "@batoi/uif-forms": "2.7.0",
+    "@batoi/uif-icons": "2.7.0",
+    "@batoi/uif-mcp": "2.7.0",
+    "@batoi/uif-mobile": "2.7.0",
+    "@batoi/uif-net": "2.7.0",
+    "@batoi/uif-overlays": "2.7.0",
+    "@batoi/uif-push": "2.7.0",
+    "@batoi/uif-pwa": "2.7.0",
+    "@batoi/uif-query": "2.7.0",
+    "@batoi/uif-rad-adapter": "2.7.0",
+    "@batoi/uif-realtime": "2.7.0",
+    "@batoi/uif-router": "2.7.0",
+    "@batoi/uif-state": "2.7.0",
+    "@batoi/uif-table": "2.7.0"
   },
   "license": "Apache-2.0"
 }

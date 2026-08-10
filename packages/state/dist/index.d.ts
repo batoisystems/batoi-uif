@@ -1,7 +1,14 @@
 type State = Record<string, unknown>;
 type Subscriber = (value: unknown) => void;
 type Computed = (state: State) => unknown;
-type SyncStatus = 'queued' | 'syncing' | 'synced' | 'failed';
+type SyncStatus = 'queued' | 'syncing' | 'synced' | 'failed' | 'conflict' | 'expired';
+interface SyncQueueOptions {
+    maxItems?: number;
+    maxAttempts?: number;
+    ttlMilliseconds?: number;
+    owner?: string;
+    now?: () => Date;
+}
 interface StoreOptions {
     immutable?: boolean;
     persist?: 'local' | 'session';
@@ -55,6 +62,8 @@ interface SyncQueueItem<T = unknown> {
     createdAt: string;
     updatedAt: string;
     lastError?: string;
+    owner?: string;
+    expiresAt?: string;
 }
 interface SyncQueue<T = unknown> {
     enqueue(action: string, payload: T, id?: string): Promise<SyncQueueItem<T>>;
@@ -62,6 +71,8 @@ interface SyncQueue<T = unknown> {
     update(id: string, patch: Partial<Omit<SyncQueueItem<T>, 'id' | 'createdAt'>>): Promise<SyncQueueItem<T>>;
     remove(id: string): Promise<void>;
     clear(status?: SyncStatus): Promise<void>;
+    clearOwner(owner?: string): Promise<void>;
+    resolveConflict(id: string, payload: T): Promise<SyncQueueItem<T>>;
     exportJSON(space?: number): Promise<string>;
     importJSON(json: string): Promise<void>;
 }
@@ -125,6 +136,6 @@ declare function createArtifactStore<T extends State>(initialState: T, options?:
 };
 declare function createIndexedDBLocalStore(options?: LocalStoreOptions): LocalStore;
 declare function createLocalStore(options?: LocalStoreOptions): LocalStore;
-declare function createSyncQueue<T = unknown>(store: LocalStore, key?: string): SyncQueue<T>;
+declare function createSyncQueue<T = unknown>(store: LocalStore, key?: string, options?: SyncQueueOptions): SyncQueue<T>;
 
-export { type ArtifactStoreOptions, type IndexedDBMigrationContext, type LocalStore, type LocalStoreOptions, type MicroAppStoreOptions, type StoreOptions, type SyncQueue, type SyncQueueItem, createAdvancedStore, createArtifactStore, createIndexedDBLocalStore, createLocalStore, createMicroAppStore, createStore, createSyncQueue };
+export { type ArtifactStoreOptions, type IndexedDBMigrationContext, type LocalStore, type LocalStoreOptions, type MicroAppStoreOptions, type StoreOptions, type SyncQueue, type SyncQueueItem, type SyncQueueOptions, type SyncStatus, createAdvancedStore, createArtifactStore, createIndexedDBLocalStore, createLocalStore, createMicroAppStore, createStore, createSyncQueue };

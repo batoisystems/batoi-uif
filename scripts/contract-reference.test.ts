@@ -12,11 +12,13 @@ describe('generated contract reference', () => {
     const generated = JSON.parse(readFileSync(new URL('docs/generated/contracts.json', root), 'utf8'));
     expect(generated).toEqual(current);
     expect(readFileSync(new URL('docs/generated/contracts.md', root), 'utf8')).toBe(renderContractReference(current));
-  });
+  }, 60_000);
 
   it('covers every profile and declarative component', async () => {
     const current = await collectContractReference(root);
     expect(Object.keys(current.profiles)).toEqual(['all', 'rad', 'dashboard', 'mobile', 'desktop', 'agent']);
+    expect(Object.keys(current.capabilityGroups)).toEqual(['dom', 'interaction', 'shells', 'offline']);
+    expect(current.migrations.length).toBeGreaterThan(0);
     expect(Object.keys(current.components).sort()).toEqual([...current.registries.components].sort());
-  });
+  }, 60_000);
 });

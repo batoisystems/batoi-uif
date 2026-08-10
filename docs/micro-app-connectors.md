@@ -41,6 +41,22 @@ const store = createLocalStore({
 
 IndexedDB upgrades run in the browser's upgrade transaction. Imports validate all keys and values before atomically replacing an object store. Use these stores only for bounded, non-sensitive convenience data; they are not credential or authorization stores.
 
+Local-first mutation queues can be governed by principal, expiry, capacity, and retry limits:
+
+```js
+const queue = createSyncQueue(store, 'sync-queue', {
+  owner: session.principalRef,
+  ttlMilliseconds: 24 * 60 * 60 * 1000,
+  maxItems: 500,
+  maxAttempts: 5,
+});
+
+await queue.enqueue('save-record', safePayload);
+await queue.clearOwner(); // call during sign-out or principal rotation
+```
+
+Queue items support explicit `conflict` and `expired` states. `resolveConflict()` returns a conflicted item to `queued` only after the application supplies its chosen replacement payload. Ownership is a client-side partitioning safeguard, not authorization; the server must still authenticate and authorize every synchronization request.
+
 ## Runtime Loading
 
 ```js
@@ -58,3 +74,4 @@ const rows = taskFeed ? await loadConnector(taskFeed) : [];
 - Use explicit origins such as `https://data.example.com` for remote APIs.
 - Wildcard network permissions are rejected. Applications may additionally enforce centrally registered origin, path-prefix, and context capabilities with `configureURLCapabilities()`.
 - Treat connector data as untrusted input until the app validates it.
+- Partition queued changes by principal, bound their lifetime and retries, and clear the principal's items during sign-out.

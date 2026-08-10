@@ -1,6 +1,6 @@
 import {
   uifProfiles
-} from "./chunk-AM64YWWQ.js";
+} from "./chunk-ZX3IMQUW.js";
 
 // src/mobile.ts
 import * as components from "@batoi/uif-components";

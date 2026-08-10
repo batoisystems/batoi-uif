@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "2.6.0",
+  "version": "2.7.0",
   "packages": {
     "actions": {
       "name": "@batoi/uif-actions",
@@ -179,6 +179,7 @@
         ".",
         "./agent",
         "./all",
+        "./compatibility",
         "./dashboard",
         "./desktop",
         "./mobile",
@@ -367,6 +368,7 @@
       "data-uif-sort",
       "data-uif-src",
       "data-uif-state",
+      "data-uif-strings",
       "data-uif-success",
       "data-uif-swap",
       "data-uif-sync-status",
@@ -601,6 +603,7 @@
     "uif:offcanvas-close",
     "uif:offcanvas-open",
     "uif:offline-error",
+    "uif:offline-expired",
     "uif:offline-queued",
     "uif:offline-synced",
     "uif:open",

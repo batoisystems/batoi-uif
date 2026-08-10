@@ -414,9 +414,11 @@ If working before that migration is complete, use the currently available worksp
 
 ## Version 2
 
-The repository and framework packages are versioned `2.6.0`. This compatible preparation release closes the typed registries, standardizes bounded configuration and resource ownership, hardens cross-origin and partitioned-storage policy, adds localization/RTL hooks, and completes advanced AI/MCP review surfaces while retaining the dependency-free v2 public surface.
+The repository and framework packages are versioned `2.7.0`. This compatible preparation release adds governed offline synchronization, machine-readable capability groups, a diagnostic v3 compatibility build, generated migration/accessibility/security references, and canonical cross-browser reference journeys while retaining the dependency-free v2 public surface.
 
 Curated v3-compatible namespace profiles are available from `@batoi/uif-profiles/all`, `/rad`, `/dashboard`, `/mobile`, `/desktop`, and `/agent`. See [Package Profiles](docs/package-profiles.md).
+
+Use `@batoi/uif-profiles/compatibility` to retain v2 behavior while emitting migration diagnostics, then follow the [v2 to v3 Migration](docs/v2-to-v3-migration.md) guide before enabling strict mode.
 
 The current status is active v2 hardening. Public release readiness requires the automated release gate plus real-browser editor, accessibility, CSP/Trusted Types, mobile viewport, and deployed-artifact verification described in [Compatibility and Release Policy](docs/compatibility-and-release-policy.md).
 

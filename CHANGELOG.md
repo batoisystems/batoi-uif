@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.7.0
+
+- Added governed Micro App sync and PWA offline work with principal ownership, expiry, conflict recovery, retry/capacity bounds, and owner-scoped cleanup.
+- Added machine-readable DOM, interaction, shell, and offline capability groups while preserving package-level runtime boundaries.
+- Added a diagnostic v3 compatibility entry point and typed migration rules with generated migration, accessibility, and security references.
+- Added strict CSP/Trusted Types browser coverage and cross-browser smoke journeys for the canonical RAD, Micro App, dashboard, mobile, desktop, PWA, AI, and MCP reference applications.
+- Split shared component implementation helpers into a private module without changing the established component facade.
+
 ## 2.6.0
 
 - Closed the canonical declarative attribute, action, event, state, error, component, and envelope registries with generated references and contract tests.

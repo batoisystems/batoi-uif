@@ -29,10 +29,12 @@ export async function collectContractReference(root) {
     }];
   }));
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     frameworkVersion: packageManifest.version,
     contractVersion: 3,
     profiles: profileModule.uifProfiles,
+    capabilityGroups: profileModule.uifCapabilityGroups,
+    migrations: uif.uifMigrationRules,
     registries: {
       attributes: [...uif.uifAttributes],
       components: [...uif.uifValues],
@@ -67,9 +69,17 @@ export function renderContractReference(reference) {
   Object.values(reference.profiles).forEach((profile) => {
     lines.push(`| ${cell(profile.name)} | \`${cell(profile.entryPoint)}\` | ${cell(profile.packages.join(', '))} | ${cell(profile.purpose)} |`);
   });
+  lines.push('', '## Capability Groups', '', '| Capability | Packages | Preferred entry points | Compatibility |', '| --- | --- | --- | --- |');
+  Object.values(reference.capabilityGroups).forEach((group) => {
+    lines.push(`| ${cell(group.name)} | ${cell(group.packages.join(', '))} | ${cell(group.preferredEntryPoints.join(', '))} | ${cell(group.compatibility)} |`);
+  });
   lines.push('', '## Components', '', '| Component | Package | Runtime | Fallback | Actions | Events | States | Errors |', '| --- | --- | --- | --- | --- | --- | --- | --- |');
   Object.entries(reference.components).forEach(([name, contract]) => {
     lines.push(`| \`${cell(name)}\` | \`@batoi/uif-${cell(contract.package)}\` | ${contract.runtimeRegistered ? 'registry' : 'compatibility adapter'} | ${cell(contract.semanticFallback)} | ${cell(contract.actions.join(', '))} | ${cell(contract.events.join(', '))} | ${cell(contract.states.join(', '))} | ${cell(contract.errors.join(', '))} |`);
+  });
+  lines.push('', '## Accessibility and Security Contracts', '', '| Component | Accessibility | Security |', '| --- | --- | --- |');
+  Object.entries(reference.components).forEach(([name, contract]) => {
+    lines.push(`| \`${cell(name)}\` | ${cell(contract.accessibility.join('; '))} | ${cell(contract.security.join('; '))} |`);
   });
   lines.push('', '## Canonical Registries', '');
   Object.entries(reference.registries).forEach(([name, values]) => {
@@ -78,5 +88,10 @@ export function renderContractReference(reference) {
   lines.push('', '## Envelope Authority', '', '| Envelope | Version | Authority |', '| --- | --- | --- |');
   lines.push(`| Agent Interaction | ${reference.envelopes.agent.version} | ${cell(reference.envelopes.agent.authority)} |`);
   lines.push(`| RAD Partial | ${reference.envelopes.rad.versions.join(', ')} | ${cell(reference.envelopes.rad.authority)} |`, '');
+  lines.push('## Migration Rules', '', '| ID | Since | Surface | Legacy | Replacement | Diagnostic |', '| --- | --- | --- | --- | --- | --- |');
+  reference.migrations.forEach((rule) => {
+    lines.push(`| \`${cell(rule.id)}\` | ${cell(rule.introduced)} | ${cell(rule.surface)} | ${cell(rule.legacy)} | ${cell(rule.replacement)} | \`${cell(rule.diagnostic)}\` |`);
+  });
+  lines.push('');
   return `${lines.join('\n')}\n`;
 }

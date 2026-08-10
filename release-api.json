@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "version": "2.6.0",
+  "version": "2.7.0",
   "packages": {
     "actions": {
       "exports": [
@@ -322,6 +322,7 @@
         "UIFJSONShape",
         "UIFLifecycleEvent",
         "UIFLocaleOptions",
+        "UIFMigrationRule",
         "UIFMountContext",
         "UIFObjectInspectionOptions",
         "UIFOptions",
@@ -383,6 +384,7 @@
         "uifContractRegistry",
         "uifErrors",
         "uifEvents",
+        "uifMigrationRules",
         "uifStates",
         "uifValues",
         "validateAgentEnvelope",
@@ -450,6 +452,7 @@
         "UIFJSONShape": "643a03d808af45fda8c2aa3f2612fbed54934e6cfb0f308f793a7e211bc0a8f9",
         "UIFLifecycleEvent": "ac07415852335451892e8beb7da4cc3e3c925d587a08841ac491deac76607f99",
         "UIFLocaleOptions": "c7f3f16a0b7b13e0f204bcf1b44f0a2da4bc5508a97e8514469a58c0c7908c44",
+        "UIFMigrationRule": "9b4c313921820deaf794fe2e080c735ed6d5f86d72614acb056c568bdff85ecc",
         "UIFMountContext": "c074340690d6bb15bf6d2562ab5e91570fa97c72971fe5136e54457463c31c9a",
         "UIFObjectInspectionOptions": "5d91d5d3f3438912f2f0d724ace420b131b0c6b0a5052902e7af43c318a7c58a",
         "UIFOptions": "bb9e036f2b8f88397718cfbb64245e6866c39c57dfa489d1f3f87342ec07b8e0",
@@ -508,9 +511,10 @@
         "uifActions": "9f19f7a390ffc553363f1f6749ea45386e3b64377d271b9fc0f6e2ca91652a27",
         "uifAttributes": "dfbc81112c097f0cd1c8f23e23e5d7064159902926d5ee74e189c7364dfeb321",
         "uifComponentContracts": "ff8f574cabc92c6a9575fe3b781fff7cffae5edd835d6807e3343ecce47a3534",
-        "uifContractRegistry": "0b20a4dc2de9b262aa2ca231fea9c176f6d03b6df1440e940e57f48c517785ac",
+        "uifContractRegistry": "51b8ff6d87a3b3c5920912b4f781749303ae060c8d1f09455b1b5a5c7cc16049",
         "uifErrors": "4a60f36a08e1a5055b086260cc290ae22790699603c339bbd26c7aac6aea80f4",
-        "uifEvents": "b241a1ecfa13723a571ce84c042e22a3722a57915738057a5d9d2bef1aeb6163",
+        "uifEvents": "68ec6196947d74c29297bd0d8fbb07c657953e2db371c271019fca81620a7a06",
+        "uifMigrationRules": "daf448f87895bdfa15095690cd1849ba4db5b39cfe82856152d55f290a0c4059",
         "uifStates": "2c49e44cd0d71f7fa0bb9e9cc207fe5a32e049b804cfb380824ed1386edea468",
         "uifValues": "e2839aa3543395cf5b6838dc0e24710bf506d57736f33a8299c990f49676c9a6",
         "validateAgentEnvelope": "e37865a1d358bb9a6a5730b4042857805f271b3418775e1394bcd1ee34353646",
@@ -1112,15 +1116,23 @@
     },
     "profiles": {
       "exports": [
+        "UIFCapabilityGroupDefinition",
+        "UIFCapabilityGroupName",
         "UIFProfileDefinition",
         "UIFProfileName",
+        "getUIFCapabilityGroup",
         "getUIFProfile",
+        "uifCapabilityGroups",
         "uifProfiles"
       ],
       "signatures": {
+        "UIFCapabilityGroupDefinition": "78307fbf4b1e9904a963dc57f8f953950f8b199a71bf57fe8f65c0e307bbdc7b",
+        "UIFCapabilityGroupName": "2a02ba3f1795dba726978e12d593cb4eeb31e9a7219e14f6ae5a81da52962285",
         "UIFProfileDefinition": "8e5bb5f751d126366230c4bdb65d36bdc9b975b093a7ec8dcb9d14dd2a190ec9",
         "UIFProfileName": "672d53f215661e926d26bb562f3a7a6d172b9b9034239fcd91684d26c876d345",
+        "getUIFCapabilityGroup": "791ce2842a3f94bb13576380834ae5f9197da8ed06b8f00e522c540b88369e05",
         "getUIFProfile": "725321a145ae28486e93af7e53a77e593e86106d6e957cb160b8354fb71fd7a9",
+        "uifCapabilityGroups": "e151c1f4526156f8639aef8a6b3ff9c55cfe54d669bc2d162aee249373e4c459",
         "uifProfiles": "4fb4a3b0889a278bb5f8262dd5d9761db64531eef068ec2c08af3922f84ea1dd"
       }
     },
@@ -1163,6 +1175,7 @@
         "OfflineTaskOptions",
         "ServiceWorkerOptions",
         "cacheStrategies",
+        "clearOfflineQueue",
         "createCacheStrategy",
         "flushOfflineQueue",
         "initInstallPrompt",
@@ -1179,11 +1192,12 @@
         "unregisterServiceWorker"
       ],
       "signatures": {
-        "OfflineTaskOptions": "e2aa52db7b83e1cb1e8326e825984e2c4d4dcc32b945f81e0de72fb7ad6029de",
+        "OfflineTaskOptions": "dc513487b4bae10b7917b1a355392fafd501a1b8b4fe1dd6c230b0381c0b8ec1",
         "ServiceWorkerOptions": "1e745b872f9f2ec98721e45e820d35d4e4a6115ba07a892a5b135d6294aa5e3f",
         "cacheStrategies": "b5b37141e41610bcf4c6fc5de3744d227119617aa986bf79398a8d3cd1302691",
+        "clearOfflineQueue": "a8d278e5c963aba6853701274943c02bb1773935353da6cc6538c8de42b4d64f",
         "createCacheStrategy": "41570e7b16761cf58b78eb423a04cf00f35227c359c5d3caf265ef63534cc0fb",
-        "flushOfflineQueue": "a65c44c63940a7ed679392c342ab4b928191fef9f060647b5dc0b6d6588dd98e",
+        "flushOfflineQueue": "84d4d4175fd362b211136ea1cebe331764b8042ba9086832c254bbd3ca3a9a98",
         "initInstallPrompt": "00467c0529c76c4597a36d3084835208b9d8d61af4ef7d99fc36d5dd679f8cea",
         "initOfflineQueue": "8381b7363fdc1bbb87edcd9f4e6ad1b2d9afa005d40c0c07f22b99ae8bed70a1",
         "isCacheableRequest": "c839db66b6dfde486879165b0f59409cf57fd42f66528fea39c7815b3ed06df2",
@@ -1306,6 +1320,8 @@
         "StoreOptions",
         "SyncQueue",
         "SyncQueueItem",
+        "SyncQueueOptions",
+        "SyncStatus",
         "createAdvancedStore",
         "createArtifactStore",
         "createIndexedDBLocalStore",
@@ -1321,15 +1337,17 @@
         "LocalStoreOptions": "8a232609eb5b1907341adbd7a758dc4cf3e4ff183ce34122c1bc54b2e8796767",
         "MicroAppStoreOptions": "ade7ae3d42020abb0cf510330654c394fa702cfc3a284b287ac0c37fbbfa3152",
         "StoreOptions": "34dce14e958d569c7f49cb14cf66fb087afc3731a76bf52f4ca5ffda11f6f994",
-        "SyncQueue": "b2fb1cabc2d2fb7a45d1caeda85bc7acf61820f0602dc124d548ec6bd097e4ba",
-        "SyncQueueItem": "6d50f49c2625a92b1b8e477273d05bbe8d29e433e0c2d2096b75f663452d135e",
+        "SyncQueue": "0763faf01c48f7ecca1d89e239ca3751733172c78d011f35499d7735bf8f26ad",
+        "SyncQueueItem": "dd1ebf63b74514ddecd54985b5b58af67b8dfb5a2f4489439b5db693b514bb90",
+        "SyncQueueOptions": "970038c5144c265a4a5324112e87599f2caf2470e7fdfcc7aff1ae8089c81b43",
+        "SyncStatus": "ffdbd0be1d1cdc5fd935cb5181448ccb2a2a8c4c7887152b2bf85d0a38944f2e",
         "createAdvancedStore": "309cd72040b9a24b73fd7dad34bd3c97cff7e589c943da2b629771fc6f07fcbe",
         "createArtifactStore": "95f67590191b61ae4af1e27eab56abc294736e8844e31718ca898cb54cb3d3a7",
         "createIndexedDBLocalStore": "dc0bdf68b6e6ffeedde8924708998c61499672877d54fc4943738f11f87d46c6",
         "createLocalStore": "f6fa6ee3d9e4912a0ccbf8ba148c1c8ab82c03745ed464e5b5d06379f23c9d58",
         "createMicroAppStore": "c5d63429a4895a7eaa45e52a516f63265af8d2b81a941a2ff62849f80a8ad26c",
         "createStore": "92c388102358606f2bc8f3b6b386f54550b9d9209757d57f5e4bc14eb08d8a5e",
-        "createSyncQueue": "9f42e6bc69c6c0e245930997f724ecbeec13e4488b9ce9ec52b4023d0aa86791"
+        "createSyncQueue": "80d12199b92fe89defbb61e6f24ffd8fa048a6ef923cf7ebd0aae0662985def7"
       }
     },
     "table": {

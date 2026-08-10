@@ -63,17 +63,27 @@ function isCacheableResponse(response) {
 }
 function queueOfflineTask(task, options) {
   if (!options?.idempotent) throw new Error("Offline tasks must be explicitly idempotent");
+  if (options.owner && !/^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,199}$/.test(options.owner)) throw new Error("Offline task owner is invalid");
   if (offlineQueue.length >= 100) throw new Error("Offline queue exceeds the 100 task limit");
   if (options.key) {
-    const existing = offlineQueue.findIndex((entry) => entry.key === options.key);
+    const existing = offlineQueue.findIndex((entry) => entry.key === options.key && entry.owner === options.owner);
     if (existing >= 0) offlineQueue.splice(existing, 1);
   }
-  offlineQueue.push({ task, key: options.key, attempts: 0, maxAttempts: Math.max(1, Math.min(10, Math.floor(options.maxAttempts ?? 3))) });
-  window.dispatchEvent(new CustomEvent("uif:offline-queued", { detail: { key: options.key, size: offlineQueue.length } }));
+  const ttl = options.ttlMilliseconds === void 0 ? void 0 : Math.max(1, Math.floor(options.ttlMilliseconds));
+  offlineQueue.push({ task, key: options.key, owner: options.owner, expiresAt: ttl ? Date.now() + ttl : void 0, attempts: 0, maxAttempts: Math.max(1, Math.min(10, Math.floor(options.maxAttempts ?? 3))) });
+  window.dispatchEvent(new CustomEvent("uif:offline-queued", { detail: { key: options.key, owner: options.owner, size: offlineQueue.length } }));
 }
-async function flushOfflineQueue() {
-  const pending = offlineQueue.splice(0);
+async function flushOfflineQueue(owner) {
+  const pending = offlineQueue.splice(0).filter((entry) => {
+    if (!owner || entry.owner === owner) return true;
+    offlineQueue.push(entry);
+    return false;
+  });
   for (const entry of pending) {
+    if (entry.expiresAt && entry.expiresAt <= Date.now()) {
+      window.dispatchEvent(new CustomEvent("uif:offline-expired", { detail: { key: entry.key, owner: entry.owner } }));
+      continue;
+    }
     try {
       entry.attempts += 1;
       await entry.task();
@@ -83,6 +93,17 @@ async function flushOfflineQueue() {
       window.dispatchEvent(new CustomEvent("uif:offline-error", { detail: { key: entry.key, attempts: entry.attempts, retrying: entry.attempts < entry.maxAttempts, error } }));
     }
   }
+}
+function clearOfflineQueue(owner) {
+  if (!owner) return offlineQueue.splice(0).length;
+  let removed = 0;
+  for (let index = offlineQueue.length - 1; index >= 0; index -= 1) {
+    if (offlineQueue[index]?.owner === owner) {
+      offlineQueue.splice(index, 1);
+      removed += 1;
+    }
+  }
+  return removed;
 }
 function initOfflineQueue() {
   const flush = () => void flushOfflineQueue();
@@ -132,6 +153,7 @@ function initInstallPrompt(el) {
 }
 export {
   cacheStrategies,
+  clearOfflineQueue,
   createCacheStrategy,
   flushOfflineQueue,
   initInstallPrompt,

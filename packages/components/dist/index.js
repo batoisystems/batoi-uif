@@ -1,9 +1,10 @@
 // src/index.ts
-import { emit, partitionStorageKey } from "@batoi/uif-core";
+import { emit as emit2 } from "@batoi/uif-core";
 import { collapse, expand, hide, show } from "@batoi/uif-effects";
 import { closeOverlay, openOverlay, positionOverlay, toggleOverlay } from "@batoi/uif-overlays";
-var instances = /* @__PURE__ */ new WeakMap();
-var actionBindings = /* @__PURE__ */ new WeakMap();
+
+// src/internal.ts
+import { emit, partitionStorageKey } from "@batoi/uif-core";
 var focusableSelector = [
   "a[href]",
   "button:not([disabled])",
@@ -12,7 +13,7 @@ var focusableSelector = [
   "textarea:not([disabled])",
   '[tabindex]:not([tabindex="-1"])'
 ].join(",");
-function setState(el, open) {
+function setComponentState(el, open) {
   el.dataset.uifState = open ? "open" : "closed";
   el.toggleAttribute("hidden", !open);
   emit(open ? "uif:open" : "uif:close", { component: el.dataset.uif, el }, el);
@@ -43,6 +44,10 @@ function storageSet(key, value) {
   } catch {
   }
 }
+
+// src/index.ts
+var instances = /* @__PURE__ */ new WeakMap();
+var actionBindings = /* @__PURE__ */ new WeakMap();
 function initModal(el) {
   const mode = el.dataset.uifMode ?? "dismissible";
   const backdrop = el.dataset.uifBackdrop ?? "true";
@@ -50,14 +55,14 @@ function initModal(el) {
   const dialog = el.dataset.uifRole === "dialog" ? el : el.querySelector('[data-uif-role="dialog"]') || el;
   const open = () => {
     void openOverlay(el, { modal: true, restoreFocus: true, closeOnEscape });
-    setState(el, true);
+    setComponentState(el, true);
     document.body.classList.add("uif-modal-open");
     dialog.querySelector(focusableSelector)?.focus();
   };
   const close = () => {
     if (mode === "locked") return;
     void closeOverlay(el);
-    setState(el, false);
+    setComponentState(el, false);
     document.body.classList.remove("uif-modal-open");
   };
   const toggle = () => el.dataset.uifState === "open" ? close() : open();
@@ -84,7 +89,7 @@ function initModal(el) {
   };
   dialog.setAttribute("role", dialog.getAttribute("role") || "dialog");
   dialog.setAttribute("aria-modal", "true");
-  if (!el.dataset.uifState) setState(el, false);
+  if (!el.dataset.uifState) setComponentState(el, false);
   document.addEventListener("keydown", onKey);
   el.addEventListener("click", onClick);
   return {
@@ -100,20 +105,20 @@ function initModal(el) {
 function initDrawer(el) {
   el.setAttribute("role", el.getAttribute("role") || "dialog");
   el.dataset.uifMode = el.dataset.uifMode ?? "left";
-  if (!el.dataset.uifState) setState(el, false);
+  if (!el.dataset.uifState) setComponentState(el, false);
   return {
     destroy: () => void 0,
     open: () => {
       void openOverlay(el, { modal: true, restoreFocus: true });
-      setState(el, true);
+      setComponentState(el, true);
     },
     close: () => {
       void closeOverlay(el);
-      setState(el, false);
+      setComponentState(el, false);
     },
     toggle: () => {
       void toggleOverlay(el, { modal: true, restoreFocus: true });
-      setState(el, el.dataset.uifState !== "open");
+      setComponentState(el, el.dataset.uifState !== "open");
     }
   };
 }
@@ -323,7 +328,7 @@ function initTabs(el) {
 }
 function initToast(el) {
   el.setAttribute("role", el.dataset.uifType === "danger" ? "alert" : "status");
-  if (!el.dataset.uifState) setState(el, true);
+  if (!el.dataset.uifState) setComponentState(el, true);
   const dispose = setupToast(el, {
     duration: Number(el.dataset.uifDuration) || void 0,
     dismissible: el.dataset.uifDismissible !== "false"
@@ -392,7 +397,7 @@ function initShell(el) {
     el.dataset.uifDensity = density;
     el.setAttribute("data-density", density);
     storageSet(densityKey, density);
-    emit("uif:shell-density", { density, el }, el);
+    emit2("uif:shell-density", { density, el }, el);
   };
   const resolveSectionPanel = (trigger) => {
     const target = trigger.dataset.uifTarget;
@@ -661,7 +666,7 @@ function initCombobox(el) {
   };
   const select = (option) => {
     if (input) input.value = option.dataset.uifValue || option.textContent?.trim() || "";
-    emit("uif:select", { value: input?.value, option }, el);
+    emit2("uif:select", { value: input?.value, option }, el);
   };
   const onClick = (event) => {
     const option = eventElement(event)?.closest('[data-uif-role="option"]');
@@ -711,7 +716,7 @@ function initCarousel(el) {
     if (live) {
       live.textContent = itemsPerSlide === 1 ? `Slide ${index + 1} of ${slides.length}` : `Items ${index + 1}\u2013${Math.min(index + itemsPerSlide, slides.length)} of ${slides.length}`;
     }
-    emit("uif:carousel-change", { index, slide: slides[index], el }, el);
+    emit2("uif:carousel-change", { index, slide: slides[index], el }, el);
   };
   const goTo = (nextIndex) => {
     if (!slides.length) return;
@@ -779,7 +784,7 @@ function initLightbox(el) {
     void openOverlay(dialog, { modal: true, restoreFocus: true, closeOnEscape: true });
     dialog.dataset.uifState = "open";
     dialog.querySelector(focusableSelector)?.focus();
-    emit("uif:lightbox-open", { index, el }, el);
+    emit2("uif:lightbox-open", { index, el }, el);
   };
   const close = () => {
     if (!dialog) return;
@@ -893,12 +898,12 @@ function initComponent(el) {
   const name = el.dataset.uif;
   if (!name || !inits[name]) return;
   instances.set(el, inits[name](el));
-  emit("uif:init", { component: name, el }, el);
+  emit2("uif:init", { component: name, el }, el);
 }
 function destroyComponent(el) {
   instances.get(el)?.destroy();
   instances.delete(el);
-  emit("uif:destroy", { el }, el);
+  emit2("uif:destroy", { el }, el);
 }
 function initAll(root = document) {
   root.querySelectorAll("[data-uif]").forEach(initComponent);
@@ -997,7 +1002,7 @@ function showToast(message, options = {}) {
   toastEl.setAttribute("role", options.type === "danger" ? "alert" : "status");
   toastEl.className = `uif-toast uif-toast-${options.type ?? "info"}`;
   getToastContainer(options.placement).appendChild(toastEl);
-  emit("uif:toast", { message, options, el: toastEl }, toastEl);
+  emit2("uif:toast", { message, options, el: toastEl }, toastEl);
   setupToast(toastEl, options);
   return toastEl;
 }

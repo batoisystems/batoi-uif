@@ -1,6 +1,6 @@
 # Generated Batoi UIF Contract Reference
 
-Framework 2.6.0; contract version 3. This file is generated from typed source definitions.
+Framework 2.7.0; contract version 3. This file is generated from typed source definitions.
 
 ## Profiles
 
@@ -12,6 +12,15 @@ Framework 2.6.0; contract version 3. This file is generated from typed source de
 | mobile | `@batoi/uif-profiles/mobile` | core, dom, net, state, components, mobile, pwa, push, realtime, icons | Mobile shells, progressive web apps, offline status, and notifications. |
 | desktop | `@batoi/uif-profiles/desktop` | core, dom, net, state, components, desktop, pwa, realtime, icons | Desktop-style workspaces and resilient application shells. |
 | agent | `@batoi/uif-profiles/agent` | core, dom, net, components, ai, mcp, icons | Provider-neutral assistant and governed tool-review interfaces. |
+
+## Capability Groups
+
+| Capability | Packages | Preferred entry points | Compatibility |
+| --- | --- | --- | --- |
+| dom | dom, query | @batoi/uif-dom | Query remains a compatibility facade and does not define a second safety model. |
+| interaction | actions, effects, overlays, components | @batoi/uif-components, @batoi/uif-profiles/all | Direct package imports remain supported for small graphs. |
+| shells | components, dashboard, mobile, desktop | @batoi/uif-profiles/dashboard, @batoi/uif-profiles/mobile, @batoi/uif-profiles/desktop | Composition packages share component lifecycle and shell primitives. |
+| offline | pwa, push, realtime, state | @batoi/uif-profiles/mobile, @batoi/uif-profiles/desktop | PWA and push remain separate permission boundaries behind one application capability model. |
 
 ## Components
 
@@ -68,13 +77,68 @@ Framework 2.6.0; contract version 3. This file is generated from typed source de
 | `typed-text` | `@batoi/uif-effects` | registry | Complete static text |  | uif:typed-text-complete | disabled, error, idle, loading, success | UIF_COMPONENT_MOUNT |
 | `wizard` | `@batoi/uif-components` | registry | Sequential fieldsets | next, previous, submit | uif:wizard-change | active, completed, error | UIF_COMPONENT_MOUNT |
 
+## Accessibility and Security Contracts
+
+| Component | Accessibility | Security |
+| --- | --- | --- |
+| `accordion` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `agent-tool` | Preserve useful semantic HTML before enhancement. | MCP invocation, permissions, and authoritative audit remain server-side. |
+| `ai-action` | Preserve useful semantic HTML before enhancement. | Browser UI never holds provider credentials. |
+| `ai-composer` | Preserve useful semantic HTML before enhancement. | Composer emits events and does not invoke a model provider directly. |
+| `ai-thread` | Preserve useful semantic HTML before enhancement. | Agent content uses validated versioned envelopes and text-safe rendering. |
+| `ajax` | Preserve useful semantic HTML before enhancement. | Partial HTML is explicit governed server output. |
+| `alert` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `animate` | Respect reduced-motion preferences. | Render untrusted values as text. |
+| `badge` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `breadcrumb` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `button` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `card` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `carousel` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `chart` | Preserve useful semantic HTML before enhancement. | Remote data and drilldown URLs are bounded and policy checked. |
+| `collapse` | Own keyboard dismissal, focus movement, and focus return. | Render untrusted values as text. |
+| `combobox` | Support keyboard option navigation and active-descendant state. | Render untrusted values as text. |
+| `command-menu` | Own keyboard dismissal, focus movement, and focus return. | Render untrusted values as text. |
+| `dashboard` | Preserve useful semantic HTML before enhancement. | Custom HTML widgets are explicitly caller-trusted. |
+| `desktop-shell` | Preserve useful semantic HTML before enhancement. | Persist preferences only; never store credentials. |
+| `drawer` | Own keyboard dismissal, focus movement, and focus return. | Render untrusted values as text. |
+| `dropdown` | Own keyboard dismissal, focus movement, and focus return. | Render untrusted values as text. |
+| `editor` | Preserve useful semantic HTML before enhancement. | Sanitize editing boundaries and validate submitted content on the server. |
+| `file-upload` | Preserve useful semantic HTML before enhancement. | Client file metadata is advisory; server validation remains authoritative. |
+| `form` | Preserve useful semantic HTML before enhancement. | Browser validation is advisory; server validation and authorization are authoritative. |
+| `install-prompt` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `lightbox` | Own keyboard dismissal, focus movement, and focus return. | Render untrusted values as text. |
+| `masonry` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `mobile-shell` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `modal` | Own keyboard dismissal, focus movement, and focus return. | Render untrusted values as text. |
+| `nav` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `navbar` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `offcanvas` | Own keyboard dismissal, focus movement, and focus return. | Render untrusted values as text. |
+| `pagination` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `popover` | Own keyboard dismissal, focus movement, and focus return. | Render untrusted values as text. |
+| `progress` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `push` | Preserve useful semantic HTML before enhancement. | Subscription authorization and delivery remain server-side. |
+| `realtime` | Preserve useful semantic HTML before enhancement. | Messages are bounded and rendered as text by default. |
+| `route` | Preserve useful semantic HTML before enhancement. | Navigation and partial URLs follow application URL policy. |
+| `shell` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `sidebar` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `skeleton` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `spinner` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `stepper` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `table` | Preserve useful semantic HTML before enhancement. | Remote data is bounded; HTML rows require governed server trust. |
+| `tabs` | Support arrow, Home, End, and focusable tab semantics. | Render untrusted values as text. |
+| `toast` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+| `tool-approval` | Preserve useful semantic HTML before enhancement. | Browser confirmation is not authorization or execution. |
+| `tooltip` | Preserve useful semantic HTML before enhancement. | Tooltip content is text-only by default. |
+| `typed-text` | Expose stable text and respect reduced motion. | Render untrusted values as text. |
+| `wizard` | Preserve useful semantic HTML before enhancement. | Render untrusted values as text. |
+
 ## Canonical Registries
 
 - attributes: `data-uif`, `data-uif-id`, `data-uif-role`, `data-uif-action`, `data-uif-target`, `data-uif-src`, `data-uif-method`, `data-uif-trigger`, `data-uif-state`, `data-uif-bind`, `data-uif-model`, `data-uif-value`, `data-uif-route`, `data-uif-mode`, `data-uif-options`, `data-uif-confirm`, `data-uif-disabled`, `data-uif-loading`, `data-uif-success`, `data-uif-error`, `data-uif-swap`, `data-uif-cache`, `data-uif-validate`, `data-uif-rule`, `data-uif-event`, `data-uif-on`, `data-uif-refresh`, `data-uif-persist`, `data-uif-density`, `data-uif-sidebar-key`, `data-uif-density-key`, `data-uif-toolbar`, `data-uif-preview`, `data-uif-animation`, `data-uif-duration`, `data-uif-delay`, `data-uif-placement`, `data-uif-container`, `data-uif-html`, `data-uif-backdrop`, `data-uif-scroll`, `data-uif-breakpoint`, `data-uif-class`, `data-uif-attribute`, `data-uif-key`, `data-uif-envelope`, `data-uif-interval`, `data-uif-message`, `data-uif-messages`
 - components: `button`, `modal`, `drawer`, `offcanvas`, `dropdown`, `tabs`, `toast`, `accordion`, `alert`, `badge`, `breadcrumb`, `collapse`, `tooltip`, `popover`, `progress`, `spinner`, `skeleton`, `pagination`, `command-menu`, `navbar`, `sidebar`, `stepper`, `wizard`, `file-upload`, `combobox`, `carousel`, `lightbox`, `masonry`, `card`, `table`, `form`, `editor`, `ajax`, `route`, `shell`, `nav`, `chart`, `animate`, `realtime`, `push`, `mobile-shell`, `desktop-shell`, `ai-action`, `ai-thread`, `ai-composer`, `agent-tool`, `tool-approval`, `typed-text`, `dashboard`, `install-prompt`
 - actions: `open`, `close`, `toggle`, `toggle-sidebar`, `toggle-section`, `submit`, `load`, `reload`, `delete`, `save`, `reset`, `clear`, `select`, `activate`, `deactivate`, `navigate`, `swap`, `append`, `prepend`, `remove`, `toast`, `set-density`, `animate`, `add-class`, `remove-class`, `toggle-class`, `set-attribute`, `remove-attribute`, `set-value`, `copy`, `scroll-to`, `focus`, `emit`, `subscribe`, `connect`, `disconnect`, `approve`, `reject`, `edit`, `install`, `next`, `preview`, `previous`, `unsubscribe`
 - states: `idle`, `loading`, `loaded`, `error`, `success`, `active`, `inactive`, `open`, `closed`, `disabled`, `selected`, `expanded`, `collapsed`, `connected`, `disconnected`, `pending`, `approved`, `rejected`, `available`, `busy`, `completed`, `connecting`, `decision-pending`, `dirty`, `empty`, `expired`, `failed`, `installed`, `offline`, `online`, `saved`, `saving`, `submitting`, `unavailable`, `waiting-approval`
-- events: `uif:before-init`, `uif:init`, `uif:before-destroy`, `uif:destroy`, `uif:error`, `uif:runtime:mounted`, `uif:runtime:error`, `uif:runtime:diagnostic`, `uif:diagnostic`, `uif:agent:submit`, `uif:agent:cancel`, `uif:agent:error`, `uif:agent:feedback`, `uif:agent:retry`, `uif:agent:copy`, `uif:tool-approve`, `uif:tool-reject`, `uif:tool-expired`, `uif:tool-invalid-review`, `uif:tool-replay-blocked`, `uif:accordion-toggle`, `uif:action-diagnostic`, `uif:ai-action`, `uif:ai-error`, `uif:ai-history-select`, `uif:ai-stream-cancel`, `uif:animation-end`, `uif:animation-start`, `uif:before-load`, `uif:carousel-change`, `uif:chart-drilldown`, `uif:chart-drilldown-error`, `uif:chart-error`, `uif:chart-export`, `uif:chart-refresh`, `uif:chart-select`, `uif:collapse-close`, `uif:collapse-open`, `uif:combobox-change`, `uif:command-menu-close`, `uif:command-menu-open`, `uif:complete`, `uif:connector-error`, `uif:dashboard-error`, `uif:desktop-change`, `uif:desktop-error`, `uif:drawer-close`, `uif:drawer-open`, `uif:dropdown-close`, `uif:dropdown-open`, `uif:editor-autosave`, `uif:editor-autosave-error`, `uif:editor-blur`, `uif:editor-change`, `uif:editor-command`, `uif:editor-destroy`, `uif:editor-diagnostics`, `uif:editor-error`, `uif:editor-focus`, `uif:editor-init`, `uif:editor-layout-change`, `uif:editor-mode-change`, `uif:editor-normalize`, `uif:editor-preview`, `uif:editor-reset`, `uif:editor-upload-error`, `uif:editor-validate`, `uif:field-errors`, `uif:file-select`, `uif:form-dirty`, `uif:form-error`, `uif:form-submit`, `uif:form-success`, `uif:form-touched`, `uif:lightbox-close`, `uif:lightbox-open`, `uif:load`, `uif:modal-close`, `uif:modal-open`, `uif:notification`, `uif:offcanvas-close`, `uif:offcanvas-open`, `uif:offline-error`, `uif:offline-queued`, `uif:offline-synced`, `uif:pagination-change`, `uif:popover-close`, `uif:popover-open`, `uif:presence`, `uif:push-change`, `uif:push-error`, `uif:pwa-install`, `uif:rad-before`, `uif:rad-error`, `uif:rad-success`, `uif:realtime-error`, `uif:realtime-message`, `uif:realtime-state`, `uif:rehydrate`, `uif:request`, `uif:response`, `uif:route-before`, `uif:route-error`, `uif:route-success`, `uif:router-error`, `uif:segment-change`, `uif:select`, `uif:shell-density`, `uif:table-before-load`, `uif:table-bulk-action`, `uif:table-error`, `uif:table-filter`, `uif:table-load`, `uif:table-loaded`, `uif:table-page`, `uif:table-page-size`, `uif:table-reset`, `uif:table-row-action`, `uif:table-select`, `uif:table-selection`, `uif:table-sort`, `uif:table-state`, `uif:tabs-change`, `uif:toast`, `uif:tool-confirmation-required`, `uif:typed-text-complete`, `uif:wizard-change`
+- events: `uif:before-init`, `uif:init`, `uif:before-destroy`, `uif:destroy`, `uif:error`, `uif:runtime:mounted`, `uif:runtime:error`, `uif:runtime:diagnostic`, `uif:diagnostic`, `uif:agent:submit`, `uif:agent:cancel`, `uif:agent:error`, `uif:agent:feedback`, `uif:agent:retry`, `uif:agent:copy`, `uif:tool-approve`, `uif:tool-reject`, `uif:tool-expired`, `uif:tool-invalid-review`, `uif:tool-replay-blocked`, `uif:accordion-toggle`, `uif:action-diagnostic`, `uif:ai-action`, `uif:ai-error`, `uif:ai-history-select`, `uif:ai-stream-cancel`, `uif:animation-end`, `uif:animation-start`, `uif:before-load`, `uif:carousel-change`, `uif:chart-drilldown`, `uif:chart-drilldown-error`, `uif:chart-error`, `uif:chart-export`, `uif:chart-refresh`, `uif:chart-select`, `uif:collapse-close`, `uif:collapse-open`, `uif:combobox-change`, `uif:command-menu-close`, `uif:command-menu-open`, `uif:complete`, `uif:connector-error`, `uif:dashboard-error`, `uif:desktop-change`, `uif:desktop-error`, `uif:drawer-close`, `uif:drawer-open`, `uif:dropdown-close`, `uif:dropdown-open`, `uif:editor-autosave`, `uif:editor-autosave-error`, `uif:editor-blur`, `uif:editor-change`, `uif:editor-command`, `uif:editor-destroy`, `uif:editor-diagnostics`, `uif:editor-error`, `uif:editor-focus`, `uif:editor-init`, `uif:editor-layout-change`, `uif:editor-mode-change`, `uif:editor-normalize`, `uif:editor-preview`, `uif:editor-reset`, `uif:editor-upload-error`, `uif:editor-validate`, `uif:field-errors`, `uif:file-select`, `uif:form-dirty`, `uif:form-error`, `uif:form-submit`, `uif:form-success`, `uif:form-touched`, `uif:lightbox-close`, `uif:lightbox-open`, `uif:load`, `uif:modal-close`, `uif:modal-open`, `uif:notification`, `uif:offcanvas-close`, `uif:offcanvas-open`, `uif:offline-error`, `uif:offline-expired`, `uif:offline-queued`, `uif:offline-synced`, `uif:pagination-change`, `uif:popover-close`, `uif:popover-open`, `uif:presence`, `uif:push-change`, `uif:push-error`, `uif:pwa-install`, `uif:rad-before`, `uif:rad-error`, `uif:rad-success`, `uif:realtime-error`, `uif:realtime-message`, `uif:realtime-state`, `uif:rehydrate`, `uif:request`, `uif:response`, `uif:route-before`, `uif:route-error`, `uif:route-success`, `uif:router-error`, `uif:segment-change`, `uif:select`, `uif:shell-density`, `uif:table-before-load`, `uif:table-bulk-action`, `uif:table-error`, `uif:table-filter`, `uif:table-load`, `uif:table-loaded`, `uif:table-page`, `uif:table-page-size`, `uif:table-reset`, `uif:table-row-action`, `uif:table-select`, `uif:table-selection`, `uif:table-sort`, `uif:table-state`, `uif:tabs-change`, `uif:toast`, `uif:tool-confirmation-required`, `uif:typed-text-complete`, `uif:wizard-change`
 - errors: `UIF_COMPONENT_DESTROY`, `UIF_COMPONENT_DUPLICATE`, `UIF_COMPONENT_MOUNT`, `UIF_COMPONENT_NAME`, `UIF_INVALID_ACCENT`, `UIF_LOCALE_CONFIG`, `UIF_STORAGE_KEY`, `UIF_STORAGE_PARTITION`, `UIF_UNSAFE_OBJECT`, `UIF_UNSAFE_PROPERTY_PATH`
 
 ## Envelope Authority
@@ -83,4 +147,14 @@ Framework 2.6.0; contract version 3. This file is generated from typed source de
 | --- | --- | --- |
 | Agent Interaction | 3 | presentation-only |
 | RAD Partial | 1, 2 | governed-server-html |
+
+## Migration Rules
+
+| ID | Since | Surface | Legacy | Replacement | Diagnostic |
+| --- | --- | --- | --- | --- | --- |
+| `options-json` | 2.4.0 | data-uif-options | Semicolon-delimited key:value options | A bounded JSON object using the component option schema | `legacy-options` |
+| `typed-text-json` | 2.6.0 | data-uif-strings | Pipe-delimited phrase lists | A bounded JSON string array | `legacy-typed-text-strings` |
+| `cross-origin-capability` | 2.6.0 | Remote URL options | Markup-only cross-origin allow flags | An application-registered exact origin/path capability plus explicit element intent | `cross-origin-capability-required` |
+| `partitioned-storage` | 2.6.0 | Persisted browser convenience data | Unpartitioned global keys | configureStoragePartition() before persistence and owner-scoped cleanup at sign-out | `storage-partition-recommended` |
+| `agent-envelope-version` | 2.4.0 | AI and MCP decisions | Unknown, incomplete, or unversioned decision envelopes | A governed Agent Interaction Envelope with supported version, request ID, expiry, and audit reference | `agent-envelope-unavailable` |
 

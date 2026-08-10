@@ -18,6 +18,7 @@ export * from './compatibility.js';
 export * from './contracts.js';
 export * from './diagnostics.js';
 export * from './micro-app.js';
+export * from './migration.js';
 
 export interface UIFApp {
   root: Document | HTMLElement;

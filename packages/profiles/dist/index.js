@@ -1,8 +1,12 @@
 import {
+  getUIFCapabilityGroup,
   getUIFProfile,
+  uifCapabilityGroups,
   uifProfiles
-} from "./chunk-AM64YWWQ.js";
+} from "./chunk-ZX3IMQUW.js";
 export {
+  getUIFCapabilityGroup,
   getUIFProfile,
+  uifCapabilityGroups,
   uifProfiles
 };

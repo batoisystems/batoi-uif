@@ -272,6 +272,7 @@ export const uifEvents = [
   'uif:offcanvas-close',
   'uif:offcanvas-open',
   'uif:offline-error',
+  'uif:offline-expired',
   'uif:offline-queued',
   'uif:offline-synced',
   'uif:pagination-change',

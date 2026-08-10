@@ -26,6 +26,27 @@ describe('local Micro App storage', () => {
     expect(await queue.list('failed')).toMatchObject([{ id: 'item-1', attempts: 1, lastError: 'offline' }]);
   });
 
+  it('partitions, expires, bounds, and resolves governed sync work', async () => {
+    const store = createLocalStore({ namespace: 'governed-sync', driver: 'memory' });
+    let current = new Date('2026-01-01T00:00:00Z');
+    const queue = createSyncQueue<{ value: number }>(store, 'sync-queue', {
+      owner: 'principal-1',
+      maxItems: 2,
+      maxAttempts: 2,
+      ttlMilliseconds: 1_000,
+      now: () => current,
+    });
+    const first = await queue.enqueue('save', { value: 1 }, 'item-1');
+    expect(first.owner).toBe('principal-1');
+    await queue.update(first.id, { status: 'conflict' });
+    expect(await queue.resolveConflict(first.id, { value: 2 })).toMatchObject({ status: 'queued', attempts: 0, payload: { value: 2 } });
+    current = new Date('2026-01-01T00:00:02Z');
+    expect(await queue.list('expired')).toHaveLength(1);
+    await expect(queue.update(first.id, { attempts: 3 })).rejects.toThrow('between 0 and 2');
+    await queue.clearOwner();
+    expect(await queue.list()).toHaveLength(0);
+  });
+
   it('enforces payload, entry, key, and namespace version boundaries', async () => {
     const store = createLocalStore({ namespace: 'bounded', driver: 'memory', maxBytes: 12, maxEntries: 1, version: 3 });
     expect(store.version).toBe(3);

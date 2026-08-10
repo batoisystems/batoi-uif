@@ -25,12 +25,20 @@ import '@batoi/uif-state';
 import '@batoi/uif-table';
 
 type UIFProfileName = 'all' | 'rad' | 'dashboard' | 'mobile' | 'desktop' | 'agent';
+type UIFCapabilityGroupName = 'dom' | 'interaction' | 'shells' | 'offline';
 interface UIFProfileDefinition {
     name: UIFProfileName;
     version: 3;
     entryPoint: string;
     packages: readonly string[];
     purpose: string;
+}
+interface UIFCapabilityGroupDefinition {
+    name: UIFCapabilityGroupName;
+    version: 3;
+    packages: readonly string[];
+    preferredEntryPoints: readonly string[];
+    compatibility: string;
 }
 declare const uifProfiles: Readonly<{
     all: Readonly<UIFProfileDefinition>;
@@ -40,6 +48,13 @@ declare const uifProfiles: Readonly<{
     desktop: Readonly<UIFProfileDefinition>;
     agent: Readonly<UIFProfileDefinition>;
 }>;
+declare const uifCapabilityGroups: Readonly<{
+    dom: Readonly<UIFCapabilityGroupDefinition>;
+    interaction: Readonly<UIFCapabilityGroupDefinition>;
+    shells: Readonly<UIFCapabilityGroupDefinition>;
+    offline: Readonly<UIFCapabilityGroupDefinition>;
+}>;
 declare function getUIFProfile(name: UIFProfileName): Readonly<UIFProfileDefinition>;
+declare function getUIFCapabilityGroup(name: UIFCapabilityGroupName): Readonly<UIFCapabilityGroupDefinition>;
 
-export { type UIFProfileDefinition, type UIFProfileName, getUIFProfile, uifProfiles };
+export { type UIFCapabilityGroupDefinition, type UIFCapabilityGroupName, type UIFProfileDefinition, type UIFProfileName, getUIFCapabilityGroup, getUIFProfile, uifCapabilityGroups, uifProfiles };

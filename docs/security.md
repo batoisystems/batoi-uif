@@ -102,6 +102,8 @@ Periodic data connectors never overlap their own polling work, use a minimum 250
 
 Local and session storage are application convenience stores, not secure credential stores. Do not persist access tokens, secrets, regulated records, private tool payloads, or authorization state there. Server authorization remains authoritative, and applications own migration decisions when changing `version` or `persistVersion`.
 
+Micro App sync and PWA offline work must be idempotent, bounded, principal-partitioned, and time-limited. `createSyncQueue()` supports ownership, expiry, conflict resolution, capacity, retry limits, and owner-scoped cleanup. `queueOfflineTask()` supports owner-scoped flushing/cleanup and expiry, emitting `uif:offline-expired` without running stale work. These client-side controls do not replace server authentication, authorization, replay protection, or conflict validation.
+
 Applications with authenticated preferences should call `configureStoragePartition({ applicationId, tenantId, principalId })` before mounting components. UIF then prefixes component preference keys by application, tenant, and principal. Call `clearStoragePartition()` during sign-out, and configure the new partition before mounting after an account or tenant change. With no configured partition, legacy v2 keys remain unchanged for compatibility. Partition identifiers and stored values are still untrusted browser data and never confer authorization.
 
 Desktop preference storage falls back to process-memory preferences when local storage is unavailable, malformed, or full. Malformed dashboard and desktop declarative JSON leaves server-rendered fallback content intact and emits `uif:dashboard-error` or `uif:desktop-error`.

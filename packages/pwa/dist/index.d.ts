@@ -2,6 +2,8 @@ interface OfflineTaskOptions {
     idempotent: true;
     key?: string;
     maxAttempts?: number;
+    owner?: string;
+    ttlMilliseconds?: number;
 }
 interface ServiceWorkerOptions {
     scope?: string;
@@ -22,9 +24,10 @@ declare function createCacheStrategy(name: keyof typeof cacheStrategies): string
 declare function isCacheableRequest(request: Request): boolean;
 declare function isCacheableResponse(response: Response): boolean;
 declare function queueOfflineTask(task: () => Promise<void>, options: OfflineTaskOptions): void;
-declare function flushOfflineQueue(): Promise<void>;
+declare function flushOfflineQueue(owner?: string): Promise<void>;
+declare function clearOfflineQueue(owner?: string): number;
 declare function initOfflineQueue(): () => void;
 declare function onAppUpdate(handler: (registration: ServiceWorkerRegistration) => void): () => void;
 declare function initInstallPrompt(el: HTMLElement): () => void;
 
-export { type OfflineTaskOptions, type ServiceWorkerOptions, cacheStrategies, createCacheStrategy, flushOfflineQueue, initInstallPrompt, initOfflineQueue, isCacheableRequest, isCacheableResponse, onAppUpdate, onNetworkChange, onOffline, onOnline, queueOfflineTask, registerServiceWorker, setupInstallPrompt, unregisterServiceWorker };
+export { type OfflineTaskOptions, type ServiceWorkerOptions, cacheStrategies, clearOfflineQueue, createCacheStrategy, flushOfflineQueue, initInstallPrompt, initOfflineQueue, isCacheableRequest, isCacheableResponse, onAppUpdate, onNetworkChange, onOffline, onOnline, queueOfflineTask, registerServiceWorker, setupInstallPrompt, unregisterServiceWorker };

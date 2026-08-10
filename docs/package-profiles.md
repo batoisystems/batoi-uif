@@ -13,6 +13,8 @@ Version 3 keeps small dependency-free framework packages while presenting six cu
 
 Use a profile when it clarifies application intent. Continue importing individual packages for the smallest production graph.
 
+For migration testing, `@batoi/uif-profiles/compatibility` re-exports the All namespaces and enables diagnostic mode while retaining v2 behavior. It is a migration build, not a seventh application profile. See [v2 to v3 Migration](v2-to-v3-migration.md).
+
 ```ts
 import { core, forms, radAdapter, table } from '@batoi/uif-profiles/rad';
 
@@ -23,6 +25,15 @@ forms.initForm(document.querySelector('form[data-uif="form"]'));
 ```
 
 Namespace exports prevent collisions between packages that intentionally expose similarly named helpers. The profile package contains no provider credentials, privileged execution, automatic global startup, or third-party runtime dependencies.
+
+## Consolidated Capability Groups
+
+`uifCapabilityGroups` is the machine-readable authority for overlapping public surfaces. It identifies the packages that retain internal responsibility and the preferred consumer entry points for DOM, interaction, shell, and offline capabilities. Tooling can read it through `@batoi/uif-profiles`; the same data is included in the generated contract reference.
+
+- DOM safety and target behavior grow in `@batoi/uif-dom`; Query remains a compatibility facade.
+- Actions, effects, overlays, and components compose as the Interaction group without merging their internal ownership.
+- Dashboard, mobile, and desktop use shared component lifecycle and shell primitives through their profiles.
+- PWA, push, realtime, and state compose as the Offline group while retaining distinct permission boundaries.
 
 ## Compatibility Packages
 

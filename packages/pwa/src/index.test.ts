@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { cacheStrategies, flushOfflineQueue, initInstallPrompt, isCacheableRequest, isCacheableResponse, onAppUpdate, onNetworkChange, queueOfflineTask, registerServiceWorker, setupInstallPrompt, type OfflineTaskOptions } from './index.js';
+import { cacheStrategies, clearOfflineQueue, flushOfflineQueue, initInstallPrompt, isCacheableRequest, isCacheableResponse, onAppUpdate, onNetworkChange, queueOfflineTask, registerServiceWorker, setupInstallPrompt, type OfflineTaskOptions } from './index.js';
 
 describe('pwa', () => {
   it('exposes cache strategies and network change cleanup', () => {
@@ -83,6 +83,25 @@ describe('pwa', () => {
     await flushOfflineQueue();
     expect(retry).toHaveBeenCalledTimes(2);
     window.removeEventListener('uif:offline-error', errors);
+  });
+
+  it('partitions and expires offline tasks by principal', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    const first = vi.fn(async () => undefined);
+    const second = vi.fn(async () => undefined);
+    const expired = vi.fn();
+    window.addEventListener('uif:offline-expired', expired);
+    queueOfflineTask(first, { idempotent: true, key: 'save', owner: 'principal-1', ttlMilliseconds: 10 });
+    queueOfflineTask(second, { idempotent: true, key: 'save', owner: 'principal-2' });
+    vi.advanceTimersByTime(20);
+    await flushOfflineQueue('principal-1');
+    expect(first).not.toHaveBeenCalled();
+    expect(second).not.toHaveBeenCalled();
+    expect(expired).toHaveBeenCalledOnce();
+    expect(clearOfflineQueue('principal-2')).toBe(1);
+    window.removeEventListener('uif:offline-expired', expired);
+    vi.useRealTimers();
   });
 
   it('reports waiting and newly installed service workers and disposes its listeners', async () => {

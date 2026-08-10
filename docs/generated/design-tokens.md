@@ -1,6 +1,6 @@
 # Generated Batoi UIF Design Token Reference
 
-Framework 2.6.0; token contract version 3. This file is generated from the CSS shipped by `@batoi/uif-css`.
+Framework 2.7.0; token contract version 3. This file is generated from the CSS shipped by `@batoi/uif-css`.
 
 Modes: `compact`, `dark`, `forced-colors`, `high-contrast`, `light`, `reduced-motion`
 
