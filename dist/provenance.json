@@ -4,19 +4,19 @@
     {
       "name": "dist/index.d.ts",
       "digest": {
-        "sha256": "adc8871a9bc7ea90a27aad711ec8c1cb02f723639921b94c74c7f012dde9c44a"
+        "sha256": "d47b95335f5dea9ba135e14d8fdb92e865fdd90143236d6c814d3798ac4773f2"
       }
     },
     {
       "name": "dist/index.global.js",
       "digest": {
-        "sha256": "62d0ff55bd2bd9c1b75f793845432b786aa2026eeeada8eba46887e8cb810bcf"
+        "sha256": "eed83004b16b205c72e0b26f5516ee75bd9fa532fa558187b8db495d85ef50c0"
       }
     },
     {
       "name": "dist/index.js",
       "digest": {
-        "sha256": "dfba9e337c126701c05dd2bf97c36b22252a27efb8c858bdd8020de696c939f1"
+        "sha256": "a185ec96fbe67933eba4b405f9e8cc20b369d74bb5b097a999a511a144ed4daf"
       }
     },
     {
@@ -28,31 +28,43 @@
     {
       "name": "dist/uif.esm.js",
       "digest": {
-        "sha256": "dfba9e337c126701c05dd2bf97c36b22252a27efb8c858bdd8020de696c939f1"
+        "sha256": "a185ec96fbe67933eba4b405f9e8cc20b369d74bb5b097a999a511a144ed4daf"
       }
     },
     {
       "name": "dist/uif.iife.js",
       "digest": {
-        "sha256": "62d0ff55bd2bd9c1b75f793845432b786aa2026eeeada8eba46887e8cb810bcf"
+        "sha256": "eed83004b16b205c72e0b26f5516ee75bd9fa532fa558187b8db495d85ef50c0"
+      }
+    },
+    {
+      "name": "dist/v4/desktop.css",
+      "digest": {
+        "sha256": "9bff8738804d688344ecf97f091fd2f02a324cc8f9d0c5ad23ac3432b7faf411"
+      }
+    },
+    {
+      "name": "dist/v4/desktop.js",
+      "digest": {
+        "sha256": "98632a1fe871463e9e4dddf1b53b582befcd6f8c34fecf0bdbaadac9215b74c0"
       }
     },
     {
       "name": "dist/v4/essential.css",
       "digest": {
-        "sha256": "4db506d1efb0346fbda921beb5b2496a05a91d1f2355e994c6046100ba285d1b"
+        "sha256": "b066954ddae3636aac7c77f1730cfbeab597f69e5189939f61d1b49639d0997e"
       }
     },
     {
       "name": "dist/v4/essential.js",
       "digest": {
-        "sha256": "a5cff63881e37048bad1174cb544243ddcdbc51198c8e4a2b75ebb462dc4462e"
+        "sha256": "d87f84fb03cee0a4e8dd029b9186e66ba137961a27f261692b14c1f896cf97f7"
       }
     },
     {
       "name": "dist/v4/foundation.css",
       "digest": {
-        "sha256": "ad54beba4113a987fa30221b4d0d385b872ace0797609e2eb038363ef6c809eb"
+        "sha256": "cf7eae15e60e67829cd771c64e81b405a963434cb1e8ebfd20bbbfdfd44a3f88"
       }
     },
     {
@@ -64,7 +76,31 @@
     {
       "name": "dist/v4/manifest.json",
       "digest": {
-        "sha256": "a1a48052e5d992771019ccd97f7067aa58ddfbf50add227f3bf190c84b083de1"
+        "sha256": "274bd45c2d7a8a366b4adc75781e4e1a3e4cbac72b435cef53932c5bb69de5ae"
+      }
+    },
+    {
+      "name": "dist/v4/mobile.css",
+      "digest": {
+        "sha256": "93cfbf0dd18d66d48f15c0e3e6725d4b7fd6c29d0fff3cc658ad4e08b78e8e54"
+      }
+    },
+    {
+      "name": "dist/v4/mobile.js",
+      "digest": {
+        "sha256": "76e2eac882ae5f2cec563fc17b75af26fc49a30557ee11b4254d693826594e9b"
+      }
+    },
+    {
+      "name": "dist/v4/rad.css",
+      "digest": {
+        "sha256": "49668e124f83c8c29f6bc91aa02dff5fafe0c750b5ceb2bc736ccf4cca122ed8"
+      }
+    },
+    {
+      "name": "dist/v4/rad.js",
+      "digest": {
+        "sha256": "94f8475a5b9addca9eb0ae716a2fa07113cbcc052088d353665e8ce14ae90d8d"
       }
     },
     {
@@ -76,13 +112,13 @@
     {
       "name": "dist/v4/theme/foundation.css",
       "digest": {
-        "sha256": "ad54beba4113a987fa30221b4d0d385b872ace0797609e2eb038363ef6c809eb"
+        "sha256": "cf7eae15e60e67829cd771c64e81b405a963434cb1e8ebfd20bbbfdfd44a3f88"
       }
     },
     {
       "name": "dist/v4/theme/manifest.json",
       "digest": {
-        "sha256": "03838400987b818acded8fe86db6c7dd053cc4d90ac5d4cb811ca24c5dbc59ff"
+        "sha256": "48ba0c1f209c3e358fad9f823e4b006a209b0bc10e3790d87e9b90d3c4c6a6ac"
       }
     },
     {
@@ -114,6 +150,18 @@
       "digest": {
         "sha256": "cf01b47df4ddd0a8d1cb596c410995e4b7ce230be3bafa7f037c83f479374610"
       }
+    },
+    {
+      "name": "dist/v4/web.css",
+      "digest": {
+        "sha256": "222710a7133c04113c8c9bd9defd3e8ef00fe89d28021cf1ec6ffea496b2f9e4"
+      }
+    },
+    {
+      "name": "dist/v4/web.js",
+      "digest": {
+        "sha256": "c46c9e61a7905758e54fb572ccbcd21dcf68bf8630832c44c9d01579debd842c"
+      }
     }
   ],
   "predicateType": "https://slsa.dev/provenance/v1",
@@ -121,26 +169,26 @@
     "buildDefinition": {
       "buildType": "https://batoi.com/uif/npm-workspace-build/v1",
       "externalParameters": {
-        "version": "4.0.0-alpha.2",
+        "version": "4.0.0-alpha.3",
         "command": "npm run build"
       },
       "internalParameters": {
         "runtimeDependencies": "workspace-only",
         "sourceMaps": false,
-        "sourceInputCount": 170,
+        "sourceInputCount": 181,
         "sourceDigestFormat": "SHA-256 of sorted JSON relative-path to SHA-256 input map"
       },
       "resolvedDependencies": [
         {
           "uri": "file:package-lock.json",
           "digest": {
-            "sha256": "e2a3ed6f519544bb4e8bf10d72a55d645b918826d5c656e1680647e6416746ff"
+            "sha256": "18af0c59d17f342f107f0f847554e639ddfc4839b4885947ba03bb4ef84d5543"
           }
         },
         {
           "uri": "uif:workspace-build-inputs",
           "digest": {
-            "sha256": "736429d7247357e735de42b41d3dc58075a2236cbc701e5a8eb471a67b23e94d"
+            "sha256": "556b491f1e0715991ce3f872896e712044b390515e6b18fd5448692c86df187f"
           }
         }
       ]
@@ -150,7 +198,7 @@
         "id": "https://github.com/batoisystems/batoi-uif/.github/workflows/ci.yml"
       },
       "metadata": {
-        "invocationId": "batoi-uif-4.0.0-alpha.2",
+        "invocationId": "batoi-uif-4.0.0-alpha.3",
         "startedOn": null,
         "finishedOn": null
       }

@@ -36,6 +36,10 @@ import { initRouter } from './packages/router/src/index.js';
 import { bindDeclarativeFilters, initTable } from './packages/table/src/index.js';
 import { claimApplicationRoot } from './packages/core/src/ownership.js';
 export { createUIF, startEssential } from './packages/profiles/src/essential.js';
+export { startWeb } from './packages/profiles/src/v4/web.js';
+export { startRAD } from './packages/profiles/src/v4/rad.js';
+export { startMobile } from './packages/profiles/src/v4/mobile.js';
+export { startDesktop } from './packages/profiles/src/v4/desktop.js';
 
 export * from './packages/core/src/index.js';
 export * from './packages/actions/src/index.js';

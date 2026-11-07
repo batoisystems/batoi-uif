@@ -1,6 +1,6 @@
 // src/index.ts
 import { isSafeURL, setTrustedHTML } from "@batoi/uif-dom";
-import { parseUIFConfiguration } from "@batoi/uif-core";
+import { parseUIFConfiguration } from "@batoi/uif-core/contracts";
 function esc(value) {
   return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }

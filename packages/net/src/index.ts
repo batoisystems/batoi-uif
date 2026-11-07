@@ -1,4 +1,4 @@
-import { emit } from '@batoi/uif-core';
+import { emit } from '@batoi/uif-core/runtime';
 
 export interface RequestOptions extends RequestInit {
   timeout?: number;
@@ -77,8 +77,18 @@ function isRetryableError(error: unknown): boolean {
   return status === undefined || status === 408 || status === 429 || status >= 500;
 }
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
+function throwIfAborted(signal: AbortSignal): void {
+  // Normalize across browser/frame/Node realms for framework abort consumers.
+  if (signal.aborted) throw new DOMException('Request aborted', 'AbortError');
+}
+
+function delay(ms: number, signal: AbortSignal): Promise<void> {
+  throwIfAborted(signal);
+  return new Promise((resolve, reject) => {
+    const abort = () => { window.clearTimeout(timer); reject(new DOMException('Request aborted', 'AbortError')); };
+    const timer = window.setTimeout(() => { signal.removeEventListener('abort', abort); resolve(); }, ms);
+    signal.addEventListener('abort', abort, { once: true });
+  });
 }
 
 function requestKey(url: string, options: RequestOptions): string {
@@ -112,6 +122,7 @@ export async function request<T = unknown>(url: string, options: RequestOptions 
   const runner = async (): Promise<T> => {
     for (const interceptor of requestInterceptors) {
       const next = await interceptor(url, req);
+      throwIfAborted(controller.signal);
       if (next) req = { ...next, signal: controller.signal };
     }
 
@@ -121,14 +132,18 @@ export async function request<T = unknown>(url: string, options: RequestOptions 
     let lastError: unknown;
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
       try {
+        throwIfAborted(controller.signal);
         let response = await fetch(url, req);
+        throwIfAborted(controller.signal);
         for (const interceptor of responseInterceptors) {
           const next = await interceptor(response);
+          throwIfAborted(controller.signal);
           if (next) response = next;
         }
 
         emit('uif:response', { url, response, attempt });
         const data = await parseResponse(response, req.parseAs);
+        throwIfAborted(controller.signal);
         emit(response.ok ? 'uif:success' : 'uif:error', { url, response, data, attempt });
 
         if (!response.ok) {
@@ -141,9 +156,10 @@ export async function request<T = unknown>(url: string, options: RequestOptions 
 
         return data as T;
       } catch (error) {
+        throwIfAborted(controller.signal);
         lastError = error;
         if (attempt >= attempts || controller.signal.aborted || !isRetryableError(error)) break;
-        await delay(req.retryDelay ?? 250 * attempt);
+        await delay(req.retryDelay ?? 250 * attempt, controller.signal);
       }
     }
     emit('uif:error', { url, error: lastError });

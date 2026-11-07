@@ -1,0 +1,3 @@
+{
+  "html": "<div data-uif-role=\"tablist\" aria-label=\"Record sections\"><button data-uif-role=\"tab\">Summary</button><button data-uif-role=\"tab\">History</button></div><section data-uif-role=\"tabpanel\">Refreshed summary</section><section data-uif-role=\"tabpanel\">Refreshed history</section>"
+}

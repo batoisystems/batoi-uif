@@ -16,7 +16,7 @@ export default defineConfig(({ command }) => ({
       mkdirSync(here('./dist/examples'), { recursive: true });
       cpSync(here('../../docs'), here('./dist/reference'), { recursive: true });
       cpSync(here('../../dist/v4'), here('./dist/dist/v4'), { recursive: true });
-      cpSync(here('../../examples/v4-essential'), here('./dist/examples/v4-essential'), { recursive: true });
+      for (const name of ['essential', 'web', 'rad', 'mobile', 'desktop']) cpSync(here(`../../examples/v4-${name}`), here(`./dist/examples/v4-${name}`), { recursive: true });
     },
   }],
 }));

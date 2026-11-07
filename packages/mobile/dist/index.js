@@ -2,6 +2,22 @@
 var mobileControllers = /* @__PURE__ */ new WeakMap();
 var segmentedControllers = /* @__PURE__ */ new WeakMap();
 var offlineBanner = null;
+function initNetworkStatus(el) {
+  const update = () => {
+    const online = navigator.onLine;
+    el.dataset.uifState = online ? "online" : "offline";
+    el.textContent = online ? el.dataset.uifOnlineLabel ?? "Online" : el.dataset.uifOfflineLabel ?? "Offline";
+  };
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
+  window.addEventListener("online", update);
+  window.addEventListener("offline", update);
+  update();
+  return { refresh: update, destroy() {
+    window.removeEventListener("online", update);
+    window.removeEventListener("offline", update);
+  } };
+}
 function initMobileShell(el) {
   const existing = mobileControllers.get(el);
   if (existing) return existing;
@@ -108,6 +124,7 @@ var mobileShell = { name: "mobile-shell", init: initMobileShell };
 export {
   hideOfflineBanner,
   initMobileShell,
+  initNetworkStatus,
   initPullToRefresh,
   initSegmentedControl,
   initSheetModal,

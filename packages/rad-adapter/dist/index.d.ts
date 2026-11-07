@@ -19,6 +19,10 @@ interface RadResponse {
         [key: string]: unknown;
     }>;
 }
+interface ScopedRadOptions {
+    /** Remount only application-owned controls after governed server HTML changes. */
+    afterSwap?(target: HTMLElement): void;
+}
 declare const radEnvelopeContract: Readonly<{
     name: "rad-partial";
     versions: readonly [1, 2];
@@ -35,6 +39,8 @@ declare const radEnvelopeContract: Readonly<{
 declare function swapContent(targetEl: HTMLElement, html: string, mode?: string): HTMLElement;
 declare function rehydrate(targetEl: HTMLElement): void;
 declare function loadPartial(sourceEl: HTMLElement): Promise<RadResponse | null>;
+/** Selected v4 binding. Server HTML remains trusted; selectors stay root-scoped. */
+declare function bindScopedRadActions(root: Document | HTMLElement, options?: ScopedRadOptions): () => void;
 declare function bindRadActions(root?: Document | HTMLElement): () => void;
 
-export { type RadResponse, type SwapMode, bindRadActions, loadPartial, radEnvelopeContract, rehydrate, swapContent };
+export { type RadResponse, type ScopedRadOptions, type SwapMode, bindRadActions, bindScopedRadActions, loadPartial, radEnvelopeContract, rehydrate, swapContent };

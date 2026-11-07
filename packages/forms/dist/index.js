@@ -1,5 +1,5 @@
 // src/index.ts
-import { emit } from "@batoi/uif-core";
+import { emit } from "@batoi/uif-core/runtime";
 import { isSafeURL, swapTrustedHTML } from "@batoi/uif-dom";
 import { cancelRequest, request } from "@batoi/uif-net";
 var ruleHandlers = {
@@ -103,10 +103,19 @@ function ensureFieldId(field, name) {
   if (!field.id) field.id = `uif-field-${cssEscape(name).replace(/\\/g, "-")}-${++fieldIdSequence}`;
   return field.id;
 }
-function swap(target, html, mode = "inner") {
+function ownTarget(target, scope) {
+  if (scope && target && target !== scope.root && !scope.root.contains(target)) throw new Error("UIF_FORM_TARGET_SCOPE");
+  return target;
+}
+function swap(target, html, mode = "inner", scope) {
   if (!target) return;
+  ownTarget(target, scope);
   const safeMode = ["inner", "outer", "append", "prepend", "before", "after"].includes(mode) ? mode : "inner";
+  if (scope && target === scope.root && ["outer", "before", "after"].includes(safeMode)) throw new Error("UIF_FORM_ROOT_REPLACEMENT");
+  const parent = target.parentElement;
   swapTrustedHTML(target, html, safeMode);
+  const affected = ["outer", "before", "after"].includes(safeMode) ? parent : target;
+  if (scope && affected && (affected === scope.root || scope.root.contains(affected))) scope.afterSwap?.(affected);
 }
 function validateField(fieldEl) {
   const form2 = fieldEl.form;
@@ -203,10 +212,10 @@ async function validateFormAsync(formEl) {
     if (validationControllers.get(formEl) === controller) validationControllers.delete(formEl);
   }
 }
-function setFormState(formEl, state) {
+function setFormState(formEl, state, detail = {}) {
   formEl.dataset.uifState = state;
   formEl.toggleAttribute("aria-busy", state === "submitting");
-  emit(`uif:form-${state}`, { form: formEl }, formEl);
+  emit(`uif:form-${state}`, { form: formEl, ...detail }, formEl);
 }
 function formRequest(formEl, url, method) {
   const data = new FormData(formEl);
@@ -239,10 +248,19 @@ function initRepeatableGroup(root) {
   return controller;
 }
 function initForm(formEl) {
+  return mountForm(formEl);
+}
+function initScopedForm(formEl, options) {
+  if (formEl !== options.root && !options.root.contains(formEl)) throw new Error("UIF_FORM_TARGET_SCOPE");
+  return mountForm(formEl, options);
+}
+function mountForm(formEl, scope) {
   const existing = formControllers.get(formEl);
   if (existing) return existing;
   const listenerController = new AbortController();
   const repeatables = /* @__PURE__ */ new Set();
+  let destroyed = false;
+  let revision = 0;
   formEl.dataset.uifState ||= "idle";
   const refresh = () => formEl.querySelectorAll('[data-uif="repeatable"]').forEach((root) => repeatables.add(initRepeatableGroup(root)));
   refresh();
@@ -265,6 +283,9 @@ function initForm(formEl) {
   );
   formEl.addEventListener("submit", async (event) => {
     event.preventDefault();
+    const operation = ++revision;
+    const previous = submitKeys.get(formEl);
+    if (previous) cancelRequest(previous);
     clearErrors(formEl);
     if (formEl.dataset.uifValidate !== "false") {
       let errors;
@@ -272,21 +293,25 @@ function initForm(formEl) {
         errors = await validateFormAsync(formEl);
       } catch (error) {
         if (isAbortError(error)) return;
-        throw error;
+        if (!destroyed && operation === revision) {
+          setFormState(formEl, "error", { error });
+        }
+        return;
       }
+      if (destroyed || operation !== revision) return;
       if (Object.keys(errors).length) {
         showErrors(formEl, errors);
         showErrorSummary(formEl, errors);
-        setFormState(formEl, "error");
+        setFormState(formEl, "error", { errors });
         return;
       }
     }
+    if (destroyed || operation !== revision || scope && !scope.root.contains(formEl)) return;
     setFormState(formEl, "submitting");
     const url = formEl.dataset.uifSrc || formEl.getAttribute("action") || window.location.href;
-    if (!isSafeURL(url, { context: "network", allowHash: false, sameOrigin: formEl.dataset.uifAllowCrossOrigin !== "true" })) {
+    if (!isSafeURL(url, { context: "network", allowHash: false, sameOrigin: formEl.dataset.uifAllowCrossOrigin !== "true", requireCapability: formEl.dataset.uifAllowCrossOrigin === "true" })) {
       const error = new Error("Batoi UIF blocked an unsafe form action URL");
-      formEl.dispatchEvent(new CustomEvent("uif:form-error", { detail: { form: formEl, error }, bubbles: true }));
-      setFormState(formEl, "error");
+      setFormState(formEl, "error", { error });
       return;
     }
     const requestedMethod = (formEl.dataset.uifMethod || formEl.getAttribute("method") || "POST").toUpperCase();
@@ -300,30 +325,51 @@ function initForm(formEl) {
         body: submission.body,
         key
       });
-      const target = resolveFormTarget(formEl);
+      if (destroyed || operation !== revision || scope && !scope.root.contains(formEl)) return;
+      const target = ownTarget(resolveFormTarget(formEl), scope);
       const mode = formEl.dataset.uifSwap || "inner";
+      const responseTarget = typeof result !== "string" && result?.target ? ownTarget(queryTarget(result.target), scope) : target;
+      if (typeof result !== "string" && result?.focus) ownTarget(queryTarget(result.focus), scope);
       if (typeof result === "string") {
-        swap(target, result, mode);
+        swap(target, result, mode, scope);
       } else if (result?.errors) {
         const errors = normalizedErrors(result.errors);
         showErrors(formEl, errors);
         showErrorSummary(formEl, errors);
-        setFormState(formEl, "error");
+        setFormState(formEl, "error", { errors });
         return;
-      } else if (result?.html) {
-        swap(result.target ? queryTarget(result.target) : target, result.html, result.swap || mode);
+      } else if (result?.html !== void 0) {
+        swap(responseTarget, result.html, result.swap || mode, scope);
       }
-      if (typeof result !== "string" && result?.focus) queryTarget(result.focus)?.focus();
+      if (destroyed || operation !== revision) return;
+      if (typeof result !== "string" && result?.focus) ownTarget(queryTarget(result.focus), scope)?.focus();
       setFormState(formEl, "success");
     } catch (error) {
-      if (isAbortError(error)) return;
-      formEl.dispatchEvent(new CustomEvent("uif:form-error", { detail: { form: formEl, error }, bubbles: true }));
-      setFormState(formEl, "error");
+      if (isAbortError(error) || destroyed || operation !== revision) return;
+      setFormState(formEl, "error", { error });
     }
+  }, { signal: listenerController.signal });
+  formEl.addEventListener("reset", () => {
+    revision++;
+    validationControllers.get(formEl)?.abort();
+    const key = submitKeys.get(formEl);
+    if (key) cancelRequest(key);
+    clearErrors(formEl);
+    formEl.querySelectorAll("[data-uif-dirty],[data-uif-touched]").forEach((field) => {
+      field.removeAttribute("data-uif-dirty");
+      field.removeAttribute("data-uif-touched");
+    });
+    delete formEl.dataset.uifDirty;
+    setFormState(formEl, "idle");
   }, { signal: listenerController.signal });
   const controller = {
     refresh,
     destroy() {
+      if (destroyed) return;
+      destroyed = true;
+      revision++;
+      formEl.removeAttribute("aria-busy");
+      if (formEl.dataset.uifState === "submitting") formEl.dataset.uifState = "idle";
       listenerController.abort();
       validationControllers.get(formEl)?.abort();
       validationControllers.delete(formEl);
@@ -347,6 +393,7 @@ export {
   form,
   initForm,
   initRepeatableGroup,
+  initScopedForm,
   registerAsyncRule,
   registerFieldAdapter,
   registerValidationMessage,

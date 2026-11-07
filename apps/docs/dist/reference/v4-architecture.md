@@ -21,6 +21,51 @@ wrappers into unimplemented advanced engines.
 - CSS foundation and family exports: selected by a generated style manifest.
 - `@batoi/uif-profiles/essential`: the common interactive web controls.
 
+The existing `profiles/rad`, `mobile` and `desktop` namespace entries are retained
+as broad v3 compatibility facades. The explicit v4 starters are different entries:
+
+| Profile | npm entry | Starter | Standalone assets |
+| --- | --- | --- | --- |
+| Essential | `@batoi/uif-profiles/essential` | `startEssential` | `dist/v4/essential.js` + `essential.css` |
+| Web | `@batoi/uif-profiles/v4/web` | `startWeb` | `web.js` + `web.css` |
+| RAD CRUD | `@batoi/uif-profiles/v4/rad` | `startRAD` | `rad.js` + `rad.css` |
+| Mobile web | `@batoi/uif-profiles/v4/mobile` | `startMobile` | `mobile.js` + `mobile.css` |
+| Desktop-style browser workspace | `@batoi/uif-profiles/v4/desktop` | `startDesktop` | `desktop.js` + `desktop.css` |
+
+Each starter imports nothing beyond its selected capability graph and mounts
+explicitly. Use one standalone profile JS/CSS pair per page, plus your external
+bootstrap; do not mix independently bundled profiles. Bundler users may import
+several starters from one resolved module graph for separate sibling roots. The
+full transitional bundle exports all five starters for legacy coexistence.
+`dist/v4/manifest.json` records each standalone graph, style families, complete
+compressed bytes, two runtime/style requests and SRI. Bootstrap, application
+HTML/data/assets and any later optional capability are additional costs. The
+compiled-package consumer tests independently bundle the actual npm subpaths.
+
+CSS profiles declare foundation, essential, navigation, forms, data, mobile and
+desktop dependencies. Conditional rules are selected recursively; shared selector
+lists stay intact. Reset/tokens/utilities/components/theme layers have explicit
+order. These are explicit family builds, not a purge against consumer markup.
+`full.css` deliberately retains every compatibility style. Profile CSS is
+standalone; importing two full profiles duplicates their shared foundation.
+
+RAD enhances native forms/tables plus `data-uif="ajax"` partials. Server HTML is a
+trusted integration boundary, not sanitized model output. Response swap, focus,
+loading and event targets stay within the app root; replacing the owned root is
+rejected. Inner swaps explicitly rehydrate selected controllers. Do not combine
+`data-uif="form"` with the ajax-submit contract on the same form. The generated
+RAD example uses static same-origin JSON fixtures: no persistence, authentication
+or server-side pagination service is implied. Large tables should use a real
+server-page endpoint. Direct legacy adapter/form APIs retain their broader scope;
+new `bindScopedRadActions` and `initScopedForm` expose the selected-root behavior.
+
+Mobile includes shell/segmented decoration, modal sheets and root-scoped browser
+connection hints. It requests no push permission and installs no service worker,
+offline queue or storage engine. Swipe/pull decorators are not gesture engines.
+Desktop enhances server-rendered shell/navigation/density and connection status;
+it does not render a native app or gain filesystem/tool authority. Persistent
+preferences require explicit, correctly partitioned application storage keys.
+
 Optional agent, Micro App, migration, editor, chart and authoring metadata must
 not enter the essential production graph. No framework package gains an external
 runtime dependency. Build/authoring tools run separately from browser code.

@@ -4,6 +4,31 @@ import { bindConnector, cancelRequest, get, post, request, upload, useRequestInt
 describe('net', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it('rejects an obsolete response even when its transport ignores abort', async () => {
+    let resolve: (response: Response) => void;
+    vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>((done) => { resolve = done; })));
+    const pending = request('/obsolete', { key: 'obsolete' });
+    const result = expect(pending).rejects.toMatchObject({ name: 'AbortError' });
+    cancelRequest('obsolete');
+    resolve!(Response.json({ stale: true }));
+    await result;
+  });
+
+  it('cancels a retry backoff immediately without a new request or retained timer', async () => {
+    vi.useFakeTimers();
+    const fetch = vi.fn(async () => new Response('busy', { status: 503 }));
+    vi.stubGlobal('fetch', fetch);
+    const pending = request('/retry-cancel', { key: 'retry-cancel', retries: 3, retryDelay: 30_000 });
+    const result = expect(pending).rejects.toMatchObject({ name: 'AbortError' });
+    await vi.advanceTimersByTimeAsync(0);
+    cancelRequest('retry-cancel');
+    await result;
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(vi.getTimerCount()).toBe(0);
   });
 
   it('performs GET and parses json', async () => {

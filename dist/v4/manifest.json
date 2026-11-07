@@ -1,31 +1,302 @@
 {
   "schemaVersion": 1,
   "contractVersion": 4,
-  "frameworkVersion": "4.0.0-alpha.2",
+  "frameworkVersion": "4.0.0-alpha.3",
+  "compression": {
+    "gzipLevel": 6,
+    "brotliQuality": 11,
+    "brotliMode": "generic"
+  },
   "artifacts": {
     "essential.js": {
-      "bytes": 25006,
-      "gzip": 8363,
-      "brotli": 7483,
-      "integrity": "sha384-tcrS8A3jgq7hIAGKP9V0OHQhuob120ozIj8dToSahABwhKwFsFLZ3D9mUmZwiSXD"
+      "bytes": 25149,
+      "gzip": 8435,
+      "brotli": 7542,
+      "integrity": "sha384-QcHce6Y1GZT7JPlRaifm7tdDll25pJWie4pJum8aj+rCBQGjD5ijxsv0wShGUhjQ"
+    },
+    "web.js": {
+      "bytes": 31958,
+      "gzip": 10160,
+      "brotli": 9083,
+      "integrity": "sha384-y3U/tUUUJ6TXAVxp/2/rB7WyFm3hCY20xfOrmk5iIZqiz2UQc4tuSSddmAR1mu/s"
+    },
+    "rad.js": {
+      "bytes": 66440,
+      "gzip": 20206,
+      "brotli": 17999,
+      "integrity": "sha384-zio8Ls16FBM7EVTuHE3TupM++9KdcZ3HqxOUkX/x+rBb4naVdZSqglX17yyJZNoH"
+    },
+    "mobile.js": {
+      "bytes": 28517,
+      "gzip": 9237,
+      "brotli": 8232,
+      "integrity": "sha384-QNLmtlQCFLFt1iFNvVEcN/ZaRXbhQgHvtU64Z71yr4uQV07VMlQi6IO4G78vGmwh"
+    },
+    "desktop.js": {
+      "bytes": 32580,
+      "gzip": 10386,
+      "brotli": 9259,
+      "integrity": "sha384-BTCKuC7vjZ73kNnzqRskqvn0NSqmj+Rh5Xt9KBkwIy/xq6BIVdkQExwr69Ko1uAW"
     },
     "foundation.css": {
-      "bytes": 26808,
-      "gzip": 6035,
-      "brotli": 5149,
-      "integrity": "sha384-nUNMhsGLe+0EuggsGdJnGXHVMFwJuaRM+QbOenRddF/YByu+cco9tC49laiqo3iJ"
+      "bytes": 26657,
+      "gzip": 5864,
+      "brotli": 5001,
+      "integrity": "sha384-OP5u4euEZ3PdnpoCswQWJBkD6cCSCFvLqzukBl9UUn/LRBdrgKuS775Dpzv+tipg"
     },
     "essential.css": {
-      "bytes": 32583,
-      "gzip": 7007,
-      "brotli": 6032,
-      "integrity": "sha384-LjDQYfF71+Immipq2L/q3FLB75ZDorQHSgJCIXXBitOCt8NiVES4Aj+AD8FQOey8"
+      "bytes": 33650,
+      "gzip": 6996,
+      "brotli": 6013,
+      "integrity": "sha384-a/SL0ZSsdVkFEKBEAfViEafYuTNqmio9uz9jQsh48AeuSoAqXqRSj6ZnP5rMzIU5"
+    },
+    "web.css": {
+      "bytes": 45639,
+      "gzip": 8616,
+      "brotli": 7411,
+      "integrity": "sha384-5MVoCd5Y5LeIm9++I2TbgVP6bIlCkT/AiZ2UYuvgulLNTh0TLAL9HPDHP/Utc+h7"
+    },
+    "rad.css": {
+      "bytes": 50300,
+      "gzip": 9248,
+      "brotli": 8009,
+      "integrity": "sha384-eh23sxBWc9trNxa1nIDe7ybzhvbINCh5WuN8UJhZbDsRk4cBFSjpWrV1pOs5Z9KI"
+    },
+    "mobile.css": {
+      "bytes": 45656,
+      "gzip": 8637,
+      "brotli": 7453,
+      "integrity": "sha384-NVTQXCC6TfoYDzsa46oOnzztTuI8uWqiAPhiyY9CSiw5V4FeSk2d3kPIkl+ChKke"
+    },
+    "desktop.css": {
+      "bytes": 54559,
+      "gzip": 9548,
+      "brotli": 8268,
+      "integrity": "sha384-I802dje6BS0KKfWVoTXkArNJvftWlZMiNc1sL3at/TC+pbcoROuFFWv3XoiJVWuH"
     },
     "full.css": {
       "bytes": 93102,
       "gzip": 15308,
       "brotli": 12966,
       "integrity": "sha384-FZR3CcVaoX/CpeG4kCrISJ4kljC3rdlmyJYQLMZPQGF+k0syhZ3/Vg9hwZ5wu3a/"
+    }
+  },
+  "consumers": {
+    "essential": {
+      "inputs": [
+        "packages/components/src/application.ts",
+        "packages/components/src/controller.ts",
+        "packages/components/src/controls/accordion.ts",
+        "packages/components/src/controls/collapse.ts",
+        "packages/components/src/controls/dropdown.ts",
+        "packages/components/src/controls/modal.ts",
+        "packages/components/src/controls/notification.ts",
+        "packages/components/src/controls/tabs.ts",
+        "packages/components/src/controls/toast.ts",
+        "packages/components/src/internal.ts",
+        "packages/core/src/compatibility.ts",
+        "packages/core/src/component-registry.ts",
+        "packages/core/src/contracts.ts",
+        "packages/core/src/ownership.ts",
+        "packages/core/src/resource-scope.ts",
+        "packages/core/src/runtime.ts",
+        "packages/core/src/storage-partition.ts",
+        "packages/effects/src/index.ts",
+        "packages/overlays/src/index.ts",
+        "packages/profiles/src/essential.ts",
+        "packages/profiles/src/selected.ts"
+      ],
+      "styles": [
+        "foundation",
+        "essential"
+      ],
+      "javascript": "essential.js",
+      "css": "essential.css",
+      "initialRequests": 2,
+      "gzipBytes": {
+        "javascript": 8435,
+        "css": 6996,
+        "total": 15431
+      }
+    },
+    "web": {
+      "inputs": [
+        "packages/components/src/application.ts",
+        "packages/components/src/controller.ts",
+        "packages/components/src/controls/accordion.ts",
+        "packages/components/src/controls/collapse.ts",
+        "packages/components/src/controls/combobox.ts",
+        "packages/components/src/controls/drawer.ts",
+        "packages/components/src/controls/dropdown.ts",
+        "packages/components/src/controls/modal.ts",
+        "packages/components/src/controls/notification.ts",
+        "packages/components/src/controls/shell.ts",
+        "packages/components/src/controls/tabs.ts",
+        "packages/components/src/controls/toast.ts",
+        "packages/components/src/internal.ts",
+        "packages/core/src/compatibility.ts",
+        "packages/core/src/component-registry.ts",
+        "packages/core/src/contracts.ts",
+        "packages/core/src/ownership.ts",
+        "packages/core/src/resource-scope.ts",
+        "packages/core/src/runtime.ts",
+        "packages/core/src/storage-partition.ts",
+        "packages/effects/src/index.ts",
+        "packages/overlays/src/index.ts",
+        "packages/profiles/src/selected.ts",
+        "packages/profiles/src/v4/web.ts",
+        "packages/profiles/src/web-components.ts"
+      ],
+      "styles": [
+        "foundation",
+        "essential",
+        "navigation",
+        "forms"
+      ],
+      "javascript": "web.js",
+      "css": "web.css",
+      "initialRequests": 2,
+      "gzipBytes": {
+        "javascript": 10160,
+        "css": 8616,
+        "total": 18776
+      }
+    },
+    "rad": {
+      "inputs": [
+        "packages/components/src/application.ts",
+        "packages/components/src/controller.ts",
+        "packages/components/src/controls/accordion.ts",
+        "packages/components/src/controls/collapse.ts",
+        "packages/components/src/controls/combobox.ts",
+        "packages/components/src/controls/drawer.ts",
+        "packages/components/src/controls/dropdown.ts",
+        "packages/components/src/controls/modal.ts",
+        "packages/components/src/controls/notification.ts",
+        "packages/components/src/controls/shell.ts",
+        "packages/components/src/controls/tabs.ts",
+        "packages/components/src/controls/toast.ts",
+        "packages/components/src/internal.ts",
+        "packages/core/src/compatibility.ts",
+        "packages/core/src/component-registry.ts",
+        "packages/core/src/contracts.ts",
+        "packages/core/src/ownership.ts",
+        "packages/core/src/resource-scope.ts",
+        "packages/core/src/runtime.ts",
+        "packages/core/src/storage-partition.ts",
+        "packages/dom/src/index.ts",
+        "packages/effects/src/index.ts",
+        "packages/forms/src/index.ts",
+        "packages/net/src/index.ts",
+        "packages/overlays/src/index.ts",
+        "packages/profiles/src/selected.ts",
+        "packages/profiles/src/v4/rad.ts",
+        "packages/profiles/src/web-components.ts",
+        "packages/rad-adapter/src/index.ts",
+        "packages/table/src/index.ts"
+      ],
+      "styles": [
+        "foundation",
+        "essential",
+        "navigation",
+        "forms",
+        "data"
+      ],
+      "javascript": "rad.js",
+      "css": "rad.css",
+      "initialRequests": 2,
+      "gzipBytes": {
+        "javascript": 20206,
+        "css": 9248,
+        "total": 29454
+      }
+    },
+    "mobile": {
+      "inputs": [
+        "packages/components/src/application.ts",
+        "packages/components/src/controller.ts",
+        "packages/components/src/controls/accordion.ts",
+        "packages/components/src/controls/collapse.ts",
+        "packages/components/src/controls/drawer.ts",
+        "packages/components/src/controls/dropdown.ts",
+        "packages/components/src/controls/modal.ts",
+        "packages/components/src/controls/notification.ts",
+        "packages/components/src/controls/tabs.ts",
+        "packages/components/src/controls/toast.ts",
+        "packages/components/src/internal.ts",
+        "packages/core/src/compatibility.ts",
+        "packages/core/src/component-registry.ts",
+        "packages/core/src/contracts.ts",
+        "packages/core/src/ownership.ts",
+        "packages/core/src/resource-scope.ts",
+        "packages/core/src/runtime.ts",
+        "packages/core/src/storage-partition.ts",
+        "packages/effects/src/index.ts",
+        "packages/mobile/src/index.ts",
+        "packages/overlays/src/index.ts",
+        "packages/profiles/src/selected.ts",
+        "packages/profiles/src/v4/mobile.ts"
+      ],
+      "styles": [
+        "foundation",
+        "essential",
+        "navigation",
+        "mobile"
+      ],
+      "javascript": "mobile.js",
+      "css": "mobile.css",
+      "initialRequests": 2,
+      "gzipBytes": {
+        "javascript": 9237,
+        "css": 8637,
+        "total": 17874
+      }
+    },
+    "desktop": {
+      "inputs": [
+        "packages/components/src/application.ts",
+        "packages/components/src/controller.ts",
+        "packages/components/src/controls/accordion.ts",
+        "packages/components/src/controls/collapse.ts",
+        "packages/components/src/controls/combobox.ts",
+        "packages/components/src/controls/drawer.ts",
+        "packages/components/src/controls/dropdown.ts",
+        "packages/components/src/controls/modal.ts",
+        "packages/components/src/controls/notification.ts",
+        "packages/components/src/controls/shell.ts",
+        "packages/components/src/controls/tabs.ts",
+        "packages/components/src/controls/toast.ts",
+        "packages/components/src/internal.ts",
+        "packages/core/src/compatibility.ts",
+        "packages/core/src/component-registry.ts",
+        "packages/core/src/contracts.ts",
+        "packages/core/src/ownership.ts",
+        "packages/core/src/resource-scope.ts",
+        "packages/core/src/runtime.ts",
+        "packages/core/src/storage-partition.ts",
+        "packages/desktop/src/index.ts",
+        "packages/dom/src/index.ts",
+        "packages/effects/src/index.ts",
+        "packages/overlays/src/index.ts",
+        "packages/profiles/src/selected.ts",
+        "packages/profiles/src/v4/desktop.ts",
+        "packages/profiles/src/web-components.ts"
+      ],
+      "styles": [
+        "foundation",
+        "essential",
+        "navigation",
+        "forms",
+        "desktop"
+      ],
+      "javascript": "desktop.js",
+      "css": "desktop.css",
+      "initialRequests": 2,
+      "gzipBytes": {
+        "javascript": 10386,
+        "css": 9548,
+        "total": 19934
+      }
     }
   },
   "initialRequests": 2,
@@ -49,6 +320,8 @@
     "packages/core/src/storage-partition.ts",
     "packages/effects/src/index.ts",
     "packages/overlays/src/index.ts",
-    "packages/profiles/src/essential.ts"
-  ]
+    "packages/profiles/src/essential.ts",
+    "packages/profiles/src/selected.ts"
+  ],
+  "note": "Include exactly one standalone profile; each owns its module graph. Bootstrap, app content/assets and optional lazy features are additional."
 }

@@ -1,30 +1,13 @@
+import {
+  startSelected
+} from "./chunk-BWRGULYP.js";
+
 // src/essential.ts
 import { createUIF } from "@batoi/uif-components/application";
-import { initModal } from "@batoi/uif-components/modal";
-import { initDropdown } from "@batoi/uif-components/dropdown";
-import { initTabs } from "@batoi/uif-components/tabs";
-import { initAccordion } from "@batoi/uif-components/accordion";
-import { initCollapse } from "@batoi/uif-components/collapse";
-import { initToast } from "@batoi/uif-components/toast";
-import { createUIF as createUIF2 } from "@batoi/uif-components/application";
 function startEssential(root = document) {
-  const app = createUIF(root, [
-    { name: "modal", init: initModal },
-    { name: "dropdown", init: initDropdown },
-    { name: "tabs", init: initTabs },
-    { name: "accordion", init: initAccordion },
-    { name: "collapse", init: initCollapse },
-    { name: "toast", init: initToast }
-  ]);
-  try {
-    app.refresh();
-    return app;
-  } catch (error) {
-    app.destroy();
-    throw error;
-  }
+  return startSelected(root);
 }
 export {
-  createUIF2 as createUIF,
+  createUIF,
   startEssential
 };

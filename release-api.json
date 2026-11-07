@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "version": "4.0.0-alpha.2",
+  "version": "4.0.0-alpha.3",
   "packages": {
     "actions": {
       "exports": [
@@ -871,10 +871,12 @@
         "FormController",
         "FormErrors",
         "RepeatableController",
+        "ScopedFormOptions",
         "clearErrors",
         "form",
         "initForm",
         "initRepeatableGroup",
+        "initScopedForm",
         "registerAsyncRule",
         "registerFieldAdapter",
         "registerValidationMessage",
@@ -888,10 +890,12 @@
         "FormController": "efd183679a417c88fdd650f5f0c9a9d406eea7a000ec90aacf163d2cc9725e65",
         "FormErrors": "20c2636c4ccb60d315f17629a519d8394922b94eb8fa1575a7f47505e170ad47",
         "RepeatableController": "a63e90c88b2b8c2bf43572f4777c7a384d9339f71e347cf5b37e89ad5f5e4f12",
+        "ScopedFormOptions": "3f219bf61ba017f8006b18708a8110e13f37f5324ab0e4a9313d13e90f0de1fd",
         "clearErrors": "8e2fbcdf9ffc4bd3cebc044e909a28b018c60a377f76b209e3762c6a5a584935",
         "form": "b4c797766107a6824dbe67f9ddd7b32e84feea83582d6b27b88734cfad8059b1",
         "initForm": "68240591ff1b59fe1742689199eae83b0fab076aac7ce1c280d64ba19896712e",
         "initRepeatableGroup": "dd6274d5002eb29bf4c481ee7f91e9b126827fc3dcfb32911ad5735552cdd437",
+        "initScopedForm": "76e3a72d3ce3401bdf59a7c641eea61b99b96faa9e317ace26550dfdc7fb2196",
         "registerAsyncRule": "d8cdae66ba3e038a283eb49ed3b1dc02c6452e80028e43865328e158ca44dac7",
         "registerFieldAdapter": "576e05200663e06399472823235668012ace081c5cc683e1debacddcc07499a7",
         "registerValidationMessage": "a3b93ab95c1392e11db38f2aaf5c09138ee88734d0b925976ae9b0754632b54e",
@@ -1037,6 +1041,7 @@
         "MobileController",
         "hideOfflineBanner",
         "initMobileShell",
+        "initNetworkStatus",
         "initPullToRefresh",
         "initSegmentedControl",
         "initSheetModal",
@@ -1048,6 +1053,7 @@
         "MobileController": "1f135d194144e3bff27134b2e70e130bf401e4af1219019216e1b5c36754ea91",
         "hideOfflineBanner": "0b8afa138d211ab2e58b06d80751889c8673152e0a75feb4326b23e503ed293c",
         "initMobileShell": "8b7018bed0d12b70a9f7664eb0c1ea1dad81dee7f227f7f2b6d280f6412425e3",
+        "initNetworkStatus": "ff824c8fde99425de8de5f08b227ae8a83399233d5ac0ebf329d95bf67c9318d",
         "initPullToRefresh": "eae238097215326a98aa67dd5fe756c7a7a7b1587ed71450924c3383770b01e2",
         "initSegmentedControl": "77372205ae7718fd06e0cfe628d898faf1643cb5964086ba3ed057d985a3913f",
         "initSheetModal": "fc587a796529524b25a6acf9e61891f32ad7beebb1260249ea552bd397c39128",
@@ -1243,8 +1249,10 @@
     "rad-adapter": {
       "exports": [
         "RadResponse",
+        "ScopedRadOptions",
         "SwapMode",
         "bindRadActions",
+        "bindScopedRadActions",
         "loadPartial",
         "radEnvelopeContract",
         "rehydrate",
@@ -1252,8 +1260,10 @@
       ],
       "signatures": {
         "RadResponse": "d4c82b07de0a5773321ba593d193aabb8a0b75e0283cc073204def0240e048fc",
+        "ScopedRadOptions": "6c18e04166242718a58aa271fafd18a1e67f9c2c78822b06a48d514dff60192e",
         "SwapMode": "de31775fd78cb08bf0a110630e15c718bbd8c1f53f8a40910288a0e493240b5a",
         "bindRadActions": "bf631a04426a872fe83bc876cc5ba48064a7c6a9d16990d9893512480809269f",
+        "bindScopedRadActions": "ffef82333b330feccce6c816269a968722aa007e036d71edb34eec0d5b728cee",
         "loadPartial": "7d658824ea272c1edd08bd4b8de3256ab7bb7725e69fd5bbda84d46418cbad53",
         "radEnvelopeContract": "272627de443e2802404d1fb087d1ddbf2bcce6b47e389b3a3c0522b023065d31",
         "rehydrate": "c215eb698bf67a34fb1633de3f04b3b7b1ca8f8c42449d0ebebed3d81a63eb44",
@@ -2597,10 +2607,12 @@
         "FormController",
         "FormErrors",
         "RepeatableController",
+        "ScopedFormOptions",
         "clearErrors",
         "form",
         "initForm",
         "initRepeatableGroup",
+        "initScopedForm",
         "registerAsyncRule",
         "registerFieldAdapter",
         "registerValidationMessage",
@@ -2614,10 +2626,12 @@
         "FormController": "efd183679a417c88fdd650f5f0c9a9d406eea7a000ec90aacf163d2cc9725e65",
         "FormErrors": "20c2636c4ccb60d315f17629a519d8394922b94eb8fa1575a7f47505e170ad47",
         "RepeatableController": "a63e90c88b2b8c2bf43572f4777c7a384d9339f71e347cf5b37e89ad5f5e4f12",
+        "ScopedFormOptions": "3f219bf61ba017f8006b18708a8110e13f37f5324ab0e4a9313d13e90f0de1fd",
         "clearErrors": "8e2fbcdf9ffc4bd3cebc044e909a28b018c60a377f76b209e3762c6a5a584935",
         "form": "b4c797766107a6824dbe67f9ddd7b32e84feea83582d6b27b88734cfad8059b1",
         "initForm": "68240591ff1b59fe1742689199eae83b0fab076aac7ce1c280d64ba19896712e",
         "initRepeatableGroup": "dd6274d5002eb29bf4c481ee7f91e9b126827fc3dcfb32911ad5735552cdd437",
+        "initScopedForm": "76e3a72d3ce3401bdf59a7c641eea61b99b96faa9e317ace26550dfdc7fb2196",
         "registerAsyncRule": "d8cdae66ba3e038a283eb49ed3b1dc02c6452e80028e43865328e158ca44dac7",
         "registerFieldAdapter": "576e05200663e06399472823235668012ace081c5cc683e1debacddcc07499a7",
         "registerValidationMessage": "a3b93ab95c1392e11db38f2aaf5c09138ee88734d0b925976ae9b0754632b54e",
@@ -2911,6 +2925,7 @@
         "MobileController",
         "hideOfflineBanner",
         "initMobileShell",
+        "initNetworkStatus",
         "initPullToRefresh",
         "initSegmentedControl",
         "initSheetModal",
@@ -2922,6 +2937,7 @@
         "MobileController": "1f135d194144e3bff27134b2e70e130bf401e4af1219019216e1b5c36754ea91",
         "hideOfflineBanner": "0b8afa138d211ab2e58b06d80751889c8673152e0a75feb4326b23e503ed293c",
         "initMobileShell": "8b7018bed0d12b70a9f7664eb0c1ea1dad81dee7f227f7f2b6d280f6412425e3",
+        "initNetworkStatus": "ff824c8fde99425de8de5f08b227ae8a83399233d5ac0ebf329d95bf67c9318d",
         "initPullToRefresh": "eae238097215326a98aa67dd5fe756c7a7a7b1587ed71450924c3383770b01e2",
         "initSegmentedControl": "77372205ae7718fd06e0cfe628d898faf1643cb5964086ba3ed057d985a3913f",
         "initSheetModal": "fc587a796529524b25a6acf9e61891f32ad7beebb1260249ea552bd397c39128",
@@ -3278,6 +3294,38 @@
         "table": "0bc003e9ba65aa151bc0c048a8c839433613fa14993614d05a4b1b095f6a94dd"
       }
     },
+    "@batoi/uif-profiles/v4/desktop": {
+      "exports": [
+        "startDesktop"
+      ],
+      "signatures": {
+        "startDesktop": "5fcdc654094c73f2affde313f2b291dcac9cd8d01da2c3b13bee7ce4b9193e16"
+      }
+    },
+    "@batoi/uif-profiles/v4/mobile": {
+      "exports": [
+        "startMobile"
+      ],
+      "signatures": {
+        "startMobile": "e8a5490784e51e3a3f1060b851c5a6c69f0512798cc78f58cadb154e69da05a9"
+      }
+    },
+    "@batoi/uif-profiles/v4/rad": {
+      "exports": [
+        "startRAD"
+      ],
+      "signatures": {
+        "startRAD": "a483df823cb5930fb3c11d2442f1bdbc1311668c306d3a0041d77d59cfd6698a"
+      }
+    },
+    "@batoi/uif-profiles/v4/web": {
+      "exports": [
+        "startWeb"
+      ],
+      "signatures": {
+        "startWeb": "51e3a4de312c2bcd615f9a0fcf0064c9a408b9cd6634068b084fd4646874bfb6"
+      }
+    },
     "@batoi/uif-push": {
       "exports": [
         "NotificationItem",
@@ -3381,8 +3429,10 @@
     "@batoi/uif-rad-adapter": {
       "exports": [
         "RadResponse",
+        "ScopedRadOptions",
         "SwapMode",
         "bindRadActions",
+        "bindScopedRadActions",
         "loadPartial",
         "radEnvelopeContract",
         "rehydrate",
@@ -3390,8 +3440,10 @@
       ],
       "signatures": {
         "RadResponse": "d4c82b07de0a5773321ba593d193aabb8a0b75e0283cc073204def0240e048fc",
+        "ScopedRadOptions": "6c18e04166242718a58aa271fafd18a1e67f9c2c78822b06a48d514dff60192e",
         "SwapMode": "de31775fd78cb08bf0a110630e15c718bbd8c1f53f8a40910288a0e493240b5a",
         "bindRadActions": "bf631a04426a872fe83bc876cc5ba48064a7c6a9d16990d9893512480809269f",
+        "bindScopedRadActions": "ffef82333b330feccce6c816269a968722aa007e036d71edb34eec0d5b728cee",
         "loadPartial": "7d658824ea272c1edd08bd4b8de3256ab7bb7725e69fd5bbda84d46418cbad53",
         "radEnvelopeContract": "272627de443e2802404d1fb087d1ddbf2bcce6b47e389b3a3c0522b023065d31",
         "rehydrate": "c215eb698bf67a34fb1633de3f04b3b7b1ca8f8c42449d0ebebed3d81a63eb44",
@@ -3691,6 +3743,8 @@
         "SafeHTMLRenderOptions",
         "SafeURLContext",
         "SafeURLPolicy",
+        "ScopedFormOptions",
+        "ScopedRadOptions",
         "ServiceWorkerOptions",
         "StoreOptions",
         "SummaryStats",
@@ -3801,6 +3855,7 @@
         "bindDesktopSettings",
         "bindRadActions",
         "bindRealtime",
+        "bindScopedRadActions",
         "brandIcons",
         "breadcrumb",
         "button",
@@ -3943,12 +3998,14 @@
         "initForm",
         "initInstallPrompt",
         "initMobileShell",
+        "initNetworkStatus",
         "initOfflineQueue",
         "initPullToRefresh",
         "initPush",
         "initRealtime",
         "initRepeatableGroup",
         "initRouter",
+        "initScopedForm",
         "initSegmentedControl",
         "initSheetModal",
         "initSwipeAction",
@@ -4096,7 +4153,11 @@
         "spinner",
         "stagger",
         "start",
+        "startDesktop",
         "startEssential",
+        "startMobile",
+        "startRAD",
+        "startWeb",
         "stepper",
         "submitForm",
         "subscribe",
@@ -4309,6 +4370,8 @@
         "SafeHTMLRenderOptions": "d85a7613e9f90b9f3cc271e24eb5e51678d58a4b07ea2b2a13c273e817f778b7",
         "SafeURLContext": "e087579c712b487b9ac4887aa4068ebe5787fb29a73eb2c310a59b8cb9b53d25",
         "SafeURLPolicy": "b951055f4749c5e125fd0f19cbd08fec50bf740ef1b462fc515bd730ab2aa43b",
+        "ScopedFormOptions": "3f219bf61ba017f8006b18708a8110e13f37f5324ab0e4a9313d13e90f0de1fd",
+        "ScopedRadOptions": "6c18e04166242718a58aa271fafd18a1e67f9c2c78822b06a48d514dff60192e",
         "ServiceWorkerOptions": "1e745b872f9f2ec98721e45e820d35d4e4a6115ba07a892a5b135d6294aa5e3f",
         "StoreOptions": "34dce14e958d569c7f49cb14cf66fb087afc3731a76bf52f4ca5ffda11f6f994",
         "SummaryStats": "ea1e425ad53d04eaa422f8408b67b2cd292bf371eaffa80a31fd7a43bbaaaf5c",
@@ -4419,6 +4482,7 @@
         "bindDesktopSettings": "07479ae4c1b10c474da4e392dea2b879093c7e17b578911624510642e4bfb25a",
         "bindRadActions": "bf631a04426a872fe83bc876cc5ba48064a7c6a9d16990d9893512480809269f",
         "bindRealtime": "355ab88b0f789d18a3c5efb96d144857a992b82173b7913328469dd051674ea9",
+        "bindScopedRadActions": "ffef82333b330feccce6c816269a968722aa007e036d71edb34eec0d5b728cee",
         "brandIcons": "8b8b3bd245823b0510e2ede5214ffa00cf97fd0eb26bcd75c5bbedb1cee8cdc3",
         "breadcrumb": "c0d332d29e64694812f6331d942339a08a40cb42d85668935c8ccbd7f747bcbf",
         "button": "ec31725b50135c70a74239c70846f71737b9128f3917f43370e091ba30f3e25e",
@@ -4561,12 +4625,14 @@
         "initForm": "68240591ff1b59fe1742689199eae83b0fab076aac7ce1c280d64ba19896712e",
         "initInstallPrompt": "00467c0529c76c4597a36d3084835208b9d8d61af4ef7d99fc36d5dd679f8cea",
         "initMobileShell": "8b7018bed0d12b70a9f7664eb0c1ea1dad81dee7f227f7f2b6d280f6412425e3",
+        "initNetworkStatus": "ff824c8fde99425de8de5f08b227ae8a83399233d5ac0ebf329d95bf67c9318d",
         "initOfflineQueue": "8381b7363fdc1bbb87edcd9f4e6ad1b2d9afa005d40c0c07f22b99ae8bed70a1",
         "initPullToRefresh": "eae238097215326a98aa67dd5fe756c7a7a7b1587ed71450924c3383770b01e2",
         "initPush": "151c216660310741ddc06a2e2a27517f7fe5417f1e3a5ae3bede0652520b94f5",
         "initRealtime": "3bafd1fa28723c7c9afdaa2dc4a9e347e5daa3b7f50129c1be7f08d62e082ab4",
         "initRepeatableGroup": "dd6274d5002eb29bf4c481ee7f91e9b126827fc3dcfb32911ad5735552cdd437",
         "initRouter": "815f16fe8da078d8d615ed0426282dad8db62ec90fcb74ed9a8f9284a775038d",
+        "initScopedForm": "76e3a72d3ce3401bdf59a7c641eea61b99b96faa9e317ace26550dfdc7fb2196",
         "initSegmentedControl": "77372205ae7718fd06e0cfe628d898faf1643cb5964086ba3ed057d985a3913f",
         "initSheetModal": "fc587a796529524b25a6acf9e61891f32ad7beebb1260249ea552bd397c39128",
         "initSwipeAction": "ea1aa8bd646dc8fe394fe0b74d1a80ceaffdd73870591a2aeb363c5e17c4fd82",
@@ -4714,7 +4780,11 @@
         "spinner": "33e7906f1ed0da5b98a1435ba1c33a4ede7bd9c7ae2c085f0488e482f8b2a006",
         "stagger": "44cd651702a3020224866247b4e81f5569d18efd35f6b95155e02bee4ea8e689",
         "start": "02b2b9d22e539526d9455db2c445012ba626e8745bf9c3955c44bacbdc26268f",
+        "startDesktop": "4644f9666efa045e0daa81ab03303d5addb39aedf3fe8c390d1813e212feabf6",
         "startEssential": "6e7245e770b3089bd8fad261e5abf3a78d197bcb699305713202e0b7418c2a10",
+        "startMobile": "648768c84a3c5692e27f03580b8dbcd7f77cba98c4776e57d3cf30e2150de6bd",
+        "startRAD": "c60d7d57effa7afc23d1e683f4cd905692e778856eff2b6899e69d1b7e068aba",
+        "startWeb": "e0b9b01a2f4bdf5b740911dfafefcc60cc8d9d6c81dda5bb3e49833483561b7e",
         "stepper": "99be6692c2868fe12965dc9cc79c36f43db387bad257c44d6660ab13920769c2",
         "submitForm": "86970ccf33f47873537ed5c7382da1686540b49ede0aec2caafe2675a1816849",
         "subscribe": "6b49892b1b0c755795067432b337983ec99af0d54d287a247a77464703844aa6",

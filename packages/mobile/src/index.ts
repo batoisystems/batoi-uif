@@ -4,6 +4,21 @@ const mobileControllers = new WeakMap<HTMLElement, MobileController>();
 const segmentedControllers = new WeakMap<HTMLElement, MobileController>();
 let offlineBanner: HTMLElement | null = null;
 
+/** Root-scoped connection hint only; it does not promise backend reachability. */
+export function initNetworkStatus(el: HTMLElement): MobileController {
+  const update = () => {
+    const online = navigator.onLine;
+    el.dataset.uifState = online ? 'online' : 'offline';
+    el.textContent = online ? (el.dataset.uifOnlineLabel ?? 'Online') : (el.dataset.uifOfflineLabel ?? 'Offline');
+  };
+  el.setAttribute('role', 'status');
+  el.setAttribute('aria-live', 'polite');
+  window.addEventListener('online', update);
+  window.addEventListener('offline', update);
+  update();
+  return { refresh: update, destroy() { window.removeEventListener('online', update); window.removeEventListener('offline', update); } };
+}
+
 export function initMobileShell(el: HTMLElement): MobileController {
   const existing = mobileControllers.get(el);
   if (existing) return existing;

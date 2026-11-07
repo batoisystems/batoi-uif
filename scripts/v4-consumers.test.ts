@@ -4,8 +4,26 @@ import { configureApplication } from '../tools/configure.mjs';
 import { build } from 'esbuild';
 import { gzipSync } from 'node:zlib';
 import process from 'node:process';
+import { readFileSync } from 'node:fs';
 
 describe('real selective consumers', () => {
+  for (const [profile, start] of Object.entries({ web: 'startWeb', rad: 'startRAD', mobile: 'startMobile', desktop: 'startDesktop' })) {
+    it(`bundles the compiled ${profile} profile and counts its complete CSS include`, async () => {
+      const budgets = JSON.parse(readFileSync('release-budgets.json', 'utf8')).consumerGzipBytes[profile];
+      const result = await build({ stdin: { contents: `export { ${start} } from '@batoi/uif-profiles/v4/${profile}';`, resolveDir: process.cwd() }, bundle: true, minify: true, format: 'esm', target: 'es2022', write: false, metafile: true });
+      const js = gzipSync(result.outputFiles[0].contents).length;
+      const css = gzipSync(readFileSync(`dist/v4/${profile}.css`)).length;
+      expect(js).toBeLessThanOrEqual(budgets.javascript);
+      expect(css).toBeLessThanOrEqual(budgets.css);
+      expect(js + css).toBeLessThanOrEqual(budgets.total);
+      expect(result.outputFiles).toHaveLength(1);
+      const inputs = Object.keys(result.metafile.inputs);
+      expect(inputs.some((input) => input.includes(`packages/profiles/dist/v4/${profile}.js`))).toBe(true);
+      expect(inputs.some((input) => /packages\/(charts|editor|icons)\/|micro-app|tools\/theme|packages\/core\/dist\/index\.js/.test(input))).toBe(false);
+      expect(Object.values(result.metafile.outputs).every((output) => !output.imports.length)).toBe(true);
+    });
+  }
+
   it('keeps a real compiled-package consumer small without source aliases', async () => {
     const result = await build({ stdin: { contents: "import {createUIF} from '@batoi/uif-components/application';import {initModal} from '@batoi/uif-components/modal';export const mount=root=>{const app=createUIF(root,[{name:'modal',init:initModal}]);app.refresh();return app;};", resolveDir: process.cwd() }, bundle: true, minify: true, format: 'esm', target: 'es2022', write: false, metafile: true });
     expect(gzipSync(result.outputFiles[0].contents).length).toBeLessThan(12000);

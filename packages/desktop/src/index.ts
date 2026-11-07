@@ -395,4 +395,4 @@ export function bindDesktopOfflineIndicator(element: HTMLElement, options: { off
   };
 }
 import { isSafeURL, setTrustedHTML } from '@batoi/uif-dom';
-import { parseUIFConfiguration } from '@batoi/uif-core';
+import { parseUIFConfiguration } from '@batoi/uif-core/contracts';

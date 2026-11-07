@@ -40,7 +40,13 @@ try {
       cpSync(join(packageRoot, file.path), target);
     }
     dependencies[pkg.name] = `file:packages/${directory}`;
-    if (directory !== 'css') imports.push(pkg.name);
+    if (directory !== 'css') for (const [subpath, entry] of Object.entries(pkg.exports ?? {})) {
+      if (typeof entry !== 'object' || !entry.import) continue;
+      if (entry.import.includes('*')) {
+        const [prefix, suffix] = entry.import.replace(/^\.\//, '').split('*');
+        for (const file of packed.files) if (file.path.startsWith(prefix) && file.path.endsWith(suffix)) imports.push(pkg.name + subpath.replace('*', file.path.slice(prefix.length, -suffix.length)).slice(1));
+      } else imports.push(pkg.name + (subpath === '.' ? '' : subpath.slice(1)));
+    }
   }
   for (const directory of directories) {
     const manifestPath = join(packages, directory, 'package.json');

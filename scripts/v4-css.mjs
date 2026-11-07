@@ -23,16 +23,54 @@ export function cssRules(css) {
   return rules;
 }
 
-const essential = /\.uif-(?:btn|modal|dropdown|tabs|toast|accordion|collapse|tooltip|popover|overlay|show|hide|fade|sr-only)(?:[\s.:#[>+~-]|$)/;
-const foundation = /\.uif-(?:card|field|input|label|container|stack|cluster|grid|text|p-|m-|gap-|flex|surface)/;
+const familyPrefixes = {
+  foundation: ['card', 'field', 'input', 'label', 'container', 'stack', 'cluster', 'grid', 'text', 'surface', 'badge', 'alert', 'empty', 'skeleton', 'spinner', 'loading-target'],
+  essential: ['btn', 'modal', 'dropdown', 'tabs', 'toast', 'accordion', 'collapse', 'tooltip', 'popover', 'overlay', 'show', 'hide', 'fade', 'sr-only', 'menu'],
+  navigation: ['app-shell', 'shell', 'responsive-shell', 'sidebar', 'navbar', 'nav', 'topbar', 'main', 'toolbar', 'breadcrumbs', 'skip-link', 'scroll-region', 'page', 'drawer', 'offcanvas', 'bottom-sheet'],
+  forms: ['form', 'field', 'input', 'error-summary', 'file-upload', 'combobox', 'uploader', 'col', 'selection-control'],
+  data: ['table', 'data-grid', 'cell-stack', 'pagination', 'filter', 'chip'],
+  mobile: ['mobile', 'sheet', 'bottom-sheet', 'segmented', 'offline'],
+  desktop: ['desktop', 'panel', 'inspector', 'kv', 'section', 'search', 'list', 'note'],
+  charts: ['chart', 'sparkline', 'stat', 'metric', 'dashboard'],
+  editor: ['editor', 'task-list'],
+  agent: ['ai', 'agent', 'tool', 'risk', 'diff'],
+  media: ['carousel', 'lightbox', 'testimonial', 'masonry', 'typed-text'],
+};
+
+export const styleDependencies = Object.freeze({
+  foundation: ['foundation'],
+  essential: ['foundation', 'essential'],
+  web: ['foundation', 'essential', 'navigation', 'forms'],
+  rad: ['foundation', 'essential', 'navigation', 'forms', 'data'],
+  mobile: ['foundation', 'essential', 'navigation', 'mobile'],
+  desktop: ['foundation', 'essential', 'navigation', 'forms', 'desktop'],
+  full: Object.keys(familyPrefixes),
+});
+
+function headerWithoutComments(rule) {
+  return rule.slice(0, rule.indexOf('{')).replace(/\/\*[\s\S]*?\*\//g, '').trim();
+}
+
+/** Keep entire shared selector lists, but filter each nested conditional block. */
+export function selectStyleRules(css, groups) {
+  const prefixes = groups.flatMap((group) => familyPrefixes[group] ?? []);
+  const selected = (header) => prefixes.some((prefix) => new RegExp(`(?:\\.uif-|\\buif-)${prefix}(?:-|[^a-z0-9-]|$)`).test(header));
+  return cssRules(css).map((rule) => {
+    const header = headerWithoutComments(rule);
+    if (/^@(?:media|supports|container|layer)\b/.test(header)) {
+      const body = selectStyleRules(rule.slice(rule.indexOf('{') + 1, -1), groups);
+      return body ? `${header}{${body}}` : '';
+    }
+    if (header.startsWith('@') && !/^@(?:-webkit-)?keyframes\b/.test(header)) throw new Error(`Undeclared style rule: ${header}`);
+    return selected(header) ? rule : '';
+  }).filter(Boolean).join('\n');
+}
+
 export function buildCSSFamily(root, family = 'essential') {
-  if (!['foundation', 'essential', 'full'].includes(family)) throw new Error('Unknown style family');
+  const groups = styleDependencies[family];
+  if (!groups) throw new Error('Unknown style family');
   const read = (file) => readFileSync(new URL(file, root), 'utf8');
-  const rules = cssRules(read('packages/css/components.css'));
-  const selected = family === 'full' ? rules : rules.filter((rule) => {
-    const selector = rule.slice(0, rule.indexOf('{')).trim();
-    // Shared responsive rules are retained intact; avoid unsafe selector pruning.
-    return selector.startsWith('@') || foundation.test(selector) || (family === 'essential' && essential.test(selector));
-  });
-  return `@layer uif.reset, uif.tokens, uif.utilities, uif.components, uif.theme;\n@layer uif.reset {${read('packages/css/reset.css')}}\n@layer uif.tokens {${read('packages/css/tokens.css')}}\n@layer uif.utilities {${read('packages/css/utilities.css')}}\n@layer uif.components {${selected.join('\n')}}\n`;
+  const source = read('packages/css/components.css');
+  const selected = family === 'full' ? source : selectStyleRules(source, groups);
+  return `@layer uif.reset, uif.tokens, uif.utilities, uif.components, uif.theme;\n@layer uif.reset {${read('packages/css/reset.css')}}\n@layer uif.tokens {${read('packages/css/tokens.css')}}\n@layer uif.utilities {${read('packages/css/utilities.css')}}\n@layer uif.components {${selected}}\n`;
 }

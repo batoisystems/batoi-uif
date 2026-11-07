@@ -7,6 +7,10 @@ interface RepeatableController {
     refresh(): void;
     destroy(): void;
 }
+interface ScopedFormOptions {
+    root: Document | HTMLElement;
+    afterSwap?(target: HTMLElement): void;
+}
 type FormField = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 type AsyncRuleHandler = (field: FormField, form: HTMLFormElement, signal: AbortSignal) => Promise<string[]>;
 type FieldAdapter = (field: FormField) => string;
@@ -22,9 +26,11 @@ declare function showErrorSummary(formEl: HTMLFormElement, errors: FormErrors): 
 declare function validateFormAsync(formEl: HTMLFormElement): Promise<FormErrors>;
 declare function initRepeatableGroup(root: HTMLElement): RepeatableController;
 declare function initForm(formEl: HTMLFormElement): FormController;
+/** Governed HTML form responses scoped to one selected application. */
+declare function initScopedForm(formEl: HTMLFormElement, options: ScopedFormOptions): FormController;
 declare const form: {
     name: string;
     init: typeof initForm;
 };
 
-export { type FormController, type FormErrors, type RepeatableController, clearErrors, form, initForm, initRepeatableGroup, registerAsyncRule, registerFieldAdapter, registerValidationMessage, showErrorSummary, showErrors, validateField, validateForm, validateFormAsync };
+export { type FormController, type FormErrors, type RepeatableController, type ScopedFormOptions, clearErrors, form, initForm, initRepeatableGroup, initScopedForm, registerAsyncRule, registerFieldAdapter, registerValidationMessage, showErrorSummary, showErrors, validateField, validateForm, validateFormAsync };

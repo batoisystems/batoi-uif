@@ -1,0 +1,20 @@
+{
+  "rows": [
+    {
+      "name": "Example record",
+      "status": "Ready"
+    }
+  ],
+  "columns": [
+    {
+      "key": "name"
+    },
+    {
+      "key": "status"
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "pageSize": 25,
+  "totalPages": 1
+}

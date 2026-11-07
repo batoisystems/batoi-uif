@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { URL } from 'node:url';
 import { catalog, components, themeSchema } from '../tools/theme/catalog.mjs';
 import { stableJSON, starterTheme } from '../tools/theme/compiler.mjs';
+import { profileExamples } from './v4-profile-examples.mjs';
 
 const root = new URL('../', import.meta.url);
 const version = JSON.parse(readFileSync(new URL('package.json', root), 'utf8')).version;
@@ -24,3 +25,9 @@ write('docs/generated/ai-theme-context.md', `# UIF 4 portable authoring context\
 write('llms.txt', `# Batoi UIF\n\nStable compatibility: 3.1.0. UIF 4 development: source ${version}.\n\n- [UIF 4 architecture](docs/v4-architecture.md)\n- [Theme authoring](docs/theme-authoring.md)\n- [Bounded AI context](docs/generated/ai-theme-context.md)\n- [Theme schema](docs/generated/theme.schema.json)\n- [Component catalog](docs/generated/v4-catalog.json)\n- [Canonical controls](docs/generated/v4-components.md)\n\nThis index is informational, not an access-control mechanism.\n`);
 write('examples/v4-essential/index.html', `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'"><title>UIF 4 essential example</title><link rel="stylesheet" href="../../dist/v4/essential.css"></head><body><main id="application" class="uif-container uif-p-4"><h1>UIF 4 essential controls</h1><p>Generated canonical fixtures · source ${version} · no backend or remote assets.</p>${components.map((c) => `<section aria-labelledby="heading-${c.name}"><h2 id="heading-${c.name}">${c.name}</h2>${c.example}</section>`).join('')}<noscript><p>JavaScript is unavailable. Sequential content remains readable; the hidden modal requires its ordinary page alternative.</p></noscript></main><script type="module" src="./main.js"></script></body></html>\n`);
 write('examples/v4-essential/main.js', `import { startEssential } from '../../dist/v4/essential.js';\nconst application = startEssential(document.querySelector('#application'));\nwindow.addEventListener('pagehide', () => application.destroy(), { once: true });\n`);
+for (const [profile, example] of Object.entries(profileExamples)) {
+  const directory = `examples/v4-${profile}/`;
+  write(`${directory}index.html`, `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'"><title>UIF 4 ${example.title}</title><link rel="stylesheet" href="../../dist/v4/${profile}.css"></head><body><div id="application" class="uif-container uif-p-4">${example.markup}<noscript><p>Enhancement is unavailable. This static demonstration does not provide a backend; retain ordinary server routes/forms in your application.</p></noscript></div><script type="module" src="./main.js"></script></body></html>\n`);
+  write(`${directory}main.js`, `import { ${example.start} } from '../../dist/v4/${profile}.js';\nconst application = ${example.start}(document.querySelector('#application'));\nwindow.addEventListener('pagehide', () => application.destroy(), { once: true });\n`);
+  for (const [name, response] of Object.entries(example.files ?? {})) write(`${directory}${name}`, JSON.stringify(response, null, 2) + '\n');
+}

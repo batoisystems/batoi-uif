@@ -1,4 +1,4 @@
-import { emit } from '@batoi/uif-core';
+import { emit } from '@batoi/uif-core/runtime';
 import { autoInit, isSafeURL, resolveTarget, safeQuerySelector, swapTrustedHTML } from '@batoi/uif-dom';
 import { cancelRequest, request } from '@batoi/uif-net';
 
@@ -25,6 +25,14 @@ const requestKeys = new WeakMap<HTMLElement, string>();
 const requestRevisions = new WeakMap<HTMLElement, number>();
 const allowedMethods = new Set(['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE']);
 let requestSequence = 0;
+export interface ScopedRadOptions {
+  /** Remount only application-owned controls after governed server HTML changes. */
+  afterSwap?(target: HTMLElement): void;
+}
+interface RadScope extends ScopedRadOptions {
+  root: Document | HTMLElement;
+  signal: AbortSignal;
+}
 const MAX_HTML_LENGTH = 1_000_000;
 const MAX_COLLECTION_ITEMS = 100;
 const MAX_MESSAGE_LENGTH = 10_000;
@@ -54,17 +62,23 @@ function notify(message: string | undefined, type: 'success' | 'error' = 'succes
   emit(type === 'error' ? 'uif:error' : 'uif:success', { message });
 }
 
-function applyEvents(events: RadResponse['events']): void {
+function scopedTarget(selector: string, scope?: RadScope): HTMLElement | null {
+  const target = safeQuerySelector<HTMLElement>(selector);
+  if (scope && target && target !== scope.root && !scope.root.contains(target)) throw new Error('UIF_RAD_TARGET_SCOPE');
+  return target;
+}
+
+function applyEvents(events: RadResponse['events'], scope?: RadScope): void {
   events?.forEach((event) => {
-    const target = event.target ? safeQuerySelector(event.target) : document;
-    emit(event.name, event.detail, target ?? document);
+    const target = event.target ? scopedTarget(event.target, scope) : scope?.root ?? document;
+    emit(event.name, event.detail, target ?? scope?.root ?? document);
   });
 }
 
-function applyActions(actions: RadResponse['actions']): void {
+function applyActions(actions: RadResponse['actions'], scope?: RadScope): void {
   actions?.forEach((action) => {
     if (action.type === 'toast') notify(String(action.message ?? ''), (action.level as 'success' | 'error') || 'success');
-    if (action.type === 'focus' && typeof action.target === 'string') safeQuerySelector<HTMLElement>(action.target)?.focus();
+    if (action.type === 'focus' && typeof action.target === 'string') scopedTarget(action.target, scope)?.focus();
     if (action.type === 'redirect' && typeof action.url === 'string' && isSafeURL(action.url, { context: 'navigation', sameOrigin: true })) window.location.assign(action.url);
   });
 }
@@ -116,6 +130,12 @@ export function rehydrate(targetEl: HTMLElement): void {
 }
 
 export async function loadPartial(sourceEl: HTMLElement): Promise<RadResponse | null> {
+  return runPartial(sourceEl);
+}
+
+async function runPartial(sourceEl: HTMLElement, scope?: RadScope): Promise<RadResponse | null> {
+  if (scope && (scope.signal.aborted || !scope.root.contains(sourceEl))) return null;
+  if (scope && sourceEl.dataset.uifLoading) scopedTarget(sourceEl.dataset.uifLoading, scope);
   const src = sourceEl.dataset.uifSrc || getAttr(sourceEl, 'href') || getAttr(sourceEl, 'action');
   if (!src) return null;
   if (sourceEl.dataset.uifConfirm && !window.confirm(sourceEl.dataset.uifConfirm)) return null;
@@ -131,7 +151,8 @@ export async function loadPartial(sourceEl: HTMLElement): Promise<RadResponse | 
   emit('uif:before-load', { source: sourceEl, src: url, method }, sourceEl);
 
   try {
-    const result = await request<unknown>(url, { key, method, body: requestPayload(sourceEl, method), credentials: 'same-origin', timeout: 15_000 });
+    const result = await request<unknown>(url, { key, method, body: requestPayload(sourceEl, method), credentials: 'same-origin', timeout: 15_000, signal: scope?.signal });
+    if (requestRevisions.get(sourceEl) !== revision || (scope && (scope.signal.aborted || !scope.root.contains(sourceEl)))) return null;
     const fallbackTarget = resolveTarget(sourceEl, sourceEl.dataset.uifTarget ?? 'self');
     const payload: RadResponse = typeof result === 'string' ? normalizeResponse({ ok: true, html: result }) : normalizeResponse(result);
     if (payload?.ok === false) throw new Error(payload.message || 'Request failed');
@@ -140,15 +161,28 @@ export async function loadPartial(sourceEl: HTMLElement): Promise<RadResponse | 
       return payload;
     }
 
-    const target = payload?.target ? safeQuerySelector<HTMLElement>(payload.target) : fallbackTarget;
-    if (target && payload?.html) {
-      const updated = swapContent(target, payload.html, payload.swap || sourceEl.dataset.uifSwap || 'inner');
-      rehydrate(updated);
+    const target = payload?.target ? scopedTarget(payload.target, scope) : fallbackTarget;
+    if (scope && target && target !== scope.root && !scope.root.contains(target)) throw new Error('UIF_RAD_TARGET_SCOPE');
+    // Validate every response target before any HTML/event/action mutation.
+    if (scope) {
+      payload.events?.forEach((event) => { if (event.target) scopedTarget(event.target, scope); });
+      payload.actions?.forEach((action) => { if (action.type === 'focus' && typeof action.target === 'string') scopedTarget(action.target, scope); });
+      if (payload.focus) scopedTarget(payload.focus, scope);
+    }
+    if (target && payload?.html !== undefined) {
+      const mode = normalizeSwapMode(payload.swap || sourceEl.dataset.uifSwap || 'inner');
+      if (scope && target === scope.root && ['outer', 'before', 'after'].includes(mode)) throw new Error('UIF_RAD_ROOT_REPLACEMENT');
+      const parent = target.parentElement;
+      const updated = swapContent(target, payload.html, mode);
+      if (scope) {
+        const affected = ['outer', 'before', 'after'].includes(mode) ? parent : target;
+        if (affected && (affected === scope.root || scope.root.contains(affected))) scope.afterSwap?.(affected);
+      } else rehydrate(updated);
     }
     if (payload.errors) emit('uif:field-errors', { source: sourceEl, errors: payload.errors }, sourceEl);
-    applyEvents(payload.events);
-    applyActions(payload.actions);
-    if (payload.focus) safeQuerySelector<HTMLElement>(payload.focus)?.focus();
+    applyEvents(payload.events, scope);
+    applyActions(payload.actions, scope);
+    if (payload.focus) scopedTarget(payload.focus, scope)?.focus();
     notify(payload?.message || sourceEl.dataset.uifSuccess);
     emit('uif:load', { source: sourceEl, payload }, sourceEl);
     return payload;
@@ -159,6 +193,43 @@ export async function loadPartial(sourceEl: HTMLElement): Promise<RadResponse | 
   } finally {
     if (requestRevisions.get(sourceEl) === revision) setLoading(sourceEl, false);
   }
+}
+
+/** Selected v4 binding. Server HTML remains trusted; selectors stay root-scoped. */
+export function bindScopedRadActions(root: Document | HTMLElement, options: ScopedRadOptions = {}): () => void {
+  const controller = new AbortController();
+  const scope: RadScope = { ...options, root, signal: controller.signal };
+  const activeSources = new Set<HTMLElement>();
+  const run = (source: HTMLElement) => {
+    activeSources.add(source);
+    const pending = runPartial(source, scope);
+    const revision = requestRevisions.get(source);
+    void pending.catch((error) => emit('uif:rad-error', { source, error }, root)).finally(() => {
+      if (requestRevisions.get(source) === revision) activeSources.delete(source);
+    });
+  };
+  const sourceFor = (event: Event, selector: string) => {
+    if (event.defaultPrevented) return null;
+    let target = event.target instanceof Element ? event.target : null;
+    while (target && !(target instanceof HTMLElement)) target = target.parentElement;
+    const source = target?.closest<HTMLElement>(selector);
+    return source && root.contains(source) ? source : null;
+  };
+  root.addEventListener('click', (event) => {
+    const source = sourceFor(event, '[data-uif="ajax"]:not(form),[data-uif-action="load"],[data-uif-action="reload"],[data-uif-action="delete"],[data-uif-action="swap"]');
+    if (!source) return;
+    event.preventDefault(); run(source);
+  }, { signal: controller.signal });
+  root.addEventListener('submit', (event) => {
+    const source = sourceFor(event, 'form[data-uif="ajax"]');
+    if (!source) return;
+    event.preventDefault(); run(source);
+  }, { signal: controller.signal });
+  return () => {
+    controller.abort();
+    activeSources.forEach((source) => { setLoading(source, false); requestRevisions.delete(source); });
+    activeSources.clear();
+  };
 }
 
 export function bindRadActions(root: Document | HTMLElement = document): () => void {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "4.0.0-alpha.2",
+  "version": "4.0.0-alpha.3",
   "packages": {
     "actions": {
       "name": "@batoi/uif-actions",
@@ -86,8 +86,12 @@
       "name": "@batoi/uif-css",
       "exports": [
         ".",
+        "./desktop",
         "./essential",
-        "./foundation"
+        "./foundation",
+        "./mobile",
+        "./rad",
+        "./web"
       ],
       "dependencies": []
     },
@@ -216,7 +220,11 @@
         "./desktop",
         "./essential",
         "./mobile",
-        "./rad"
+        "./rad",
+        "./v4/desktop",
+        "./v4/mobile",
+        "./v4/rad",
+        "./v4/web"
       ],
       "dependencies": [
         "@batoi/uif-actions",
@@ -3015,11 +3023,17 @@
     "uif.css",
     "uif.esm.js",
     "uif.iife.js",
+    "v4/desktop.css",
+    "v4/desktop.js",
     "v4/essential.css",
     "v4/essential.js",
     "v4/foundation.css",
     "v4/full.css",
     "v4/manifest.json",
+    "v4/mobile.css",
+    "v4/mobile.js",
+    "v4/rad.css",
+    "v4/rad.js",
     "v4/theme/desktop.html",
     "v4/theme/foundation.css",
     "v4/theme/manifest.json",
@@ -3027,6 +3041,8 @@
     "v4/theme/preview.css",
     "v4/theme/theme.css",
     "v4/theme/uif.theme.json",
-    "v4/theme/web.html"
+    "v4/theme/web.html",
+    "v4/web.css",
+    "v4/web.js"
   ]
 }
