@@ -3,6 +3,11 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   resolve: {
     alias: {
+      '@batoi/uif-core/runtime': new URL('./packages/core/src/runtime.ts', import.meta.url).pathname,
+      '@batoi/uif-core/registry': new URL('./packages/core/src/component-registry.ts', import.meta.url).pathname,
+      '@batoi/uif-core/contracts': new URL('./packages/core/src/contracts.ts', import.meta.url).pathname,
+      '@batoi/uif-core/compatibility': new URL('./packages/core/src/compatibility.ts', import.meta.url).pathname,
+      '@batoi/uif-core/storage-partition': new URL('./packages/core/src/storage-partition.ts', import.meta.url).pathname,
       '@batoi/uif-ai': new URL('./packages/ai/src/index.ts', import.meta.url).pathname,
       '@batoi/uif-actions': new URL('./packages/actions/src/index.ts', import.meta.url).pathname,
       '@batoi/uif-charts': new URL('./packages/charts/src/index.ts', import.meta.url).pathname,

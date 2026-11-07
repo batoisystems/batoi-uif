@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "contractVersion": 4,
+  "frameworkVersion": "4.0.0-alpha.1",
+  "artifacts": {
+    "essential.js": {
+      "bytes": 21242,
+      "gzip": 7095,
+      "brotli": 6358,
+      "integrity": "sha384-lnlBAApVdigfjR5wEO6iicx8bQEqJ6L2HM6ygx9svTlNx0S6jkudV9+oahLmm7Ic"
+    },
+    "foundation.css": {
+      "bytes": 26808,
+      "gzip": 6035,
+      "brotli": 5149,
+      "integrity": "sha384-nUNMhsGLe+0EuggsGdJnGXHVMFwJuaRM+QbOenRddF/YByu+cco9tC49laiqo3iJ"
+    },
+    "essential.css": {
+      "bytes": 32583,
+      "gzip": 7007,
+      "brotli": 6032,
+      "integrity": "sha384-LjDQYfF71+Immipq2L/q3FLB75ZDorQHSgJCIXXBitOCt8NiVES4Aj+AD8FQOey8"
+    },
+    "full.css": {
+      "bytes": 93102,
+      "gzip": 15308,
+      "brotli": 12966,
+      "integrity": "sha384-FZR3CcVaoX/CpeG4kCrISJ4kljC3rdlmyJYQLMZPQGF+k0syhZ3/Vg9hwZ5wu3a/"
+    }
+  },
+  "initialRequests": 2,
+  "essentialInputs": [
+    "packages/components/src/application.ts",
+    "packages/components/src/controller.ts",
+    "packages/components/src/controls/accordion.ts",
+    "packages/components/src/controls/collapse.ts",
+    "packages/components/src/controls/dropdown.ts",
+    "packages/components/src/controls/modal.ts",
+    "packages/components/src/controls/notification.ts",
+    "packages/components/src/controls/tabs.ts",
+    "packages/components/src/controls/toast.ts",
+    "packages/components/src/internal.ts",
+    "packages/core/src/compatibility.ts",
+    "packages/core/src/component-registry.ts",
+    "packages/core/src/contracts.ts",
+    "packages/core/src/resource-scope.ts",
+    "packages/core/src/runtime.ts",
+    "packages/core/src/storage-partition.ts",
+    "packages/effects/src/index.ts",
+    "packages/overlays/src/index.ts",
+    "packages/profiles/src/essential.ts"
+  ]
+}

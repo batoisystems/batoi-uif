@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-profiles",
-  "version": "3.1.0",
+  "version": "4.0.0-alpha.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -37,40 +37,44 @@
     "./compatibility": {
       "types": "./dist/compatibility.d.ts",
       "import": "./dist/compatibility.js"
+    },
+    "./essential": {
+      "types": "./dist/essential.d.ts",
+      "import": "./dist/essential.js"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/all.ts src/rad.ts src/dashboard.ts src/mobile.ts src/desktop.ts src/agent.ts src/compatibility.ts --format esm --dts --clean"
+    "build": "tsup src/index.ts src/all.ts src/rad.ts src/dashboard.ts src/mobile.ts src/desktop.ts src/agent.ts src/compatibility.ts src/essential.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-actions": "3.1.0",
-    "@batoi/uif-ai": "3.1.0",
-    "@batoi/uif-charts": "3.1.0",
-    "@batoi/uif-components": "3.1.0",
-    "@batoi/uif-core": "3.1.0",
-    "@batoi/uif-dashboard": "3.1.0",
-    "@batoi/uif-desktop": "3.1.0",
-    "@batoi/uif-dom": "3.1.0",
-    "@batoi/uif-editor": "3.1.0",
-    "@batoi/uif-effects": "3.1.0",
-    "@batoi/uif-extension-kit": "3.1.0",
-    "@batoi/uif-forms": "3.1.0",
-    "@batoi/uif-icons": "3.1.0",
-    "@batoi/uif-mcp": "3.1.0",
-    "@batoi/uif-mobile": "3.1.0",
-    "@batoi/uif-net": "3.1.0",
-    "@batoi/uif-overlays": "3.1.0",
-    "@batoi/uif-push": "3.1.0",
-    "@batoi/uif-pwa": "3.1.0",
-    "@batoi/uif-query": "3.1.0",
-    "@batoi/uif-rad-adapter": "3.1.0",
-    "@batoi/uif-realtime": "3.1.0",
-    "@batoi/uif-router": "3.1.0",
-    "@batoi/uif-state": "3.1.0",
-    "@batoi/uif-table": "3.1.0"
+    "@batoi/uif-actions": "4.0.0-alpha.1",
+    "@batoi/uif-ai": "4.0.0-alpha.1",
+    "@batoi/uif-charts": "4.0.0-alpha.1",
+    "@batoi/uif-components": "4.0.0-alpha.1",
+    "@batoi/uif-core": "4.0.0-alpha.1",
+    "@batoi/uif-dashboard": "4.0.0-alpha.1",
+    "@batoi/uif-desktop": "4.0.0-alpha.1",
+    "@batoi/uif-dom": "4.0.0-alpha.1",
+    "@batoi/uif-editor": "4.0.0-alpha.1",
+    "@batoi/uif-effects": "4.0.0-alpha.1",
+    "@batoi/uif-extension-kit": "4.0.0-alpha.1",
+    "@batoi/uif-forms": "4.0.0-alpha.1",
+    "@batoi/uif-icons": "4.0.0-alpha.1",
+    "@batoi/uif-mcp": "4.0.0-alpha.1",
+    "@batoi/uif-mobile": "4.0.0-alpha.1",
+    "@batoi/uif-net": "4.0.0-alpha.1",
+    "@batoi/uif-overlays": "4.0.0-alpha.1",
+    "@batoi/uif-push": "4.0.0-alpha.1",
+    "@batoi/uif-pwa": "4.0.0-alpha.1",
+    "@batoi/uif-query": "4.0.0-alpha.1",
+    "@batoi/uif-rad-adapter": "4.0.0-alpha.1",
+    "@batoi/uif-realtime": "4.0.0-alpha.1",
+    "@batoi/uif-router": "4.0.0-alpha.1",
+    "@batoi/uif-state": "4.0.0-alpha.1",
+    "@batoi/uif-table": "4.0.0-alpha.1"
   },
   "license": "Apache-2.0"
 }

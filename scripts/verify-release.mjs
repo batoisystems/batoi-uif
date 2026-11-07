@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { distributionFiles } from './distribution-files.mjs';
 import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
 import { readdir } from 'node:fs/promises';
@@ -158,7 +159,7 @@ assert(existsSync(integrityPath), 'dist/integrity.json is missing');
 if (existsSync(integrityPath)) {
   const integrity = readJson('dist/integrity.json');
   assert(integrity.version === rootPackage.version, `integrity manifest version ${integrity.version} does not match ${rootPackage.version}`);
-  const artifactNames = readdirSync(new URL('dist/', root)).filter((name) => name !== 'integrity.json').sort();
+  const artifactNames = distributionFiles(new URL('dist/', root));
   assert(!artifactNames.some((name) => name.endsWith('.map')), 'root distribution contains undeclared source maps');
   const manifestNames = Object.keys(integrity.files ?? {}).sort();
   assert(JSON.stringify(manifestNames) === JSON.stringify(artifactNames), 'integrity manifest artifact list is stale');

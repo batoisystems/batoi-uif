@@ -1,10 +1,12 @@
 {
   "name": "@batoi/uif-css",
-  "version": "3.1.0",
+  "version": "4.0.0-alpha.1",
   "type": "module",
   "main": "index.css",
   "exports": {
-    ".": "./index.css"
+    ".": "./index.css",
+    "./foundation": "./foundation.css",
+    "./essential": "./essential.css"
   },
   "files": [
     "*.css"

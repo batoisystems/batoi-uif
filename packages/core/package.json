@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-core",
-  "version": "3.1.0",
+  "version": "4.0.0-alpha.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -9,13 +9,33 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime.d.ts",
+      "import": "./dist/runtime.js"
+    },
+    "./registry": {
+      "types": "./dist/component-registry.d.ts",
+      "import": "./dist/component-registry.js"
+    },
+    "./contracts": {
+      "types": "./dist/contracts.d.ts",
+      "import": "./dist/contracts.js"
+    },
+    "./compatibility": {
+      "types": "./dist/compatibility.d.ts",
+      "import": "./dist/compatibility.js"
+    },
+    "./storage-partition": {
+      "types": "./dist/storage-partition.d.ts",
+      "import": "./dist/storage-partition.js"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,iife --dts --global-name BatoiUIF --clean"
+    "build": "tsup src/index.ts --format iife --global-name BatoiUIF --clean && tsup src/index.ts src/runtime.ts src/component-registry.ts src/contracts.ts src/compatibility.ts src/storage-partition.ts --format esm --dts"
   },
   "license": "Apache-2.0"
 }

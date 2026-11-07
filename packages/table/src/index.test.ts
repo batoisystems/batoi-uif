@@ -2,6 +2,21 @@ import { describe, expect, it, vi } from 'vitest';
 import { filterElements, filterTable, goToPage, initDeclarativeFilters, initTable, loadRemoteTable, selectedRows, setTableState, sortTable } from './index.js';
 
 describe('table', () => {
+  it('retires row handlers before remount and preserves header semantics', () => {
+    document.body.innerHTML = '<table><thead><tr><th data-uif-sort="name">Name</th></tr></thead><tbody><tr><td><button data-uif-row-action="edit">Edit</button></td></tr></tbody></table>';
+    const table = document.querySelector('table')!;
+    const oldAction = vi.fn();
+    initTable(table, { onRowAction: oldAction }).destroy();
+    const nextAction = vi.fn();
+    const next = initTable(table, { onRowAction: nextAction });
+    table.querySelector('button')!.click();
+    expect(oldAction).not.toHaveBeenCalled();
+    expect(nextAction).toHaveBeenCalledOnce();
+    expect(table.querySelector('th')!.hasAttribute('role')).toBe(false);
+    next.destroy();
+    table.querySelector('button')!.click();
+    expect(nextAction).toHaveBeenCalledOnce();
+  });
   it('sorts, filters, and returns selected rows', () => {
     document.body.innerHTML = `
       <table><tbody>

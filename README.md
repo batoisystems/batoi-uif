@@ -10,7 +10,27 @@ Batoi UIF is a dependency-free frontend application interface framework for serv
 
 It is designed as the frontend foundation for Batoi RAD and as a future open-source framework for HTML-first applications that need app-like behavior without shipping a large runtime stack.
 
-> Status: **v2 active development**
+> Status: **UIF 4 development**. Stable compatibility release: **3.1.0**.
+
+## UIF 4 development
+
+The new selective entry mounts only requested controls. The essential deployment
+uses `dist/v4/essential.js` and `dist/v4/essential.css`; importing alone does not
+start it. Keep an external bootstrap for strict CSP:
+
+```js
+import { startEssential } from '/assets/uif/v4/essential.js';
+const app = startEssential(document);
+// app.refresh(changedSubtree) after application-owned swaps; app.destroy() on teardown.
+```
+
+See [architecture and migration](docs/v4-architecture.md),
+[theme authoring / CLI / local MCP](docs/theme-authoring.md),
+[canonical example](examples/v4-essential/), and
+[generated component contracts](docs/generated/v4-components.md).
+Themes and authoring tools are experimental; hosted AI integrations, manual
+assistive-technology acceptance and RADX pilot gates remain required before GA.
+The full distribution below is the compatibility option, not the smallest include.
 
 ## Browser Distribution
 
@@ -28,8 +48,11 @@ ES module usage:
 
 ```html
 <link rel="stylesheet" href="/assets/uif/uif.css" />
-<script type="module" src="/assets/uif/uif.esm.js"></script>
+<script type="module" src="/assets/app-bootstrap.js"></script>
 ```
+
+In `app-bootstrap.js`, import `start` from `/assets/uif/uif.esm.js` and call
+`start(document)`. Loading an ESM file without calling startup does not enhance HTML.
 
 Classic script usage:
 

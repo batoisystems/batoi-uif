@@ -1,5 +1,6 @@
 // src/index.ts
-import { getCompatibilityMode, parseUIFJSON } from "@batoi/uif-core";
+import { getCompatibilityMode } from "@batoi/uif-core/compatibility";
+import { parseUIFJSON } from "@batoi/uif-core/contracts";
 var animationPresets = [
   { name: "fade-in", category: "entrance", duration: 180, description: "Fade content into view." },
   { name: "fade-out", category: "exit", duration: 180, description: "Fade content out of view." },

@@ -10,7 +10,9 @@ interface OverlayOptions {
 declare function getOverlayStack(): HTMLElement[];
 declare function openOverlay(el: HTMLElement, options?: OverlayOptions): Promise<void>;
 declare function closeOverlay(el?: HTMLElement | undefined): Promise<void>;
+/** Synchronous lifecycle cleanup, without returning focus to a removed subtree. */
+declare function destroyOverlay(el: HTMLElement): void;
 declare function toggleOverlay(el: HTMLElement, options?: OverlayOptions): Promise<void>;
 declare function positionOverlay(anchor: HTMLElement, panel: HTMLElement, options?: OverlayOptions): void;
 
-export { type OverlayOptions, closeOverlay, getOverlayStack, openOverlay, positionOverlay, toggleOverlay };
+export { type OverlayOptions, closeOverlay, destroyOverlay, getOverlayStack, openOverlay, positionOverlay, toggleOverlay };

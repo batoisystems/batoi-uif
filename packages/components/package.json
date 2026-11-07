@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-components",
-  "version": "3.1.0",
+  "version": "4.0.0-alpha.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -9,18 +9,110 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./accordion": {
+      "types": "./dist/controls/accordion.d.ts",
+      "import": "./dist/controls/accordion.js"
+    },
+    "./button": {
+      "types": "./dist/controls/button.d.ts",
+      "import": "./dist/controls/button.js"
+    },
+    "./carousel": {
+      "types": "./dist/controls/carousel.d.ts",
+      "import": "./dist/controls/carousel.js"
+    },
+    "./collapse": {
+      "types": "./dist/controls/collapse.d.ts",
+      "import": "./dist/controls/collapse.js"
+    },
+    "./combobox": {
+      "types": "./dist/controls/combobox.d.ts",
+      "import": "./dist/controls/combobox.js"
+    },
+    "./command-menu": {
+      "types": "./dist/controls/command-menu.d.ts",
+      "import": "./dist/controls/command-menu.js"
+    },
+    "./dismissible": {
+      "types": "./dist/controls/dismissible.d.ts",
+      "import": "./dist/controls/dismissible.js"
+    },
+    "./drawer": {
+      "types": "./dist/controls/drawer.d.ts",
+      "import": "./dist/controls/drawer.js"
+    },
+    "./dropdown": {
+      "types": "./dist/controls/dropdown.d.ts",
+      "import": "./dist/controls/dropdown.js"
+    },
+    "./file-upload": {
+      "types": "./dist/controls/file-upload.d.ts",
+      "import": "./dist/controls/file-upload.js"
+    },
+    "./lightbox": {
+      "types": "./dist/controls/lightbox.d.ts",
+      "import": "./dist/controls/lightbox.js"
+    },
+    "./modal": {
+      "types": "./dist/controls/modal.d.ts",
+      "import": "./dist/controls/modal.js"
+    },
+    "./notification": {
+      "types": "./dist/controls/notification.d.ts",
+      "import": "./dist/controls/notification.js"
+    },
+    "./pagination": {
+      "types": "./dist/controls/pagination.d.ts",
+      "import": "./dist/controls/pagination.js"
+    },
+    "./passive": {
+      "types": "./dist/controls/passive.d.ts",
+      "import": "./dist/controls/passive.js"
+    },
+    "./popover": {
+      "types": "./dist/controls/popover.d.ts",
+      "import": "./dist/controls/popover.js"
+    },
+    "./progress": {
+      "types": "./dist/controls/progress.d.ts",
+      "import": "./dist/controls/progress.js"
+    },
+    "./shell": {
+      "types": "./dist/controls/shell.d.ts",
+      "import": "./dist/controls/shell.js"
+    },
+    "./tabs": {
+      "types": "./dist/controls/tabs.d.ts",
+      "import": "./dist/controls/tabs.js"
+    },
+    "./toast": {
+      "types": "./dist/controls/toast.d.ts",
+      "import": "./dist/controls/toast.js"
+    },
+    "./tooltip": {
+      "types": "./dist/controls/tooltip.d.ts",
+      "import": "./dist/controls/tooltip.js"
+    },
+    "./controller": {
+      "types": "./dist/controller.d.ts",
+      "import": "./dist/controller.js"
+    },
+    "./application": {
+      "types": "./dist/application.d.ts",
+      "import": "./dist/application.js"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --clean"
+    "build": "tsup src/index.ts src/controller.ts src/controls/*.ts src/application.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-core": "3.1.0",
-    "@batoi/uif-effects": "3.1.0",
-    "@batoi/uif-overlays": "3.1.0"
+    "@batoi/uif-core": "4.0.0-alpha.1",
+    "@batoi/uif-effects": "4.0.0-alpha.1",
+    "@batoi/uif-overlays": "4.0.0-alpha.1"
   },
   "license": "Apache-2.0"
 }

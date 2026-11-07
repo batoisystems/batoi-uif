@@ -1,6 +1,6 @@
 {
   "name": "@batoi/uif-editor",
-  "version": "3.1.0",
+  "version": "4.0.0-alpha.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,9 +18,9 @@
     "build": "tsup src/index.ts --format esm --dts --clean"
   },
   "dependencies": {
-    "@batoi/uif-core": "3.1.0",
-    "@batoi/uif-dom": "3.1.0",
-    "@batoi/uif-net": "3.1.0"
+    "@batoi/uif-core": "4.0.0-alpha.1",
+    "@batoi/uif-dom": "4.0.0-alpha.1",
+    "@batoi/uif-net": "4.0.0-alpha.1"
   },
   "license": "Apache-2.0"
 }

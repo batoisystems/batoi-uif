@@ -63,4 +63,30 @@ git diff --check
 
 The Playwright matrix covers Chromium, Firefox, WebKit, and a representative narrow Chromium viewport. A public release additionally requires manual assistive-technology, CSP/Trusted Types, and deployed-artifact checks.
 
-Development requires Node.js 20.19 or later in the Node 20 line, or Node.js 22.12 or later. The patched Vite 8, Vitest 4, jsdom 29, and Playwright toolchain is development-only and does not alter framework runtime dependencies. npm currently reports one low-severity Windows development-server advisory through the esbuild range shared by Vite and tsup; do not expose local development servers to untrusted networks, and remove this note when those tools accept a patched esbuild release.
+Development requires Node.js 20.19 or later in the Node 20 line, or Node.js 22.12 or later. Vite 8, Vitest 4, jsdom 29, Playwright and axe are development-only and do not alter framework runtime dependencies. The 4.0 development lockfile updates the reviewed advisory matches, including esbuild 0.28.2. tsup is retained at 8.5.1 to preserve Node 20 support, with a narrowly scoped esbuild override; full builds and package/browser checks validate that pre-1.0 minor transition. The live npm advisory audit reported zero findings on 2026-11-07; this is a dated dependency result, not a vulnerability-free certification. Do not expose local development servers to untrusted networks.
+
+## UIF 4 adoption
+
+The new essential and per-component entries do not auto-register or mutate global
+compatibility settings. Configuration is a bounded JSON object; unknown options
+are rejected unless a selected definition explicitly declares them. Attribute
+options remain documented individually. Do not let compatibility and selective
+runtimes own the same subtree. Refresh the changed subtree after application-owned
+HTML swaps and destroy the application before removing its root.
+
+`npm run verify:v4-compatibility` compares current facade declarations with the
+immutable 3.1 commit in `release-v3-baseline.json`. It follows split declaration
+re-exports and normalizes union order, rather than accepting generated chunk-name
+changes as public API breaks. The release baseline uses the same resolved
+declarations. Runtime behavior and DOM compatibility still require tests/pilots.
+
+The essential consumer gate counts one ESM plus one CSS file (all runtime/focus
+dependencies included): JS ≤24,000, CSS ≤10,000 gzip bytes; foundation CSS ≤8,000.
+`npm run configure -- manifest.json new-directory` creates an explicit component
+and icon subset, refusing existing output directories. For example:
+`{"components":["modal","tabs"],"icons":["check"]}`. Its manifest reports the full
+initial JS/CSS cost; bootstrap, app data, images and optional fonts are additional.
+Family CSS intentionally preserves whole shared responsive rules. Package/archive
+inventory budgets are separate from consumer download budgets; independent entry
+stubs/shared chunks give the components package a reviewed 12,000-byte ceiling.
+The full browser ceiling remains unchanged.

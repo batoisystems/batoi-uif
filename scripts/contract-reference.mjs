@@ -93,5 +93,5 @@ export function renderContractReference(reference) {
     lines.push(`| \`${cell(rule.id)}\` | ${cell(rule.introduced)} | ${cell(rule.surface)} | ${cell(rule.legacy)} | ${cell(rule.replacement)} | \`${cell(rule.diagnostic)}\` |`);
   });
   lines.push('');
-  return `${lines.join('\n')}\n`;
+  return `${lines.join('\n').trimEnd()}\n`;
 }

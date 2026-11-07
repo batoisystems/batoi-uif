@@ -1,5 +1,7 @@
 import { IconCategory } from './sets/index.js';
 export { iconSets } from './sets/index.js';
+import { a as IconMetadata, b as IconMetadataRegistry, e as IconSearchOptions, c as IconOptions } from './types-Cudl5MAr.js';
+export { I as IconDefinition, d as IconRegistry, f as IconStatus } from './types-Cudl5MAr.js';
 export { adminSecurityIcons } from './sets/admin-security.js';
 export { brandIcons } from './sets/brand.js';
 export { chartIcons } from './sets/charts.js';
@@ -3034,32 +3036,6 @@ declare const icons: {
 };
 type IconName = keyof typeof icons;
 
-interface IconDefinition {
-    body: string | string[];
-    viewBox?: string;
-}
-interface IconOptions {
-    className?: string;
-    hidden?: boolean;
-    size?: number | string;
-    title?: string;
-}
-type IconRegistry = Record<string, IconDefinition>;
-type IconStatus = 'stable' | 'draft' | 'deprecated';
-interface IconMetadata {
-    aliases: string[];
-    category: string;
-    name: string;
-    since?: string;
-    status: IconStatus;
-    tags: string[];
-}
-type IconMetadataRegistry<Name extends string = string> = Readonly<Record<Name, IconMetadata>>;
-interface IconSearchOptions {
-    category?: string;
-    includeDeprecated?: boolean;
-}
-
 declare const iconMetadata: IconMetadataRegistry<IconName>;
 declare function getIconMetadata(name: IconName | string): IconMetadata | undefined;
 declare function iconsByCategory(category: IconCategory | string): IconName[];
@@ -3075,4 +3051,4 @@ interface MountIconsOptions {
 }
 declare function mountIcons(root?: ParentNode, options?: MountIconsOptions): void;
 
-export { IconCategory, type IconDefinition, type IconMetadata, type IconMetadataRegistry, type IconName, type IconOptions, type IconRegistry, type IconSearchOptions, type IconStatus, type MountIconsOptions, getIconMetadata, hasIcon, icon, iconElement, iconMetadata, icons, iconsByCategory, mountIcons, registerIcon, searchIcons };
+export { IconCategory, IconMetadata, IconMetadataRegistry, type IconName, IconOptions, IconSearchOptions, type MountIconsOptions, getIconMetadata, hasIcon, icon, iconElement, iconMetadata, icons, iconsByCategory, mountIcons, registerIcon, searchIcons };

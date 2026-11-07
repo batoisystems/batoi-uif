@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { URL } from 'node:url';
 import { createHash } from 'node:crypto';
 import ts from 'typescript';
 
@@ -27,11 +28,65 @@ function declarationNames(node) {
 }
 
 function signature(text) {
-  return createHash('sha256').update(text.replace(/\s+/g, ' ').trim()).digest('hex');
+  const source = ts.createSourceFile('signature.d.ts', text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const result = ts.transform(source, [(context) => {
+    const visit = (node) => {
+      if (ts.isUnionTypeNode(node)) return ts.factory.updateUnionTypeNode(node, [...node.types].sort((a, b) => a.getText(source) < b.getText(source) ? -1 : a.getText(source) > b.getText(source) ? 1 : 0).map((type) => ts.visitNode(type, visit)));
+      return ts.visitEachChild(node, visit, context);
+    };
+    return (node) => ts.visitNode(node, visit);
+  }]);
+  const normalized = ts.createPrinter({ removeComments: true }).printFile(result.transformed[0]);
+  result.dispose();
+  return createHash('sha256').update(normalized.replace(/\s+/g, ' ').trim()).digest('hex');
 }
 
-export function declarationAPI(url) {
-  return declarationAPIFromText(readFileSync(url, 'utf8'), url.pathname);
+export function declarationAPI(url, readDeclaration = (file) => readFileSync(file, 'utf8')) {
+  // A split declaration entry must compare the underlying public declaration,
+  // not the bundler's randomly assigned re-export alias or chunk filename.
+  const cache = new Map();
+  const collect = (file) => {
+    if (cache.has(file.href)) return cache.get(file.href);
+    const exports = new Map();
+    cache.set(file.href, exports);
+    const text = readDeclaration(file);
+    if (text === null) return exports;
+    const source = ts.createSourceFile(file.pathname, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    const local = new Map();
+    const imported = new Map();
+    const relativeModule = (name) => {
+      if (!name.startsWith('.')) return null;
+      const target = new URL(name.replace(/\.js$/, '.d.ts'), file);
+      return collect(target);
+    };
+    for (const node of source.statements) {
+      declarationNames(node).forEach((name) => local.set(name, node.getText(source)));
+      if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
+        const bindings = node.importClause?.namedBindings;
+        if (bindings && ts.isNamedImports(bindings)) bindings.elements.forEach((entry) => imported.set(entry.name.text, { module: node.moduleSpecifier.text, name: entry.propertyName?.text ?? entry.name.text }));
+      }
+    }
+    const resolve = (name) => {
+      if (local.has(name)) return local.get(name);
+      const entry = imported.get(name);
+      return entry ? relativeModule(entry.module)?.get(entry.name) : undefined;
+    };
+    for (const node of source.statements) {
+      if (ts.isExportDeclaration(node)) {
+        const linked = node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier) ? relativeModule(node.moduleSpecifier.text) : null;
+        if (node.exportClause && ts.isNamedExports(node.exportClause)) node.exportClause.elements.forEach((entry) => {
+          const name = entry.propertyName?.text ?? entry.name.text;
+          exports.set(entry.name.text, linked?.get(name) ?? resolve(name) ?? entry.getText(source));
+        });
+        else if (!node.exportClause && linked) linked.forEach((value, name) => exports.set(name, value));
+        else if (node.exportClause && ts.isNamespaceExport(node.exportClause)) exports.set(node.exportClause.name.text, node.exportClause.name.text);
+      } else if (isExported(node)) declarationNames(node).forEach((name) => exports.set(name, node.getText(source)));
+    }
+    return exports;
+  };
+  const declarations = collect(url);
+  const exports = [...declarations.keys()].sort();
+  return { exports, signatures: Object.fromEntries(exports.map((name) => [name, signature(declarations.get(name))])) };
 }
 
 export function declarationAPIFromText(text, fileName = 'index.d.ts') {

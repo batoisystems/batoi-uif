@@ -1,6 +1,6 @@
 # Generated Batoi UIF Contract Reference
 
-Framework 3.1.0; contract version 3. This file is generated from typed source definitions.
+Framework 4.0.0-alpha.1; contract version 3. This file is generated from typed source definitions.
 
 ## Profiles
 
@@ -157,4 +157,3 @@ Framework 3.1.0; contract version 3. This file is generated from typed source de
 | `cross-origin-capability` | 2.6.0 | Remote URL options | Markup-only cross-origin allow flags | An application-registered exact origin/path capability plus explicit element intent | `cross-origin-capability-required` |
 | `partitioned-storage` | 2.6.0 | Persisted browser convenience data | Unpartitioned global keys | configureStoragePartition() before persistence and owner-scoped cleanup at sign-out | `storage-partition-recommended` |
 | `agent-envelope-version` | 2.4.0 | AI and MCP decisions | Unknown, incomplete, or unversioned decision envelopes | A governed Agent Interaction Envelope with supported version, request ID, expiry, and audit reference | `agent-envelope-unavailable` |
-

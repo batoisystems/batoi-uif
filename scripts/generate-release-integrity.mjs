@@ -1,14 +1,15 @@
 import { createHash } from 'node:crypto';
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { URL } from 'node:url';
 import { gzipSync } from 'node:zlib';
+import { distributionFiles } from './distribution-files.mjs';
 
 const root = new URL('..', import.meta.url);
 const dist = new URL('dist/', root);
 const pkg = JSON.parse(readFileSync(new URL('package.json', root), 'utf8'));
 const files = {};
 
-for (const name of readdirSync(dist).filter((entry) => entry !== 'integrity.json').sort()) {
+for (const name of distributionFiles(dist)) {
   const bytes = readFileSync(new URL(name, dist));
   files[name] = {
     bytes: bytes.length,

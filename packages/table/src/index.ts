@@ -523,7 +523,7 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
   applyResponsiveColumns(table);
   table.querySelectorAll<HTMLTableCellElement>('th[data-uif-sort]').forEach((header, index) => {
     header.tabIndex = 0;
-    header.setAttribute('role', 'button');
+    // Keep native columnheader semantics for aria-sort and reading order.
     header.setAttribute('aria-sort', 'none');
     const sort = () => {
       const current = activeSort(table);
@@ -587,7 +587,7 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
       nextCell.tabIndex = 0;
       nextCell.focus();
     }
-  });
+  }, listenerOptions);
   document.querySelectorAll<HTMLElement>(`[data-uif-table-action][data-uif-target="#${cssEscape(table.id)}"]`).forEach((actionEl) => {
     actionEl.addEventListener('click', () => {
       const action = actionEl.dataset.uifTableAction || actionEl.dataset.uifAction || '';
@@ -621,7 +621,7 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
       const id = row.dataset.uifRowId || row.querySelector<HTMLInputElement>('[data-uif-role="row-select"]')?.value || '';
       table.dispatchEvent(new CustomEvent('uif:table-row-action', { detail: { table, action, row, id }, bubbles: true }));
     }
-  });
+  }, listenerOptions);
   updateSelectionState(table);
   updatePaginationControls(table);
   if (options.src || table.dataset.uifSrc) void loadRemoteTable(table, options);

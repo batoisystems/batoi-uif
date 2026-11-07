@@ -1,0 +1,412 @@
+{
+  "schemaVersion": 1,
+  "frameworkVersion": "4.0.0-alpha.1",
+  "components": [
+    {
+      "name": "accordion",
+      "package": "components",
+      "status": "v4-canonical-automated",
+      "manualAcceptance": "pending",
+      "fallback": "Section content is visible before enhancement.",
+      "note": "Canonical keyboard, axe and lifecycle fixtures exist; manual/device acceptance remains open."
+    },
+    {
+      "name": "agent-tool",
+      "package": "mcp",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Tool plan, review, progress, result, or receipt summary",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "ai-action",
+      "package": "ai",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Button or form describing an assistant action",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "ai-composer",
+      "package": "ai",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Labelled textarea and submit button",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "ai-thread",
+      "package": "ai",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Ordered message transcript",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "ajax",
+      "package": "rad-adapter",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Link, button, or form with a normal server destination",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "alert",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Inline alert content",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "animate",
+      "package": "effects",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Static final visual state",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "badge",
+      "package": "components",
+      "status": "presentational-adapter",
+      "manualAcceptance": "pending",
+      "fallback": "Inline status text",
+      "note": "Class/role/state decoration does not imply a workflow, drag/drop or advanced control engine."
+    },
+    {
+      "name": "breadcrumb",
+      "package": "components",
+      "status": "presentational-adapter",
+      "manualAcceptance": "pending",
+      "fallback": "Navigation list",
+      "note": "Class/role/state decoration does not imply a workflow, drag/drop or advanced control engine."
+    },
+    {
+      "name": "button",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Native button or link",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "card",
+      "package": "components",
+      "status": "presentational-adapter",
+      "manualAcceptance": "pending",
+      "fallback": "Article or section",
+      "note": "Class/role/state decoration does not imply a workflow, drag/drop or advanced control engine."
+    },
+    {
+      "name": "carousel",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Sequential figures or articles",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "chart",
+      "package": "charts",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Accessible data table or textual summary",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "collapse",
+      "package": "components",
+      "status": "v4-canonical-automated",
+      "manualAcceptance": "pending",
+      "fallback": "Content remains visible before enhancement.",
+      "note": "Canonical keyboard, axe and lifecycle fixtures exist; manual/device acceptance remains open."
+    },
+    {
+      "name": "combobox",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Labelled native input and option list",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "command-menu",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Search input and command list",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "dashboard",
+      "package": "dashboard",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Sections containing metrics, tables, and lists",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "desktop-shell",
+      "package": "desktop",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Application landmarks and navigation",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "drawer",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Visible complementary region",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "dropdown",
+      "package": "components",
+      "status": "v4-canonical-automated",
+      "manualAcceptance": "pending",
+      "fallback": "Keep important navigation as visible native links without JavaScript.",
+      "note": "Canonical keyboard, axe and lifecycle fixtures exist; manual/device acceptance remains open."
+    },
+    {
+      "name": "editor",
+      "package": "editor",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Textarea",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "file-upload",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Native file input",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "form",
+      "package": "forms",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Native form and controls",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "install-prompt",
+      "package": "pwa",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Normal installation guidance",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "lightbox",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Linked image gallery",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "masonry",
+      "package": "components",
+      "status": "presentational-adapter",
+      "manualAcceptance": "pending",
+      "fallback": "Sequential card or figure list",
+      "note": "Class/role/state decoration does not imply a workflow, drag/drop or advanced control engine."
+    },
+    {
+      "name": "mobile-shell",
+      "package": "mobile",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Mobile application landmarks and navigation",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "modal",
+      "package": "components",
+      "status": "v4-canonical-automated",
+      "manualAcceptance": "pending",
+      "fallback": "Dialog content requires an ordinary page/link alternative when initially hidden.",
+      "note": "Canonical keyboard, axe and lifecycle fixtures exist; manual/device acceptance remains open."
+    },
+    {
+      "name": "nav",
+      "package": "components",
+      "status": "presentational-adapter",
+      "manualAcceptance": "pending",
+      "fallback": "Navigation region",
+      "note": "Class/role/state decoration does not imply a workflow, drag/drop or advanced control engine."
+    },
+    {
+      "name": "navbar",
+      "package": "components",
+      "status": "presentational-adapter",
+      "manualAcceptance": "pending",
+      "fallback": "Navigation region",
+      "note": "Class/role/state decoration does not imply a workflow, drag/drop or advanced control engine."
+    },
+    {
+      "name": "offcanvas",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Visible complementary region",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "pagination",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Navigation list",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "popover",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Inline contextual content",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "progress",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Native progress element or textual status",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "push",
+      "package": "push",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Notification preference control",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "realtime",
+      "package": "realtime",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Existing feed content",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "route",
+      "package": "router",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Native link navigation",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "shell",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Header, navigation, main, and complementary landmarks",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "sidebar",
+      "package": "components",
+      "status": "presentational-adapter",
+      "manualAcceptance": "pending",
+      "fallback": "Complementary navigation region",
+      "note": "Class/role/state decoration does not imply a workflow, drag/drop or advanced control engine."
+    },
+    {
+      "name": "skeleton",
+      "package": "components",
+      "status": "presentational-adapter",
+      "manualAcceptance": "pending",
+      "fallback": "Existing content or loading status",
+      "note": "Class/role/state decoration does not imply a workflow, drag/drop or advanced control engine."
+    },
+    {
+      "name": "spinner",
+      "package": "components",
+      "status": "presentational-adapter",
+      "manualAcceptance": "pending",
+      "fallback": "Textual loading status",
+      "note": "Class/role/state decoration does not imply a workflow, drag/drop or advanced control engine."
+    },
+    {
+      "name": "stepper",
+      "package": "components",
+      "status": "presentational-adapter",
+      "manualAcceptance": "pending",
+      "fallback": "Ordered list of steps",
+      "note": "Class/role/state decoration does not imply a workflow, drag/drop or advanced control engine."
+    },
+    {
+      "name": "table",
+      "package": "table",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Semantic table",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "tabs",
+      "package": "components",
+      "status": "v4-canonical-automated",
+      "manualAcceptance": "pending",
+      "fallback": "Sequential content sections remain visible before enhancement.",
+      "note": "Canonical keyboard, axe and lifecycle fixtures exist; manual/device acceptance remains open."
+    },
+    {
+      "name": "toast",
+      "package": "components",
+      "status": "v4-canonical-automated",
+      "manualAcceptance": "pending",
+      "fallback": "Inline status text.",
+      "note": "Canonical keyboard, axe and lifecycle fixtures exist; manual/device acceptance remains open."
+    },
+    {
+      "name": "tool-approval",
+      "package": "mcp",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Review summary with explicit decision controls",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "tooltip",
+      "package": "components",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Adjacent help text",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "typed-text",
+      "package": "effects",
+      "status": "v3-compatibility-v4-pending",
+      "manualAcceptance": "pending",
+      "fallback": "Complete static text",
+      "note": "Existing compatibility capability, not promoted to the v4 canonical acceptance contract."
+    },
+    {
+      "name": "wizard",
+      "package": "components",
+      "status": "presentational-adapter",
+      "manualAcceptance": "pending",
+      "fallback": "Sequential fieldsets",
+      "note": "Class/role/state decoration does not imply a workflow, drag/drop or advanced control engine."
+    }
+  ],
+  "limitations": [
+    "Mobile swipe-action and pull-to-refresh helpers currently decorate markup; they are not gesture engines.",
+    "Native date-input examples are not a full calendar/date-range engine.",
+    "Theme recipes are browser layouts, not native OS applications.",
+    "Browser AI/MCP packages do not execute privileged tools."
+  ]
+}

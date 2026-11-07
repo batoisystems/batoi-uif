@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { URL } from 'node:url';
+import { distributionFiles } from './distribution-files.mjs';
 
 function readJson(url) {
   return JSON.parse(readFileSync(url, 'utf8'));
@@ -39,8 +40,17 @@ export function collectReleaseMetadata(root) {
     dependencies,
   };
 
-  const artifactNames = ['index.d.ts', 'index.js', 'index.global.js', 'uif.css', 'uif.esm.js', 'uif.iife.js'];
+  const artifactNames = distributionFiles(new URL('dist/', root)).filter((name) => !['provenance.json', 'sbom.cdx.json'].includes(name));
   const subjects = artifactNames.map((name) => ({ name: `dist/${name}`, digest: { sha256: digest(new URL(`dist/${name}`, root)) } }));
+  const inputPaths = ['index.ts', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.base.json', 'tsup.config.mjs', '.github/workflows/ci.yml'];
+  for (const directory of ['packages', 'scripts', 'tools']) {
+    for (const name of readdirSync(new URL(`${directory}/`, root), { recursive: true })) {
+      if (typeof name !== 'string' || /(?:^|\/)dist\//.test(name) || /\.test\./.test(name)) continue;
+      if (directory === 'packages' ? /\/src\/.+\.ts$|\/package\.json$|^css\/[^/]+\.css$/.test(name) : /\.(mjs|js|css|html)$/.test(name)) inputPaths.push(`${directory}/${name}`);
+    }
+  }
+  const inputManifest = Object.fromEntries(inputPaths.sort().map((name) => [name, digest(new URL(name, root))]));
+  const sourceDigest = createHash('sha256').update(JSON.stringify(inputManifest)).digest('hex');
   const provenance = {
     _type: 'https://in-toto.io/Statement/v1',
     subject: subjects,
@@ -48,12 +58,15 @@ export function collectReleaseMetadata(root) {
     predicate: {
       buildDefinition: {
         buildType: 'https://batoi.com/uif/npm-workspace-build/v1',
-        externalParameters: { version: rootPackage.version, command: 'npm run build:dist' },
-        internalParameters: { runtimeDependencies: 'workspace-only', sourceMaps: false },
-        resolvedDependencies: [],
+        externalParameters: { version: rootPackage.version, command: 'npm run build' },
+        internalParameters: { runtimeDependencies: 'workspace-only', sourceMaps: false, sourceInputCount: inputPaths.length, sourceDigestFormat: 'SHA-256 of sorted JSON relative-path to SHA-256 input map' },
+        resolvedDependencies: [
+          { uri: 'file:package-lock.json', digest: { sha256: digest(new URL('package-lock.json', root)) } },
+          { uri: 'uif:workspace-build-inputs', digest: { sha256: sourceDigest } },
+        ],
       },
       runDetails: {
-        builder: { id: 'https://github.com/batoi/batoi-uif/.github/workflows/ci.yml' },
+        builder: { id: 'https://github.com/batoisystems/batoi-uif/.github/workflows/ci.yml' },
         metadata: { invocationId: `batoi-uif-${rootPackage.version}`, startedOn: null, finishedOn: null },
       },
     },

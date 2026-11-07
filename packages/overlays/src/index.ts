@@ -29,7 +29,10 @@ function top(): OverlayRecord | undefined {
 
 function onKey(event: KeyboardEvent): void {
   const entry = top();
-  if (event.key === 'Escape' && entry && entry.options.closeOnEscape !== false) closeOverlay(entry.el);
+  if (event.key === 'Escape' && entry && entry.options.closeOnEscape !== false) {
+    event.preventDefault();
+    void closeOverlay(entry.el);
+  }
 }
 
 function emitOverlay(type: string, entry: OverlayRecord): void {
@@ -45,6 +48,7 @@ function syncOverlayState(): void {
   const activeModal = stack.some((entry) => entry.options.modal);
   const inertBackground = stack.some((entry) => entry.options.modal && entry.options.inert !== false);
   document.body.classList.toggle('uif-overlay-open', activeModal);
+  document.body.classList.toggle('uif-modal-open', stack.some((entry) => entry.el.dataset.uif === 'modal'));
 
   const protectedElements = new Set<HTMLElement>();
   stack.forEach((entry) => {
@@ -111,7 +115,8 @@ export async function openOverlay(el: HTMLElement, options: OverlayOptions = {})
   } finally {
     opening.delete(el);
   }
-  el.querySelector<HTMLElement>('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')?.focus();
+  if (!stack.includes(entry)) return;
+  el.querySelector<HTMLElement>('button:not(:disabled),[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')?.focus();
   emitOverlay('uif:overlay-opened', entry);
 }
 
@@ -134,6 +139,19 @@ export async function closeOverlay(el: HTMLElement | undefined = top()?.el): Pro
   if (!stack.length) {
     document.removeEventListener('keydown', onKey);
   }
+  emitOverlay('uif:overlay-closed', entry);
+}
+
+/** Synchronous lifecycle cleanup, without returning focus to a removed subtree. */
+export function destroyOverlay(el: HTMLElement): void {
+  const index = stack.findIndex((entry) => entry.el === el);
+  if (index < 0) return;
+  const [entry] = stack.splice(index, 1);
+  emitOverlay('uif:overlay-close', entry);
+  el.hidden = true;
+  el.setAttribute('aria-hidden', 'true');
+  syncOverlayState();
+  if (!stack.length) document.removeEventListener('keydown', onKey);
   emitOverlay('uif:overlay-closed', entry);
 }
 

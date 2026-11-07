@@ -1648,7 +1648,7 @@ export function adaptRecords(
   });
 }
 
-async function loadChartData(el: HTMLElement): Promise<ChartDatum[]> {
+async function loadChartData(el: HTMLElement, signal?: AbortSignal): Promise<ChartDatum[]> {
   if (el.dataset.uifTable) {
     const table = document.querySelector<HTMLTableElement>(el.dataset.uifTable);
     if (table) return adaptTable(table);
@@ -1658,7 +1658,7 @@ async function loadChartData(el: HTMLElement): Promise<ChartDatum[]> {
     if (!isSafeURL(el.dataset.uifSrc, { context: 'network', allowHash: false, sameOrigin: !allowCrossOrigin, requireCapability: allowCrossOrigin })) throw new Error('Batoi UIF blocked an unsafe chart data URL');
     const response = await request<ChartDatum[] | { data?: ChartDatum[]; rows?: ChartDatum[] }>(
       el.dataset.uifSrc,
-      { method: 'GET' },
+      { method: 'GET', signal },
     );
     if (Array.isArray(response)) return response;
     return response.data ?? response.rows ?? [];
@@ -1666,11 +1666,11 @@ async function loadChartData(el: HTMLElement): Promise<ChartDatum[]> {
   return Promise.resolve(parseChartData(el));
 }
 
-async function loadFlintChart(el: HTMLElement): Promise<FlintChartAdapterResult> {
+async function loadFlintChart(el: HTMLElement, signal?: AbortSignal): Promise<FlintChartAdapterResult> {
   if (el.dataset.uifSrc) {
     const allowCrossOrigin = el.dataset.uifAllowCrossOrigin === 'true';
     if (!isSafeURL(el.dataset.uifSrc, { context: 'network', allowHash: false, sameOrigin: !allowCrossOrigin, requireCapability: allowCrossOrigin })) throw new Error('Batoi UIF blocked an unsafe chart data URL');
-    const response = await request<unknown>(el.dataset.uifSrc, { method: 'GET' });
+    const response = await request<unknown>(el.dataset.uifSrc, { method: 'GET', signal });
     return adaptFlintChart(flintInputFromElement(el, response), optionsFromElement(el, false));
   }
   return adaptFlintChart(flintInputFromElement(el), optionsFromElement(el, false));
@@ -1847,18 +1847,29 @@ export function initChart(el: HTMLElement): ChartController {
   let data: ChartDatum[] = [];
   let timer: number | undefined;
   let resizeTimer: number | undefined;
+  let destroyed = false;
+  let revision = 0;
+  let pending: AbortController | undefined;
 
   const refresh = async () => {
+    if (destroyed) return;
+    const current = ++revision;
+    pending?.abort();
+    pending = new AbortController();
+    const signal = pending.signal;
     el.dataset.uifState = 'loading';
     try {
       if (el.dataset.uifChartFormat === 'flint') {
-        const adapted = await loadFlintChart(el);
+        const adapted = await loadFlintChart(el, signal);
+        if (destroyed || current !== revision) return;
         data = adapted.data;
         options = adapted.options;
         if (adapted.warnings.length) el.dataset.uifChartWarnings = adapted.warnings.join(' | ');
         else delete el.dataset.uifChartWarnings;
       } else {
-        data = await loadChartData(el);
+        const loaded = await loadChartData(el, signal);
+        if (destroyed || current !== revision) return;
+        data = loaded;
         options = optionsFromElement(el);
       }
       setTrustedHTML(el, renderChart(data, responsiveOptions(el, options)), { trusted: true, context: 'chart render' });
@@ -1867,6 +1878,7 @@ export function initChart(el: HTMLElement): ChartController {
         new CustomEvent('uif:chart-refresh', { detail: { data, options }, bubbles: true }),
       );
     } catch (error) {
+      if (destroyed || current !== revision || signal.aborted) return;
       el.dataset.uifState = 'error';
       setTrustedHTML(el, `<div class="uif-chart-state" data-uif-state="error">${esc(el.dataset.uifError || 'Unable to load chart')}</div>`, { trusted: true, context: 'chart error' });
       el.dispatchEvent(new CustomEvent('uif:chart-error', { detail: { error }, bubbles: true }));
@@ -1877,15 +1889,19 @@ export function initChart(el: HTMLElement): ChartController {
   const resize =
     typeof ResizeObserver !== 'undefined'
       ? new ResizeObserver(() => {
+          if (destroyed) return;
           if (resizeTimer) window.clearTimeout(resizeTimer);
           resizeTimer = window.setTimeout(() => {
+            if (destroyed) return;
             setTrustedHTML(el, renderChart(data, responsiveOptions(el, options)), { trusted: true, context: 'chart resize' });
           }, 80);
         })
       : null;
   resize?.observe(el);
-  if (el.dataset.uifRefresh === 'interval' || el.dataset.uifInterval)
-    timer = window.setInterval(() => void refresh(), Number(el.dataset.uifInterval || 30000));
+  if (el.dataset.uifRefresh === 'interval' || el.dataset.uifInterval) {
+    const interval = Number(el.dataset.uifInterval || 30000);
+    timer = window.setInterval(() => void refresh().catch(() => undefined), Number.isFinite(interval) ? Math.max(1000, Math.min(3600000, interval)) : 30000);
+  }
 
   const select = (event: Event) => {
     const target =
@@ -1922,6 +1938,10 @@ export function initChart(el: HTMLElement): ChartController {
   const controller = {
     refresh,
     destroy() {
+      if (destroyed) return;
+      destroyed = true;
+      revision++;
+      pending?.abort();
       resize?.disconnect();
       if (timer) window.clearInterval(timer);
       if (resizeTimer) window.clearTimeout(resizeTimer);
@@ -1929,7 +1949,7 @@ export function initChart(el: HTMLElement): ChartController {
       el.removeEventListener('keydown', select);
       el.removeEventListener('focusin', announceMark);
       el.removeEventListener('mouseover', announceMark);
-      controllers.delete(el);
+      if (controllers.get(el) === controller) controllers.delete(el);
     },
   };
   controllers.set(el, controller);

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>UIF 4 theme studio</title>
+    <link rel="stylesheet" href="/studio.css" />
+  </head>
+  <body>
+    <header>
+      <h1>UIF 4 theme studio</h1>
+      <p>Development-only, local preview. No model, file application or publishing authority.</p>
+    </header>
+    <main>
+      <section aria-labelledby="manifest-heading">
+        <h2 id="manifest-heading">Portable manifest and token inspector</h2>
+        <label for="source">Theme JSON</label
+        ><textarea id="source" spellcheck="false" maxlength="100000" rows="24"></textarea
+        ><label for="file">Open a local theme manifest</label
+        ><input id="file" type="file" accept=".json,application/json" />
+        <div>
+          <button id="build" type="button">Validate and preview</button
+          ><button id="download" type="button">Export manifest</button>
+        </div>
+        <p id="status" role="status" aria-live="polite">Loading starter…</p>
+        <pre
+          id="report"
+          role="region"
+          tabindex="0"
+          aria-label="Validation, contrast and byte report"
+        ></pre>
+      </section>
+      <section aria-labelledby="preview-heading">
+        <h2 id="preview-heading">Responsive preview and states</h2>
+        <div class="controls">
+          <div>
+            <label for="profile">Profile</label
+            ><select id="profile">
+              <option>web</option>
+              <option>mobile</option>
+              <option>desktop</option>
+            </select>
+          </div>
+          <div>
+            <label for="mode">Mode</label
+            ><select id="mode">
+              <option>light</option>
+              <option>dark</option>
+              <option>high-contrast</option>
+            </select>
+          </div>
+          <div>
+            <label for="direction">Direction</label
+            ><select id="direction">
+              <option value="ltr">LTR</option>
+              <option value="rtl">RTL</option>
+            </select>
+          </div>
+          <div>
+            <label for="density">Density</label
+            ><select id="density">
+              <option>comfortable</option>
+              <option>compact</option>
+            </select>
+          </div>
+          <div>
+            <label for="width">Width</label
+            ><select id="width">
+              <option value="320">320</option>
+              <option value="768">768</option>
+              <option value="1440">1440</option>
+            </select>
+          </div>
+        </div>
+        <div id="viewport" data-width="320">
+          <iframe id="preview" title="Isolated theme preview" sandbox="allow-same-origin"></iframe>
+        </div>
+        <p>
+          Static controls illustrate states; they do not submit data. Missing selected
+          profiles/modes are reported. Contrast ratios cover specified semantic pairs, not full WCAG
+          conformance.
+        </p>
+      </section>
+    </main>
+    <script type="module" src="/studio.js"></script>
+  </body>
+</html>

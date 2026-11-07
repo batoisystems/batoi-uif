@@ -1,4 +1,7 @@
 import {
+  coreUiIcons
+} from "./chunk-Y7W2JUIA.js";
+import {
   deviceIcons
 } from "./chunk-5HU5KHID.js";
 import {
@@ -25,9 +28,6 @@ import {
 import {
   contentIcons
 } from "./chunk-6NIHK33E.js";
-import {
-  coreUiIcons
-} from "./chunk-Y7W2JUIA.js";
 
 // src/sets/index.ts
 var iconSets = {

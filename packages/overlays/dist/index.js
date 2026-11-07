@@ -9,7 +9,10 @@ function top() {
 }
 function onKey(event) {
   const entry = top();
-  if (event.key === "Escape" && entry && entry.options.closeOnEscape !== false) closeOverlay(entry.el);
+  if (event.key === "Escape" && entry && entry.options.closeOnEscape !== false) {
+    event.preventDefault();
+    void closeOverlay(entry.el);
+  }
 }
 function emitOverlay(type, entry) {
   entry.el.dispatchEvent(
@@ -23,6 +26,7 @@ function syncOverlayState() {
   const activeModal = stack.some((entry) => entry.options.modal);
   const inertBackground = stack.some((entry) => entry.options.modal && entry.options.inert !== false);
   document.body.classList.toggle("uif-overlay-open", activeModal);
+  document.body.classList.toggle("uif-modal-open", stack.some((entry) => entry.el.dataset.uif === "modal"));
   const protectedElements = /* @__PURE__ */ new Set();
   stack.forEach((entry) => {
     let node = entry.el;
@@ -84,7 +88,8 @@ async function openOverlay(el, options = {}) {
   } finally {
     opening.delete(el);
   }
-  el.querySelector('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')?.focus();
+  if (!stack.includes(entry)) return;
+  el.querySelector('button:not(:disabled),[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')?.focus();
   emitOverlay("uif:overlay-opened", entry);
 }
 async function closeOverlay(el = top()?.el) {
@@ -106,6 +111,17 @@ async function closeOverlay(el = top()?.el) {
   if (!stack.length) {
     document.removeEventListener("keydown", onKey);
   }
+  emitOverlay("uif:overlay-closed", entry);
+}
+function destroyOverlay(el) {
+  const index = stack.findIndex((entry2) => entry2.el === el);
+  if (index < 0) return;
+  const [entry] = stack.splice(index, 1);
+  emitOverlay("uif:overlay-close", entry);
+  el.hidden = true;
+  el.setAttribute("aria-hidden", "true");
+  syncOverlayState();
+  if (!stack.length) document.removeEventListener("keydown", onKey);
   emitOverlay("uif:overlay-closed", entry);
 }
 async function toggleOverlay(el, options = {}) {
@@ -159,6 +175,7 @@ function positionOverlay(anchor, panel, options = {}) {
 }
 export {
   closeOverlay,
+  destroyOverlay,
   getOverlayStack,
   openOverlay,
   positionOverlay,

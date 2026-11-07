@@ -1,4 +1,4 @@
-import { emit } from './index.js';
+import { emit } from './runtime.js';
 import { parseUIFConfiguration, UIFError, type UIFErrorDetail, type UIFResourceLimits } from './contracts.js';
 import { createResourceScope, type UIFResourceScope } from './resource-scope.js';
 
@@ -157,6 +157,7 @@ export function createComponentRegistry(): UIFComponentRegistry {
         });
         if (!parsed.valid) {
           emit('uif:runtime:diagnostic', { component: name, issues: parsed.issues }, element);
+          if ((definition.version ?? 3) >= 4) return;
         }
         const options = Object.freeze({ ...(definition.defaults ?? {}), ...parsed.value });
         const resources = createResourceScope();

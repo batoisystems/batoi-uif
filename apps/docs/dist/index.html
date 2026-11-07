@@ -4,19 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Batoi UIF Docs</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/uif-color-tile-32-DHUY_k2h.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/uif-color-tile-16-CbYhdgqP.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/uif-color-tile-180-DxEXKgXA.png" />
-    <link rel="icon" type="image/svg+xml" href="/assets/uif-color-DOffQSqc.svg" />
-    <link rel="stylesheet" crossorigin href="/assets/index-CfPDtBpb.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/uif-color-tile-32-DHUY_k2h.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/uif-color-tile-16-CbYhdgqP.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/uif-color-tile-180-DxEXKgXA.png" />
+    <link rel="icon" type="image/svg+xml" href="./assets/uif-color-DOffQSqc.svg" />
+    <script type="module" crossorigin src="./assets/index-DurrA4Dr.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Bct0x_D4.css">
   </head>
-  <body>
+  <body class="uif-docs">
     <main class="uif-container uif-stack uif-p-4">
       <h1>Batoi UIF Documentation</h1>
-      <p><strong>Version 3.1.0</strong> · Carousel and QA improvements</p>
+      <p><strong>UIF 4 development preview</strong> · Stable compatibility release: 3.1.0</p>
       <p>Dependency-free, HTML-first interface framework for server-rendered, RAD, mobile, realtime, push, and AI-assisted applications.</p>
 
       <nav class="uif-cluster" aria-label="Documentation sections" data-uif="nav">
+        <a href="#v4-essential">Small UIF 4 include</a>
+        <a href="#theme-authoring">Theme authors</a>
+        <a href="#ai-authoring">AI authoring</a>
         <a href="#getting-started">Getting Started</a>
         <a href="#installation">Installation</a>
         <a href="#browser-distribution">Browser Distribution</a>
@@ -44,6 +48,41 @@
         <a href="#roadmap">Roadmap</a>
       </nav>
 
+      <label for="docs-search">Search documentation</label>
+      <input id="docs-search" class="uif-input" type="search" autocomplete="off" aria-describedby="docs-search-status">
+      <p id="docs-search-status" role="status" aria-live="polite">Search the sections on this page.</p>
+
+      <section id="v4-essential" class="uif-card">
+        <h2>Include UIF 4 in five minutes</h2>
+        <p>Development build: use the essential runtime for modal, dropdown, tabs, accordion, collapse and toast. No chart, editor, full icon catalog or AI authoring server is downloaded. Copy <code>dist/v4/essential.js</code> and <code>essential.css</code> to your assets directory, then use an external bootstrap:</p>
+        <pre><code>&lt;link rel="stylesheet" href="/assets/uif/v4/essential.css"&gt;
+&lt;script type="module" src="/assets/app-bootstrap.js"&gt;&lt;/script&gt;
+
+// app-bootstrap.js
+import { startEssential } from '/assets/uif/v4/essential.js';
+const application = startEssential(document);
+// After an application-owned partial update:
+// application.refresh(changedSubtree);
+// On application teardown:
+// application.destroy();</code></pre>
+        <p>Importing alone does not mount controls. Do not start the broad compatibility runtime on the same subtree. <a href="./examples/v4-essential/">Open the generated canonical example</a>. <code>dist/v4/manifest.json</code> records measured JS/CSS bytes and SRI; application bootstrap, data and assets are additional.</p>
+      </section>
+
+      <section id="theme-authoring" class="uif-card">
+        <h2>Theme author journey</h2>
+        <p>A single typed JSON pack builds responsive web, mobile bottom navigation and desktop workspace previews, with scoped light/dark tokens. These are browser layouts, not native OS applications. Token contrast checks supplement rendered and manual accessibility checks.</p>
+        <pre><code>npm run theme -- create brand.json brand
+npm run theme -- validate brand.json
+npm run theme -- build brand.json output/brand</code></pre>
+        <p><a href="./reference/theme-authoring.md">Compiler, token subset, CLI and trust boundaries</a> · <a href="./reference/generated/theme.schema.json">Theme schema</a> · <a href="./dist/v4/theme/web.html">Web preview</a> · <a href="./dist/v4/theme/mobile.html">Mobile preview</a> · <a href="./dist/v4/theme/desktop.html">Desktop preview</a></p>
+      </section>
+
+      <section id="ai-authoring" class="uif-card">
+        <h2>AI authoring journey</h2>
+        <p>Give Claude, ChatGPT or another assistant the compact context, schema and starter pack. Validate its returned JSON locally using the same CLI. Local MCP discovery/build/export tools are optional; no model SDK or provider credential enters the browser runtime. Hosted connector acceptance and public OAuth deployment are not yet verified.</p>
+        <p><a href="./reference/generated/ai-theme-context.md">Compact context</a> · <a href="./reference/generated/starter.theme.json">Starter pack</a> · <a href="./reference/generated/v4-components.md">Canonical component contracts</a> · <a href="./reference/v4-architecture.md">Architecture and migration</a></p>
+      </section>
+
       <section id="getting-started" class="uif-card">
         <h2>Getting Started</h2>
         <pre><code>npm install
@@ -55,7 +94,11 @@ npm run build</code></pre>
       <section id="installation" class="uif-card">
         <h2>Installation</h2>
         <pre><code>&lt;link rel="stylesheet" href="/assets/uif/uif.css"&gt;
-&lt;script type="module" src="/assets/uif/uif.esm.js"&gt;&lt;/script&gt;</code></pre>
+&lt;script type="module" src="/assets/app-bootstrap.js"&gt;&lt;/script&gt;
+
+// app-bootstrap.js — full compatibility build
+import { start } from '/assets/uif/uif.esm.js';
+start(document);</code></pre>
       </section>
 
       <section id="browser-distribution" class="uif-card">
@@ -90,8 +133,10 @@ init(document);</code></pre>
         <h2>Components</h2>
         <p>Component coverage includes modal, drawer, dropdown, tabs, toast, accordion, alert, badge, breadcrumb, collapse, tooltip, popover, progress, spinner, skeleton, pagination, command menu, navbar/sidebar, stepper/wizard, file upload, and combobox. The component gallery also demonstrates professional app-pattern primitives such as button matrices, toolbars, form sections, metric rows, hero banners, summary blocks, inspectors, stat cards, empty states, filter builders, notification panels, and picker wrappers.</p>
         <div data-uif="tabs">
+          <div data-uif-role="tablist" aria-label="Component examples">
           <button data-uif-role="tab">Modal</button>
           <button data-uif-role="tab">Dropdown</button>
+          </div>
           <div data-uif-role="tabpanel">Components initialize from declarative markup and include ARIA defaults.</div>
           <div data-uif-role="tabpanel"><code>data-uif="dropdown"</code> closes on outside click and Escape.</div>
         </div>
@@ -244,7 +289,7 @@ uif('.item').addClass('active').text('Ready');</code></pre>
 
       <section id="roadmap" class="uif-card">
         <h2>Roadmap</h2>
-        <p>Version 2.4 adds the v3-compatible lifecycle and contract foundation, IndexedDB Micro App storage, centralized security policies, and complete governed AI/MCP UI workflows while preserving the dependency-free public surface.</p>
+        <p>UIF 4 development focuses on selective imports, smaller includes, typed themes, provider-neutral authoring and stronger accessibility/lifecycle evidence. The broad 3.1 compatibility facade remains available during adoption; GA requires the published release gates and actual integration acceptance.</p>
       </section>
     </main>
   </body>

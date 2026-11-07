@@ -1,0 +1,15 @@
+.uif-docs main,
+.uif-docs main > * {
+  min-inline-size: 0;
+}
+
+.uif-docs pre {
+  max-inline-size: 100%;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.uif-docs section {
+  overflow-wrap: anywhere;
+}

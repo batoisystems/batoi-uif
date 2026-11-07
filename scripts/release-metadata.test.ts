@@ -16,7 +16,9 @@ describe('release supply-chain metadata', () => {
 
   it('covers all distributable browser artifacts with SHA-256 subjects', () => {
     const { provenance } = collectReleaseMetadata(root);
-    expect(provenance.subject).toHaveLength(6);
+    expect(provenance.subject.length).toBeGreaterThan(6);
+    expect(provenance.subject.some((subject) => subject.name === 'dist/v4/essential.js')).toBe(true);
+    expect(provenance.predicate.buildDefinition.resolvedDependencies).toHaveLength(2);
     expect(provenance.subject.every((subject) => /^[a-f0-9]{64}$/.test(subject.digest.sha256))).toBe(true);
   });
 });

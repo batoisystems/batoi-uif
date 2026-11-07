@@ -8,7 +8,7 @@
     "actions": 5000,
     "ai": 5000,
     "charts": 24000,
-    "components": 10000,
+    "components": 12000,
     "core": 33000,
     "dashboard": 3000,
     "desktop": 5000,
@@ -33,6 +33,7 @@
     "table": 8000
   },
   "budgetNotes": {
+    "v4-component-packaging": "The independently importable control entry points, shared chunks, explicit application owner and keyboard/teardown fixes measured 11,003 gzip bytes across every package JS file before the esbuild update. The package/archive inventory ceiling is 12,000; this is not a consumer download budget. The v4 essential JS/CSS budgets remain 24,000/10,000 and the full browser ceiling stays 148,000. Per-consumer graphs and sizes are tested separately.",
     "v3-foundation": "The v3 alpha includes complete typed component metadata, unified resource and hydration ownership, capability groups, a diagnostic compatibility build, generated contracts, versioned token and locale modes, SBOM/provenance, and the completed security and agent foundations. Core remains below 33 KB gzip and the alpha compatibility bundle remains below 148 KB gzip; profile imports remain the production recommendation."
   }
 }

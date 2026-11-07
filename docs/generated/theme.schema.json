@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UIF portable theme, supported DTCG subset",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "name",
+    "framework",
+    "profiles",
+    "components",
+    "tokens",
+    "modes",
+    "layouts"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,63}$"
+    },
+    "framework": {
+      "const": "^4.0.0"
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "web",
+          "mobile",
+          "desktop"
+        ]
+      }
+    },
+    "components": {
+      "type": "array",
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "modal",
+          "dropdown",
+          "tabs",
+          "accordion",
+          "collapse",
+          "toast"
+        ]
+      }
+    },
+    "tokens": {
+      "$ref": "#/$defs/tree"
+    },
+    "modes": {
+      "type": "object",
+      "required": [
+        "light"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "light": {
+          "$ref": "#/$defs/tree"
+        },
+        "dark": {
+          "$ref": "#/$defs/tree"
+        },
+        "high-contrast": {
+          "$ref": "#/$defs/tree"
+        }
+      }
+    },
+    "layouts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "web": {
+          "enum": [
+            "sidebar",
+            "content"
+          ]
+        },
+        "mobile": {
+          "enum": [
+            "bottom-nav",
+            "stack"
+          ]
+        },
+        "desktop": {
+          "enum": [
+            "workspace",
+            "sidebar"
+          ]
+        }
+      }
+    },
+    "assets": {
+      "type": "array",
+      "maxItems": 0
+    }
+  },
+  "$defs": {
+    "tree": {
+      "type": "object",
+      "maxProperties": 512,
+      "propertyNames": {
+        "pattern": "^(\\$description|[a-z][a-z0-9-]{0,63})$"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "$ref": "#/$defs/token"
+          },
+          {
+            "$ref": "#/$defs/tree"
+          }
+        ]
+      }
+    },
+    "token": {
+      "type": "object",
+      "required": [
+        "$value"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "$type": {
+          "enum": [
+            "color",
+            "dimension",
+            "duration",
+            "number",
+            "fontWeight",
+            "fontFamily",
+            "cubicBezier"
+          ]
+        },
+        "$value": {},
+        "$description": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "description": "Run the UIF validator as well: alias/type/contrast/resource and cross-field constraints are not all expressible here. Active code, arbitrary CSS, remote assets and public server deployment are outside this format."
+}

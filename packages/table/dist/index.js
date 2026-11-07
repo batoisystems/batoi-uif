@@ -425,7 +425,6 @@ function initTable(table, options = {}) {
   applyResponsiveColumns(table);
   table.querySelectorAll("th[data-uif-sort]").forEach((header, index) => {
     header.tabIndex = 0;
-    header.setAttribute("role", "button");
     header.setAttribute("aria-sort", "none");
     const sort2 = () => {
       const current = activeSort(table);
@@ -489,7 +488,7 @@ function initTable(table, options = {}) {
       nextCell.tabIndex = 0;
       nextCell.focus();
     }
-  });
+  }, listenerOptions);
   document.querySelectorAll(`[data-uif-table-action][data-uif-target="#${cssEscape(table.id)}"]`).forEach((actionEl) => {
     actionEl.addEventListener("click", () => {
       const action = actionEl.dataset.uifTableAction || actionEl.dataset.uifAction || "";
@@ -523,7 +522,7 @@ function initTable(table, options = {}) {
       const id = row.dataset.uifRowId || row.querySelector('[data-uif-role="row-select"]')?.value || "";
       table.dispatchEvent(new CustomEvent("uif:table-row-action", { detail: { table, action, row, id }, bubbles: true }));
     }
-  });
+  }, listenerOptions);
   updateSelectionState(table);
   updatePaginationControls(table);
   if (options.src || table.dataset.uifSrc) void loadRemoteTable(table, options);

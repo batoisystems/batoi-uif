@@ -1,41 +1,29 @@
-interface ComponentInstance {
-    destroy(): void;
-    open?(): void;
-    close?(): void;
-    toggle?(): void;
-    [action: string]: unknown;
-}
-interface ToastOptions {
-    type?: string;
-    duration?: number;
-    placement?: string;
-    dismissible?: boolean;
-}
-declare function initModal(el: HTMLElement): ComponentInstance;
-declare function initDrawer(el: HTMLElement): ComponentInstance;
-declare function initDropdown(el: HTMLElement): ComponentInstance;
-declare function initTabs(el: HTMLElement): ComponentInstance;
-declare function initToast(el: HTMLElement): ComponentInstance;
-declare function initAccordion(el: HTMLElement): ComponentInstance;
-declare function initButton(el: HTMLElement): ComponentInstance;
-declare function initShell(el: HTMLElement): ComponentInstance;
-declare function initPassive(el: HTMLElement): ComponentInstance;
-declare function initDismissible(el: HTMLElement): ComponentInstance;
-declare function initCollapse(el: HTMLElement): ComponentInstance;
-declare function initTooltip(el: HTMLElement): ComponentInstance;
-declare function initPopover(el: HTMLElement): ComponentInstance;
-declare function initProgress(el: HTMLElement): ComponentInstance;
-declare function initPagination(el: HTMLElement): ComponentInstance;
-declare function initCommandMenu(el: HTMLElement): ComponentInstance;
-declare function initFileUpload(el: HTMLElement): ComponentInstance;
-declare function initCombobox(el: HTMLElement): ComponentInstance;
-declare function initCarousel(el: HTMLElement): ComponentInstance;
-declare function initLightbox(el: HTMLElement): ComponentInstance;
+import { destroyComponent } from './controller.js';
+export { ComponentInstance, bindComponentActions } from './controller.js';
+import { initModal } from './controls/modal.js';
+import { initDrawer } from './controls/drawer.js';
+import { initDropdown } from './controls/dropdown.js';
+import { initTabs } from './controls/tabs.js';
+import { initToast } from './controls/toast.js';
+import { initAccordion } from './controls/accordion.js';
+import { initButton } from './controls/button.js';
+import { initShell } from './controls/shell.js';
+import { initPassive } from './controls/passive.js';
+import { initDismissible } from './controls/dismissible.js';
+import { initCollapse } from './controls/collapse.js';
+import { initTooltip } from './controls/tooltip.js';
+import { initPopover } from './controls/popover.js';
+import { initProgress } from './controls/progress.js';
+import { initPagination } from './controls/pagination.js';
+import { initCommandMenu } from './controls/command-menu.js';
+import { initFileUpload } from './controls/file-upload.js';
+import { initCombobox } from './controls/combobox.js';
+import { initCarousel } from './controls/carousel.js';
+import { initLightbox } from './controls/lightbox.js';
+export { showToast } from './controls/notification.js';
+
 declare function initComponent(el: HTMLElement): void;
-declare function destroyComponent(el: HTMLElement): void;
 declare function initAll(root?: Document | HTMLElement): () => void;
-declare function bindComponentActions(root?: Document | HTMLElement): () => void;
-declare function showToast(message: string, options?: ToastOptions): HTMLElement;
 declare const button: {
     name: string;
     init: typeof initButton;
@@ -197,4 +185,4 @@ declare const table: {
     destroy: typeof destroyComponent;
 };
 
-export { type ComponentInstance, accordion, alert, badge, bindComponentActions, breadcrumb, button, card, carousel, collapseComponent, combobox, commandMenu, destroyComponent, drawer, dropdown, fileUpload, initAll, initComponent, lightbox, masonry, modal, nav, navbar, offcanvas, pagination, popover, progress, shell, showToast, sidebar, skeleton, spinner, stepper, table, tabs, toast, tooltip, wizard };
+export { accordion, alert, badge, breadcrumb, button, card, carousel, collapseComponent, combobox, commandMenu, destroyComponent, drawer, dropdown, fileUpload, initAll, initComponent, lightbox, masonry, modal, nav, navbar, offcanvas, pagination, popover, progress, shell, sidebar, skeleton, spinner, stepper, table, tabs, toast, tooltip, wizard };

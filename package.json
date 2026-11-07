@@ -1,7 +1,7 @@
 {
   "name": "batoi-uif",
   "private": true,
-  "version": "3.1.0",
+  "version": "4.0.0-alpha.1",
   "description": "Batoi UIF — Unified Interface Framework",
   "license": "Apache-2.0",
   "packageManager": "npm@10.0.0",
@@ -15,7 +15,7 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "npm --workspace @batoi/uif-core run build && npm --workspace @batoi/uif-dom run build && npm --workspace @batoi/uif-query run build && npm --workspace @batoi/uif-effects run build && npm --workspace @batoi/uif-actions run build && npm --workspace @batoi/uif-overlays run build && npm --workspace @batoi/uif-net run build && npm --workspace @batoi/uif-icons run build && npm --workspace @batoi/uif-components run build && npm --workspace @batoi/uif-forms run build && npm --workspace @batoi/uif-editor run build && npm --workspace @batoi/uif-state run build && npm --workspace @batoi/uif-table run build && npm --workspace @batoi/uif-router run build && npm --workspace @batoi/uif-rad-adapter run build && npm --workspace @batoi/uif-pwa run build && npm --workspace @batoi/uif-charts run build && npm --workspace @batoi/uif-dashboard run build && npm --workspace @batoi/uif-desktop run build && npm --workspace @batoi/uif-realtime run build && npm --workspace @batoi/uif-push run build && npm --workspace @batoi/uif-mobile run build && npm --workspace @batoi/uif-ai run build && npm --workspace @batoi/uif-mcp run build && npm --workspace @batoi/uif-extension-kit run build && npm --workspace @batoi/uif-profiles run build && npm run build:dist && npm run docs:contracts && npm --workspace @batoi/uif-docs run build && npm --workspace @batoi/uif-playground run build",
+    "build": "npm --workspace @batoi/uif-core run build && npm --workspace @batoi/uif-dom run build && npm --workspace @batoi/uif-query run build && npm --workspace @batoi/uif-effects run build && npm --workspace @batoi/uif-actions run build && npm --workspace @batoi/uif-overlays run build && npm --workspace @batoi/uif-net run build && npm --workspace @batoi/uif-icons run build && npm --workspace @batoi/uif-components run build && npm --workspace @batoi/uif-forms run build && npm --workspace @batoi/uif-editor run build && npm --workspace @batoi/uif-state run build && npm --workspace @batoi/uif-table run build && npm --workspace @batoi/uif-router run build && npm --workspace @batoi/uif-rad-adapter run build && npm --workspace @batoi/uif-pwa run build && npm --workspace @batoi/uif-charts run build && npm --workspace @batoi/uif-dashboard run build && npm --workspace @batoi/uif-desktop run build && npm --workspace @batoi/uif-realtime run build && npm --workspace @batoi/uif-push run build && npm --workspace @batoi/uif-mobile run build && npm --workspace @batoi/uif-ai run build && npm --workspace @batoi/uif-mcp run build && npm --workspace @batoi/uif-extension-kit run build && npm --workspace @batoi/uif-profiles run build && npm run build:dist && npm run build:v4 && npm run docs:contracts && npm --workspace @batoi/uif-docs run build && npm --workspace @batoi/uif-playground run build",
     "build:dist": "tsup index.ts --format esm,iife --dts --global-name BatoiUIF --out-dir dist --clean --minify && node scripts/build-css.mjs && node scripts/generate-release-metadata.mjs && node scripts/generate-release-integrity.mjs",
     "dev:docs": "npm --workspace @batoi/uif-docs run dev",
     "dev:playground": "npm --workspace @batoi/uif-playground run dev",
@@ -27,22 +27,36 @@
     "audit:security": "npm audit --audit-level=moderate",
     "release:api-baseline": "node scripts/generate-api-baseline.mjs",
     "release:contract-baseline": "node scripts/generate-contract-baseline.mjs",
-    "docs:contracts": "node scripts/generate-contract-reference.mjs && node scripts/generate-design-token-reference.mjs",
+    "docs:contracts": "node scripts/generate-contract-reference.mjs && node scripts/generate-design-token-reference.mjs && node scripts/generate-v4-reference.mjs",
     "verify:packages": "node scripts/verify-package-contents.mjs",
     "verify:packed-install": "node scripts/smoke-packed-install.mjs",
-    "verify:release": "npm run test:security && npm run verify:packages && npm run verify:packed-install && node scripts/verify-release.mjs"
+    "verify:release": "npm run test:security && npm run verify:packages && npm run verify:packed-install && node scripts/verify-release.mjs",
+    "build:v4": "node scripts/build-v4.mjs && node scripts/generate-release-metadata.mjs && node scripts/generate-release-integrity.mjs",
+    "theme": "node tools/theme/cli.mjs",
+    "theme:mcp": "node tools/theme/server.mjs",
+    "theme:studio": "node tools/theme/studio.mjs",
+    "configure": "node tools/configure.mjs",
+    "migrate": "node tools/migrate.mjs",
+    "verify:v4-compatibility": "node scripts/verify-v4-compatibility.mjs"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.11.0",
     "@eslint/js": "^9.25.0",
     "@playwright/test": "^1.61.1",
     "@types/node": "^22.15.14",
     "eslint": "^9.25.0",
     "eslint-config-prettier": "^10.1.2",
+    "esbuild": "^0.28.2",
     "jsdom": "^29.1.1",
     "prettier": "^3.5.3",
-    "tsup": "^8.4.0",
+    "tsup": "8.5.1",
     "typescript": "^5.8.3",
-    "vite": "^8.1.4",
-    "vitest": "^4.1.10"
+    "vite": "^8.1.6",
+    "vitest": "^4.1.12"
+  },
+  "overrides": {
+    "tsup@8.5.1": {
+      "esbuild": "$esbuild"
+    }
   }
 }

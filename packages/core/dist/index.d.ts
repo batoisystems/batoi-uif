@@ -1,76 +1,10 @@
-type UIFErrorCategory = 'config' | 'security' | 'network' | 'limit' | 'state' | 'compatibility' | 'internal';
-interface UIFErrorDetail {
-    code: string;
-    category: UIFErrorCategory;
-    package: string;
-    component?: string;
-    phase?: string;
-    recoverable: boolean;
-    retryable?: boolean;
-    correlationId?: string;
-    cause?: unknown;
-}
-declare class UIFError extends Error implements UIFErrorDetail {
-    readonly code: string;
-    readonly category: UIFErrorCategory;
-    readonly package: string;
-    readonly component?: string;
-    readonly phase?: string;
-    readonly recoverable: boolean;
-    readonly retryable?: boolean;
-    readonly correlationId?: string;
-    constructor(message: string, detail: UIFErrorDetail);
-}
-interface UIFResourceLimits {
-    maxBytes?: number;
-    maxCharacters?: number;
-    maxItems?: number;
-    maxKeys?: number;
-    maxDepth?: number;
-}
-declare const defaultUIFResourceLimits: Readonly<Required<UIFResourceLimits>>;
-declare function isSafeObjectKey(key: string): boolean;
-declare function isSafePropertyPath(path: string): boolean;
-declare function assertSafePropertyPath(path: string): void;
-interface UIFObjectInspectionOptions {
-    maxDepth?: number;
-    maxKeys?: number;
-    maxIssues?: number;
-}
-declare function findUnsafeObjectPaths(value: unknown, options?: UIFObjectInspectionOptions): string[];
-declare function assertSafeObject(value: unknown, options?: UIFObjectInspectionOptions): void;
-interface UIFConfigurationIssue {
-    path: string;
-    code: 'invalid-json' | 'not-object' | 'unknown-key' | 'unsafe-key' | 'limit';
-    message: string;
-}
-interface UIFConfigurationResult<T extends Record<string, unknown>> {
-    value: T;
-    issues: UIFConfigurationIssue[];
-    valid: boolean;
-}
-interface UIFConfigurationOptions {
-    allowedKeys?: readonly string[];
-    allowUnknown?: boolean;
-    limits?: UIFResourceLimits;
-}
-type UIFJSONShape = 'any' | 'array' | 'object';
-interface UIFJSONParseOptions {
-    shape?: UIFJSONShape;
-    limits?: UIFResourceLimits;
-}
-interface UIFJSONIssue {
-    path: string;
-    code: 'invalid-json' | 'invalid-shape' | 'unsafe-key' | 'limit';
-    message: string;
-}
-interface UIFJSONResult<T = unknown> {
-    value: T | undefined;
-    issues: UIFJSONIssue[];
-    valid: boolean;
-}
-declare function parseUIFJSON<T = unknown>(input: string, options?: UIFJSONParseOptions): UIFJSONResult<T>;
-declare function parseUIFConfiguration<T extends Record<string, unknown> = Record<string, unknown>>(input: string | unknown, options?: UIFConfigurationOptions): UIFConfigurationResult<T>;
+export { UIFApp, UIFComponent, UIFLifecycleEvent, UIFOptions, UIFPlugin, emit, init, on, parseOptions, registerPlugin, setAccent, setDensity } from './runtime.js';
+import { UIFResourceLimits } from './contracts.js';
+export { UIFConfigurationIssue, UIFConfigurationOptions, UIFConfigurationResult, UIFError, UIFErrorCategory, UIFErrorDetail, UIFJSONIssue, UIFJSONParseOptions, UIFJSONResult, UIFJSONShape, UIFObjectInspectionOptions, assertSafeObject, assertSafePropertyPath, defaultUIFResourceLimits, findUnsafeObjectPaths, isSafeObjectKey, isSafePropertyPath, parseUIFConfiguration, parseUIFJSON } from './contracts.js';
+import { U as UIFComponentDefinition } from './component-registry-Cc5NOUbC.js';
+export { a as UIFComponentRegistry, b as UIFController, c as UIFMountContext, d as UIFResourceScope, e as UIFUpdateReason, f as createComponentRegistry, g as createResourceScope } from './component-registry-Cc5NOUbC.js';
+export { UIFStoragePartition, clearStoragePartition, configureStoragePartition, getStoragePartition, getStoragePartitionPrefix, partitionStorageKey } from './storage-partition.js';
+export { UIFCompatibilityMode, UIFCompatibilityOptions, configureCompatibility, getCompatibilityMode } from './compatibility.js';
 
 type AgentEnvelopeKind = 'message' | 'notice' | 'stream-delta' | 'stream-complete' | 'tool-plan' | 'tool-review' | 'tool-progress' | 'tool-result' | 'receipt' | 'error';
 type AgentEnvelopeStatus = 'draft' | 'pending' | 'streaming' | 'waiting-approval' | 'approved' | 'rejected' | 'executing' | 'completed' | 'partial' | 'failed' | 'cancelled' | 'expired' | 'superseded';
@@ -186,12 +120,12 @@ interface UIFContractEntry<Name extends string = string> {
     status: 'stable' | 'compatibility';
 }
 declare const uifContractRegistry: Readonly<{
-    attributes: readonly UIFContractEntry<"data-uif-options" | "data-uif" | "data-uif-id" | "data-uif-role" | "data-uif-action" | "data-uif-target" | "data-uif-src" | "data-uif-method" | "data-uif-trigger" | "data-uif-state" | "data-uif-bind" | "data-uif-model" | "data-uif-value" | "data-uif-route" | "data-uif-mode" | "data-uif-confirm" | "data-uif-disabled" | "data-uif-loading" | "data-uif-success" | "data-uif-error" | "data-uif-swap" | "data-uif-cache" | "data-uif-validate" | "data-uif-rule" | "data-uif-event" | "data-uif-on" | "data-uif-refresh" | "data-uif-persist" | "data-uif-density" | "data-uif-sidebar-key" | "data-uif-density-key" | "data-uif-toolbar" | "data-uif-preview" | "data-uif-animation" | "data-uif-duration" | "data-uif-delay" | "data-uif-placement" | "data-uif-container" | "data-uif-html" | "data-uif-backdrop" | "data-uif-scroll" | "data-uif-breakpoint" | "data-uif-class" | "data-uif-attribute" | "data-uif-key" | "data-uif-envelope" | "data-uif-interval" | "data-uif-message" | "data-uif-messages">[];
-    components: readonly UIFContractEntry<"button" | "form" | "nav" | "progress" | "table" | "route" | "push" | "modal" | "drawer" | "offcanvas" | "dropdown" | "tabs" | "toast" | "accordion" | "alert" | "badge" | "breadcrumb" | "collapse" | "tooltip" | "popover" | "spinner" | "skeleton" | "pagination" | "command-menu" | "navbar" | "sidebar" | "stepper" | "wizard" | "file-upload" | "combobox" | "carousel" | "lightbox" | "masonry" | "card" | "editor" | "ajax" | "shell" | "chart" | "animate" | "realtime" | "mobile-shell" | "desktop-shell" | "ai-action" | "ai-thread" | "ai-composer" | "agent-tool" | "tool-approval" | "typed-text" | "dashboard" | "install-prompt">[];
-    actions: readonly UIFContractEntry<"select" | "toast" | "animate" | "open" | "close" | "toggle" | "toggle-sidebar" | "toggle-section" | "submit" | "load" | "reload" | "delete" | "save" | "reset" | "clear" | "activate" | "deactivate" | "navigate" | "swap" | "append" | "prepend" | "remove" | "set-density" | "add-class" | "remove-class" | "toggle-class" | "set-attribute" | "remove-attribute" | "set-value" | "copy" | "scroll-to" | "focus" | "emit" | "subscribe" | "connect" | "disconnect" | "approve" | "reject" | "edit" | "install" | "next" | "preview" | "previous" | "unsubscribe">[];
+    attributes: readonly UIFContractEntry<"data-uif" | "data-uif-options" | "data-uif-id" | "data-uif-role" | "data-uif-action" | "data-uif-target" | "data-uif-src" | "data-uif-method" | "data-uif-trigger" | "data-uif-state" | "data-uif-bind" | "data-uif-model" | "data-uif-value" | "data-uif-route" | "data-uif-mode" | "data-uif-confirm" | "data-uif-disabled" | "data-uif-loading" | "data-uif-success" | "data-uif-error" | "data-uif-swap" | "data-uif-cache" | "data-uif-validate" | "data-uif-rule" | "data-uif-event" | "data-uif-on" | "data-uif-refresh" | "data-uif-persist" | "data-uif-density" | "data-uif-sidebar-key" | "data-uif-density-key" | "data-uif-toolbar" | "data-uif-preview" | "data-uif-animation" | "data-uif-duration" | "data-uif-delay" | "data-uif-placement" | "data-uif-container" | "data-uif-html" | "data-uif-backdrop" | "data-uif-scroll" | "data-uif-breakpoint" | "data-uif-class" | "data-uif-attribute" | "data-uif-key" | "data-uif-envelope" | "data-uif-interval" | "data-uif-message" | "data-uif-messages">[];
+    components: readonly UIFContractEntry<"button" | "form" | "nav" | "progress" | "table" | "animate" | "push" | "route" | "modal" | "drawer" | "offcanvas" | "dropdown" | "tabs" | "toast" | "accordion" | "alert" | "badge" | "breadcrumb" | "collapse" | "tooltip" | "popover" | "spinner" | "skeleton" | "pagination" | "command-menu" | "navbar" | "sidebar" | "stepper" | "wizard" | "file-upload" | "combobox" | "carousel" | "lightbox" | "masonry" | "card" | "editor" | "ajax" | "shell" | "chart" | "realtime" | "mobile-shell" | "desktop-shell" | "ai-action" | "ai-thread" | "ai-composer" | "agent-tool" | "tool-approval" | "typed-text" | "dashboard" | "install-prompt">[];
+    actions: readonly UIFContractEntry<"select" | "animate" | "toast" | "open" | "close" | "toggle" | "toggle-sidebar" | "toggle-section" | "submit" | "load" | "reload" | "delete" | "save" | "reset" | "clear" | "activate" | "deactivate" | "navigate" | "swap" | "append" | "prepend" | "remove" | "set-density" | "add-class" | "remove-class" | "toggle-class" | "set-attribute" | "remove-attribute" | "set-value" | "copy" | "scroll-to" | "focus" | "emit" | "subscribe" | "connect" | "disconnect" | "approve" | "reject" | "edit" | "install" | "next" | "preview" | "previous" | "unsubscribe">[];
     states: readonly UIFContractEntry<"error" | "pending" | "waiting-approval" | "approved" | "rejected" | "completed" | "failed" | "expired" | "unavailable" | "open" | "idle" | "loading" | "loaded" | "success" | "active" | "inactive" | "closed" | "disabled" | "selected" | "expanded" | "collapsed" | "connected" | "disconnected" | "available" | "busy" | "connecting" | "decision-pending" | "dirty" | "empty" | "installed" | "offline" | "online" | "saved" | "saving" | "submitting">[];
-    events: readonly UIFContractEntry<"uif:before-init" | "uif:init" | "uif:before-destroy" | "uif:destroy" | "uif:error" | "uif:runtime:diagnostic" | "uif:runtime:mounted" | "uif:runtime:error" | "uif:diagnostic" | "uif:agent:submit" | "uif:agent:cancel" | "uif:agent:error" | "uif:agent:feedback" | "uif:agent:retry" | "uif:agent:copy" | "uif:tool-approve" | "uif:tool-reject" | "uif:tool-expired" | "uif:tool-invalid-review" | "uif:tool-replay-blocked" | "uif:accordion-toggle" | "uif:action-diagnostic" | "uif:ai-action" | "uif:ai-error" | "uif:ai-history-select" | "uif:ai-stream-cancel" | "uif:animation-end" | "uif:animation-start" | "uif:before-load" | "uif:carousel-change" | "uif:chart-drilldown" | "uif:chart-drilldown-error" | "uif:chart-error" | "uif:chart-export" | "uif:chart-refresh" | "uif:chart-select" | "uif:collapse-close" | "uif:collapse-open" | "uif:combobox-change" | "uif:command-menu-close" | "uif:command-menu-open" | "uif:complete" | "uif:connector-error" | "uif:dashboard-error" | "uif:desktop-change" | "uif:desktop-error" | "uif:drawer-close" | "uif:drawer-open" | "uif:dropdown-close" | "uif:dropdown-open" | "uif:editor-autosave" | "uif:editor-autosave-error" | "uif:editor-blur" | "uif:editor-change" | "uif:editor-command" | "uif:editor-destroy" | "uif:editor-diagnostics" | "uif:editor-error" | "uif:editor-focus" | "uif:editor-init" | "uif:editor-layout-change" | "uif:editor-mode-change" | "uif:editor-normalize" | "uif:editor-preview" | "uif:editor-reset" | "uif:editor-upload-error" | "uif:editor-validate" | "uif:field-errors" | "uif:file-select" | "uif:form-dirty" | "uif:form-error" | "uif:form-submit" | "uif:form-success" | "uif:form-touched" | "uif:lightbox-close" | "uif:lightbox-open" | "uif:load" | "uif:modal-close" | "uif:modal-open" | "uif:notification" | "uif:offcanvas-close" | "uif:offcanvas-open" | "uif:offline-error" | "uif:offline-expired" | "uif:offline-queued" | "uif:offline-synced" | "uif:pagination-change" | "uif:popover-close" | "uif:popover-open" | "uif:presence" | "uif:push-change" | "uif:push-error" | "uif:pwa-install" | "uif:rad-before" | "uif:rad-error" | "uif:rad-success" | "uif:realtime-error" | "uif:realtime-message" | "uif:realtime-state" | "uif:rehydrate" | "uif:request" | "uif:response" | "uif:route-before" | "uif:route-error" | "uif:route-success" | "uif:router-error" | "uif:segment-change" | "uif:select" | "uif:shell-density" | "uif:table-before-load" | "uif:table-bulk-action" | "uif:table-error" | "uif:table-filter" | "uif:table-load" | "uif:table-loaded" | "uif:table-page" | "uif:table-page-size" | "uif:table-reset" | "uif:table-row-action" | "uif:table-select" | "uif:table-selection" | "uif:table-sort" | "uif:table-state" | "uif:tabs-change" | "uif:toast" | "uif:tool-confirmation-required" | "uif:typed-text-complete" | "uif:wizard-change">[];
-    errors: readonly UIFContractEntry<"UIF_INVALID_ACCENT" | "UIF_UNSAFE_PROPERTY_PATH" | "UIF_UNSAFE_OBJECT" | "UIF_COMPONENT_DESTROY" | "UIF_COMPONENT_DUPLICATE" | "UIF_COMPONENT_MOUNT" | "UIF_COMPONENT_NAME" | "UIF_LOCALE_CONFIG" | "UIF_STORAGE_KEY" | "UIF_STORAGE_PARTITION">[];
+    events: readonly UIFContractEntry<"uif:runtime:error" | "uif:runtime:diagnostic" | "uif:runtime:mounted" | "uif:before-init" | "uif:init" | "uif:before-destroy" | "uif:destroy" | "uif:error" | "uif:diagnostic" | "uif:agent:submit" | "uif:agent:cancel" | "uif:agent:error" | "uif:agent:feedback" | "uif:agent:retry" | "uif:agent:copy" | "uif:tool-approve" | "uif:tool-reject" | "uif:tool-expired" | "uif:tool-invalid-review" | "uif:tool-replay-blocked" | "uif:accordion-toggle" | "uif:action-diagnostic" | "uif:ai-action" | "uif:ai-error" | "uif:ai-history-select" | "uif:ai-stream-cancel" | "uif:animation-end" | "uif:animation-start" | "uif:before-load" | "uif:carousel-change" | "uif:chart-drilldown" | "uif:chart-drilldown-error" | "uif:chart-error" | "uif:chart-export" | "uif:chart-refresh" | "uif:chart-select" | "uif:collapse-close" | "uif:collapse-open" | "uif:combobox-change" | "uif:command-menu-close" | "uif:command-menu-open" | "uif:complete" | "uif:connector-error" | "uif:dashboard-error" | "uif:desktop-change" | "uif:desktop-error" | "uif:drawer-close" | "uif:drawer-open" | "uif:dropdown-close" | "uif:dropdown-open" | "uif:editor-autosave" | "uif:editor-autosave-error" | "uif:editor-blur" | "uif:editor-change" | "uif:editor-command" | "uif:editor-destroy" | "uif:editor-diagnostics" | "uif:editor-error" | "uif:editor-focus" | "uif:editor-init" | "uif:editor-layout-change" | "uif:editor-mode-change" | "uif:editor-normalize" | "uif:editor-preview" | "uif:editor-reset" | "uif:editor-upload-error" | "uif:editor-validate" | "uif:field-errors" | "uif:file-select" | "uif:form-dirty" | "uif:form-error" | "uif:form-submit" | "uif:form-success" | "uif:form-touched" | "uif:lightbox-close" | "uif:lightbox-open" | "uif:load" | "uif:modal-close" | "uif:modal-open" | "uif:notification" | "uif:offcanvas-close" | "uif:offcanvas-open" | "uif:offline-error" | "uif:offline-expired" | "uif:offline-queued" | "uif:offline-synced" | "uif:pagination-change" | "uif:popover-close" | "uif:popover-open" | "uif:presence" | "uif:push-change" | "uif:push-error" | "uif:pwa-install" | "uif:rad-before" | "uif:rad-error" | "uif:rad-success" | "uif:realtime-error" | "uif:realtime-message" | "uif:realtime-state" | "uif:rehydrate" | "uif:request" | "uif:response" | "uif:route-before" | "uif:route-error" | "uif:route-success" | "uif:router-error" | "uif:segment-change" | "uif:select" | "uif:shell-density" | "uif:table-before-load" | "uif:table-bulk-action" | "uif:table-error" | "uif:table-filter" | "uif:table-load" | "uif:table-loaded" | "uif:table-page" | "uif:table-page-size" | "uif:table-reset" | "uif:table-row-action" | "uif:table-select" | "uif:table-selection" | "uif:table-sort" | "uif:table-state" | "uif:tabs-change" | "uif:toast" | "uif:tool-confirmation-required" | "uif:typed-text-complete" | "uif:wizard-change">[];
+    errors: readonly UIFContractEntry<"UIF_COMPONENT_NAME" | "UIF_COMPONENT_DUPLICATE" | "UIF_COMPONENT_DESTROY" | "UIF_COMPONENT_MOUNT" | "UIF_UNSAFE_PROPERTY_PATH" | "UIF_UNSAFE_OBJECT" | "UIF_INVALID_ACCENT" | "UIF_LOCALE_CONFIG" | "UIF_STORAGE_KEY" | "UIF_STORAGE_PARTITION">[];
 }>;
 type UIFAttribute = (typeof uifAttributes)[number];
 type UIFValue = (typeof uifValues)[number];
@@ -199,65 +133,6 @@ type UIFAction = (typeof uifActions)[number];
 type UIFState = (typeof uifStates)[number];
 type UIFEvent = (typeof uifEvents)[number];
 type UIFErrorCode = (typeof uifErrors)[number];
-
-interface UIFResourceScope {
-    readonly signal: AbortSignal;
-    readonly destroyed: boolean;
-    add(dispose: () => void): () => void;
-    listen(target: EventTarget, type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): () => void;
-    timeout(callback: () => void, delay: number): number;
-    interval(callback: () => void, delay: number): number;
-    observe(observer: {
-        disconnect(): void;
-    }): void;
-    destroy(): void;
-}
-declare function createResourceScope(): UIFResourceScope;
-
-interface UIFController {
-    update?(reason: UIFUpdateReason): void | Promise<void>;
-    suspend?(): void;
-    resume?(): void;
-    destroy(): void;
-}
-type UIFUpdateReason = 'refresh' | 'attribute' | 'content' | 'rehydrate';
-interface UIFMountContext<Options extends Record<string, unknown>> {
-    element: HTMLElement;
-    root: Document | HTMLElement;
-    options: Readonly<Options>;
-    signal: AbortSignal;
-    resources: UIFResourceScope;
-    emit<T = unknown>(name: string, detail?: T): void;
-    error(message: string, detail: Omit<UIFErrorDetail, 'package' | 'component'>): UIFError;
-}
-interface UIFComponentDefinition<Options extends Record<string, unknown> = Record<string, unknown>, Controller extends UIFController = UIFController> {
-    name: string;
-    version?: number;
-    package?: string;
-    defaults?: Readonly<Partial<Options>>;
-    optionKeys?: readonly (keyof Options & string)[];
-    attributes?: readonly string[];
-    roles?: readonly string[];
-    actions?: readonly string[];
-    events?: readonly string[];
-    states?: readonly string[];
-    errors?: readonly string[];
-    semanticFallback?: string;
-    accessibility?: readonly string[];
-    security?: readonly string[];
-    limits?: UIFResourceLimits;
-    mount(context: UIFMountContext<Options>): Controller | (() => void) | void;
-}
-interface UIFComponentRegistry {
-    register(definition: UIFComponentDefinition): () => void;
-    get(name: string): UIFComponentDefinition | undefined;
-    definitions(): UIFComponentDefinition[];
-    refresh(root?: Document | HTMLElement, reason?: UIFUpdateReason): void;
-    suspend(root?: Document | HTMLElement): void;
-    resume(root?: Document | HTMLElement): void;
-    destroy(root?: Document | HTMLElement): void;
-}
-declare function createComponentRegistry(): UIFComponentRegistry;
 
 type UIFHydrationScope = 'root' | 'target' | 'refresh';
 interface UIFHydrationAdapter {
@@ -270,17 +145,6 @@ interface UIFHydrationLifecycle {
     destroy(): void;
 }
 declare function createHydrationLifecycle(root: Document | HTMLElement, adapters: readonly UIFHydrationAdapter[]): UIFHydrationLifecycle;
-
-interface UIFStoragePartition {
-    applicationId: string;
-    principalId: string;
-    tenantId?: string;
-}
-declare function configureStoragePartition(partition: UIFStoragePartition | null): void;
-declare function getStoragePartition(): Readonly<UIFStoragePartition> | null;
-declare function getStoragePartitionPrefix(partition?: Readonly<UIFStoragePartition> | null): string | null;
-declare function partitionStorageKey(key: string, partition?: Readonly<UIFStoragePartition> | null): string;
-declare function clearStoragePartition(storage?: Storage, partition?: Readonly<UIFStoragePartition> | null): number;
 
 interface UIFLocaleOptions {
     locales?: string | readonly string[];
@@ -363,13 +227,6 @@ declare const uifComponentContracts: Readonly<{
     'install-prompt': Readonly<UIFComponentContract>;
 }>;
 declare function getUIFComponentContract(name: string): Readonly<UIFComponentContract> | undefined;
-
-type UIFCompatibilityMode = 'v2' | 'diagnostic' | 'v3';
-interface UIFCompatibilityOptions {
-    mode?: UIFCompatibilityMode;
-}
-declare function configureCompatibility(options: UIFCompatibilityOptions | null): void;
-declare function getCompatibilityMode(): UIFCompatibilityMode;
 
 type UIFDiagnosticDurationBucket = '<1ms' | '1-15ms' | '16-50ms' | '51-250ms' | '251-1000ms' | '>1000ms';
 interface UIFDiagnostic {
@@ -524,33 +381,4 @@ declare const uifMigrationRules: readonly [{
     readonly diagnostic: "agent-envelope-unavailable";
 }];
 
-type UIFOptions = Record<string, unknown>;
-
-interface UIFApp {
-    root: Document | HTMLElement;
-    options: UIFOptions;
-    destroyed: boolean;
-    destroy(): void;
-    restart(options?: UIFOptions): UIFApp;
-}
-interface UIFPlugin {
-    name: string;
-    setup(app: UIFApp): void;
-}
-interface UIFComponent {
-    name: string;
-    init(el: HTMLElement): void;
-    destroy?(el: HTMLElement): void;
-}
-interface UIFLifecycleEvent<T = unknown> extends CustomEvent<T> {
-    type: 'uif:before-init' | 'uif:init' | 'uif:before-destroy' | 'uif:destroy' | 'uif:error';
-}
-declare function parseOptions(el: HTMLElement): UIFOptions;
-declare function emit<T = unknown>(name: string, detail?: T, target?: EventTarget): void;
-declare function on(name: string, handler: EventListener, target?: EventTarget): () => void;
-declare function registerPlugin(plugin: UIFPlugin): void;
-declare function setDensity(density: 'compact' | 'default' | 'roomy', target?: HTMLElement): void;
-declare function setAccent(color: string, target?: HTMLElement): void;
-declare function init(root?: Document | HTMLElement, options?: UIFOptions): UIFApp;
-
-export { type AgentActor, type AgentActorRole, type AgentArtifactPart, type AgentContentPart, type AgentDataPart, type AgentEnvelopeIssue, type AgentEnvelopeKind, type AgentEnvelopeResult, type AgentEnvelopeStatus, type AgentInteractionEnvelope, type AgentRiskDisclosure, type AgentRiskLevel, type AgentSourcePart, type AgentTextPart, type AgentUsageDisclosure, type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppConnectorWorkflow, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type UIFAction, type UIFApp, type UIFAttribute, type UIFCompatibilityMode, type UIFCompatibilityOptions, type UIFComponent, type UIFComponentContract, type UIFComponentDefinition, type UIFComponentRegistry, type UIFConfigurationIssue, type UIFConfigurationOptions, type UIFConfigurationResult, type UIFContractEntry, type UIFController, type UIFDiagnostic, type UIFDiagnosticDurationBucket, type UIFDiagnosticInput, type UIFDiagnosticsOptions, UIFError, type UIFErrorCategory, type UIFErrorCode, type UIFErrorDetail, type UIFEvent, type UIFHydrationAdapter, type UIFHydrationLifecycle, type UIFHydrationScope, type UIFJSONIssue, type UIFJSONParseOptions, type UIFJSONResult, type UIFJSONShape, type UIFLifecycleEvent, type UIFLocaleOptions, type UIFMigrationRule, type UIFMountContext, type UIFObjectInspectionOptions, type UIFOptions, type UIFPlugin, type UIFResourceLimits, type UIFResourceScope, type UIFState, type UIFStoragePartition, type UIFTextDirection, type UIFUpdateReason, type UIFValue, agentContentPartTypes, agentEnvelopeContract, agentEnvelopeKinds, agentEnvelopeStatuses, applyLocale, assertSafeObject, assertSafePropertyPath, clearStoragePartition, configureCompatibility, configureDiagnostics, configureLocale, configureStoragePartition, createComponentRegistry, createHydrationLifecycle, createResourceScope, defaultUIFResourceLimits, diagnosticDurationBucket, emit, findUnsafeObjectPaths, formatUIFCurrency, formatUIFDate, formatUIFNumber, getCompatibilityMode, getLocaleConfiguration, getLocaleDirection, getStoragePartition, getStoragePartitionPrefix, getUIFComponentContract, init, isSafeObjectKey, isSafePropertyPath, listMicroAppConnectorWorkflows, on, parseAgentEnvelope, parseMicroAppManifest, parseOptions, parseUIFConfiguration, parseUIFJSON, partitionStorageKey, registerPlugin, reportDiagnostic, setAccent, setDensity, translateUIFMessage, uifActions, uifAttributes, uifComponentContracts, uifContractRegistry, uifErrors, uifEvents, uifMigrationRules, uifStates, uifValues, validateAgentEnvelope, validateMicroAppConnectorWorkflows, validateMicroAppManifest };
+export { type AgentActor, type AgentActorRole, type AgentArtifactPart, type AgentContentPart, type AgentDataPart, type AgentEnvelopeIssue, type AgentEnvelopeKind, type AgentEnvelopeResult, type AgentEnvelopeStatus, type AgentInteractionEnvelope, type AgentRiskDisclosure, type AgentRiskLevel, type AgentSourcePart, type AgentTextPart, type AgentUsageDisclosure, type MicroAppConnectorManifest, type MicroAppConnectorMode, type MicroAppConnectorType, type MicroAppConnectorWorkflow, type MicroAppLocalStore, type MicroAppManifest, type MicroAppManifestIssue, type MicroAppManifestResult, type MicroAppPermissionsManifest, type MicroAppRealtimeManifest, type MicroAppRealtimeTransport, type MicroAppStorageManifest, type MicroAppStorageMode, type UIFAction, type UIFAttribute, type UIFComponentContract, UIFComponentDefinition, type UIFContractEntry, type UIFDiagnostic, type UIFDiagnosticDurationBucket, type UIFDiagnosticInput, type UIFDiagnosticsOptions, type UIFErrorCode, type UIFEvent, type UIFHydrationAdapter, type UIFHydrationLifecycle, type UIFHydrationScope, type UIFLocaleOptions, type UIFMigrationRule, UIFResourceLimits, type UIFState, type UIFTextDirection, type UIFValue, agentContentPartTypes, agentEnvelopeContract, agentEnvelopeKinds, agentEnvelopeStatuses, applyLocale, configureDiagnostics, configureLocale, createHydrationLifecycle, diagnosticDurationBucket, formatUIFCurrency, formatUIFDate, formatUIFNumber, getLocaleConfiguration, getLocaleDirection, getUIFComponentContract, listMicroAppConnectorWorkflows, parseAgentEnvelope, parseMicroAppManifest, reportDiagnostic, translateUIFMessage, uifActions, uifAttributes, uifComponentContracts, uifContractRegistry, uifErrors, uifEvents, uifMigrationRules, uifStates, uifValues, validateAgentEnvelope, validateMicroAppConnectorWorkflows, validateMicroAppManifest };

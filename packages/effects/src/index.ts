@@ -1,4 +1,5 @@
-import { getCompatibilityMode, parseUIFJSON } from '@batoi/uif-core';
+import { getCompatibilityMode } from '@batoi/uif-core/compatibility';
+import { parseUIFJSON } from '@batoi/uif-core/contracts';
 
 export interface EffectOptions {
   className?: string;

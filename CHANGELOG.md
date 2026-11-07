@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.0.0-alpha.1 — development checkpoint
+
+- Added explicit selective application ownership, core runtime subpaths, independent control imports, icon subsets and a measured essential JS/CSS deployment. Kept the 3.1 facade and immutable compatibility baseline.
+- Added a typed, bounded theme compiler, scoped light/dark tokens, responsive web/mobile/desktop previews, generated schemas/catalog/context, provider-neutral CLI, private local authoring MCP tools and a development-only isolated theme studio.
+- Improved combobox/tabs/overlay keyboard and lifecycle behavior, table listener cleanup/header semantics, and cancellation/latest-result ownership for chart refreshes.
+- Added consumer graph/byte checks, canonical axe/reflow/RTL/forced-color fixtures, browser lifecycle benchmarks, conservative hash-checked HTML migration and working documentation startup/search.
+- Updated development-tool advisory matches, pinned CI actions, adopted clean CI installation and enabled the owner-approved private vulnerability-reporting channel.
+- This is not beta or GA. Asset materialization, full capability/style/profile consolidation, host interoperability, manual assistive-technology evidence, independent authoring-boundary review and RADX pilot acceptance remain open. Stable GitHub Latest and production assets remain 3.1.0 until their promotion gates pass.
+
 ## 3.1.0
 
 - Fixed direct links to generated component-gallery anchors and preserved native same-document fragment navigation, including browser history traversal.

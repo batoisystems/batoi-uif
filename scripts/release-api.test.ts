@@ -1,9 +1,23 @@
 // @vitest-environment node
 
 import { describe, expect, it } from 'vitest';
-import { declarationAPIFromText } from './release-api.mjs';
+import { declarationAPIFromText, declarationAPI } from './release-api.mjs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { pathToFileURL } from 'node:url';
 
 describe('release API declarations', () => {
+  it('compares declarations through split local exports and bundler aliases', () => {
+    const root = mkdtempSync(join(tmpdir(), 'uif-api-'));
+    try {
+      writeFileSync(join(root, 'chunk.d.ts'), 'interface Value { id: string; }\nexport { Value as V };');
+      writeFileSync(join(root, 'index.d.ts'), "export { V as Value } from './chunk.js';");
+      const split = declarationAPI(pathToFileURL(join(root, 'index.d.ts')));
+      const flat = declarationAPIFromText('interface Value { id: string; }\nexport { Value };');
+      expect(split).toEqual(flat);
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
   it('records sorted exports and stable declaration signatures', () => {
     const compact = declarationAPIFromText('export interface User { id: string; }\nexport declare function find(id: string): User;');
     const formatted = declarationAPIFromText(`
@@ -28,6 +42,12 @@ describe('release API declarations', () => {
     const api = declarationAPIFromText('declare function internal(value: string): void;\nexport { internal as publicName };');
     expect(api.exports).toEqual(['publicName']);
     expect(api.signatures.publicName).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it('ignores union ordering but retains actual type changes', () => {
+    const a = declarationAPIFromText("export type Mode = 'a' | 'b';");
+    expect(declarationAPIFromText("export type Mode = 'b' | 'a';")).toEqual(a);
+    expect(declarationAPIFromText("export type Mode = 'a' | 'c';")).not.toEqual(a);
   });
 
   it('keeps registry signatures stable behind a named public type', () => {

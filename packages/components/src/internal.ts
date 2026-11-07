@@ -1,4 +1,5 @@
-import { emit, partitionStorageKey } from '@batoi/uif-core';
+import { emit } from '@batoi/uif-core/runtime';
+import { partitionStorageKey } from '@batoi/uif-core/storage-partition';
 
 export const focusableSelector = [
   'a[href]',
@@ -20,8 +21,10 @@ export function resolveComponentTarget(source: HTMLElement): HTMLElement | null 
   if (!expr) return source.closest<HTMLElement>('[data-uif]');
   if (expr === 'self') return source;
   if (expr === 'parent') return source.parentElement;
-  if (expr.startsWith('closest:')) return source.closest<HTMLElement>(expr.slice(8));
-  return document.querySelector<HTMLElement>(expr);
+  try {
+    if (expr.startsWith('closest:')) return source.closest<HTMLElement>(expr.slice(8));
+    return document.querySelector<HTMLElement>(expr);
+  } catch { return null; }
 }
 
 export function eventElement(event: Event): HTMLElement | null {

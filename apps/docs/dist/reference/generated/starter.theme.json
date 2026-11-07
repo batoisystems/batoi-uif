@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "name": "workspace",
+  "framework": "^4.0.0",
+  "profiles": [
+    "web",
+    "mobile",
+    "desktop"
+  ],
+  "components": [
+    "modal",
+    "dropdown",
+    "tabs",
+    "accordion",
+    "collapse",
+    "toast"
+  ],
+  "tokens": {
+    "text": {
+      "$type": "color",
+      "$value": "#1c2a3a"
+    },
+    "bg": {
+      "$type": "color",
+      "$value": "#f6f9fc"
+    },
+    "surface": {
+      "$type": "color",
+      "$value": "#ffffff"
+    },
+    "color-primary": {
+      "$type": "color",
+      "$value": "#0e68b0"
+    },
+    "on-primary": {
+      "$type": "color",
+      "$value": "#ffffff"
+    }
+  },
+  "modes": {
+    "light": {},
+    "dark": {
+      "text": {
+        "$type": "color",
+        "$value": "#f0f4f8"
+      },
+      "bg": {
+        "$type": "color",
+        "$value": "#101820"
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "#17232e"
+      },
+      "color-primary": {
+        "$type": "color",
+        "$value": "#72bfff"
+      },
+      "on-primary": {
+        "$type": "color",
+        "$value": "#101820"
+      }
+    }
+  },
+  "layouts": {
+    "web": "sidebar",
+    "mobile": "bottom-nav",
+    "desktop": "workspace"
+  },
+  "assets": []
+}

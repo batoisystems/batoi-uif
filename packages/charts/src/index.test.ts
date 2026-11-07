@@ -22,6 +22,41 @@ import {
 afterEach(() => configureTrustedTypes(null));
 
 describe('charts', () => {
+  it('does not render a late network response after destruction', async () => {
+    let respond!: (response: Response) => void;
+    let signal: AbortSignal | undefined;
+    vi.stubGlobal('fetch', vi.fn((_url, options) => {
+      signal = options.signal;
+      return new Promise<Response>((resolve) => { respond = resolve; });
+    }));
+    const el = document.createElement('div');
+    el.textContent = 'Server fallback';
+    el.dataset.uifSrc = '/chart-data';
+    const controller = initChart(el);
+    await vi.waitFor(() => expect(respond).toBeTypeOf('function'));
+    controller.destroy();
+    expect(signal?.aborted).toBe(true);
+    respond(Response.json([{ label: 'Late', value: 3 }]));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(el.textContent).toBe('Server fallback');
+  });
+
+  it('keeps the newest refresh when an old fetch ignores cancellation', async () => {
+    const replies: Array<(response: Response) => void> = [];
+    vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>((resolve) => replies.push(resolve))));
+    const el = document.createElement('div');
+    el.dataset.uifSrc = '/chart-data';
+    const controller = initChart(el);
+    const next = controller.refresh();
+    await vi.waitFor(() => expect(replies).toHaveLength(2));
+    replies[1](Response.json([{ label: 'Newest', value: 3 }]));
+    await next;
+    replies[0](Response.json([{ label: 'Obsolete', value: 9 }]));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(el.textContent).toContain('Newest');
+    expect(el.textContent).not.toContain('Obsolete');
+    controller.destroy();
+  });
   it('keeps bar corners square at baselines and stacked joins', () => {
     for (const type of ['bar', 'horizontal-bar', 'grouped-bar', 'stacked-bar', 'waterfall'] as const) {
       const host = document.createElement('div');

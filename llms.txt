@@ -1,0 +1,12 @@
+# Batoi UIF
+
+Stable compatibility: 3.1.0. UIF 4 development: source 4.0.0-alpha.1.
+
+- [UIF 4 architecture](docs/v4-architecture.md)
+- [Theme authoring](docs/theme-authoring.md)
+- [Bounded AI context](docs/generated/ai-theme-context.md)
+- [Theme schema](docs/generated/theme.schema.json)
+- [Component catalog](docs/generated/v4-catalog.json)
+- [Canonical controls](docs/generated/v4-components.md)
+
+This index is informational, not an access-control mechanism.
