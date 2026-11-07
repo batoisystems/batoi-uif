@@ -22,6 +22,22 @@ import {
 afterEach(() => configureTrustedTypes(null));
 
 describe('charts', () => {
+  it('keeps bar corners square at baselines and stacked joins', () => {
+    for (const type of ['bar', 'horizontal-bar', 'grouped-bar', 'stacked-bar', 'waterfall'] as const) {
+      const host = document.createElement('div');
+      host.innerHTML = renderChart([
+        { label: 'A', value: 10, values: { Gain: 10, Loss: -4 } },
+        { label: 'B', value: -4, values: { Gain: 5, Loss: -2 } },
+      ], { type });
+      const bars = host.querySelectorAll('rect.uif-chart-mark');
+      expect(bars.length).toBeGreaterThan(0);
+      bars.forEach((bar) => {
+        expect(bar.getAttribute('rx')).toBe('0');
+        expect(bar.getAttribute('ry')).toBe('0');
+      });
+    }
+  });
+
   it('renders svg bar charts without external libraries', () => {
     const html = renderChart([{ label: 'Jan', value: 10 }], { type: 'bar' });
     expect(html).toContain('<svg');

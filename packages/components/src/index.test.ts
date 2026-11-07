@@ -498,13 +498,36 @@ describe('components', () => {
     expect(document.querySelector<HTMLElement>('#one')?.hidden).toBe(false);
     expect(document.querySelector<HTMLElement>('#two')?.hidden).toBe(false);
     expect(document.querySelector<HTMLElement>('#three')?.hidden).toBe(true);
-    expect(document.querySelector('#status')?.textContent).toBe('Items 1–2 of 4');
+    expect(document.querySelector('#status')?.textContent).toBe('Items 1, 2 of 4');
 
     document.querySelector('#next')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(document.querySelector<HTMLElement>('#one')?.hidden).toBe(true);
     expect(document.querySelector<HTMLElement>('#three')?.hidden).toBe(false);
     expect(document.querySelector<HTMLElement>('#four')?.hidden).toBe(false);
-    expect(document.querySelector('#status')?.textContent).toBe('Items 3–4 of 4');
+    expect(document.querySelector('#status')?.textContent).toBe('Items 3, 4 of 4');
+  });
+
+  it('runs bounded carousel autoplay, pauses during interaction, and clears timers on destroy', () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = `<section data-uif="carousel" data-uif-autoplay="true" data-uif-interval="1500">
+      <article data-uif-role="slide">One</article><article data-uif-role="slide">Two</article>
+      <button data-uif-action="toggle-autoplay">Pause</button><span data-uif-role="status"></span></section>`;
+    initAll(document);
+    const el = document.querySelector<HTMLElement>('section')!;
+    const status = el.querySelector('[data-uif-role="status"]')!;
+    vi.advanceTimersByTime(1500);
+    expect(status.textContent).toBe('Slide 2 of 2');
+    el.dispatchEvent(new MouseEvent('mouseenter'));
+    vi.advanceTimersByTime(3000);
+    expect(status.textContent).toBe('Slide 2 of 2');
+    el.dispatchEvent(new MouseEvent('mouseleave'));
+    vi.advanceTimersByTime(1500);
+    expect(status.textContent).toBe('Slide 1 of 2');
+    el.querySelector<HTMLButtonElement>('button')!.click();
+    vi.advanceTimersByTime(3000);
+    expect(status.textContent).toBe('Slide 1 of 2');
+    destroyComponent(el);
+    expect(vi.getTimerCount()).toBe(0);
   });
 
   it('opens lightbox items and updates image and caption', () => {

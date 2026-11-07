@@ -80,11 +80,11 @@ test('component gallery exposes complete interactive media and typed-text exampl
   await expect(page.locator('#component-count')).toHaveText(String(await cards.count()));
   await expect(page.locator('#multi-image-slider img')).toHaveCount(3);
   await expect(page.locator('#multi-image-slider [data-uif-role="status"]')).toHaveText(
-    'Slide 1 of 3',
+    'Items 1, 2 of 3',
   );
   await page.locator('#multi-image-slider [data-uif-action="next"]').click();
   await expect(page.locator('#multi-image-slider [data-uif-role="status"]')).toHaveText(
-    'Slide 2 of 3',
+    'Items 2, 3 of 3',
   );
 
   const responsiveCode = page
@@ -123,6 +123,13 @@ test('component gallery exposes complete interactive media and typed-text exampl
   await expect(themeToggle).toHaveAttribute('aria-pressed', 'true');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
+
+test('component deep links resolve generated anchors on initial navigation', async ({ page }) => {
+  await page.goto('/examples/component-gallery/#component-button-matrix');
+  const target = page.locator('#component-button-matrix');
+  await expect(target).toBeInViewport();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
 });
 
 test('icon gallery provides CSS usage and first-party brand icons', async ({ page }) => {

@@ -10,31 +10,31 @@
     {
       "name": "dist/index.js",
       "digest": {
-        "sha256": "c41231541ae26ba6a70a5527dcd659c30705b4f2fc2e87d8d99d6c3e97ef3e3c"
+        "sha256": "fd17e1051d5e3deff11e11bd98ba6fbea6c8ff66919bae16b7ef4ed77a3faa95"
       }
     },
     {
       "name": "dist/index.global.js",
       "digest": {
-        "sha256": "30459c247bc036b79d990f143ade40adb092d59899b49bc1623d0bb826715028"
+        "sha256": "3e4405b8f9d280fb8d0817cc9cbe93a7f5b3ec0c0d116de88b26390a9d8ff20c"
       }
     },
     {
       "name": "dist/uif.css",
       "digest": {
-        "sha256": "a5cdccee2d2da7150e6c86a37960fad20e2a402a81677be3f6544e007a983c33"
+        "sha256": "217538e80caee9c20f5b3bc0068a30f9c8b34217fce935199481b2b29a79d4c3"
       }
     },
     {
       "name": "dist/uif.esm.js",
       "digest": {
-        "sha256": "c41231541ae26ba6a70a5527dcd659c30705b4f2fc2e87d8d99d6c3e97ef3e3c"
+        "sha256": "fd17e1051d5e3deff11e11bd98ba6fbea6c8ff66919bae16b7ef4ed77a3faa95"
       }
     },
     {
       "name": "dist/uif.iife.js",
       "digest": {
-        "sha256": "30459c247bc036b79d990f143ade40adb092d59899b49bc1623d0bb826715028"
+        "sha256": "3e4405b8f9d280fb8d0817cc9cbe93a7f5b3ec0c0d116de88b26390a9d8ff20c"
       }
     }
   ],
@@ -43,7 +43,7 @@
     "buildDefinition": {
       "buildType": "https://batoi.com/uif/npm-workspace-build/v1",
       "externalParameters": {
-        "version": "3.0.0",
+        "version": "3.1.0",
         "command": "npm run build:dist"
       },
       "internalParameters": {
@@ -57,7 +57,7 @@
         "id": "https://github.com/batoi/batoi-uif/.github/workflows/ci.yml"
       },
       "metadata": {
-        "invocationId": "batoi-uif-3.0.0",
+        "invocationId": "batoi-uif-3.1.0",
         "startedOn": null,
         "finishedOn": null
       }

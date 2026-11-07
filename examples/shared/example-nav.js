@@ -164,6 +164,13 @@ function normalizeComponentAnchors() {
     const label = card.querySelector('h2')?.textContent?.trim();
     if (label) card.id = componentId(label);
   });
+  if (window.location.hash) {
+    try {
+      document.getElementById(decodeURIComponent(window.location.hash.slice(1)))?.scrollIntoView();
+    } catch {
+      // A malformed fragment must not prevent navigation initialization.
+    }
+  }
 }
 
 function initializeSearch(form) {

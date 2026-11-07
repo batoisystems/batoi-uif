@@ -312,6 +312,10 @@
                     class="uif-carousel"
                     data-uif="carousel"
                     aria-label="Product highlights"
+                    data-uif-items-per-slide="2"
+                    data-uif-step="1"
+                    data-uif-autoplay="true"
+                    data-uif-interval="5000"
                     tabindex="0"
                   >
                     <div class="uif-carousel-viewport">
@@ -372,16 +376,18 @@
                       </button>
                     </div>
                     <div class="uif-carousel-indicators" aria-label="Choose slide">
+                      <button class="uif-btn" type="button" data-uif-action="toggle-autoplay">Pause slides</button>
                       <button type="button" data-uif-slide-to="0" aria-label="Slide 1"></button>
                       <button type="button" data-uif-slide-to="1" aria-label="Slide 2"></button>
                       <button type="button" data-uif-slide-to="2" aria-label="Slide 3"></button>
                     </div>
                   </section>
                 </div>
-                <pre><code>&lt;section class="uif-carousel" data-uif="carousel" tabindex="0"&gt;
+                <pre><code>&lt;section class="uif-carousel" data-uif="carousel" data-uif-items-per-slide="2" data-uif-step="1" data-uif-autoplay="true" data-uif-interval="5000" tabindex="0"&gt;
   &lt;article class="uif-carousel-slide" data-uif-role="slide" data-uif-state="active"&gt;...&lt;/article&gt;
   &lt;button data-uif-action="previous"&gt;Previous&lt;/button&gt;
   &lt;button data-uif-action="next"&gt;Next&lt;/button&gt;
+  &lt;button data-uif-action="toggle-autoplay"&gt;Pause slides&lt;/button&gt;
   &lt;button data-uif-slide-to="0"&gt;&lt;/button&gt;
 &lt;/section&gt;</code></pre>
               </article>

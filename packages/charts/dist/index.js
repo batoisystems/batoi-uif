@@ -502,7 +502,7 @@ function renderBars(data, options, mode) {
         const w = band * 0.64;
         const h = Math.abs(y1 - y0);
         const label2 = `${d.label ?? ""} ${key}: ${fmt(value2, options)}`;
-        return `<rect ${markAttrs(label2, options, { index: i, value: value2, series: key })} x="${round(x2)}" y="${round(Math.min(y0, y1))}" width="${round(w)}" height="${round(h)}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc(label2)}</title></rect>`;
+        return `<rect ${markAttrs(label2, options, { index: i, value: value2, series: key })} x="${round(x2)}" y="${round(Math.min(y0, y1))}" width="${round(w)}" height="${round(h)}" rx="0" ry="0" style="fill:${palette[s % palette.length]}"><title>${esc(label2)}</title></rect>`;
       }).join("");
     }
     if (series.length && mode === "grouped-bar") {
@@ -512,7 +512,7 @@ function renderBars(data, options, mode) {
         const y2 = yScale(value2);
         const x2 = plot.left + i * band + band * 0.14 + s * inner;
         const label2 = `${d.label ?? ""} ${key}: ${fmt(value2, options)}`;
-        return `<rect ${markAttrs(label2, options, { index: i, value: value2, series: key })} x="${round(x2)}" y="${round(Math.min(y2, zeroY))}" width="${round(inner * 0.86)}" height="${round(Math.abs(zeroY - y2))}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc(label2)}</title></rect>`;
+        return `<rect ${markAttrs(label2, options, { index: i, value: value2, series: key })} x="${round(x2)}" y="${round(Math.min(y2, zeroY))}" width="${round(inner * 0.86)}" height="${round(Math.abs(zeroY - y2))}" rx="0" ry="0" style="fill:${palette[s % palette.length]}"><title>${esc(label2)}</title></rect>`;
       }).join("");
     }
     const value = d.value ?? 0;
@@ -520,11 +520,11 @@ function renderBars(data, options, mode) {
     if (!vertical) {
       const x2 = xScale(value);
       const y2 = plot.top + i * band + band * 0.18;
-      return `<rect ${markAttrs(label, options, { index: i, value })} x="${round(Math.min(x2, zeroX))}" y="${round(y2)}" width="${round(Math.abs(x2 - zeroX))}" height="${round(band * 0.64)}" rx="3"><title>${esc(label)}</title></rect>`;
+      return `<rect ${markAttrs(label, options, { index: i, value })} x="${round(Math.min(x2, zeroX))}" y="${round(y2)}" width="${round(Math.abs(x2 - zeroX))}" height="${round(band * 0.64)}" rx="0" ry="0"><title>${esc(label)}</title></rect>`;
     }
     const y = yScale(value);
     const x = plot.left + i * band + band * 0.18;
-    return `<rect ${markAttrs(label, options, { index: i, value })} x="${round(x)}" y="${round(Math.min(y, zeroY))}" width="${round(band * 0.64)}" height="${round(Math.abs(zeroY - y))}" rx="3"><title>${esc(label)}</title></rect>`;
+    return `<rect ${markAttrs(label, options, { index: i, value })} x="${round(x)}" y="${round(Math.min(y, zeroY))}" width="${round(band * 0.64)}" height="${round(Math.abs(zeroY - y))}" rx="0" ry="0"><title>${esc(label)}</title></rect>`;
   }).join("");
   const labels = options.axes === false ? "" : normalized.map(
     (d, i) => vertical ? `<text class="uif-chart-axis-label" x="${round(plot.left + i * band + band / 2)}" y="${height - 8}" text-anchor="middle">${esc(d.label)}</text>` : `<text class="uif-chart-axis-label" x="${plot.left - 8}" y="${round(plot.top + i * band + band / 2 + 4)}" text-anchor="end">${esc(d.label)}</text>`
@@ -847,7 +847,7 @@ function renderHistogram(data, options, distribution = false) {
     const x1 = x(bin.x1);
     const yy = y(bin.count);
     const label = `${fmt(bin.x0, options)}-${fmt(bin.x1, options)}: ${bin.count}`;
-    return `<rect ${markAttrs(label, options, { index: binIndex, value: bin.count })} x="${round(x0 + 1)}" y="${round(yy)}" width="${round(Math.max(1, x1 - x0 - 2))}" height="${round(height - plot.bottom - yy)}" rx="2"><title>${esc(label)}</title></rect>`;
+    return `<rect ${markAttrs(label, options, { index: binIndex, value: bin.count })} x="${round(x0 + 1)}" y="${round(yy)}" width="${round(Math.max(1, x1 - x0 - 2))}" height="${round(height - plot.bottom - yy)}" rx="0" ry="0"><title>${esc(label)}</title></rect>`;
   }).join("");
   return svgWrap(
     "histogram",
@@ -1096,7 +1096,7 @@ function renderWaterfall(data, options) {
     const total = step.role === "start" || step.role === "end" || step.role === "total";
     const color = total ? "var(--uif-chart-2,var(--uif-color-info))" : positive ? "var(--uif-chart-1,var(--uif-color-success))" : "var(--uif-chart-4,var(--uif-color-danger))";
     const label = `${step.datum.label ?? `Step ${step.index + 1}`}: ${fmt(step.delta, options)}`;
-    return `<rect ${markAttrs(label, options, { index: step.index, value: step.delta })} x="${round(x)}" y="${round(Math.min(y0, y1))}" width="${round(band * 0.64)}" height="${round(h)}" rx="3" style="fill:${step.datum.color || color}"><title>${esc(label)}</title></rect>`;
+    return `<rect ${markAttrs(label, options, { index: step.index, value: step.delta })} x="${round(x)}" y="${round(Math.min(y0, y1))}" width="${round(band * 0.64)}" height="${round(h)}" rx="0" ry="0" style="fill:${step.datum.color || color}"><title>${esc(label)}</title></rect>`;
   }).join("");
   const connectors = steps.slice(0, -1).map((step) => {
     const x1 = plot.left + step.index * band + band * 0.82;

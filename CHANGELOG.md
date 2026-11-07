@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.0
+
+- Fixed direct links to generated component-gallery anchors and preserved native same-document fragment navigation, including browser history traversal.
+- Added opt-in carousel autoplay with configurable intervals, pause/play controls, reduced-motion handling, interaction/visibility pauses, and timer cleanup.
+- Updated the multi-image gallery to show two images and advance one item per step, with ordered wraparound and accurate status text.
+- Added responsive outer spacing to the browser-extension example and documented carousel configuration.
+- Made vertical, horizontal, grouped, stacked, histogram, and waterfall bars square at their corners so axes and stacked joins remain flush.
+
 ## 3.0.0
 
 - Released the consolidated Batoi Unified Interface Framework v3 contract for general availability after the complete alpha and beta release matrices passed locally and in GitHub Actions.

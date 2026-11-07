@@ -683,7 +683,7 @@ function renderBars(
             const w = band * 0.64;
             const h = Math.abs(y1 - y0);
             const label = `${d.label ?? ''} ${key}: ${fmt(value, options)}`;
-            return `<rect ${markAttrs(label, options, { index: i, value, series: key })} x="${round(x)}" y="${round(Math.min(y0, y1))}" width="${round(w)}" height="${round(h)}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc(label)}</title></rect>`;
+            return `<rect ${markAttrs(label, options, { index: i, value, series: key })} x="${round(x)}" y="${round(Math.min(y0, y1))}" width="${round(w)}" height="${round(h)}" rx="0" ry="0" style="fill:${palette[s % palette.length]}"><title>${esc(label)}</title></rect>`;
           })
           .join('');
       }
@@ -695,7 +695,7 @@ function renderBars(
             const y = yScale(value);
             const x = plot.left + i * band + band * 0.14 + s * inner;
             const label = `${d.label ?? ''} ${key}: ${fmt(value, options)}`;
-            return `<rect ${markAttrs(label, options, { index: i, value, series: key })} x="${round(x)}" y="${round(Math.min(y, zeroY))}" width="${round(inner * 0.86)}" height="${round(Math.abs(zeroY - y))}" rx="3" style="fill:${palette[s % palette.length]}"><title>${esc(label)}</title></rect>`;
+            return `<rect ${markAttrs(label, options, { index: i, value, series: key })} x="${round(x)}" y="${round(Math.min(y, zeroY))}" width="${round(inner * 0.86)}" height="${round(Math.abs(zeroY - y))}" rx="0" ry="0" style="fill:${palette[s % palette.length]}"><title>${esc(label)}</title></rect>`;
           })
           .join('');
       }
@@ -704,11 +704,11 @@ function renderBars(
       if (!vertical) {
         const x = xScale(value);
         const y = plot.top + i * band + band * 0.18;
-        return `<rect ${markAttrs(label, options, { index: i, value })} x="${round(Math.min(x, zeroX))}" y="${round(y)}" width="${round(Math.abs(x - zeroX))}" height="${round(band * 0.64)}" rx="3"><title>${esc(label)}</title></rect>`;
+        return `<rect ${markAttrs(label, options, { index: i, value })} x="${round(Math.min(x, zeroX))}" y="${round(y)}" width="${round(Math.abs(x - zeroX))}" height="${round(band * 0.64)}" rx="0" ry="0"><title>${esc(label)}</title></rect>`;
       }
       const y = yScale(value);
       const x = plot.left + i * band + band * 0.18;
-      return `<rect ${markAttrs(label, options, { index: i, value })} x="${round(x)}" y="${round(Math.min(y, zeroY))}" width="${round(band * 0.64)}" height="${round(Math.abs(zeroY - y))}" rx="3"><title>${esc(label)}</title></rect>`;
+      return `<rect ${markAttrs(label, options, { index: i, value })} x="${round(x)}" y="${round(Math.min(y, zeroY))}" width="${round(band * 0.64)}" height="${round(Math.abs(zeroY - y))}" rx="0" ry="0"><title>${esc(label)}</title></rect>`;
     })
     .join('');
   const labels =
@@ -1116,7 +1116,7 @@ function renderHistogram(data: ChartDatum[], options: ChartOptions, distribution
       const x1 = x(bin.x1);
       const yy = y(bin.count);
       const label = `${fmt(bin.x0, options)}-${fmt(bin.x1, options)}: ${bin.count}`;
-      return `<rect ${markAttrs(label, options, { index: binIndex, value: bin.count })} x="${round(x0 + 1)}" y="${round(yy)}" width="${round(Math.max(1, x1 - x0 - 2))}" height="${round(height - plot.bottom - yy)}" rx="2"><title>${esc(label)}</title></rect>`;
+      return `<rect ${markAttrs(label, options, { index: binIndex, value: bin.count })} x="${round(x0 + 1)}" y="${round(yy)}" width="${round(Math.max(1, x1 - x0 - 2))}" height="${round(height - plot.bottom - yy)}" rx="0" ry="0"><title>${esc(label)}</title></rect>`;
     })
     .join('');
   return svgWrap(
@@ -1416,7 +1416,7 @@ function renderWaterfall(data: ChartDatum[], options: ChartOptions): string {
           ? 'var(--uif-chart-1,var(--uif-color-success))'
           : 'var(--uif-chart-4,var(--uif-color-danger))';
       const label = `${step.datum.label ?? `Step ${step.index + 1}`}: ${fmt(step.delta, options)}`;
-      return `<rect ${markAttrs(label, options, { index: step.index, value: step.delta })} x="${round(x)}" y="${round(Math.min(y0, y1))}" width="${round(band * 0.64)}" height="${round(h)}" rx="3" style="fill:${step.datum.color || color}"><title>${esc(label)}</title></rect>`;
+      return `<rect ${markAttrs(label, options, { index: step.index, value: step.delta })} x="${round(x)}" y="${round(Math.min(y0, y1))}" width="${round(band * 0.64)}" height="${round(h)}" rx="0" ry="0" style="fill:${step.datum.color || color}"><title>${esc(label)}</title></rect>`;
     })
     .join('');
   const connectors = steps

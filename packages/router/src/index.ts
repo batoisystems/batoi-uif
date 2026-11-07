@@ -51,14 +51,16 @@ export function initRouter(root: Document | HTMLElement = document, options: Rou
   const key = `router:${++routerSequence}`;
   let disposed = false;
   let navigation = 0;
+  let loadedRoute = window.location.pathname + window.location.search;
   updateActiveLinks(root, activeClass);
   const onClick = async (event: Event) => {
     const mouseEvent = event as MouseEvent;
     const target = event.target instanceof HTMLElement ? event.target : null;
     const link = target?.closest<HTMLAnchorElement>('a[data-uif="route"]');
     if (!link || link.origin !== window.location.origin || mouseEvent.button !== 0 || mouseEvent.metaKey || mouseEvent.ctrlKey || mouseEvent.shiftKey || mouseEvent.altKey || link.hasAttribute('download') || (link.target && link.target !== '_self')) return;
-    event.preventDefault();
     const url = new URL(link.href);
+    if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) return;
+    event.preventDefault();
     const allowed = await options.beforeNavigate?.(url);
     if (allowed === false || disposed) return;
     const currentNavigation = ++navigation;
@@ -66,15 +68,23 @@ export function initRouter(root: Document | HTMLElement = document, options: Rou
     void loadRoute(link.href, routeTarget, options, key, () => !disposed && navigation === currentNavigation).then(() => {
       if (disposed || navigation !== currentNavigation) return;
       history.pushState({ uifTarget: link.dataset.uifTarget || options.target || null }, '', link.href);
+      loadedRoute = window.location.pathname + window.location.search;
       updateActiveLinks(root, activeClass);
     }).catch((error) => handleRouteError(error, link.href));
   };
   const onPopState = (event: PopStateEvent) => {
+    if (window.location.pathname + window.location.search === loadedRoute) {
+      updateActiveLinks(root, activeClass);
+      return;
+    }
     const targetExpr = (event.state as { uifTarget?: string } | null)?.uifTarget || options.target;
     const routeTarget = targetExpr ? safeQuerySelector<HTMLElement>(targetExpr) : defaultTarget;
     const currentNavigation = ++navigation;
     void loadRoute(window.location.href, routeTarget, options, key, () => !disposed && navigation === currentNavigation).then(() => {
-      if (!disposed && navigation === currentNavigation) updateActiveLinks(root, activeClass);
+      if (!disposed && navigation === currentNavigation) {
+        loadedRoute = window.location.pathname + window.location.search;
+        updateActiveLinks(root, activeClass);
+      }
     }).catch((error) => handleRouteError(error, window.location.href));
   };
   root.addEventListener('click', onClick);

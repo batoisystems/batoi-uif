@@ -3382,7 +3382,7 @@ select.uif-input {
   justify-content: center;
   gap: var(--uif-space-2);
 }
-.uif-carousel-indicators button {
+.uif-carousel-indicators button[data-uif-slide-to] {
   width: 0.7rem;
   height: 0.7rem;
   padding: 0;

@@ -2,6 +2,19 @@ import { describe, expect, it, vi } from 'vitest';
 import { initRouter } from './index.js';
 
 describe('router', () => {
+  it('keeps same-document fragments and their history traversal native', () => {
+    const fetch = vi.fn();
+    vi.stubGlobal('fetch', fetch);
+    document.body.innerHTML = '<a data-uif="route" href="#details">Details</a><section id="details">Details</section>';
+    const dispose = initRouter(document);
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
+    document.querySelector('a')?.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    expect(fetch).not.toHaveBeenCalled();
+    dispose();
+  });
+
   it('loads same-origin route partials into a target', async () => {
     document.body.innerHTML = '<a data-uif="route" href="/next" data-uif-target="#view">Next</a><main id="view"></main>';
     vi.stubGlobal('fetch', vi.fn(async () => new Response('<p>Next</p>', { headers: { 'content-type': 'text/html' } })));
