@@ -18,6 +18,7 @@ interface UIFComponent {
 interface UIFLifecycleEvent<T = unknown> extends CustomEvent<T> {
     type: 'uif:before-init' | 'uif:init' | 'uif:before-destroy' | 'uif:destroy' | 'uif:error';
 }
+/** Strict, bounded configuration without changing another app's legacy mode. */
 declare function parseOptions(el: HTMLElement): UIFOptions;
 declare function emit<T = unknown>(name: string, detail?: T, target?: EventTarget): void;
 declare function on(name: string, handler: EventListener, target?: EventTarget): () => void;

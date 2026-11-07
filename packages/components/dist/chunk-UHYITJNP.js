@@ -1,6 +1,6 @@
 import {
   eventElement
-} from "./chunk-D73MWFXY.js";
+} from "./chunk-TH7UJRFA.js";
 
 // src/controls/carousel.ts
 import { emit } from "@batoi/uif-core/runtime";

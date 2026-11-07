@@ -28,7 +28,9 @@ export function resolveComponentTarget(source: HTMLElement): HTMLElement | null 
 }
 
 export function eventElement(event: Event): HTMLElement | null {
-  return event.target instanceof HTMLElement ? event.target : null;
+  let target = event.target instanceof Element ? event.target : event.target instanceof Node ? event.target.parentElement : null;
+  while (target && !(target instanceof HTMLElement)) target = target.parentElement;
+  return target;
 }
 
 export function storageGet(key: string | undefined): string | null {

@@ -50,38 +50,85 @@ export const animationPresets: AnimationPreset[] = [
   { name: 'crossfade', category: 'layout', duration: 220, description: 'Soft layout/content transition.' },
 ];
 
-const activeAnimations = new WeakMap<HTMLElement, number>();
+interface EffectOperation {
+  signal: AbortSignal;
+  finish(): void;
+}
+const visibility = new WeakMap<HTMLElement, AbortController>();
+const activeAnimations = new WeakMap<HTMLElement, AbortController>();
+
+function beginEffect(el: HTMLElement, operations: WeakMap<HTMLElement, AbortController>, cleanup = () => {}): EffectOperation {
+  operations.get(el)?.abort();
+  const controller = new AbortController();
+  operations.set(el, controller);
+  controller.signal.addEventListener('abort', cleanup, { once: true });
+  return {
+    signal: controller.signal,
+    finish() {
+      controller.signal.removeEventListener('abort', cleanup);
+      if (!controller.signal.aborted) cleanup();
+      if (operations.get(el) === controller) operations.delete(el);
+    },
+  };
+}
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 }
 
-function nextFrame(): Promise<void> {
-  return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+/** Cancellation settles the promise and releases the scheduled callback immediately. */
+function waitForEffect(signal: AbortSignal, duration?: number): Promise<boolean> {
+  if (signal.aborted) return Promise.resolve(false);
+  return new Promise((resolve) => {
+    const frame = duration === undefined;
+    const finish = () => {
+      signal.removeEventListener('abort', abort);
+      resolve(!signal.aborted);
+    };
+    const handle = frame ? requestAnimationFrame(finish) : window.setTimeout(finish, duration);
+    const abort = () => {
+      if (frame) cancelAnimationFrame(handle);
+      else window.clearTimeout(handle);
+      finish();
+    };
+    signal.addEventListener('abort', abort, { once: true });
+  });
+}
+
+async function transitionWithin(el: HTMLElement, className: string, options: EffectOptions, signal: AbortSignal): Promise<void> {
+  if (prefersReducedMotion()) {
+    if (!signal.aborted) el.classList.add(className);
+    return;
+  }
+  if (!await waitForEffect(signal)) return;
+  if (options.delay && !await waitForEffect(signal, options.delay)) return;
+  if (signal.aborted) return;
+  el.classList.add(className);
+  await waitForEffect(signal, options.duration ?? 180);
 }
 
 export async function transition(el: HTMLElement, className: string, options: EffectOptions = {}): Promise<void> {
-  if (prefersReducedMotion()) {
-    el.classList.add(className);
-    return;
-  }
-  await nextFrame();
-  if (options.delay) await new Promise((resolve) => window.setTimeout(resolve, options.delay));
-  el.classList.add(className);
-  await new Promise((resolve) => window.setTimeout(resolve, options.duration ?? 180));
+  const operation = beginEffect(el, visibility);
+  try { await transitionWithin(el, className, options, operation.signal); }
+  finally { operation.finish(); }
 }
 
 export async function show(el: HTMLElement, options: EffectOptions = {}): Promise<void> {
+  const operation = beginEffect(el, visibility);
   el.hidden = false;
   el.dataset.uifState = 'open';
-  await transition(el, options.className ?? 'uif-is-visible', options);
+  try { await transitionWithin(el, options.className ?? 'uif-is-visible', options, operation.signal); }
+  finally { operation.finish(); }
 }
 
 export async function hide(el: HTMLElement, options: EffectOptions = {}): Promise<void> {
+  const operation = beginEffect(el, visibility);
   el.dataset.uifState = 'closed';
   el.classList.remove(options.className ?? 'uif-is-visible');
-  if (!prefersReducedMotion()) await new Promise((resolve) => window.setTimeout(resolve, options.duration ?? 180));
-  el.hidden = true;
+  try {
+    if (!prefersReducedMotion()) await waitForEffect(operation.signal, options.duration ?? 180);
+    if (!operation.signal.aborted) el.hidden = true;
+  } finally { operation.finish(); }
 }
 
 export async function toggle(el: HTMLElement, options: EffectOptions = {}): Promise<void> {
@@ -90,44 +137,57 @@ export async function toggle(el: HTMLElement, options: EffectOptions = {}): Prom
 }
 
 export async function expand(el: HTMLElement, options: EffectOptions = {}): Promise<void> {
+  const operation = beginEffect(el, visibility, () => { el.style.height = ''; });
   el.style.height = '0px';
   el.hidden = false;
-  await nextFrame();
-  el.style.height = `${el.scrollHeight}px`;
-  await transition(el, options.className ?? 'uif-is-expanded', options);
-  el.style.height = '';
+  el.dataset.uifState = 'open';
+  try {
+    if (!await waitForEffect(operation.signal)) return;
+    el.style.height = `${el.scrollHeight}px`;
+    await transitionWithin(el, options.className ?? 'uif-is-expanded', options, operation.signal);
+  } finally { operation.finish(); }
 }
 
 export async function collapse(el: HTMLElement, options: EffectOptions = {}): Promise<void> {
+  const operation = beginEffect(el, visibility, () => { el.style.height = ''; });
   el.style.height = `${el.scrollHeight}px`;
-  await nextFrame();
-  el.style.height = '0px';
-  await hide(el, options);
-  el.style.height = '';
+  el.dataset.uifState = 'closed';
+  el.classList.remove(options.className ?? 'uif-is-expanded');
+  try {
+    if (!prefersReducedMotion() && !await waitForEffect(operation.signal)) return;
+    el.style.height = '0px';
+    if (!prefersReducedMotion()) await waitForEffect(operation.signal, options.duration ?? 180);
+    if (!operation.signal.aborted) el.hidden = true;
+  } finally { operation.finish(); }
 }
 
 export async function animate(el: HTMLElement, animation: string, options: EffectOptions = {}): Promise<void> {
   const className = options.className ?? `uif-animate-${animation}`;
-  el.classList.remove(className, 'uif-is-animating');
-  if (prefersReducedMotion()) {
-    el.dataset.uifAnimation = animation;
-    return;
-  }
-  await nextFrame();
-  if (options.delay) await new Promise((resolve) => window.setTimeout(resolve, options.delay));
-  const preset = animationPresets.find((item) => item.name === animation);
-  const duration = options.duration ?? preset?.duration ?? 220;
-  el.style.animationDuration = `${duration}ms`;
-  if (options.easing) el.style.animationTimingFunction = options.easing;
-  if (options.repeat) el.style.animationIterationCount = String(options.repeat);
-  if (options.direction) el.style.animationDirection = options.direction;
-  if (options.fill) el.style.animationFillMode = options.fill;
-  el.classList.add('uif-is-animating', className);
-  const token = Date.now();
-  activeAnimations.set(el, token);
-  await new Promise((resolve) => window.setTimeout(resolve, duration * (options.repeat ?? 1)));
-  if (activeAnimations.get(el) !== token) return;
-  el.classList.remove('uif-is-animating', className);
+  const operation = beginEffect(el, activeAnimations, () => {
+    el.classList.remove('uif-is-animating', className);
+    clearAnimationStyles(el);
+  });
+  try {
+    if (prefersReducedMotion()) {
+      el.dataset.uifAnimation = animation;
+      return;
+    }
+    if (!await waitForEffect(operation.signal)) return;
+    if (options.delay && !await waitForEffect(operation.signal, options.delay)) return;
+    if (operation.signal.aborted) return;
+    const preset = animationPresets.find((item) => item.name === animation);
+    const duration = options.duration ?? preset?.duration ?? 220;
+    el.style.animationDuration = `${duration}ms`;
+    if (options.easing) el.style.animationTimingFunction = options.easing;
+    if (options.repeat) el.style.animationIterationCount = String(options.repeat);
+    if (options.direction) el.style.animationDirection = options.direction;
+    if (options.fill) el.style.animationFillMode = options.fill;
+    el.classList.add('uif-is-animating', className);
+    await waitForEffect(operation.signal, duration * (options.repeat ?? 1));
+  } finally { operation.finish(); }
+}
+
+function clearAnimationStyles(el: HTMLElement): void {
   el.style.animationDuration = '';
   el.style.animationTimingFunction = '';
   el.style.animationIterationCount = '';
@@ -153,14 +213,13 @@ export async function animateGroup(root: ParentNode, selector: string, animation
 }
 
 export function cancelAnimation(el: HTMLElement): void {
+  visibility.get(el)?.abort();
+  visibility.delete(el);
+  activeAnimations.get(el)?.abort();
   activeAnimations.delete(el);
   el.classList.remove('uif-is-animating');
   [...el.classList].filter((name) => name.startsWith('uif-animate-')).forEach((name) => el.classList.remove(name));
-  el.style.animationDuration = '';
-  el.style.animationTimingFunction = '';
-  el.style.animationIterationCount = '';
-  el.style.animationDirection = '';
-  el.style.animationFillMode = '';
+  clearAnimationStyles(el);
 }
 
 export interface AnimationController { refresh(): void; destroy(): void; }

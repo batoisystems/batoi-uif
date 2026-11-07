@@ -1,7 +1,32 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { URL } from 'node:url';
 import { createHash } from 'node:crypto';
 import ts from 'typescript';
+
+/** Freeze every declared JS/types subpath, not only package index facades. */
+export function collectPublicEntryAPIs(root) {
+  const entries = {};
+  for (const folder of readdirSync(new URL('packages/', root)).sort()) {
+    const directory = new URL(`packages/${folder}/`, root);
+    const manifest = JSON.parse(readFileSync(new URL('package.json', directory), 'utf8'));
+    for (const [subpath, target] of Object.entries(manifest.exports ?? {}).sort(([a], [b]) => a.localeCompare(b))) {
+      if (typeof target !== 'object' || !target.types) continue;
+      if (target.types.includes('*')) {
+        const [prefix, suffix, extra] = target.types.replace(/^\.\//, '').split('*');
+        if (extra !== undefined || !subpath.includes('*')) throw new Error(`Unsupported types export pattern: ${manifest.name}${subpath}`);
+        const matches = readdirSync(directory, { recursive: true }).filter((file) => file.startsWith(prefix) && file.endsWith(suffix) && file.length > prefix.length + suffix.length).sort();
+        if (!matches.length) throw new Error(`Empty types export pattern: ${manifest.name}${subpath}`);
+        for (const file of matches) {
+          const name = subpath.replace('*', file.slice(prefix.length, file.length - suffix.length));
+          entries[`${manifest.name}${name.slice(1)}`] = declarationAPI(new URL(file, directory));
+        }
+      } else entries[`${manifest.name}${subpath === '.' ? '' : subpath.slice(1)}`] = declarationAPI(new URL(target.types, directory));
+    }
+  }
+  const browser = new URL('dist/index.d.ts', root);
+  if (existsSync(browser)) entries['batoi-uif/browser'] = declarationAPI(browser);
+  return entries;
+}
 
 function isExported(node) {
   return node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword) ?? false;

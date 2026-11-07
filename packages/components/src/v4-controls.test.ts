@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createUIF } from './application.js';
 import { initModal } from './controls/modal.js';
+import { initDrawer } from './controls/drawer.js';
 import { initTabs } from './controls/tabs.js';
 import { closeOverlay, getOverlayStack } from '@batoi/uif-overlays';
 
@@ -11,6 +12,22 @@ afterEach(async () => {
 });
 
 describe('v4 canonical control boundaries', () => {
+  it('toggles a drawer from its previous state without immediately hiding a new open', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    const el = document.createElement('div');
+    el.dataset.uif = 'drawer';
+    document.body.append(el);
+    const controller = initDrawer(el);
+    controller.toggle?.();
+    expect(el.dataset.uifState).toBe('open');
+    expect(el.hidden).toBe(false);
+    expect(getOverlayStack()).toEqual([el]);
+    controller.toggle?.();
+    expect(el.dataset.uifState).toBe('closed');
+    expect(getOverlayStack()).toEqual([]);
+    controller.destroy();
+  });
+
   it('dismisses only the top modal and cleans background ownership on destroy', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
     document.body.innerHTML = '<main><p id="background">Page</p><div id="first" data-uif="modal"><button>Outer</button><div id="second" data-uif="modal"><button>Inner</button></div></div></main>';

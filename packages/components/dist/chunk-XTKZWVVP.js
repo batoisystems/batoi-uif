@@ -1,10 +1,10 @@
 import {
   showToast
-} from "./chunk-KT6YEKUB.js";
+} from "./chunk-X5CNZCAQ.js";
 import {
   eventElement,
   resolveComponentTarget
-} from "./chunk-D73MWFXY.js";
+} from "./chunk-TH7UJRFA.js";
 
 // src/controller.ts
 import { emit } from "@batoi/uif-core/runtime";
@@ -49,10 +49,14 @@ function mountComponent(el, init, owner) {
   return controller;
 }
 function destroyComponent(el) {
-  instances.get(el)?.destroy();
+  const controller = instances.get(el);
   instances.delete(el);
   owners.delete(el);
-  emit("uif:destroy", { el }, el);
+  try {
+    controller?.destroy();
+  } finally {
+    emit("uif:destroy", { el }, el);
+  }
 }
 function bindComponentActions(root = document) {
   const existing = actionBindings.get(root);

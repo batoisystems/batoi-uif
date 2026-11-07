@@ -4,10 +4,25 @@ import {
   registerRuntimeComponent,
   runtimeRegistry,
   start,
+  startEssential,
   unregisterAction,
 } from '../../../index.js';
 
 describe('root start lifecycle', () => {
+  it('supports staged sibling roots from one module graph and prevents overlap', () => {
+    document.body.innerHTML = '<main id="legacy"><div id="nested"></div></main><main id="selected"></main>';
+    const legacyRoot = document.querySelector<HTMLElement>('#legacy')!;
+    const selectedRoot = document.querySelector<HTMLElement>('#selected')!;
+    const legacy = start(legacyRoot);
+    const selected = startEssential(selectedRoot);
+    expect(() => startEssential(legacyRoot)).toThrow(/overlap/);
+    expect(() => startEssential(document.querySelector<HTMLElement>('#nested')!)).toThrow(/overlap/);
+    expect(() => start(selectedRoot)).toThrow(/overlap/);
+    selected.destroy(); legacy.destroy();
+    startEssential(legacyRoot).destroy();
+    start(selectedRoot).destroy();
+  });
+
   it('returns the active app for repeated starts without duplicating action handlers', () => {
     document.body.innerHTML = '<button data-uif-event="click" data-uif-action="count-once">Run</button>';
     const handler = vi.fn();

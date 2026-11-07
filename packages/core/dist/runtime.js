@@ -6,8 +6,7 @@ import {
   registerPlugin,
   setAccent,
   setDensity
-} from "./chunk-7ZBMMGWA.js";
-import "./chunk-BMLSDHN3.js";
+} from "./chunk-WMVHGMA3.js";
 import "./chunk-JL4ZCOE3.js";
 export {
   emit,

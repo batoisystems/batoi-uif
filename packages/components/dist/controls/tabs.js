@@ -1,7 +1,7 @@
 import {
   initTabs
-} from "../chunk-FR5ALJFM.js";
-import "../chunk-D73MWFXY.js";
+} from "../chunk-NOJAAGTR.js";
+import "../chunk-TH7UJRFA.js";
 export {
   initTabs
 };

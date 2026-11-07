@@ -1,6 +1,6 @@
 import {
   eventElement
-} from "./chunk-D73MWFXY.js";
+} from "./chunk-TH7UJRFA.js";
 
 // src/controls/dismissible.ts
 import { hide } from "@batoi/uif-effects";

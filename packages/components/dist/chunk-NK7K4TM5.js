@@ -1,7 +1,7 @@
 import {
   eventElement,
   focusableSelector
-} from "./chunk-D73MWFXY.js";
+} from "./chunk-TH7UJRFA.js";
 
 // src/controls/lightbox.ts
 import { emit } from "@batoi/uif-core/runtime";

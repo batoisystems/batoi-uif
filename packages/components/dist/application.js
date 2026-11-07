@@ -2,18 +2,14 @@ import {
   bindComponentActions,
   destroyComponent,
   mountComponent
-} from "./chunk-KE65AGYK.js";
-import "./chunk-KT6YEKUB.js";
-import "./chunk-D73MWFXY.js";
+} from "./chunk-XTKZWVVP.js";
+import "./chunk-X5CNZCAQ.js";
+import "./chunk-TH7UJRFA.js";
 
 // src/application.ts
 import { createComponentRegistry } from "@batoi/uif-core/registry";
-var roots = /* @__PURE__ */ new Set();
+import { claimApplicationRoot } from "@batoi/uif-core/ownership";
 function createUIF(root, components = []) {
-  for (const active of roots) {
-    if (active === root || active.contains(root) || root.contains(active))
-      throw new Error("UIF application roots must not overlap");
-  }
   const registry = createComponentRegistry();
   const elements = /* @__PURE__ */ new Map();
   let destroyed = false;
@@ -24,37 +20,79 @@ function createUIF(root, components = []) {
       version: 4,
       optionKeys: component.optionKeys ?? [],
       mount({ element }) {
-        mountComponent(element, component.init, root);
+        const controller = mountComponent(element, component.init, root);
         elements.set(element, component.name);
-        return () => {
-          elements.delete(element);
-          destroyComponent(element);
+        return {
+          update(reason) {
+            if (typeof controller.update === "function") return controller.update(reason);
+            if (typeof controller.refresh === "function") return controller.refresh();
+          },
+          suspend() {
+            if (typeof controller.suspend === "function") controller.suspend();
+          },
+          resume() {
+            if (typeof controller.resume === "function") controller.resume();
+          },
+          destroy() {
+            elements.delete(element);
+            destroyComponent(element);
+          }
         };
       }
     });
   };
   components.forEach(register);
-  const unbind = bindComponentActions(root);
-  roots.add(root);
-  return {
+  const lease = claimApplicationRoot(root);
+  let unbind;
+  try {
+    unbind = bindComponentActions(root);
+  } catch (error) {
+    lease.destroy();
+    throw error;
+  }
+  const assertTarget = (target) => {
+    lease.assert();
+    if (target !== root && !root.contains(target)) throw new Error("UIF target is outside its application root");
+  };
+  const api = {
     register,
     refresh(target = root) {
       if (destroyed) return;
-      if (target !== root && !root.contains(target))
-        throw new Error("UIF target is outside its application root");
+      assertTarget(target);
       elements.forEach((name, element) => {
         if (!root.contains(element) || element.dataset.uif !== name) registry.destroy(element);
       });
       registry.refresh(target);
     },
+    /** Use after replacing inner HTML/attributes of an existing component root. */
+    rehydrate(target = root) {
+      if (destroyed) return;
+      assertTarget(target);
+      registry.destroy(target);
+      api.refresh(target);
+    },
+    suspend(target = root) {
+      if (destroyed) return;
+      assertTarget(target);
+      registry.suspend(target);
+    },
+    resume(target = root) {
+      if (destroyed) return;
+      assertTarget(target);
+      registry.resume(target);
+    },
     destroy() {
       if (destroyed) return;
       destroyed = true;
-      roots.delete(root);
-      Array.from(elements.keys()).forEach((element) => registry.destroy(element));
-      unbind();
+      try {
+        Array.from(elements.keys()).forEach((element) => registry.destroy(element));
+      } finally {
+        unbind();
+        lease.destroy();
+      }
     }
   };
+  return api;
 }
 export {
   createUIF

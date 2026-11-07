@@ -1,6 +1,6 @@
 import {
   handleAction
-} from "./chunk-KE65AGYK.js";
+} from "./chunk-XTKZWVVP.js";
 
 // src/controls/button.ts
 function initButton(el) {

@@ -296,57 +296,9 @@ var BatoiUIF = (() => {
     return { value: output, issues, valid: issues.length === 0 };
   }
 
-  // src/compatibility.ts
-  var compatibilityMode = "v2";
-  function configureCompatibility(options) {
-    compatibilityMode = options?.mode ?? "v2";
-  }
-  function getCompatibilityMode() {
-    return compatibilityMode;
-  }
-
   // src/runtime.ts
   var plugins = /* @__PURE__ */ new Map();
   var apps = /* @__PURE__ */ new WeakMap();
-  function coerceValue(value) {
-    if (value === "true") return true;
-    if (value === "false") return false;
-    if (value === "null") return null;
-    if (value !== "" && !Number.isNaN(Number(value))) return Number(value);
-    return value;
-  }
-  function parseOptions(el) {
-    const raw = el.getAttribute("data-uif-options");
-    if (!raw) return {};
-    try {
-      const result = parseUIFConfiguration(raw);
-      if (result.issues.some((issue) => issue.code === "invalid-json")) throw new SyntaxError("Invalid options");
-      if (!result.valid) emit("uif:runtime:diagnostic", { component: el.dataset.uif, issues: result.issues }, el);
-      return result.value;
-    } catch {
-      const compatibilityMode2 = getCompatibilityMode();
-      emit("uif:runtime:diagnostic", {
-        component: el.dataset.uif,
-        issues: [{
-          path: "data-uif-options",
-          code: compatibilityMode2 === "v3" ? "legacy-options-rejected" : "legacy-options",
-          message: compatibilityMode2 === "v3" ? "Legacy semicolon options are rejected in v3 mode; use a JSON object." : "Legacy semicolon options are deprecated; migrate to a JSON object before v3."
-        }]
-      }, el);
-      if (compatibilityMode2 === "v3") return {};
-      return raw.split(";").reduce((acc, pair) => {
-        const [key, ...rest] = pair.split(":");
-        const name = key?.trim();
-        if (!name || !isSafeObjectKey(name)) {
-          if (name) emit("uif:runtime:diagnostic", { component: el.dataset.uif, issues: [{ path: name, code: "unsafe-key", message: `Unsafe option key: ${name}` }] }, el);
-          return acc;
-        }
-        const value = rest.join(":").trim();
-        acc[name] = value === "" ? true : coerceValue(value);
-        return acc;
-      }, {});
-    }
-  }
   function emit(name, detail, target = document) {
     target.dispatchEvent(new CustomEvent(name, { detail, bubbles: true }));
   }
@@ -409,6 +361,69 @@ var BatoiUIF = (() => {
     }
     emit("uif:init", { root, options }, root);
     return app;
+  }
+
+  // src/compatibility.ts
+  var compatibilityMode = "v2";
+  function configureCompatibility(options) {
+    compatibilityMode = options?.mode ?? "v2";
+  }
+  function getCompatibilityMode() {
+    return compatibilityMode;
+  }
+
+  // src/legacy-options.ts
+  function coerceValue(value) {
+    if (value === "true") return true;
+    if (value === "false") return false;
+    if (value === "null") return null;
+    if (value !== "" && !Number.isNaN(Number(value))) return Number(value);
+    return value;
+  }
+  function parseOptions(el) {
+    const raw = el.getAttribute("data-uif-options");
+    if (!raw) return {};
+    const parsed = parseUIFConfiguration(raw);
+    if (!parsed.issues.some((issue) => issue.code === "invalid-json")) {
+      if (!parsed.valid)
+        emit("uif:runtime:diagnostic", { component: el.dataset.uif, issues: parsed.issues }, el);
+      return parsed.value;
+    }
+    const compatibilityMode2 = getCompatibilityMode();
+    emit(
+      "uif:runtime:diagnostic",
+      {
+        component: el.dataset.uif,
+        issues: [
+          {
+            path: "data-uif-options",
+            code: compatibilityMode2 === "v3" ? "legacy-options-rejected" : "legacy-options",
+            message: compatibilityMode2 === "v3" ? "Legacy semicolon options are rejected in v3 mode; use a JSON object." : "Legacy semicolon options are deprecated; migrate to a JSON object before v3."
+          }
+        ]
+      },
+      el
+    );
+    if (compatibilityMode2 === "v3") return {};
+    return raw.split(";").reduce((acc, pair) => {
+      const [key, ...rest] = pair.split(":");
+      const name = key?.trim();
+      if (!name || !isSafeObjectKey(name)) {
+        if (name)
+          emit(
+            "uif:runtime:diagnostic",
+            {
+              component: el.dataset.uif,
+              issues: [{ path: name, code: "unsafe-key", message: `Unsafe option key: ${name}` }]
+            },
+            el
+          );
+        return acc;
+      }
+      const value = rest.join(":").trim();
+      acc[name] = value === "" ? true : coerceValue(value);
+      return acc;
+    }, {});
   }
 
   // src/agent.ts

@@ -1,4 +1,4 @@
-import { hide, show } from '@batoi/uif-effects';
+import { cancelAnimation, hide, show } from '@batoi/uif-effects';
 
 export interface OverlayOptions {
   opener?: HTMLElement | null;
@@ -19,8 +19,9 @@ interface OverlayRecord {
 }
 
 const stack: OverlayRecord[] = [];
-const opening = new WeakSet<HTMLElement>();
-const closing = new WeakSet<HTMLElement>();
+const operations = new WeakMap<HTMLElement, symbol>();
+const closing = new WeakMap<HTMLElement, OverlayRecord>();
+const destroying = new WeakSet<HTMLElement>();
 const backgroundState = new Map<HTMLElement, { inert: boolean; inertAttribute: boolean; ariaHidden: string | null }>();
 
 function top(): OverlayRecord | undefined {
@@ -28,11 +29,53 @@ function top(): OverlayRecord | undefined {
 }
 
 function onKey(event: KeyboardEvent): void {
+  if (event.defaultPrevented) return;
   const entry = top();
   if (event.key === 'Escape' && entry && entry.options.closeOnEscape !== false) {
     event.preventDefault();
     void closeOverlay(entry.el);
   }
+  if (event.key === 'Tab' && entry?.options.modal) {
+    const candidates = focusableElements(entry.el);
+    const first = candidates[0];
+    const last = candidates.at(-1);
+    if (!first || !last) {
+      event.preventDefault();
+      focusOverlay(entry.el);
+    } else if (!candidates.includes(document.activeElement as HTMLElement)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+    } else if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+}
+
+function isAvailable(el: HTMLElement): boolean {
+  if (!el.isConnected || el.closest('[hidden],[inert],[aria-hidden="true"]')) return false;
+  for (let node: HTMLElement | null = el; node; node = node.parentElement) {
+    const style = getComputedStyle(node);
+    if (style.display === 'none' || style.visibility === 'hidden' || style.visibility === 'collapse') return false;
+  }
+  return true;
+}
+
+function focusableElements(el: HTMLElement): HTMLElement[] {
+  return [...el.querySelectorAll<HTMLElement>('a[href],button,input:not([type="hidden"]),select,textarea,[tabindex],[contenteditable="true"]')]
+    .filter((candidate) => candidate.tabIndex >= 0 && !candidate.matches(':disabled') && isAvailable(candidate));
+}
+
+function focusOverlay(el: HTMLElement): void {
+  const first = focusableElements(el)[0];
+  if (first) { first.focus(); return; }
+  const dialog = el.querySelector<HTMLElement>('[data-uif-role="dialog"]') ?? el;
+  if (!isAvailable(dialog)) return;
+  if (!dialog.hasAttribute('tabindex')) dialog.setAttribute('tabindex', '-1');
+  dialog.focus();
 }
 
 function emitOverlay(type: string, entry: OverlayRecord): void {
@@ -102,57 +145,69 @@ export function getOverlayStack(): HTMLElement[] {
 }
 
 export async function openOverlay(el: HTMLElement, options: OverlayOptions = {}): Promise<void> {
-  if (opening.has(el) || stack.some((entry) => entry.el === el)) return;
-  opening.add(el);
+  if (destroying.has(el) || stack.some((entry) => entry.el === el)) return;
+  const operation = Symbol('open');
+  operations.set(el, operation);
+  closing.delete(el);
   if (!stack.length) document.addEventListener('keydown', onKey);
   const entry = { el, opener: options.opener ?? (document.activeElement as HTMLElement), options };
   stack.push(entry);
-  emitOverlay('uif:overlay-open', entry);
-  syncOverlayState();
   el.setAttribute('aria-hidden', 'false');
-  try {
-    await show(el);
-  } finally {
-    opening.delete(el);
-  }
-  if (!stack.includes(entry)) return;
-  el.querySelector<HTMLElement>('button:not(:disabled),[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')?.focus();
+  const pending = show(el);
+  syncOverlayState();
+  if (top() === entry) focusOverlay(el);
+  emitOverlay('uif:overlay-open', entry);
+  await pending;
+  if (operations.get(el) !== operation || !stack.includes(entry)) return;
   emitOverlay('uif:overlay-opened', entry);
 }
 
 export async function closeOverlay(el: HTMLElement | undefined = top()?.el): Promise<void> {
   if (!el) return;
-  if (closing.has(el)) return;
+  // A hidden parent cannot retain an active descendant modal/focus owner.
+  const descendants = stack.filter((entry) => entry.el !== el && el.contains(entry.el)).reverse();
+  const pendingChildren = descendants.map((entry) => closeOverlay(entry.el));
   const index = stack.findIndex((entry) => entry.el === el);
+  const wasTop = top()?.el === el;
   const [entry] = index >= 0 ? stack.splice(index, 1) : [];
   if (!entry) return;
-  closing.add(el);
-  emitOverlay('uif:overlay-close', entry);
+  const operation = Symbol('close');
+  operations.set(el, operation);
+  closing.set(el, entry);
   el.setAttribute('aria-hidden', 'true');
+  const pending = hide(el);
   syncOverlayState();
-  try {
-    await hide(el);
-  } finally {
-    closing.delete(el);
-  }
-  if (entry?.options.restoreFocus !== false) entry?.opener?.focus?.();
-  if (!stack.length) {
-    document.removeEventListener('keydown', onKey);
-  }
+  if (!stack.length) document.removeEventListener('keydown', onKey);
+  emitOverlay('uif:overlay-close', entry);
+  await Promise.all([pending, ...pendingChildren]);
+  if (operations.get(el) !== operation) return;
+  closing.delete(el);
+  operations.delete(el);
+  const opener = entry.opener;
+  if (wasTop && entry.options.restoreFocus !== false && opener && isAvailable(opener) && (!top() || top()?.el.contains(opener))) opener.focus();
   emitOverlay('uif:overlay-closed', entry);
 }
 
 /** Synchronous lifecycle cleanup, without returning focus to a removed subtree. */
 export function destroyOverlay(el: HTMLElement): void {
-  const index = stack.findIndex((entry) => entry.el === el);
-  if (index < 0) return;
-  const [entry] = stack.splice(index, 1);
-  emitOverlay('uif:overlay-close', entry);
-  el.hidden = true;
-  el.setAttribute('aria-hidden', 'true');
-  syncOverlayState();
-  if (!stack.length) document.removeEventListener('keydown', onKey);
-  emitOverlay('uif:overlay-closed', entry);
+  if (destroying.has(el)) return;
+  destroying.add(el);
+  try {
+    stack.filter((entry) => entry.el !== el && el.contains(entry.el)).reverse().forEach((entry) => destroyOverlay(entry.el));
+    const index = stack.findIndex((entry) => entry.el === el);
+    const entry = index >= 0 ? stack.splice(index, 1)[0] : closing.get(el);
+    operations.delete(el);
+    closing.delete(el);
+    cancelAnimation(el);
+    if (entry && index >= 0) emitOverlay('uif:overlay-close', entry);
+    el.hidden = true;
+    el.dataset.uifState = 'closed';
+    el.classList.remove('uif-is-visible');
+    el.setAttribute('aria-hidden', 'true');
+    syncOverlayState();
+    if (!stack.length) document.removeEventListener('keydown', onKey);
+    if (entry) emitOverlay('uif:overlay-closed', entry);
+  } finally { destroying.delete(el); }
 }
 
 export async function toggleOverlay(el: HTMLElement, options: OverlayOptions = {}): Promise<void> {

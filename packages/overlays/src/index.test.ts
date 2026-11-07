@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { closeOverlay, getOverlayStack, openOverlay, positionOverlay } from './index.js';
+import { closeOverlay, destroyOverlay, getOverlayStack, openOverlay, positionOverlay } from './index.js';
 
 afterEach(async () => {
+  vi.useRealTimers();
   while (getOverlayStack().length) {
     await closeOverlay(getOverlayStack().at(-1));
   }
@@ -11,6 +12,86 @@ afterEach(async () => {
 });
 
 describe('overlays', () => {
+  it('closes or destroys active descendants when their parent is removed', async () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    const parent = document.createElement('div');
+    const child = document.createElement('div');
+    parent.append(child); document.body.append(parent);
+    await openOverlay(parent, { modal: true });
+    await openOverlay(child, { modal: true });
+    await closeOverlay(parent);
+    expect(getOverlayStack()).toEqual([]);
+    expect(child.hidden).toBe(true);
+    await openOverlay(parent, { modal: true });
+    await openOverlay(child, { modal: true });
+    parent.addEventListener('uif:overlay-close', () => { void openOverlay(parent); });
+    destroyOverlay(parent);
+    expect(getOverlayStack()).toEqual([]);
+    expect(parent.hidden).toBe(true);
+    expect(child.hidden).toBe(true);
+  });
+
+  it('ignores stale completions during open/close/reopen and cancels on destroy', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false })));
+    const el = document.createElement('div');
+    el.innerHTML = '<button>Action</button>';
+    document.body.append(el);
+    const opened = vi.fn();
+    const closed = vi.fn();
+    el.addEventListener('uif:overlay-opened', opened);
+    el.addEventListener('uif:overlay-closed', closed);
+    const first = openOverlay(el, { modal: true });
+    const closing = closeOverlay(el);
+    const second = openOverlay(el, { modal: true });
+    await vi.runAllTimersAsync();
+    await Promise.all([first, closing, second]);
+    expect(el.hidden).toBe(false);
+    expect(getOverlayStack()).toEqual([el]);
+    expect(opened).toHaveBeenCalledTimes(1);
+    expect(closed).not.toHaveBeenCalled();
+    const pending = closeOverlay(el);
+    destroyOverlay(el);
+    await pending;
+    expect(el.hidden).toBe(true);
+    expect(getOverlayStack()).toEqual([]);
+    expect(closed).toHaveBeenCalledTimes(1);
+    expect(vi.getTimerCount()).toBe(0);
+    expect(document.body.classList.contains('uif-overlay-open')).toBe(false);
+  });
+
+  it('skips hidden controls, traps modal focus and gives empty dialogs a focus target', async () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    const el = document.createElement('div');
+    el.innerHTML = '<input type="hidden"><div hidden><button>Hidden</button></div><button style="display:none">CSS hidden</button><button disabled>Disabled</button><button id="first">First</button><button id="last">Last</button>';
+    document.body.append(el);
+    await openOverlay(el, { modal: true });
+    expect(document.activeElement?.id).toBe('first');
+    const shift = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
+    document.activeElement!.dispatchEvent(shift);
+    expect(shift.defaultPrevented).toBe(true);
+    expect(document.activeElement?.id).toBe('last');
+    await closeOverlay(el);
+    el.replaceChildren();
+    await openOverlay(el, { modal: true });
+    expect(document.activeElement).toBe(el);
+    const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+    el.dispatchEvent(tab);
+    expect(tab.defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(el);
+  });
+
+  it('does not close a modal when a child control has consumed Escape', async () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
+    const el = document.createElement('div');
+    el.innerHTML = '<button>Child</button>';
+    document.body.append(el);
+    el.addEventListener('keydown', (event) => event.preventDefault());
+    await openOverlay(el, { modal: true });
+    el.firstElementChild!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    expect(getOverlayStack()).toEqual([el]);
+  });
+
   it('opens and closes overlays with stack tracking', async () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
     const el = document.createElement('div');

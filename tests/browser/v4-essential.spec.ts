@@ -2,6 +2,61 @@ import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { arch, cpus, platform } from 'node:os';
 
+test('built runtimes reject independent bundle copies but support staged sibling roots', async ({ page }) => {
+  await page.goto('/tests/browser/v4-lifecycle.html');
+  const result = await page.evaluate(async () => {
+    const full = await import('/dist/index.js');
+    const essential = await import('/dist/v4/essential.js');
+    const first = document.createElement('section');
+    const second = document.createElement('section');
+    document.querySelector('main')!.append(first, second);
+    const legacy = full.start(first);
+    const selected = full.startEssential(second);
+    let overlap = '';
+    let independent = '';
+    try { full.startEssential(first); } catch (error) { overlap = String(error); }
+    const third = document.createElement('section');
+    document.querySelector('main')!.append(third);
+    try { essential.startEssential(third); } catch (error) { independent = String(error); }
+    selected.destroy(); legacy.destroy();
+    const remounted = essential.startEssential(third);
+    remounted.destroy();
+    return { overlap, independent, released: !Reflect.has(document, Symbol.for('batoi.uif.root-ownership.v4')) };
+  });
+  expect(result.overlap).toContain('overlap');
+  expect(result.independent).toContain('runtime instance');
+  expect(result.released).toBe(true);
+});
+
+test('rapid modal transitions preserve focus and child Escape does not dismiss the parent', async ({ page }) => {
+  await page.goto('/tests/browser/v4-lifecycle.html');
+  await page.evaluate(async () => {
+    const { startEssential } = await import('/dist/v4/essential.js');
+    const root = document.querySelector<HTMLElement>('main')!;
+    root.insertAdjacentHTML('beforeend', '<button id="open" data-uif-action="open" data-uif-target="#dialog">Open</button><div id="dialog" data-uif="modal" hidden aria-label="Review"><div hidden><button>Hidden</button></div><div data-uif="dropdown"><button data-uif-role="trigger">Actions</button><div data-uif-role="panel" hidden><button role="menuitem">Edit</button></div></div><button data-uif-action="close" data-uif-target="#dialog">Close</button></div>');
+    startEssential(root);
+  });
+  await page.getByRole('button', { name: 'Open', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Actions', exact: true })).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.getByRole('menuitem', { name: 'Edit' })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Actions', exact: true })).toBeFocused();
+  await page.evaluate(() => {
+    document.querySelector<HTMLButtonElement>('#dialog > button')!.click();
+    document.querySelector<HTMLButtonElement>('#open')!.click();
+  });
+  await expect(page.getByRole('dialog')).toBeVisible();
+  // A later task observes the old 180ms close deadline without suppressing motion.
+  await expect.poll(() => page.evaluate(() => new Promise((resolve) => setTimeout(() => resolve(document.querySelector<HTMLElement>('#dialog')!.hidden), 250)))).toBe(false);
+  await page.keyboard.press('Shift+Tab');
+  await expect(page.getByRole('button', { name: 'Close', exact: true })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Open', exact: true })).toBeFocused();
+});
+
 test('built docs search, generated example and references work below a deployment prefix', async ({ page, request }) => {
   await page.goto('/apps/docs/dist/');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

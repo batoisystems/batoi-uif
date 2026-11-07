@@ -4,6 +4,40 @@ import { initTabs } from './controls/tabs.js';
 import { initCombobox } from './controls/combobox.js';
 
 describe('selective application ownership', () => {
+  it('rehydrates replaced inner markup and forwards native controller lifecycle', () => {
+    const root = document.createElement('main');
+    root.innerHTML = '<div data-uif="custom">Before</div>';
+    const refresh = vi.fn();
+    const suspend = vi.fn();
+    const resume = vi.fn();
+    const destroy = vi.fn();
+    const init = vi.fn(() => ({ refresh, suspend, resume, destroy }));
+    const app = createUIF(root, [{ name: 'custom', init }]);
+    app.refresh(); app.refresh();
+    expect(init).toHaveBeenCalledOnce();
+    expect(refresh).toHaveBeenCalledOnce();
+    app.suspend(); app.resume();
+    expect(suspend).toHaveBeenCalledOnce();
+    expect(resume).toHaveBeenCalledOnce();
+    root.firstElementChild!.textContent = 'Replacement';
+    app.rehydrate(root.firstElementChild as HTMLElement);
+    expect(destroy).toHaveBeenCalledOnce();
+    expect(init).toHaveBeenCalledTimes(2);
+    expect(() => app.rehydrate(document.createElement('aside'))).toThrow(/outside/);
+    app.destroy();
+    expect(destroy).toHaveBeenCalledTimes(2);
+  });
+  it('dispatches actions from SVG icons inside native buttons', () => {
+    const root = document.createElement('main');
+    root.innerHTML = '<button data-uif-action="open" data-uif-target="parent"><svg><path d="M0 0"></path></svg></button>';
+    root.dataset.uif = 'custom';
+    const open = vi.fn();
+    const app = createUIF(root, [{ name: 'custom', init: () => ({ open, destroy() {} }) }]);
+    app.refresh();
+    root.querySelector('path')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(open).toHaveBeenCalledOnce();
+    app.destroy();
+  });
   it('owns only registered components and cleans detached elements', () => {
     const root = document.createElement('main');
     root.innerHTML = '<div data-uif="tabs"><button data-uif-role="tab">One</button><div data-uif-role="tabpanel">One</div></div><div data-uif="modal"></div>';

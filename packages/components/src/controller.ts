@@ -57,10 +57,11 @@ export function mountComponent(
   return controller;
 }
 export function destroyComponent(el: HTMLElement): void {
-  instances.get(el)?.destroy();
+  const controller = instances.get(el);
   instances.delete(el);
   owners.delete(el);
-  emit('uif:destroy', { el }, el);
+  try { controller?.destroy(); }
+  finally { emit('uif:destroy', { el }, el); }
 }
 export function bindComponentActions(root: Document | HTMLElement = document): () => void {
   const existing = actionBindings.get(root);

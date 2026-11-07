@@ -12,7 +12,7 @@ import { collectContractBaseline, removedContractEntries } from './contract-base
 import { collectContractReference, renderContractReference } from './contract-reference.mjs';
 import { collectDesignTokenReference, renderDesignTokenReference } from './design-token-reference.mjs';
 import { collectReleaseMetadata } from './release-metadata.mjs';
-import { declarationAPI } from './release-api.mjs';
+import { collectPublicEntryAPIs, declarationAPI } from './release-api.mjs';
 
 const root = new URL('..', import.meta.url);
 const failures = [];
@@ -103,6 +103,16 @@ for (const obsolete of ['Expected v1 `data-uif`', 'v0 moves from core foundation
 
 assert(apiBaseline.version === rootPackage.version, `API baseline version ${apiBaseline.version} does not match ${rootPackage.version}`);
 assert(apiBaseline.schemaVersion === 2, `API baseline schema ${apiBaseline.schemaVersion ?? 'missing'} is not supported`);
+const entryAPIs = collectPublicEntryAPIs(root);
+assert(JSON.stringify(Object.keys(entryAPIs).sort()) === JSON.stringify(Object.keys(apiBaseline.entryPoints ?? {}).sort()), 'public entry-point baseline inventory is incomplete or stale');
+for (const [name, expected] of Object.entries(apiBaseline.entryPoints ?? {})) {
+  const current = entryAPIs[name];
+  if (!current) continue;
+  const removed = expected.exports.filter((entry) => !current.exports.includes(entry));
+  const changed = expected.exports.filter((entry) => current.exports.includes(entry) && expected.signatures[entry] !== current.signatures[entry]);
+  assert(!removed.length, `${name} removed public exports: ${removed.join(', ')}`);
+  assert(!changed.length, `${name} changed public signatures: ${changed.join(', ')}`);
+}
 for (const [name, expected] of Object.entries(apiBaseline.packages ?? {})) {
   const declaration = new URL(`packages/${name}/dist/index.d.ts`, root);
   assert(existsSync(declaration), `${name} public declaration is missing`);

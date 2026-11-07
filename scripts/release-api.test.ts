@@ -1,13 +1,31 @@
 // @vitest-environment node
 
 import { describe, expect, it } from 'vitest';
-import { declarationAPIFromText, declarationAPI } from './release-api.mjs';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { collectPublicEntryAPIs, declarationAPIFromText, declarationAPI } from './release-api.mjs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { pathToFileURL } from 'node:url';
 
 describe('release API declarations', () => {
+  it('includes every exported types subpath and the browser facade', () => {
+    const root = mkdtempSync(join(tmpdir(), 'uif-api-entries-'));
+    try {
+      const directory = join(root, 'packages', 'sample');
+      mkdirSync(join(directory, 'dist'), { recursive: true });
+      mkdirSync(join(root, 'dist'));
+      mkdirSync(join(directory, 'dist', 'sets'));
+      writeFileSync(join(directory, 'package.json'), JSON.stringify({ name: '@batoi/uif-sample', exports: { '.': { types: './dist/index.d.ts' }, './selected': { types: './dist/selected.d.ts' }, './sets/*': { types: './dist/sets/*.d.ts' }, './style': './style.css' } }));
+      writeFileSync(join(directory, 'dist', 'index.d.ts'), 'export declare function legacy(): void;');
+      writeFileSync(join(directory, 'dist', 'selected.d.ts'), 'export declare function selected(): void;');
+      writeFileSync(join(root, 'dist', 'index.d.ts'), 'export declare function start(): void;');
+      writeFileSync(join(directory, 'dist', 'sets', 'icons.d.ts'), 'export declare const icons: string[];');
+      const entries = collectPublicEntryAPIs(pathToFileURL(`${root}/`));
+      expect(Object.keys(entries)).toEqual(['@batoi/uif-sample', '@batoi/uif-sample/selected', '@batoi/uif-sample/sets/icons', 'batoi-uif/browser']);
+      expect(entries['@batoi/uif-sample/selected'].exports).toEqual(['selected']);
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
+
   it('compares declarations through split local exports and bundler aliases', () => {
     const root = mkdtempSync(join(tmpdir(), 'uif-api-'));
     try {

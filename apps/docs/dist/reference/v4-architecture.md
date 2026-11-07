@@ -15,6 +15,7 @@ wrappers into unimplemented advanced engines.
 
 - `@batoi/uif-core/runtime`: lifecycle, events and bounded configuration primitives.
 - `@batoi/uif-core/registry`: explicit per-application component registration.
+- `@batoi/uif-core/ownership`: application-root lifecycle leases (not authorization).
 - `@batoi/uif-components/<component>`: an independently importable controller.
 - `@batoi/uif-icons/runtime`: icon rendering with an explicitly supplied subset.
 - CSS foundation and family exports: selected by a generated style manifest.
@@ -30,6 +31,37 @@ Keep the 3.1 root exports, selectors and event vocabulary during adoption. New
 strict runtime configuration is application-owned; importing an entry must not
 silently change another application's compatibility mode. Do not mount old and
 new runtimes on the same subtree. Components retain a semantic HTML fallback.
+
+The minimal `runtime` parser accepts bounded JSON objects only. The core facade
+retains its explicitly configured legacy semicolon parser; importing the strict
+entry does not change that setting. Invalid strict component options prevent a
+mount rather than falling back to permissive parsing.
+
+Use one UIF bundle/module graph per document. Strict application roots must be
+nonoverlapping. A document-wide ownership marker rejects a second independently
+bundled runtime while an application is active, even on a sibling root: otherwise
+the two overlay stacks would disagree about focus and background ownership. For
+staged adoption, the full compatibility bundle exports `startEssential` and
+`createUIF` as well as `start`, sharing their internal graph. Mount old and selected
+applications on separate sibling roots. Do not include `essential.js` alongside
+the full bundle. This cooperative marker is a lifecycle guard, not a security
+boundary against arbitrary scripts.
+
+`app.refresh(target)` mounts new descendants, updates existing controllers and
+retires detached/type-changed components. Use `app.rehydrate(target)` after
+replacing the inner markup or configuration of an existing selected component:
+it destroys controllers within the target before remounting them. `suspend` and
+`resume` forward optional controller hooks. Targets must belong to the app root;
+destroy before moving a root into another app or document. Destroy is idempotent
+and releases the root for remounting. Tenant changes must also explicitly clear
+application-owned state; a DOM refresh is not a tenant switch or a storage reset.
+
+Visibility operations on the same element supersede one another. Cancellation
+settles pending effects and clears their timers/frames; destroying an overlay is
+synchronous and does not restore focus to a removed subtree. Only the top modal
+owns Tab trapping, and an Escape already consumed by a child control does not
+dismiss its parent. Hidden, inert and disabled controls are excluded from focus
+selection; an empty dialog receives a programmatic focus target.
 
 Token schema, theme-pack schema, runtime version and agent-envelope version are
 independently versioned. Changes require explicit migration diagnostics and a

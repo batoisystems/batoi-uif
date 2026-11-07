@@ -1,6 +1,6 @@
 import {
   eventElement
-} from "./chunk-D73MWFXY.js";
+} from "./chunk-TH7UJRFA.js";
 
 // src/controls/notification.ts
 import { emit } from "@batoi/uif-core/runtime";

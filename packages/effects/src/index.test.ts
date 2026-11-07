@@ -4,6 +4,8 @@ import {
   animate,
   animationPresets,
   cancelAnimation,
+  collapse,
+  expand,
   hide,
   initAnimation,
   initAnimationTriggers,
@@ -13,9 +15,59 @@ import {
   toggle,
 } from './index.js';
 
-afterEach(() => configureCompatibility(null));
+afterEach(() => { configureCompatibility(null); vi.useRealTimers(); vi.unstubAllGlobals(); });
 
 describe('effects', () => {
+  it('cancels a stale hide when shown again and releases scheduled work', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false })));
+    const el = document.createElement('div');
+    const closing = hide(el, { duration: 100 });
+    const reopening = show(el, { duration: 20 });
+    await vi.runAllTimersAsync();
+    await Promise.all([closing, reopening]);
+    expect(el.hidden).toBe(false);
+    expect(el.dataset.uifState).toBe('open');
+    expect(el.classList.contains('uif-is-visible')).toBe(true);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('does not add delayed classes or retain height after cancellation', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false })));
+    const el = document.createElement('div');
+    const animation = animate(el, 'pop', { delay: 1000 });
+    const opening = expand(el);
+    cancelAnimation(el);
+    await Promise.all([animation, opening]);
+    expect(el.style.height).toBe('');
+    expect(el.className).toBe('');
+    expect(vi.getTimerCount()).toBe(0);
+    const closing = collapse(el);
+    const reopened = expand(el, { duration: 1 });
+    await vi.runAllTimersAsync();
+    await Promise.all([closing, reopened]);
+    expect(el.hidden).toBe(false);
+    expect(el.style.height).toBe('');
+    expect(el.classList.contains('uif-is-expanded')).toBe(true);
+  });
+
+  it('keeps a replacement animation intact when an aborted animation settles', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false })));
+    const el = document.createElement('div');
+    const first = animate(el, 'pop', { duration: 100 });
+    await vi.advanceTimersByTimeAsync(20);
+    const second = animate(el, 'pop', { duration: 200 });
+    await vi.advanceTimersByTimeAsync(20);
+    await first;
+    expect(el.classList.contains('uif-is-animating')).toBe(true);
+    expect(el.style.animationDuration).toBe('200ms');
+    await vi.runAllTimersAsync();
+    await second;
+    expect(el.classList.contains('uif-is-animating')).toBe(false);
+  });
+
   it('shows, hides, and toggles with reduced motion', async () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })));
     const el = document.createElement('div');

@@ -1,9 +1,7 @@
 import {
-  isSafeObjectKey,
   parseUIFConfiguration,
   UIFError,
 } from './contracts.js';
-import { getCompatibilityMode } from './compatibility.js';
 
 export type UIFOptions = Record<string, unknown>;
 
@@ -33,48 +31,13 @@ export interface UIFLifecycleEvent<T = unknown> extends CustomEvent<T> {
 const plugins = new Map<string, UIFPlugin>();
 const apps = new WeakMap<Document | HTMLElement, UIFApp>();
 
-function coerceValue(value: string): unknown {
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-  if (value === 'null') return null;
-  if (value !== '' && !Number.isNaN(Number(value))) return Number(value);
-  return value;
-}
-
+/** Strict, bounded configuration without changing another app's legacy mode. */
 export function parseOptions(el: HTMLElement): UIFOptions {
   const raw = el.getAttribute('data-uif-options');
   if (!raw) return {};
-
-  try {
-    const result = parseUIFConfiguration(raw);
-    if (result.issues.some((issue) => issue.code === 'invalid-json')) throw new SyntaxError('Invalid options');
-    if (!result.valid) emit('uif:runtime:diagnostic', { component: el.dataset.uif, issues: result.issues }, el);
-    return result.value;
-  } catch {
-    const compatibilityMode = getCompatibilityMode();
-    emit('uif:runtime:diagnostic', {
-      component: el.dataset.uif,
-      issues: [{
-        path: 'data-uif-options',
-        code: compatibilityMode === 'v3' ? 'legacy-options-rejected' : 'legacy-options',
-        message: compatibilityMode === 'v3'
-          ? 'Legacy semicolon options are rejected in v3 mode; use a JSON object.'
-          : 'Legacy semicolon options are deprecated; migrate to a JSON object before v3.',
-      }],
-    }, el);
-    if (compatibilityMode === 'v3') return {};
-    return raw.split(';').reduce<UIFOptions>((acc, pair) => {
-      const [key, ...rest] = pair.split(':');
-      const name = key?.trim();
-      if (!name || !isSafeObjectKey(name)) {
-        if (name) emit('uif:runtime:diagnostic', { component: el.dataset.uif, issues: [{ path: name, code: 'unsafe-key', message: `Unsafe option key: ${name}` }] }, el);
-        return acc;
-      }
-      const value = rest.join(':').trim();
-      acc[name] = value === '' ? true : coerceValue(value);
-      return acc;
-    }, {});
-  }
+  const result = parseUIFConfiguration(raw);
+  if (!result.valid) emit('uif:runtime:diagnostic', { component: el.dataset.uif, issues: result.issues }, el);
+  return result.valid ? result.value : {};
 }
 
 export function emit<T = unknown>(name: string, detail?: T, target: EventTarget = document): void {

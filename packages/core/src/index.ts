@@ -1,4 +1,5 @@
 export * from './runtime.js';
+export { parseOptions } from './legacy-options.js';
 export * from './agent.js';
 export * from './attributes.js';
 export * from './component-registry.js';

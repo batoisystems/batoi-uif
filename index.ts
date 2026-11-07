@@ -34,6 +34,8 @@ import { bindRadActions } from './packages/rad-adapter/src/index.js';
 import { initRealtime } from './packages/realtime/src/index.js';
 import { initRouter } from './packages/router/src/index.js';
 import { bindDeclarativeFilters, initTable } from './packages/table/src/index.js';
+import { claimApplicationRoot } from './packages/core/src/ownership.js';
+export { createUIF, startEssential } from './packages/profiles/src/essential.js';
 
 export * from './packages/core/src/index.js';
 export * from './packages/actions/src/index.js';
@@ -174,6 +176,8 @@ export function start(root: Document | HTMLElement = document): BatoiUIFApp {
     return existing;
   }
 
+  const lease = claimApplicationRoot(root, 'compatibility');
+
   const hydration = createHydrationLifecycle(root, [
     { name: 'component-actions', scope: 'root', hydrate: bindComponentActions },
     { name: 'rad-actions', scope: 'root', hydrate: bindRadActions },
@@ -189,6 +193,7 @@ export function start(root: Document | HTMLElement = document): BatoiUIFApp {
     destroyed: false,
     refresh(target: Document | HTMLElement = root) {
       if (app.destroyed) return;
+      lease.assert();
       hydration.refresh(target);
     },
     suspend(target: Document | HTMLElement = root) {
@@ -199,10 +204,10 @@ export function start(root: Document | HTMLElement = document): BatoiUIFApp {
     },
     destroy() {
       if (app.destroyed) return;
-      runtimeRegistry.destroy(root);
-      hydration.destroy();
       app.destroyed = true;
       apps.delete(root);
+      try { runtimeRegistry.destroy(root); hydration.destroy(); }
+      finally { lease.destroy(); }
     },
     restart() {
       app.destroy();
@@ -210,8 +215,8 @@ export function start(root: Document | HTMLElement = document): BatoiUIFApp {
     },
   };
   apps.set(root, app);
-  app.refresh(root);
-  return app;
+  try { app.refresh(root); return app; }
+  catch (error) { app.destroy(); throw error; }
 }
 
 export function autoStart(root: Document | HTMLElement = document): void {

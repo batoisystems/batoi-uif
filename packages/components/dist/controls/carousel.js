@@ -1,7 +1,7 @@
 import {
   initCarousel
-} from "../chunk-JMU36AO7.js";
-import "../chunk-D73MWFXY.js";
+} from "../chunk-UHYITJNP.js";
+import "../chunk-TH7UJRFA.js";
 export {
   initCarousel
 };

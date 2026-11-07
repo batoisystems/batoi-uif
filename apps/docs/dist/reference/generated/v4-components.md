@@ -1,6 +1,6 @@
 # UIF 4 selected component contracts
 
-Generated from tools/theme/catalog.mjs; framework source 4.0.0-alpha.1. These six controls are the initial v4 canonical set, not a claim that every v3 component meets the v4 gate. JSON options are empty/strict; use the listed attributes.
+Generated from tools/theme/catalog.mjs; framework source 4.0.0-alpha.2. These six controls are the initial v4 canonical set, not a claim that every v3 component meets the v4 gate. JSON options are empty/strict; use the listed attributes.
 
 ## modal
 

@@ -1,18 +1,60 @@
 // src/index.ts
-import { hide, show } from "@batoi/uif-effects";
+import { cancelAnimation, hide, show } from "@batoi/uif-effects";
 var stack = [];
-var opening = /* @__PURE__ */ new WeakSet();
-var closing = /* @__PURE__ */ new WeakSet();
+var operations = /* @__PURE__ */ new WeakMap();
+var closing = /* @__PURE__ */ new WeakMap();
+var destroying = /* @__PURE__ */ new WeakSet();
 var backgroundState = /* @__PURE__ */ new Map();
 function top() {
   return stack[stack.length - 1];
 }
 function onKey(event) {
+  if (event.defaultPrevented) return;
   const entry = top();
   if (event.key === "Escape" && entry && entry.options.closeOnEscape !== false) {
     event.preventDefault();
     void closeOverlay(entry.el);
   }
+  if (event.key === "Tab" && entry?.options.modal) {
+    const candidates = focusableElements(entry.el);
+    const first = candidates[0];
+    const last = candidates.at(-1);
+    if (!first || !last) {
+      event.preventDefault();
+      focusOverlay(entry.el);
+    } else if (!candidates.includes(document.activeElement)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+    } else if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+}
+function isAvailable(el) {
+  if (!el.isConnected || el.closest('[hidden],[inert],[aria-hidden="true"]')) return false;
+  for (let node = el; node; node = node.parentElement) {
+    const style = getComputedStyle(node);
+    if (style.display === "none" || style.visibility === "hidden" || style.visibility === "collapse") return false;
+  }
+  return true;
+}
+function focusableElements(el) {
+  return [...el.querySelectorAll('a[href],button,input:not([type="hidden"]),select,textarea,[tabindex],[contenteditable="true"]')].filter((candidate) => candidate.tabIndex >= 0 && !candidate.matches(":disabled") && isAvailable(candidate));
+}
+function focusOverlay(el) {
+  const first = focusableElements(el)[0];
+  if (first) {
+    first.focus();
+    return;
+  }
+  const dialog = el.querySelector('[data-uif-role="dialog"]') ?? el;
+  if (!isAvailable(dialog)) return;
+  if (!dialog.hasAttribute("tabindex")) dialog.setAttribute("tabindex", "-1");
+  dialog.focus();
 }
 function emitOverlay(type, entry) {
   entry.el.dispatchEvent(
@@ -75,54 +117,67 @@ function getOverlayStack() {
   return stack.map((entry) => entry.el);
 }
 async function openOverlay(el, options = {}) {
-  if (opening.has(el) || stack.some((entry2) => entry2.el === el)) return;
-  opening.add(el);
+  if (destroying.has(el) || stack.some((entry2) => entry2.el === el)) return;
+  const operation = /* @__PURE__ */ Symbol("open");
+  operations.set(el, operation);
+  closing.delete(el);
   if (!stack.length) document.addEventListener("keydown", onKey);
   const entry = { el, opener: options.opener ?? document.activeElement, options };
   stack.push(entry);
-  emitOverlay("uif:overlay-open", entry);
-  syncOverlayState();
   el.setAttribute("aria-hidden", "false");
-  try {
-    await show(el);
-  } finally {
-    opening.delete(el);
-  }
-  if (!stack.includes(entry)) return;
-  el.querySelector('button:not(:disabled),[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')?.focus();
+  const pending = show(el);
+  syncOverlayState();
+  if (top() === entry) focusOverlay(el);
+  emitOverlay("uif:overlay-open", entry);
+  await pending;
+  if (operations.get(el) !== operation || !stack.includes(entry)) return;
   emitOverlay("uif:overlay-opened", entry);
 }
 async function closeOverlay(el = top()?.el) {
   if (!el) return;
-  if (closing.has(el)) return;
+  const descendants = stack.filter((entry2) => entry2.el !== el && el.contains(entry2.el)).reverse();
+  const pendingChildren = descendants.map((entry2) => closeOverlay(entry2.el));
   const index = stack.findIndex((entry2) => entry2.el === el);
+  const wasTop = top()?.el === el;
   const [entry] = index >= 0 ? stack.splice(index, 1) : [];
   if (!entry) return;
-  closing.add(el);
-  emitOverlay("uif:overlay-close", entry);
+  const operation = /* @__PURE__ */ Symbol("close");
+  operations.set(el, operation);
+  closing.set(el, entry);
   el.setAttribute("aria-hidden", "true");
+  const pending = hide(el);
   syncOverlayState();
-  try {
-    await hide(el);
-  } finally {
-    closing.delete(el);
-  }
-  if (entry?.options.restoreFocus !== false) entry?.opener?.focus?.();
-  if (!stack.length) {
-    document.removeEventListener("keydown", onKey);
-  }
+  if (!stack.length) document.removeEventListener("keydown", onKey);
+  emitOverlay("uif:overlay-close", entry);
+  await Promise.all([pending, ...pendingChildren]);
+  if (operations.get(el) !== operation) return;
+  closing.delete(el);
+  operations.delete(el);
+  const opener = entry.opener;
+  if (wasTop && entry.options.restoreFocus !== false && opener && isAvailable(opener) && (!top() || top()?.el.contains(opener))) opener.focus();
   emitOverlay("uif:overlay-closed", entry);
 }
 function destroyOverlay(el) {
-  const index = stack.findIndex((entry2) => entry2.el === el);
-  if (index < 0) return;
-  const [entry] = stack.splice(index, 1);
-  emitOverlay("uif:overlay-close", entry);
-  el.hidden = true;
-  el.setAttribute("aria-hidden", "true");
-  syncOverlayState();
-  if (!stack.length) document.removeEventListener("keydown", onKey);
-  emitOverlay("uif:overlay-closed", entry);
+  if (destroying.has(el)) return;
+  destroying.add(el);
+  try {
+    stack.filter((entry2) => entry2.el !== el && el.contains(entry2.el)).reverse().forEach((entry2) => destroyOverlay(entry2.el));
+    const index = stack.findIndex((entry2) => entry2.el === el);
+    const entry = index >= 0 ? stack.splice(index, 1)[0] : closing.get(el);
+    operations.delete(el);
+    closing.delete(el);
+    cancelAnimation(el);
+    if (entry && index >= 0) emitOverlay("uif:overlay-close", entry);
+    el.hidden = true;
+    el.dataset.uifState = "closed";
+    el.classList.remove("uif-is-visible");
+    el.setAttribute("aria-hidden", "true");
+    syncOverlayState();
+    if (!stack.length) document.removeEventListener("keydown", onKey);
+    if (entry) emitOverlay("uif:overlay-closed", entry);
+  } finally {
+    destroying.delete(el);
+  }
 }
 async function toggleOverlay(el, options = {}) {
   if (stack.some((entry) => entry.el === el)) await closeOverlay(el);

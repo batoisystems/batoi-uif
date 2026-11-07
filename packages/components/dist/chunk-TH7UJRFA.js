@@ -27,7 +27,9 @@ function resolveComponentTarget(source) {
   }
 }
 function eventElement(event) {
-  return event.target instanceof HTMLElement ? event.target : null;
+  let target = event.target instanceof Element ? event.target : event.target instanceof Node ? event.target.parentElement : null;
+  while (target && !(target instanceof HTMLElement)) target = target.parentElement;
+  return target;
 }
 function storageGet(key) {
   if (!key) return null;

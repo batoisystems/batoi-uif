@@ -1,15 +1,24 @@
 import {
   setComponentState
-} from "./chunk-D73MWFXY.js";
+} from "./chunk-TH7UJRFA.js";
 
 // src/controls/drawer.ts
-import { closeOverlay, destroyOverlay, openOverlay, toggleOverlay } from "@batoi/uif-overlays";
+import { closeOverlay, destroyOverlay, openOverlay } from "@batoi/uif-overlays";
 function initDrawer(el) {
+  const open = (opener) => {
+    void openOverlay(el, { modal: true, restoreFocus: true, opener });
+    setComponentState(el, true);
+  };
+  const close = () => {
+    void closeOverlay(el);
+    setComponentState(el, false);
+  };
   const onClose = (event) => {
     if (event.target === el) setComponentState(el, false);
   };
   el.addEventListener("uif:overlay-close", onClose);
   el.setAttribute("role", el.getAttribute("role") || "dialog");
+  el.setAttribute("aria-modal", "true");
   el.dataset.uifMode = el.dataset.uifMode ?? "left";
   if (!el.dataset.uifState) setComponentState(el, false);
   return {
@@ -17,18 +26,9 @@ function initDrawer(el) {
       destroyOverlay(el);
       el.removeEventListener("uif:overlay-close", onClose);
     },
-    open: (opener) => {
-      void openOverlay(el, { modal: true, restoreFocus: true, opener });
-      setComponentState(el, true);
-    },
-    close: () => {
-      void closeOverlay(el);
-      setComponentState(el, false);
-    },
-    toggle: (opener) => {
-      void toggleOverlay(el, { modal: true, restoreFocus: true, opener });
-      setComponentState(el, el.dataset.uifState !== "open");
-    }
+    open,
+    close,
+    toggle: (opener) => el.dataset.uifState === "open" ? close() : open(opener)
   };
 }
 

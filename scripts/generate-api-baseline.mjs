@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { URL } from 'node:url';
-import { declarationAPI } from './release-api.mjs';
+import { collectPublicEntryAPIs, declarationAPI } from './release-api.mjs';
 
 const root = new URL('..', import.meta.url);
 const pkg = JSON.parse(readFileSync(new URL('package.json', root), 'utf8'));
@@ -11,4 +11,4 @@ for (const name of readdirSync(new URL('packages/', root)).sort()) {
   if (existsSync(declaration)) packages[name] = declarationAPI(declaration);
 }
 
-writeFileSync(new URL('release-api.json', root), `${JSON.stringify({ schemaVersion: 2, version: pkg.version, packages }, null, 2)}\n`);
+writeFileSync(new URL('release-api.json', root), `${JSON.stringify({ schemaVersion: 2, version: pkg.version, packages, entryPoints: collectPublicEntryAPIs(root) }, null, 2)}\n`);

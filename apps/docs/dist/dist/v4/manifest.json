@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "contractVersion": 4,
-  "frameworkVersion": "4.0.0-alpha.1",
+  "frameworkVersion": "4.0.0-alpha.2",
   "artifacts": {
     "essential.js": {
-      "bytes": 21242,
-      "gzip": 7095,
-      "brotli": 6358,
-      "integrity": "sha384-lnlBAApVdigfjR5wEO6iicx8bQEqJ6L2HM6ygx9svTlNx0S6jkudV9+oahLmm7Ic"
+      "bytes": 25006,
+      "gzip": 8363,
+      "brotli": 7483,
+      "integrity": "sha384-tcrS8A3jgq7hIAGKP9V0OHQhuob120ozIj8dToSahABwhKwFsFLZ3D9mUmZwiSXD"
     },
     "foundation.css": {
       "bytes": 26808,
@@ -43,6 +43,7 @@
     "packages/core/src/compatibility.ts",
     "packages/core/src/component-registry.ts",
     "packages/core/src/contracts.ts",
+    "packages/core/src/ownership.ts",
     "packages/core/src/resource-scope.ts",
     "packages/core/src/runtime.ts",
     "packages/core/src/storage-partition.ts",

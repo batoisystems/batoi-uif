@@ -1,11 +1,10 @@
 import {
   eventElement,
-  focusableSelector,
   setComponentState
-} from "./chunk-D73MWFXY.js";
+} from "./chunk-TH7UJRFA.js";
 
 // src/controls/modal.ts
-import { closeOverlay, destroyOverlay, getOverlayStack, openOverlay } from "@batoi/uif-overlays";
+import { closeOverlay, destroyOverlay, openOverlay } from "@batoi/uif-overlays";
 function initModal(el) {
   const mode = el.dataset.uifMode ?? "dismissible";
   const backdrop = el.dataset.uifBackdrop ?? "true";
@@ -14,7 +13,6 @@ function initModal(el) {
   const open = (opener) => {
     void openOverlay(el, { modal: true, restoreFocus: true, closeOnEscape, opener });
     setComponentState(el, true);
-    dialog.querySelector(focusableSelector)?.focus();
   };
   const close = () => {
     if (mode === "locked") return;
@@ -22,20 +20,6 @@ function initModal(el) {
     setComponentState(el, false);
   };
   const toggle = (opener) => el.dataset.uifState === "open" ? close() : open(opener);
-  const onKey = (event) => {
-    if (event.key !== "Tab" || getOverlayStack().at(-1) !== el) return;
-    const focusable = Array.from(dialog.querySelectorAll(focusableSelector));
-    if (!focusable.length) return;
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  };
   const onClick = (event) => {
     const target = eventElement(event);
     if (target?.closest('[data-uif="modal"],[data-uif="drawer"]') !== el) return;
@@ -49,12 +33,10 @@ function initModal(el) {
   dialog.setAttribute("role", dialog.getAttribute("role") || "dialog");
   dialog.setAttribute("aria-modal", "true");
   if (!el.dataset.uifState) setComponentState(el, false);
-  document.addEventListener("keydown", onKey);
   el.addEventListener("uif:overlay-close", onClose);
   el.addEventListener("click", onClick);
   return {
     destroy: () => {
-      document.removeEventListener("keydown", onKey);
       el.removeEventListener("click", onClick);
       destroyOverlay(el);
       el.removeEventListener("uif:overlay-close", onClose);

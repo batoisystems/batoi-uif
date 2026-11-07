@@ -17,6 +17,6 @@ export function startEssential(root: Document | HTMLElement = document) {
     { name: 'collapse', init: initCollapse },
     { name: 'toast', init: initToast },
   ]);
-  app.refresh();
-  return app;
+  try { app.refresh(); return app; }
+  catch (error) { app.destroy(); throw error; }
 }

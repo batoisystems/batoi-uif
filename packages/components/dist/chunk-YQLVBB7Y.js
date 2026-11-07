@@ -3,7 +3,7 @@ import {
   resolveComponentTarget,
   storageGet,
   storageSet
-} from "./chunk-D73MWFXY.js";
+} from "./chunk-TH7UJRFA.js";
 
 // src/controls/shell.ts
 import { emit } from "@batoi/uif-core/runtime";
