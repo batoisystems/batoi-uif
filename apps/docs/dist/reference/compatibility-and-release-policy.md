@@ -67,6 +67,12 @@ Development requires Node.js 20.19 or later in the Node 20 line, or Node.js 22.1
 
 ## UIF 4 adoption
 
+URL policy resolves relative destinations against the document base before
+checking protocol, origin and capability rules. Backslashes and protocol-relative
+URLs are rejected; `allowRelative: false` and `allowHash: false` are enforced.
+These restrictions also apply to the compatibility APIs that use the shared
+policy. Use ordinary slash-separated, explicit same-origin URLs for requests.
+
 The new essential and per-component entries do not auto-register or mutate global
 compatibility settings. Configuration is a bounded JSON object; unknown options
 are rejected unless a selected definition explicitly declares them. Attribute

@@ -7,7 +7,7 @@ import {
 
 // src/v4/rad.ts
 import { initScopedForm } from "@batoi/uif-forms";
-import { initTable } from "@batoi/uif-table";
+import { initScopedTable } from "@batoi/uif-table";
 import { bindScopedRadActions } from "@batoi/uif-rad-adapter";
 function startRAD(root = document) {
   let application;
@@ -29,7 +29,7 @@ function startRAD(root = document) {
         init(el) {
           if (!(el instanceof HTMLTableElement))
             throw new Error("UIF table requires a native table");
-          return { ...initTable(el) };
+          return { ...initScopedTable(el, root) };
         }
       }
     ],

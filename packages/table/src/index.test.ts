@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { filterElements, filterTable, goToPage, initDeclarativeFilters, initTable, loadRemoteTable, selectedRows, setTableState, sortTable } from './index.js';
+import { filterElements, filterTable, goToPage, initDeclarativeFilters, initScopedTable, initTable, loadRemoteTable, selectedRows, setTableState, sortTable } from './index.js';
 
 describe('table', () => {
   it('retires row handlers before remount and preserves header semantics', () => {
@@ -255,5 +255,64 @@ describe('table', () => {
 
     expect(fetch).not.toHaveBeenCalled();
     expect(table.dataset.uifState).toBe('error');
+  });
+
+  it('keeps scoped filters, pagination, selection and bulk controls inside their app', () => {
+    const controls = '<input data-uif-table-filter="#scoped"><button data-uif-table-action="delete" data-uif-target="#scoped">Delete</button><button data-uif-table-page="prev" data-uif-target="#scoped">Previous</button><span data-uif-table-page-label="#scoped">Unchanged</span><output class="count">Unchanged</output>';
+    document.body.innerHTML = `<main>${controls}<table id="scoped" data-uif-selection-target=".count"><tbody><tr><td><input type="checkbox" data-uif-role="row-select"></td><td>Ada</td></tr><tr><td>Grace</td></tr></tbody></table></main><aside>${controls}</aside>`;
+    const root = document.querySelector('main')!;
+    const sibling = document.querySelector('aside')!;
+    const table = root.querySelector('table')!;
+    const onBulkAction = vi.fn();
+    const controller = initScopedTable(table, root, { onBulkAction });
+    expect(root.querySelector('[data-uif-table-page-label]')!.textContent).toBe('Page 1');
+    expect(sibling.querySelector('[data-uif-table-page-label]')!.textContent).toBe('Unchanged');
+    expect(sibling.querySelector('button[data-uif-table-page]')!.hasAttribute('disabled')).toBe(false);
+    const foreignInput = sibling.querySelector('input')!;
+    foreignInput.value = 'Missing'; foreignInput.dispatchEvent(new Event('input'));
+    expect(table.tBodies[0].rows[0].hidden).toBe(false);
+    const ownInput = root.querySelector('input')!;
+    ownInput.value = 'Ada'; ownInput.dispatchEvent(new Event('input'));
+    expect(table.tBodies[0].rows[1].hidden).toBe(true);
+    const checkbox = table.querySelector('input')!;
+    checkbox.checked = true; checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(root.querySelector('.count')!.textContent).toBe('1');
+    expect(sibling.querySelector('.count')!.textContent).toBe('Unchanged');
+    sibling.querySelector<HTMLButtonElement>('[data-uif-table-action]')!.click();
+    expect(onBulkAction).not.toHaveBeenCalled();
+    root.querySelector<HTMLButtonElement>('[data-uif-table-action]')!.click();
+    expect(onBulkAction).toHaveBeenCalledOnce();
+    controller.destroy();
+    ownInput.value = 'Missing'; ownInput.dispatchEvent(new Event('input'));
+    expect(table.tBodies[0].rows[0].hidden).toBe(false);
+  });
+
+  it('does not read sibling filters into scoped remote table queries', async () => {
+    document.body.innerHTML = '<main><input name="owned" value="yes" data-uif-table-filter="#scoped"><table id="scoped"><thead><tr><th>Name</th></tr></thead><tbody></tbody></table></main><aside><input name="foreign" value="private" data-uif-table-filter="#scoped"><form data-uif-table-controls="#scoped"><input name="grouped" value="private"></form></aside>';
+    const root = document.querySelector('main')!;
+    const table = root.querySelector('table')!;
+    const controller = initScopedTable(table, root);
+    const fetch = vi.fn(async (_url: RequestInfo | URL) => Response.json({ rows: [{ name: 'Ada' }] }));
+    vi.stubGlobal('fetch', fetch);
+    try {
+      await loadRemoteTable(table, { src: '/rows', columns: ['name'] });
+      const url = new URL(String(fetch.mock.calls[0][0]));
+      expect(url.searchParams.get('owned')).toBe('yes');
+      expect(url.searchParams.has('foreign')).toBe(false);
+      expect(url.searchParams.has('grouped')).toBe(false);
+    } finally { controller.destroy(); vi.unstubAllGlobals(); }
+  });
+
+  it('rejects foreign explicit filters and incompatible existing table ownership', () => {
+    document.body.innerHTML = '<main><table></table></main><aside><input></aside>';
+    const root = document.querySelector('main')!;
+    const table = root.querySelector('table')!;
+    expect(() => initScopedTable(table, root, { filterInput: document.querySelector('input') })).toThrow('UIF_TABLE_TARGET_SCOPE');
+    const legacy = initTable(table);
+    expect(() => initScopedTable(table, root)).toThrow('UIF_TABLE_ROOT_OWNED');
+    legacy.destroy();
+    const scoped = initScopedTable(table, root);
+    expect(initScopedTable(table, root)).toBe(scoped);
+    scoped.destroy();
   });
 });

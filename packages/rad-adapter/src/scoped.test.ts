@@ -62,4 +62,56 @@ describe('selected application RAD binding', () => {
     expect(afterSwap).not.toHaveBeenCalled();
     expect(error).not.toHaveBeenCalled();
   });
+
+  it('cleans only the captured loader after a swap removes it', async () => {
+    const { root, button, afterSwap, error } = fixture({ html: '<p>Replaced</p>' });
+    root.querySelector('#target')!.innerHTML = '<span class="loader" hidden>Loading</span>';
+    const loader = root.querySelector<HTMLElement>('.loader')!;
+    const siblingLoader = document.createElement('span');
+    siblingLoader.className = 'loader';
+    document.querySelector('#foreign')!.append(siblingLoader);
+    button.dataset.uifLoading = '.loader';
+    button.click();
+    expect(loader.hidden).toBe(false);
+    await vi.waitFor(() => expect(afterSwap).toHaveBeenCalledOnce());
+    await vi.waitFor(() => expect(button.hasAttribute('aria-busy')).toBe(false));
+    expect(loader.isConnected).toBe(false);
+    expect(loader.hidden).toBe(true);
+    expect(siblingLoader.hidden).toBe(false);
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it('does not re-resolve a changed loading selector during disposal', async () => {
+    const { root, button, dispose } = fixture({});
+    const loader = document.createElement('span');
+    loader.id = 'owned-loader'; loader.hidden = true; root.append(loader);
+    button.dataset.uifLoading = '#owned-loader';
+    vi.stubGlobal('fetch', vi.fn((_url, options?: RequestInit) => new Promise<Response>((_resolve, reject) => {
+      options?.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+    })));
+    button.click();
+    expect(loader.hidden).toBe(false);
+    button.dataset.uifLoading = '#foreign';
+    loader.remove(); button.remove(); dispose();
+    expect(loader.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>('#foreign')!.hidden).toBe(false);
+    expect(button.hasAttribute('aria-busy')).toBe(false);
+  });
+
+  it('rejects an initially foreign loader without mutating it or starting a request', async () => {
+    const { button, error } = fixture({});
+    button.dataset.uifLoading = '#foreign'; button.click();
+    await vi.waitFor(() => expect(error).toHaveBeenCalledOnce());
+    expect(fetch).not.toHaveBeenCalled();
+    expect(document.querySelector<HTMLElement>('#foreign')!.hidden).toBe(false);
+    expect(button.hasAttribute('aria-busy')).toBe(false);
+  });
+
+  it('blocks backslash authority request URLs before starting fetch', async () => {
+    const { button, error } = fixture({});
+    button.dataset.uifSrc = '/\\evil.example/partial'; button.click();
+    await vi.waitFor(() => expect(error).toHaveBeenCalledOnce());
+    expect(fetch).not.toHaveBeenCalled();
+    expect(button.hasAttribute('aria-busy')).toBe(false);
+  });
 });

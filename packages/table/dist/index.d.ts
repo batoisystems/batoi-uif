@@ -56,9 +56,11 @@ declare function filterElements(targetSelector: string, query: string, mode?: 'c
 declare function bindDeclarativeFilters(root?: Document | HTMLElement): () => void;
 declare function initDeclarativeFilters(root?: Document | HTMLElement): void;
 declare function initTable(table: HTMLTableElement, options?: TableOptions): TableController;
+/** Associate external table controls only within the selected application root. */
+declare function initScopedTable(table: HTMLTableElement, root: Document | HTMLElement, options?: TableOptions): TableController;
 declare const dataTable: {
     name: string;
     init: (el: HTMLElement) => TableController;
 };
 
-export { type RemoteTableResponse, type TableController, type TableOptions, applyResponsiveColumns, bindDeclarativeFilters, dataTable, exportTable, filterElements, filterTable, goToPage, initDeclarativeFilters, initTable, loadRemoteTable, selectedRows, setTableState, sortTable };
+export { type RemoteTableResponse, type TableController, type TableOptions, applyResponsiveColumns, bindDeclarativeFilters, dataTable, exportTable, filterElements, filterTable, goToPage, initDeclarativeFilters, initScopedTable, initTable, loadRemoteTable, selectedRows, setTableState, sortTable };

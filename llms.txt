@@ -1,6 +1,6 @@
 # Batoi UIF
 
-Stable compatibility: 3.1.0. UIF 4 development: source 4.0.0-alpha.3.
+Stable compatibility: 3.1.0. UIF 4 development: source 4.0.0-alpha.4.
 
 - [UIF 4 architecture](docs/v4-architecture.md)
 - [Theme authoring](docs/theme-authoring.md)

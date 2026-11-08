@@ -1,5 +1,25 @@
 # Changelog
 
+## 4.0.0-alpha.4 — development checkpoint
+
+- Pin RAD loading indicators at request start so swaps, attribute changes and teardown cannot redirect cleanup into sibling applications.
+- Apply protocol, relative/fragment, origin and capability rules to resolved URLs; reject ambiguous backslash destinations and account for the document base URL.
+- Add `initScopedTable` and use it in the selected RAD profile. Associated filters, remote query inputs, pagination, selection labels and bulk controls remain inside the selected application.
+- Complete the saved alpha.2–alpha.3 security diff review. It found no new reportable security findings; this is not certification of unchanged authoring tooling or a GA acceptance claim.
+- Stable promotion still requires the outstanding implementation and manual/device, hosted-authoring and RADX integration acceptance gates.
+
+## 4.0.0-alpha.3 — development checkpoint
+
+- Add selective web, RAD, mobile and desktop starters with measured standalone JS/CSS families and source/packed consumer graph checks.
+- Scope governed RAD/form response targets, rehydrate partial swaps, cancel obsolete network results, and repair form reset/error lifecycle.
+- Generate runnable same-origin JSON profile examples and test responsive, RTL, accessibility and profile journeys.
+
+## 4.0.0-alpha.2 — development checkpoint
+
+- Isolate strict runtime parsing from the compatibility facade and enforce cooperative application-root ownership.
+- Add explicit subtree rehydration, update/suspend/resume hooks, detached component cleanup, cancellable effects and overlay focus/race fixes.
+- Extend API baselines to typed subpaths and retain immutable 3.1 facade comparisons.
+
 ## 4.0.0-alpha.1 — development checkpoint
 
 - Added explicit selective application ownership, core runtime subpaths, independent control imports, icon subsets and a measured essential JS/CSS deployment. Kept the 3.1 facade and immutable compatibility baseline.

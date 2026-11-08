@@ -4,19 +4,19 @@
     {
       "name": "dist/index.d.ts",
       "digest": {
-        "sha256": "d47b95335f5dea9ba135e14d8fdb92e865fdd90143236d6c814d3798ac4773f2"
+        "sha256": "a3bdcc01bfc262205572ab5d43d2abe4444758e3b092442c6c98e6bd650d7983"
       }
     },
     {
       "name": "dist/index.global.js",
       "digest": {
-        "sha256": "eed83004b16b205c72e0b26f5516ee75bd9fa532fa558187b8db495d85ef50c0"
+        "sha256": "e52f53e556295da922c50bb47f008a19cc1211ed05f9efde43b4353ef579a660"
       }
     },
     {
       "name": "dist/index.js",
       "digest": {
-        "sha256": "a185ec96fbe67933eba4b405f9e8cc20b369d74bb5b097a999a511a144ed4daf"
+        "sha256": "8fa874341f23cf603d1416531d22b21d59ded7b87e6afa117f657ed9efdbe619"
       }
     },
     {
@@ -28,13 +28,13 @@
     {
       "name": "dist/uif.esm.js",
       "digest": {
-        "sha256": "a185ec96fbe67933eba4b405f9e8cc20b369d74bb5b097a999a511a144ed4daf"
+        "sha256": "8fa874341f23cf603d1416531d22b21d59ded7b87e6afa117f657ed9efdbe619"
       }
     },
     {
       "name": "dist/uif.iife.js",
       "digest": {
-        "sha256": "eed83004b16b205c72e0b26f5516ee75bd9fa532fa558187b8db495d85ef50c0"
+        "sha256": "e52f53e556295da922c50bb47f008a19cc1211ed05f9efde43b4353ef579a660"
       }
     },
     {
@@ -76,7 +76,7 @@
     {
       "name": "dist/v4/manifest.json",
       "digest": {
-        "sha256": "274bd45c2d7a8a366b4adc75781e4e1a3e4cbac72b435cef53932c5bb69de5ae"
+        "sha256": "d79de094bb049b31aff4d68b3b06a694fd67d87987d40213c14bbb73f3e76b8c"
       }
     },
     {
@@ -100,7 +100,7 @@
     {
       "name": "dist/v4/rad.js",
       "digest": {
-        "sha256": "94f8475a5b9addca9eb0ae716a2fa07113cbcc052088d353665e8ce14ae90d8d"
+        "sha256": "e6a3f7faedaf70592bc2f2b0bcac1001ed091db1fd24e89bc2d4165e3b5c5a6e"
       }
     },
     {
@@ -169,7 +169,7 @@
     "buildDefinition": {
       "buildType": "https://batoi.com/uif/npm-workspace-build/v1",
       "externalParameters": {
-        "version": "4.0.0-alpha.3",
+        "version": "4.0.0-alpha.4",
         "command": "npm run build"
       },
       "internalParameters": {
@@ -182,13 +182,13 @@
         {
           "uri": "file:package-lock.json",
           "digest": {
-            "sha256": "18af0c59d17f342f107f0f847554e639ddfc4839b4885947ba03bb4ef84d5543"
+            "sha256": "0a33675dbca5f8ddf8a4d05439682303fc1421d7fd7e810ce3fb085388858d13"
           }
         },
         {
           "uri": "uif:workspace-build-inputs",
           "digest": {
-            "sha256": "556b491f1e0715991ce3f872896e712044b390515e6b18fd5448692c86df187f"
+            "sha256": "2e3c9d4adc011e7eb01cda8da9d0e0f99f43dd2ee2c0d5719687bff368ab4b72"
           }
         }
       ]
@@ -198,7 +198,7 @@
         "id": "https://github.com/batoisystems/batoi-uif/.github/workflows/ci.yml"
       },
       "metadata": {
-        "invocationId": "batoi-uif-4.0.0-alpha.3",
+        "invocationId": "batoi-uif-4.0.0-alpha.4",
         "startedOn": null,
         "finishedOn": null
       }

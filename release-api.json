@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "version": "4.0.0-alpha.3",
+  "version": "4.0.0-alpha.4",
   "packages": {
     "actions": {
       "exports": [
@@ -1377,6 +1377,7 @@
         "filterTable",
         "goToPage",
         "initDeclarativeFilters",
+        "initScopedTable",
         "initTable",
         "loadRemoteTable",
         "selectedRows",
@@ -1395,6 +1396,7 @@
         "filterTable": "454e50e94a517320c81355d902a592f93e1d89dc994108b18b2ed8fd769581f5",
         "goToPage": "e99dfc31dcc569fedb9fd7ce533dfbfadb1fccf8ee6890898bf1000570f1f144",
         "initDeclarativeFilters": "b5d60706f080caa98434a1bffd2dfc655eb6e53160563d5812a08ee4ccd3c80e",
+        "initScopedTable": "dd985a694c6409847bebe35cc461577e3634de38df08ade3312bfafd339e2cc0",
         "initTable": "25233b85343d069ea74cd53096765c7d0f86ce83002767b7960a69d732b4db4f",
         "loadRemoteTable": "2b5bf132f9b1b5889ae9156548ae4c0d0c4a2479cd50263fac1facc9905288fe",
         "selectedRows": "41539fa5dba429df35ca1135e987d073ed3e30f407a73a07149626e456439413",
@@ -3557,6 +3559,7 @@
         "filterTable",
         "goToPage",
         "initDeclarativeFilters",
+        "initScopedTable",
         "initTable",
         "loadRemoteTable",
         "selectedRows",
@@ -3575,6 +3578,7 @@
         "filterTable": "454e50e94a517320c81355d902a592f93e1d89dc994108b18b2ed8fd769581f5",
         "goToPage": "e99dfc31dcc569fedb9fd7ce533dfbfadb1fccf8ee6890898bf1000570f1f144",
         "initDeclarativeFilters": "b5d60706f080caa98434a1bffd2dfc655eb6e53160563d5812a08ee4ccd3c80e",
+        "initScopedTable": "dd985a694c6409847bebe35cc461577e3634de38df08ade3312bfafd339e2cc0",
         "initTable": "25233b85343d069ea74cd53096765c7d0f86ce83002767b7960a69d732b4db4f",
         "loadRemoteTable": "2b5bf132f9b1b5889ae9156548ae4c0d0c4a2479cd50263fac1facc9905288fe",
         "selectedRows": "41539fa5dba429df35ca1135e987d073ed3e30f407a73a07149626e456439413",
@@ -4006,6 +4010,7 @@
         "initRepeatableGroup",
         "initRouter",
         "initScopedForm",
+        "initScopedTable",
         "initSegmentedControl",
         "initSheetModal",
         "initSwipeAction",
@@ -4633,6 +4638,7 @@
         "initRepeatableGroup": "dd6274d5002eb29bf4c481ee7f91e9b126827fc3dcfb32911ad5735552cdd437",
         "initRouter": "815f16fe8da078d8d615ed0426282dad8db62ec90fcb74ed9a8f9284a775038d",
         "initScopedForm": "76e3a72d3ce3401bdf59a7c641eea61b99b96faa9e317ace26550dfdc7fb2196",
+        "initScopedTable": "dd985a694c6409847bebe35cc461577e3634de38df08ade3312bfafd339e2cc0",
         "initSegmentedControl": "77372205ae7718fd06e0cfe628d898faf1643cb5964086ba3ed057d985a3913f",
         "initSheetModal": "fc587a796529524b25a6acf9e61891f32ad7beebb1260249ea552bd397c39128",
         "initSwipeAction": "ea1aa8bd646dc8fe394fe0b74d1a80ceaffdd73870591a2aeb363c5e17c4fd82",

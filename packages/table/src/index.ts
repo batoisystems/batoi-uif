@@ -1,4 +1,4 @@
-import { isSafeURL, setTrustedHTML } from '@batoi/uif-dom';
+import { isSafeURL, safeQuerySelector, setTrustedHTML } from '@batoi/uif-dom';
 import { cancelRequest, request } from '@batoi/uif-net';
 
 export interface TableOptions {
@@ -50,6 +50,7 @@ interface TableFilter {
 }
 
 const tableControllers = new WeakMap<HTMLTableElement, TableController>();
+const tableControlRoots = new WeakMap<HTMLTableElement, Document | HTMLElement>();
 const initializedFilters = new WeakSet<HTMLInputElement | HTMLSelectElement>();
 const filterCleanups = new WeakMap<HTMLInputElement | HTMLSelectElement, () => void>();
 const tableRequestKeys = new WeakMap<HTMLTableElement, string>();
@@ -283,12 +284,16 @@ function renderRemoteRows(table: HTMLTableElement, data: RemoteTableResponse, co
 
 function controlsForTable(table: HTMLTableElement, selector: string): Array<HTMLInputElement | HTMLSelectElement> {
   if (!selector) return [];
-  return Array.from(document.querySelectorAll<HTMLInputElement | HTMLSelectElement>(`[${selector}="#${cssEscape(table.id)}"]`));
+  return Array.from(controlRoot(table).querySelectorAll<HTMLInputElement | HTMLSelectElement>(`[${selector}="#${cssEscape(table.id)}"]`));
+}
+
+function controlRoot(table: HTMLTableElement): Document | HTMLElement {
+  return tableControlRoots.get(table) ?? table.ownerDocument;
 }
 
 function tableFilters(table: HTMLTableElement): TableFilter[] {
   const controls = [...controlsForTable(table, 'data-uif-table-filter')];
-  const grouped = document.querySelector<HTMLElement>(`[data-uif-table-controls="#${cssEscape(table.id)}"]`);
+  const grouped = controlRoot(table).querySelector<HTMLElement>(`[data-uif-table-controls="#${cssEscape(table.id)}"]`);
   if (grouped) controls.push(...Array.from(grouped.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[name]')));
   const seen = new Set<HTMLInputElement | HTMLSelectElement>();
   return controls
@@ -438,7 +443,7 @@ function updateSelectionState(table: HTMLTableElement): void {
   });
   const targetSelector = table.dataset.uifSelectionTarget;
   if (targetSelector) {
-    const target = document.querySelector<HTMLElement>(targetSelector);
+    const target = safeQuerySelector<HTMLElement>(targetSelector, controlRoot(table));
     if (target) target.textContent = String(selected.length);
   }
   table.dispatchEvent(new CustomEvent('uif:table-selection', { detail: { table, rows: selected, ids, totalSelected: selected.length }, bubbles: true }));
@@ -459,13 +464,13 @@ function updatePaginationControls(table: HTMLTableElement): void {
   if (!table.id) return;
   const current = Number(table.dataset.uifPage || 1);
   const totalPages = Number(table.dataset.uifTotalPages || 0);
-  document.querySelectorAll<HTMLElement>(`[data-uif-table-page][data-uif-target="#${cssEscape(table.id)}"]`).forEach((control) => {
+  controlRoot(table).querySelectorAll<HTMLElement>(`[data-uif-table-page][data-uif-target="#${cssEscape(table.id)}"]`).forEach((control) => {
     const page = control.dataset.uifTablePage || '';
     const disabled = (page === 'first' || page === 'prev' || page === 'previous') && current <= 1 ? true : (page === 'next' || page === 'last') && totalPages > 0 && current >= totalPages;
     if ('disabled' in control) (control as HTMLButtonElement).disabled = disabled;
     control.setAttribute('aria-disabled', String(disabled));
   });
-  document.querySelectorAll<HTMLElement>(`[data-uif-table-page-label="#${cssEscape(table.id)}"]`).forEach((label) => {
+  controlRoot(table).querySelectorAll<HTMLElement>(`[data-uif-table-page-label="#${cssEscape(table.id)}"]`).forEach((label) => {
     label.textContent = totalPages ? `Page ${current} of ${totalPages}` : `Page ${current}`;
   });
 }
@@ -495,7 +500,7 @@ function resetTable(table: HTMLTableElement, options: TableOptions = {}): void {
   [...controlsForTable(table, 'data-uif-table-filter'), ...controlsForTable(table, 'data-uif-table-page-size')].forEach((control) => {
     control.value = control instanceof HTMLSelectElement ? control.querySelector('option')?.value ?? '' : '';
   });
-  const grouped = document.querySelector<HTMLFormElement>(`[data-uif-table-controls="#${cssEscape(table.id)}"]`);
+  const grouped = controlRoot(table).querySelector<HTMLFormElement>(`[data-uif-table-controls="#${cssEscape(table.id)}"]`);
   grouped?.reset();
   table.dataset.uifPage = '1';
   delete table.dataset.uifSort;
@@ -515,8 +520,22 @@ function resetTable(table: HTMLTableElement, options: TableOptions = {}): void {
 }
 
 export function initTable(table: HTMLTableElement, options: TableOptions = {}): TableController {
+  return mountTable(table, options);
+}
+
+/** Associate external table controls only within the selected application root. */
+export function initScopedTable(table: HTMLTableElement, root: Document | HTMLElement, options: TableOptions = {}): TableController {
+  if (!root.contains(table) || (options.filterInput && !root.contains(options.filterInput))) throw new Error('UIF_TABLE_TARGET_SCOPE');
+  return mountTable(table, options, root);
+}
+
+function mountTable(table: HTMLTableElement, options: TableOptions, root?: Document | HTMLElement): TableController {
   const existing = tableControllers.get(table);
-  if (existing) return existing;
+  if (existing) {
+    if (root && controlRoot(table) !== root) throw new Error('UIF_TABLE_ROOT_OWNED');
+    return existing;
+  }
+  if (root) tableControlRoots.set(table, root);
   const listenerController = new AbortController();
   const listenerOptions = { signal: listenerController.signal };
   table.dataset.uifState = table.dataset.uifState || 'idle';
@@ -572,7 +591,7 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
       updatePaginationControls(table);
     }, listenerOptions);
   });
-  document.querySelectorAll<HTMLElement>(`[data-uif-table-reset="#${cssEscape(table.id)}"]`).forEach((resetEl) => {
+  controlRoot(table).querySelectorAll<HTMLElement>(`[data-uif-table-reset="#${cssEscape(table.id)}"]`).forEach((resetEl) => {
     resetEl.addEventListener('click', () => resetTable(table, options), listenerOptions);
   }, listenerOptions);
   table.addEventListener('keydown', (event) => {
@@ -588,7 +607,7 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
       nextCell.focus();
     }
   }, listenerOptions);
-  document.querySelectorAll<HTMLElement>(`[data-uif-table-action][data-uif-target="#${cssEscape(table.id)}"]`).forEach((actionEl) => {
+  controlRoot(table).querySelectorAll<HTMLElement>(`[data-uif-table-action][data-uif-target="#${cssEscape(table.id)}"]`).forEach((actionEl) => {
     actionEl.addEventListener('click', () => {
       const action = actionEl.dataset.uifTableAction || actionEl.dataset.uifAction || '';
       const selected = selectedRows(table);
@@ -596,7 +615,7 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
       table.dispatchEvent(new CustomEvent('uif:table-bulk-action', { detail: { table, action, rows: selected, ids: selectedRowIds(table) }, bubbles: true }));
     }, listenerOptions);
   });
-  document.querySelectorAll<HTMLElement>(`[data-uif-table-page][data-uif-target="#${cssEscape(table.id)}"]`).forEach((pageEl) => {
+  controlRoot(table).querySelectorAll<HTMLElement>(`[data-uif-table-page][data-uif-target="#${cssEscape(table.id)}"]`).forEach((pageEl) => {
     pageEl.addEventListener('click', () => {
       void goToPage(table, pageFromControl(pageEl, table), options);
     }, listenerOptions);
@@ -637,7 +656,10 @@ export function initTable(table: HTMLTableElement, options: TableOptions = {}): 
       const key = tableRequestKeys.get(table);
       if (key) cancelRequest(key);
       tableRequestKeys.delete(table);
-      if (tableControllers.get(table) === controller) tableControllers.delete(table);
+      if (tableControllers.get(table) === controller) {
+        tableControllers.delete(table);
+        tableControlRoots.delete(table);
+      }
     },
   };
   tableControllers.set(table, controller);

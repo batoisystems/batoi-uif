@@ -115,12 +115,12 @@ function setHTMLSink(target, html) {
 }
 function isSafeURL(value, policy = {}) {
   const candidate = value.trim();
-  if (!candidate || /[\u0000-\u001f\u007f]/.test(candidate) || candidate.startsWith("//")) return false;
+  if (!candidate || /[\u0000-\u001f\u007f\\]/.test(candidate) || candidate.startsWith("//")) return false;
   const context = policy.context ?? "link";
   const allowRelative = policy.allowRelative ?? true;
   const allowHash = policy.allowHash ?? context === "link";
-  if (allowHash && candidate.startsWith("#")) return true;
-  if (allowRelative && (/^(?:\.\/|\.\.\/|\/)/.test(candidate) || !/^[a-z][a-z\d+.-]*:/i.test(candidate))) return true;
+  if (candidate.startsWith("#")) return allowHash;
+  if (!allowRelative && !/^[a-z][a-z\d+.-]*:/i.test(candidate)) return false;
   const defaults = {
     link: ["http:", "https:", "mailto:", "tel:"],
     image: ["http:", "https:"],
@@ -128,11 +128,11 @@ function isSafeURL(value, policy = {}) {
     navigation: ["http:", "https:"]
   };
   try {
-    const base = typeof window === "undefined" ? "http://localhost/" : window.location.href;
+    const base = typeof window === "undefined" ? "http://localhost/" : typeof document === "undefined" ? window.location.href : document.baseURI;
     const parsed = new URL(candidate, base);
     if (!(policy.protocols ?? defaults[context]).includes(parsed.protocol.toLowerCase())) return false;
     if (!policy.sameOrigin || typeof window === "undefined") {
-      if (typeof window === "undefined" || parsed.origin === new URL(base).origin) return true;
+      if (typeof window === "undefined" || parsed.origin === window.location.origin) return true;
       return !policy.requireCapability && !urlCapabilityPolicy.enforce || isURLCapabilityAllowed(parsed, context);
     }
     if (parsed.origin === window.location.origin) return true;

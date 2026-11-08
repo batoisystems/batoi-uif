@@ -10,3 +10,9 @@ test('renders safe HTML under strict CSP and Trusted Types enforcement', async (
   expect(await page.evaluate(() => (window as Window & { __unsafe?: boolean }).__unsafe)).toBeUndefined();
   expect(await page.evaluate(() => (window as Window & { __uifSecurityViolations?: string[] }).__uifSecurityViolations ?? [])).toEqual([]);
 });
+
+test('enforces URL policy for browser-normalized destinations and document base URLs', async ({ page }) => {
+  await page.goto('/tests/browser/security.html');
+  await expect(page.locator('#safe-output')).toHaveAttribute('data-url-policy', JSON.stringify([false, false, false, false, false, false]));
+  expect(await page.evaluate(() => (window as Window & { __uifSecurityViolations?: string[] }).__uifSecurityViolations ?? [])).toEqual([]);
+});

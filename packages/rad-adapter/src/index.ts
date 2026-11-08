@@ -23,6 +23,7 @@ const bodylessMethods = new Set(['GET', 'HEAD']);
 const boundRoots = new WeakMap<Document | HTMLElement, () => void>();
 const requestKeys = new WeakMap<HTMLElement, string>();
 const requestRevisions = new WeakMap<HTMLElement, number>();
+const loadingTargets = new WeakMap<HTMLElement, HTMLElement | null>();
 const allowedMethods = new Set(['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE']);
 let requestSequence = 0;
 export interface ScopedRadOptions {
@@ -51,9 +52,15 @@ function normalizeSwapMode(mode?: string): SwapMode {
   return swapModes.has(mode ?? '') ? (mode as SwapMode) : 'inner';
 }
 
-function setLoading(sourceEl: HTMLElement, loading: boolean): void {
+function setLoading(sourceEl: HTMLElement, loading: boolean, target: HTMLElement | null = null): void {
   sourceEl.toggleAttribute('aria-busy', loading);
-  const loadingTarget = sourceEl.dataset.uifLoading ? safeQuerySelector<HTMLElement>(sourceEl.dataset.uifLoading) : null;
+  // Resolve once at request start. Swaps or attribute changes must not redirect cleanup.
+  const loadingTarget = loading ? target : loadingTargets.get(sourceEl) ?? null;
+  if (loading) {
+    const previous = loadingTargets.get(sourceEl);
+    if (previous !== loadingTarget) previous?.setAttribute('hidden', '');
+    loadingTargets.set(sourceEl, loadingTarget);
+  } else loadingTargets.delete(sourceEl);
   loadingTarget?.toggleAttribute('hidden', !loading);
 }
 
@@ -135,7 +142,7 @@ export async function loadPartial(sourceEl: HTMLElement): Promise<RadResponse | 
 
 async function runPartial(sourceEl: HTMLElement, scope?: RadScope): Promise<RadResponse | null> {
   if (scope && (scope.signal.aborted || !scope.root.contains(sourceEl))) return null;
-  if (scope && sourceEl.dataset.uifLoading) scopedTarget(sourceEl.dataset.uifLoading, scope);
+  const loadingTarget = sourceEl.dataset.uifLoading ? scopedTarget(sourceEl.dataset.uifLoading, scope) : null;
   const src = sourceEl.dataset.uifSrc || getAttr(sourceEl, 'href') || getAttr(sourceEl, 'action');
   if (!src) return null;
   if (sourceEl.dataset.uifConfirm && !window.confirm(sourceEl.dataset.uifConfirm)) return null;
@@ -147,7 +154,7 @@ async function runPartial(sourceEl: HTMLElement, scope?: RadScope): Promise<RadR
   requestKeys.set(sourceEl, key);
   const revision = (requestRevisions.get(sourceEl) ?? 0) + 1;
   requestRevisions.set(sourceEl, revision);
-  setLoading(sourceEl, true);
+  setLoading(sourceEl, true, loadingTarget);
   emit('uif:before-load', { source: sourceEl, src: url, method }, sourceEl);
 
   try {

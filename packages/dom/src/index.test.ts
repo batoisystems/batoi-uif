@@ -94,6 +94,36 @@ describe('dom', () => {
     configureURLCapabilities(null);
   });
 
+  it('rejects ambiguous backslash authorities before applying URL policy', () => {
+    for (const url of ['\\\\evil.example/path', '/\\evil.example/path', '\\evil.example/path', 'https:\\evil.example/path']) {
+      expect(isSafeURL(url, { context: 'network', sameOrigin: true })).toBe(false);
+      expect(isSafeURL(url, { context: 'navigation', sameOrigin: true })).toBe(false);
+      expect(isSafeURL(url, { context: 'network', requireCapability: true })).toBe(false);
+    }
+    expect(isSafeURL('./records', { context: 'network', sameOrigin: true })).toBe(true);
+    expect(isSafeURL('../records?q=one', { context: 'network', sameOrigin: true })).toBe(true);
+  });
+
+  it('enforces relative, fragment and protocol rules on relative-looking input', () => {
+    for (const url of ['/records', './records', '../records', 'records', '?page=2']) {
+      expect(isSafeURL(url, { context: 'network', allowRelative: false })).toBe(false);
+      expect(isSafeURL(url, { context: 'network', protocols: ['https:'] })).toBe(false);
+    }
+    expect(isSafeURL('#details', { context: 'network', allowHash: false })).toBe(false);
+    expect(isSafeURL('#details', { context: 'link', allowHash: true, allowRelative: false })).toBe(true);
+    expect(isSafeURL(new URL('/records', window.location.href).href, { context: 'network', allowRelative: false })).toBe(true);
+  });
+
+  it('resolves relative destinations against the document base without treating it as the page origin', () => {
+    const base = document.createElement('base');
+    base.href = 'https://other.example/'; document.head.prepend(base);
+    try {
+      expect(isSafeURL('/records', { context: 'network', sameOrigin: true })).toBe(false);
+      expect(isSafeURL('records', { context: 'network', requireCapability: true })).toBe(false);
+      expect(isSafeURL(new URL('/records', window.location.href).href, { context: 'network', sameOrigin: true })).toBe(true);
+    } finally { base.remove(); }
+  });
+
   it('requires an exact normalized capability path boundary when requested', () => {
     configureURLCapabilities({
       enforce: false,

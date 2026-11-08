@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "contractVersion": 4,
-  "frameworkVersion": "4.0.0-alpha.3",
+  "frameworkVersion": "4.0.0-alpha.4",
   "compression": {
     "gzipLevel": 6,
     "brotliQuality": 11,
@@ -21,10 +21,10 @@
       "integrity": "sha384-y3U/tUUUJ6TXAVxp/2/rB7WyFm3hCY20xfOrmk5iIZqiz2UQc4tuSSddmAR1mu/s"
     },
     "rad.js": {
-      "bytes": 66440,
-      "gzip": 20206,
-      "brotli": 17999,
-      "integrity": "sha384-zio8Ls16FBM7EVTuHE3TupM++9KdcZ3HqxOUkX/x+rBb4naVdZSqglX17yyJZNoH"
+      "bytes": 66803,
+      "gzip": 20405,
+      "brotli": 18144,
+      "integrity": "sha384-3NwQqgrFx319mXtdSN+EzjQkSXYwMnZdwF6y+vAUWd18cXEivvSmJooyStEjWtLU"
     },
     "mobile.js": {
       "bytes": 28517,
@@ -206,9 +206,9 @@
       "css": "rad.css",
       "initialRequests": 2,
       "gzipBytes": {
-        "javascript": 20206,
+        "javascript": 20405,
         "css": 9248,
-        "total": 29454
+        "total": 29653
       }
     },
     "mobile": {

@@ -53,7 +53,12 @@ RAD enhances native forms/tables plus `data-uif="ajax"` partials. Server HTML is
 trusted integration boundary, not sanitized model output. Response swap, focus,
 loading and event targets stay within the app root; replacing the owned root is
 rejected. Inner swaps explicitly rehydrate selected controllers. Do not combine
-`data-uif="form"` with the ajax-submit contract on the same form. The generated
+`data-uif="form"` with the ajax-submit contract on the same form. Table-associated
+filters, remote-query inputs, pagination, bulk controls and selection labels are
+resolved inside the RAD application root through `initScopedTable(table, root)`.
+Direct `initTable` retains document-wide control associations. Loading indicators
+are captured before a request and cleaned up by reference, not by a fresh selector
+lookup after a swap. The generated
 RAD example uses static same-origin JSON fixtures: no persistence, authentication
 or server-side pagination service is implied. Large tables should use a real
 server-page endpoint. Direct legacy adapter/form APIs retain their broader scope;

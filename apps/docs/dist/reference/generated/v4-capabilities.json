@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "frameworkVersion": "4.0.0-alpha.3",
+  "frameworkVersion": "4.0.0-alpha.4",
   "components": [
     {
       "name": "accordion",

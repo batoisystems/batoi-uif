@@ -1,5 +1,5 @@
 import { initScopedForm } from '@batoi/uif-forms';
-import { initTable } from '@batoi/uif-table';
+import { initScopedTable } from '@batoi/uif-table';
 import { bindScopedRadActions } from '@batoi/uif-rad-adapter';
 import { startSelected } from '../selected.js';
 import { webComponents } from '../web-components.js';
@@ -25,7 +25,7 @@ export function startRAD(root: Document | HTMLElement = document) {
         init(el) {
           if (!(el instanceof HTMLTableElement))
             throw new Error('UIF table requires a native table');
-          return { ...initTable(el) };
+          return { ...initScopedTable(el, root) };
         },
       },
     ],
