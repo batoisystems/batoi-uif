@@ -1,21 +1,21 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:63822475-0000-4000-8000-c48b7dc52b45",
+  "serialNumber": "urn:uuid:a383c4e3-0000-4000-8000-670ad554a1d8",
   "version": 1,
   "metadata": {
     "component": {
       "type": "framework",
       "name": "batoi-uif",
-      "version": "4.0.0-alpha.4"
+      "version": "4.0.0-alpha.5"
     }
   },
   "components": [
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-actions@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-actions@4.0.0-alpha.5",
       "name": "@batoi/uif-actions",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -32,9 +32,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-ai@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-ai@4.0.0-alpha.5",
       "name": "@batoi/uif-ai",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -51,9 +51,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-charts@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-charts@4.0.0-alpha.5",
       "name": "@batoi/uif-charts",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -70,9 +70,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-components@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-components@4.0.0-alpha.5",
       "name": "@batoi/uif-components",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -89,9 +89,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
       "name": "@batoi/uif-core",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -108,9 +108,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-css@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-css@4.0.0-alpha.5",
       "name": "@batoi/uif-css",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -127,9 +127,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-dashboard@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-dashboard@4.0.0-alpha.5",
       "name": "@batoi/uif-dashboard",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -146,9 +146,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-desktop@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-desktop@4.0.0-alpha.5",
       "name": "@batoi/uif-desktop",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -165,9 +165,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
       "name": "@batoi/uif-dom",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -184,9 +184,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-editor@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-editor@4.0.0-alpha.5",
       "name": "@batoi/uif-editor",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -203,9 +203,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-effects@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-effects@4.0.0-alpha.5",
       "name": "@batoi/uif-effects",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -222,9 +222,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-extension-kit@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-extension-kit@4.0.0-alpha.5",
       "name": "@batoi/uif-extension-kit",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -241,9 +241,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-forms@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-forms@4.0.0-alpha.5",
       "name": "@batoi/uif-forms",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -260,9 +260,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-icons@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-icons@4.0.0-alpha.5",
       "name": "@batoi/uif-icons",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -279,9 +279,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-mcp@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-mcp@4.0.0-alpha.5",
       "name": "@batoi/uif-mcp",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -298,9 +298,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-mobile@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-mobile@4.0.0-alpha.5",
       "name": "@batoi/uif-mobile",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -317,9 +317,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5",
       "name": "@batoi/uif-net",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -336,9 +336,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-overlays@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-overlays@4.0.0-alpha.5",
       "name": "@batoi/uif-overlays",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -355,9 +355,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-profiles@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-profiles@4.0.0-alpha.5",
       "name": "@batoi/uif-profiles",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -374,9 +374,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-push@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-push@4.0.0-alpha.5",
       "name": "@batoi/uif-push",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -393,9 +393,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-pwa@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-pwa@4.0.0-alpha.5",
       "name": "@batoi/uif-pwa",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -412,9 +412,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-query@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-query@4.0.0-alpha.5",
       "name": "@batoi/uif-query",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -431,9 +431,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-rad-adapter@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-rad-adapter@4.0.0-alpha.5",
       "name": "@batoi/uif-rad-adapter",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -450,9 +450,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-realtime@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-realtime@4.0.0-alpha.5",
       "name": "@batoi/uif-realtime",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -469,9 +469,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-router@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-router@4.0.0-alpha.5",
       "name": "@batoi/uif-router",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -488,9 +488,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-state@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-state@4.0.0-alpha.5",
       "name": "@batoi/uif-state",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -507,9 +507,9 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:npm/%40batoi%2Fuif-table@4.0.0-alpha.4",
+      "bom-ref": "pkg:npm/%40batoi%2Fuif-table@4.0.0-alpha.5",
       "name": "@batoi/uif-table",
-      "version": "4.0.0-alpha.4",
+      "version": "4.0.0-alpha.5",
       "licenses": [
         {
           "license": {
@@ -527,204 +527,204 @@
   ],
   "dependencies": [
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-actions@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-actions@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-effects@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-effects@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-ai@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-ai@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-charts@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-charts@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-components@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-components@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-effects@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-overlays@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-effects@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-overlays@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-css@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-css@4.0.0-alpha.5",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-dashboard@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-dashboard@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-charts@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-charts@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-desktop@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-desktop@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-editor@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-editor@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-effects@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-effects@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-extension-kit@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-extension-kit@4.0.0-alpha.5",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-forms@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-forms@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-icons@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-icons@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-mcp@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-mcp@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-mobile@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-mobile@4.0.0-alpha.5",
       "dependsOn": []
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-overlays@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-overlays@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-effects@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-effects@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-profiles@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-profiles@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-actions@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-ai@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-charts@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-components@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-dashboard@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-desktop@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-editor@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-effects@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-extension-kit@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-forms@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-icons@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-mcp@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-mobile@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-overlays@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-push@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-pwa@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-query@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-rad-adapter@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-realtime@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-router@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-state@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-table@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-actions@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-ai@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-charts@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-components@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-dashboard@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-desktop@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-editor@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-effects@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-extension-kit@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-forms@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-icons@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-mcp@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-mobile@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-overlays@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-push@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-pwa@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-query@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-rad-adapter@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-realtime@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-router@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-state@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-table@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-push@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-push@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-components@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-pwa@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-components@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-pwa@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-pwa@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-pwa@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-query@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-query@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-rad-adapter@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-rad-adapter@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-realtime@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-realtime@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-router@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-router@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-state@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-state@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-core@4.0.0-alpha.5"
       ]
     },
     {
-      "ref": "pkg:npm/%40batoi%2Fuif-table@4.0.0-alpha.4",
+      "ref": "pkg:npm/%40batoi%2Fuif-table@4.0.0-alpha.5",
       "dependsOn": [
-        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.4",
-        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.4"
+        "pkg:npm/%40batoi%2Fuif-dom@4.0.0-alpha.5",
+        "pkg:npm/%40batoi%2Fuif-net@4.0.0-alpha.5"
       ]
     }
   ]

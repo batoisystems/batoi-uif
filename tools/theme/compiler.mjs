@@ -115,15 +115,17 @@ export function validateTheme(input) {
   if (input.framework !== '^4.0.0') issue('$.framework', 'Expected framework ^4.0.0');
   if (!Array.isArray(input.profiles) || !input.profiles.length || input.profiles.length > 3 || input.profiles.some((p) => !themeProfiles.includes(p)) || new Set(input.profiles).size !== input.profiles.length) issue('$.profiles', 'Choose unique web/mobile/desktop profiles');
   if (!Array.isArray(input.components) || input.components.length > themeComponents.length || input.components.some((c) => !themeComponents.includes(c)) || new Set(input.components).size !== input.components.length) issue('$.components', 'Unsupported or duplicate components');
-  if (!record(input.layouts) || Object.entries(input.layouts).some(([p, l]) => !layouts[p]?.includes(l)) || input.profiles?.some?.((p) => !input.layouts[p])) issue('$.layouts', 'Choose a supported layout for each profile');
-  // Initial portable format accepts local, content-hashed assets only. No remote fetch.
-  if (input.assets !== undefined && (!Array.isArray(input.assets) || input.assets.length > 32 || input.assets.some((a) => !record(a) || Object.keys(a).some((k) => !['path', 'mediaType', 'sha256', 'license'].includes(k)) || !/^assets\/[a-zA-Z0-9_-]+\.(png|jpe?g|webp|woff2)$/.test(a.path) || !/^[a-f0-9]{64}$/.test(a.sha256) || !['image/png', 'image/jpeg', 'image/webp', 'font/woff2'].includes(a.mediaType) || typeof a.license !== 'string' || a.license.length > 200))) issue('$.assets', 'Assets require a safe local path, supported media type, SHA-256 and license');
+  const selectedProfiles = Array.isArray(input.profiles) ? input.profiles.filter((p) => typeof p === 'string') : [];
+  if (!record(input.layouts) || Object.entries(input.layouts).some(([p, l]) => !Object.hasOwn(layouts, p) || !layouts[p].includes(l)) || selectedProfiles.some((p) => !Object.hasOwn(input.layouts, p))) issue('$.layouts', 'Choose a supported layout for each profile');
+  // The schema and every authoring path agree: assets are reserved, not materialized.
+  if (input.assets !== undefined && (!Array.isArray(input.assets) || input.assets.length > 0)) issue('$.assets', 'Asset materialization is not enabled; assets must be empty');
   const modes = Object.create(null);
   try {
     const base = flatten(input.tokens);
     if (!record(input.modes) || !input.modes.light || Object.keys(input.modes).some((m) => !['light', 'dark', 'high-contrast'].includes(m))) throw new Error('Modes require light and optionally dark/high-contrast');
     for (const [name, tree] of Object.entries(input.modes)) {
       const combined = { ...base, ...flatten(tree) };
+      if (Object.keys(combined).length > 512) throw new Error('Combined mode token count exceeds 512');
       if (new Set(Object.values(combined).map((t) => t.cssName)).size !== Object.keys(combined).length) throw new Error('Mode token CSS names collide');
       modes[name] = resolveTokens(combined);
       const values = Object.fromEntries(Object.values(modes[name]).map((t) => [t.cssName, t.value]));

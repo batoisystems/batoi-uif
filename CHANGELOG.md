@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.0.0-alpha.5 — development checkpoint
+
+- Complete the independent local authoring-boundary security audit, retaining its scope and deployment limitations; no reportable vulnerability was identified.
+- Bind MCP application to the exact reviewed artifact identity; reject changed compiler/foundation inputs before workspace creation or replacement.
+- Align reserved asset validation with the empty-assets schema, enforce the 512-token limit after base/mode merging, and return structured errors for malformed profile/layout input.
+- Add a disposable-checkout regression that changes foundation input between build and apply, plus validator shape, resource-limit and destination-preservation tests.
+- Hosted authoring/OAuth, manual assistive-technology/device and RADX integration acceptance remain required before stable promotion.
+
 ## 4.0.0-alpha.4 — development checkpoint
 
 - Pin RAD loading indicators at request start so swaps, attribute changes and teardown cannot redirect cleanup into sibling applications.

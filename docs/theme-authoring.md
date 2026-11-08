@@ -50,10 +50,11 @@ typography/shadows, arbitrary CSS and remote assets are not implemented.
 This is a documented subset, not full DTCG conformance. See the
 [DTCG 2025.10 format report](https://www.designtokens.org/tr/2025.10/format/).
 
-Keep assets empty in this implementation. The format reserves reviewed local
-asset metadata, but build/application intentionally reject asset materialization.
+Keep assets empty in this implementation. The field is reserved; the schema,
+validator, compiler and materializers all reject nonempty local or remote assets.
 The compiler does not fetch URLs, extract archives, invoke a model or execute
-template code. Limits are 100,000 input bytes, 512 tokens and 16 nesting levels.
+template code. Limits are 100,000 input bytes, 512 tokens in each effective
+base-plus-mode tree, and 16 nesting levels. Mode overrides do not count twice.
 
 One pack selects web/mobile/desktop recipes. Web supports content/sidebar,
 mobile stack/bottom navigation, and desktop sidebar/workspace. These are browser
@@ -98,6 +99,8 @@ directory controlled by another user. Symlink checks are defense in depth, not
 an OS sandbox against concurrent hostile filesystem mutation.
 
 Application verifies immutable artifact identity and the actual previous bytes.
+MCP apply rejects compiler/foundation input changes that would produce a different
+artifact from the reviewed ID. Rebuild, preview and review the new artifact first.
 Replacing an existing theme requires its reviewed `expectedBase` SHA-256.
 Edited files or stale receipts fail closed. Replacement keeps the old directory
 under a `.rollback-*` name. Do not remove backups until the owner approves.
@@ -105,6 +108,11 @@ The CLI `apply <manifest> <destination> <expectedBase>` uses the same mechanism.
 Backend audit records requested/applied hashes, not theme payloads or secrets.
 An interrupted request can leave a requested-only audit entry; inspect the
 destination receipt before retrying. Hashes prove identity, not trust.
+
+Enabling application delegates that capability to the connected MCP client.
+This local service does not enforce a separate human-confirmation exchange or
+require preview/diff before each call. The operator and client must enforce their
+approval policy; a model instruction or tool annotation is not that control.
 
 Optional `--http` is **loopback-only private development access**. Supply a private
 `UIF_AUTHORING_TOKEN` of at least 32 characters through the environment. It denies

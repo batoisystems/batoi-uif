@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "contractVersion": 4,
-  "frameworkVersion": "4.0.0-alpha.4",
+  "frameworkVersion": "4.0.0-alpha.5",
   "compression": {
     "gzipLevel": 6,
     "brotliQuality": 11,

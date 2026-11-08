@@ -76,7 +76,7 @@ export function createAuthoringService({ workspace, allowApply = false, now = Da
         const entry = get(args.artifactId);
         const audit = containedPath(workspace, '.uif-audit.jsonl');
         appendFileSync(audit, stableJSON({ phase: 'requested', artifactId: entry.artifact.id, name: entry.theme.name, previous: args.expectedBase ?? null }) + '\n');
-        const result = writeArtifact(workspace, entry.theme.name, entry.theme, { expectedBase: args.expectedBase, allowReplace: true });
+        const result = writeArtifact(workspace, entry.theme.name, entry.theme, { expectedBase: args.expectedBase, expectedArtifactId: entry.artifact.id, allowReplace: true });
         appendFileSync(audit, stableJSON({ phase: 'applied', artifactId: result.artifactId, inputHash: result.manifest.inputHash, name: entry.theme.name, previous: args.expectedBase ?? null }) + '\n');
         return { artifactId: result.artifactId, applied: true, rollbackAvailable: Boolean(result.rollback) };
       }

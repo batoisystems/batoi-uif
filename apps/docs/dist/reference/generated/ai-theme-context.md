@@ -1,6 +1,6 @@
 # UIF 4 portable authoring context
 
-Source version: 4.0.0-alpha.4. Status: development; do not claim GA or host certification.
+Source version: 4.0.0-alpha.5. Status: development; do not claim GA or host certification.
 
 Return JSON only, matching theme.schema.json and starter.theme.json. Use schemaVersion 1, framework ^4.0.0 and lowercase names. Profiles: web/mobile/desktop. Layout choices: {"web":["sidebar","content"],"mobile":["bottom-nav","stack"],"desktop":["workspace","sidebar"]}. Components: modal, dropdown, tabs, accordion, collapse, toast. Tokens use the documented DTCG subset: color, dimension, duration, number, fontWeight, fontFamily, cubicBezier. Opaque sRGB only; aliases use {group.token}. Require text/bg, text/surface and on-primary/color-primary contrast >=4.5. Do not invent JavaScript, CSS strings, remote assets or permissions. Asset materialization is not enabled; use assets:[].
 

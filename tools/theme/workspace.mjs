@@ -17,16 +17,17 @@ export function containedPath(root, name) {
   return destination;
 }
 
-export function writeArtifact(root, name, theme, { expectedBase, allowReplace = false } = {}) {
+export function writeArtifact(root, name, theme, { expectedBase, expectedArtifactId, allowReplace = false } = {}) {
   const lock = containedPath(root, '.uif-apply.lock');
   mkdirSync(lock);
-  try { return writeUnlocked(root, name, theme, { expectedBase, allowReplace }); }
+  try { return writeUnlocked(root, name, theme, { expectedBase, expectedArtifactId, allowReplace }); }
   finally { rmSync(lock, { recursive: true }); }
 }
 
-function writeUnlocked(root, name, theme, { expectedBase, allowReplace }) {
+function writeUnlocked(root, name, theme, { expectedBase, expectedArtifactId, allowReplace }) {
   const destination = containedPath(root, name);
   const artifact = compileTheme(theme);
+  if (expectedArtifactId !== undefined && artifact.id !== expectedArtifactId) throw new Error('Compiler inputs changed since the reviewed artifact; rebuild and review before applying');
   if (theme.assets?.length) throw new Error('Asset materialization is not enabled; use a token-only pack or explicitly reviewed local assets');
   if (existsSync(destination)) {
     if (!allowReplace || !expectedBase) throw new Error('Existing themes require explicit replacement and the expected artifact hash');

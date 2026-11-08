@@ -61,4 +61,35 @@ describe('portable theme compiler', () => {
     for (let i = 0; i < 20; i++) tree = tree.next = {};
     expect(validateTheme(theme).valid).toBe(false);
   });
+
+  it.each([null, 42, 'web', { some: 1 }, [{ toString: {} }]])('reports malformed profile shapes without throwing: %j', (profiles) => {
+    const theme = { ...starterTheme(), profiles };
+    const result = validateTheme(theme);
+    expect(result.valid).toBe(false);
+    expect(result.issues.some((issue) => issue.path === '$.profiles')).toBe(true);
+  });
+
+  it.each([null, { constructor: 'sidebar' }, { toString: 'sidebar' }, { web: 'script' }])('reports malformed layouts without throwing: %j', (layouts) => {
+    const result = validateTheme({ ...starterTheme(), layouts });
+    expect(result.valid).toBe(false);
+    expect(result.issues.some((issue) => issue.path === '$.layouts')).toBe(true);
+  });
+
+  it('rejects reserved local assets consistently with the published schema', () => {
+    const theme = starterTheme();
+    theme.assets = [{ path: 'assets/logo.png', mediaType: 'image/png', sha256: 'a'.repeat(64), license: 'CC0' }];
+    expect(validateTheme(theme).issues).toContainEqual({ path: '$.assets', message: 'Asset materialization is not enabled; assets must be empty' });
+    expect(() => compileTheme(theme)).toThrow(/assets must be empty/);
+  });
+
+  it('bounds the effective base-plus-mode token count while allowing overrides', () => {
+    const theme = starterTheme();
+    for (let i = 0; i < 507; i++) theme.tokens[`extra-${i}`] = { $type: 'number', $value: i };
+    expect(validateTheme(theme).valid).toBe(true);
+    theme.modes.light['extra-0'] = { $type: 'number', $value: 1 };
+    expect(validateTheme(theme).valid).toBe(true);
+    theme.modes.light.overflow = { $type: 'number', $value: 1 };
+    expect(validateTheme(theme).valid).toBe(false);
+    expect(() => compileTheme(theme)).toThrow(/Combined mode token count exceeds 512/);
+  });
 });

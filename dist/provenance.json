@@ -76,7 +76,7 @@
     {
       "name": "dist/v4/manifest.json",
       "digest": {
-        "sha256": "d79de094bb049b31aff4d68b3b06a694fd67d87987d40213c14bbb73f3e76b8c"
+        "sha256": "4493682f1cf83d0696fe2029de3688508f387f8467a0810f4edf5196b4c69017"
       }
     },
     {
@@ -169,7 +169,7 @@
     "buildDefinition": {
       "buildType": "https://batoi.com/uif/npm-workspace-build/v1",
       "externalParameters": {
-        "version": "4.0.0-alpha.4",
+        "version": "4.0.0-alpha.5",
         "command": "npm run build"
       },
       "internalParameters": {
@@ -182,13 +182,13 @@
         {
           "uri": "file:package-lock.json",
           "digest": {
-            "sha256": "0a33675dbca5f8ddf8a4d05439682303fc1421d7fd7e810ce3fb085388858d13"
+            "sha256": "b17a715e6a0fa94cdaefcc62ea0dbb9d688a10e3742844edd30db1b2ca138412"
           }
         },
         {
           "uri": "uif:workspace-build-inputs",
           "digest": {
-            "sha256": "2e3c9d4adc011e7eb01cda8da9d0e0f99f43dd2ee2c0d5719687bff368ab4b72"
+            "sha256": "38aad9b2a07747a4b2cf0f24477cacdeb7af8882be95138c57aa71a545604db6"
           }
         }
       ]
@@ -198,7 +198,7 @@
         "id": "https://github.com/batoisystems/batoi-uif/.github/workflows/ci.yml"
       },
       "metadata": {
-        "invocationId": "batoi-uif-4.0.0-alpha.4",
+        "invocationId": "batoi-uif-4.0.0-alpha.5",
         "startedOn": null,
         "finishedOn": null
       }
