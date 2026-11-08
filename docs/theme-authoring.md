@@ -1,6 +1,6 @@
 # UIF 4 theme authoring
 
-Status: development on `codex/uif-4`. Stable 3.1 remains available. These tools
+Status: experimental local authoring tools included with stable UIF 4.0.0. These tools
 require a repository checkout and Node 22; they are not part of the browser
 runtime or a hosted connector service. No model/provider account is required.
 

@@ -42,7 +42,7 @@ export function collectReleaseMetadata(root) {
 
   const artifactNames = distributionFiles(new URL('dist/', root)).filter((name) => !['provenance.json', 'sbom.cdx.json'].includes(name));
   const subjects = artifactNames.map((name) => ({ name: `dist/${name}`, digest: { sha256: digest(new URL(`dist/${name}`, root)) } }));
-  const inputPaths = ['index.ts', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.base.json', 'tsup.config.mjs', '.github/workflows/ci.yml'];
+  const inputPaths = ['index.ts', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.base.json', 'tsup.config.mjs', '.github/workflows/ci.yml', '.github/workflows/pages.yml'];
   for (const directory of ['packages', 'scripts', 'tools']) {
     for (const name of readdirSync(new URL(`${directory}/`, root), { recursive: true })) {
       if (typeof name !== 'string' || /(?:^|\/)dist\//.test(name) || /\.test\./.test(name)) continue;

@@ -123,10 +123,12 @@ Consumer fixtures count all transitive JavaScript, CSS and initial chunks. Repor
 raw, gzip and Brotli sizes with pinned settings. Browser benchmarks record the
 machine/fixture and median/p95, not the minimum of a trivial smoke test.
 
-The existing 3.1 release remains the immutable rollback reference. Alpha/beta/RC
-and stable 4.0 publication require the release gates in the local implementation
-plan; manual accessibility and host integration results cannot be inferred from
-unit tests or mocked gateways.
+The existing 3.1 release remains the immutable rollback reference. The owner
+directed stable 4.0.0 publication on 2026-11-08 with Batoi testing-team acceptance
+deferred. Manual accessibility/device and actual hosted/RADX integration results
+remain unverified; unit tests or mocked gateways do not substitute for them.
+Unchecked enhancement-plan tasks are not represented as implemented by this
+version number. See the [released scope and limitations](compatibility-and-release-policy.md#40-release-scope).
 
 ## Conservative migration tooling
 

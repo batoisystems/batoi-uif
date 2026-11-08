@@ -10,9 +10,9 @@ Batoi UIF is a dependency-free frontend application interface framework for serv
 
 It is designed as the frontend foundation for Batoi RAD and as a future open-source framework for HTML-first applications that need app-like behavior without shipping a large runtime stack.
 
-> Status: **UIF 4 development**. Stable compatibility release: **3.1.0**.
+> Stable release: **Batoi UIF 4.0.0**. The 3.1-compatible facade remains available.
 
-## UIF 4 development
+## UIF 4 selective runtime
 
 The new selective entry mounts only requested controls. The essential deployment
 uses `dist/v4/essential.js` and `dist/v4/essential.css`; importing alone does not
@@ -28,8 +28,11 @@ See [architecture and migration](docs/v4-architecture.md),
 [theme authoring / CLI / local MCP](docs/theme-authoring.md),
 [canonical example](examples/v4-essential/), and
 [generated component contracts](docs/generated/v4-components.md).
-Themes and authoring tools are experimental; hosted AI integrations, manual
-assistive-technology acceptance and RADX pilot gates remain required before GA.
+Theme authoring tools remain experimental and local-only. Hosted AI connectors,
+asset materialization and broader contract consolidation remain roadmap work.
+The owner directed stable publication before Batoi testing-team acceptance;
+manual assistive-technology/device and real RADX integration testing are deferred,
+not claimed as passed. See the [release scope and limitations](docs/compatibility-and-release-policy.md#40-release-scope).
 The full distribution below is the compatibility option, not the smallest include.
 
 ## Browser Distribution

@@ -26,6 +26,7 @@ playwright-report/
 test-results/
 .playwright-cli/
 output/playwright/
+.pages-site/
 
 # nyc test coverage
 .nyc_output

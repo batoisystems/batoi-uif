@@ -8,7 +8,7 @@ Accessibility behavior is tested in the DOM unit suite and must be verified with
 
 ## Public API Stability
 
-Public package exports, documented `data-uif-*` attributes, lifecycle events, and generated browser globals are the compatibility surface for v2.
+Public package exports, documented `data-uif-*` attributes, lifecycle events, and generated browser globals form the maintained compatibility surface. Historical v2/v3 compatibility mode names remain available.
 
 - Additive APIs and attributes may ship in minor releases.
 - Behavior fixes that preserve documented intent may ship in patch releases.
@@ -96,3 +96,32 @@ Family CSS intentionally preserves whole shared responsive rules. Package/archiv
 inventory budgets are separate from consumer download budgets; independent entry
 stubs/shared chunks give the components package a reviewed 12,000-byte ceiling.
 The full browser ceiling remains unchanged.
+
+## 4.0 release scope
+
+On 2026-11-08 the owner explicitly directed stable 4.0.0 publication and the
+neighboring asset update, with Batoi testing-team acceptance to follow later.
+This is a release decision for the implemented scope, not a statement that every
+enhancement-plan task or original manual acceptance criterion is complete.
+
+The stable runtime includes selective component imports, explicit application
+ownership, essential/web/RAD/mobile/desktop profiles and CSS, lifecycle and
+overlay fixes, scoped governed RAD/form/table integration, icon subsets, and
+measured consumer byte budgets. The existing compatibility facade is retained.
+
+Local theme compiler/CLI/MCP/studio tools are experimental. They do not provide
+hosted OAuth, public Claude/ChatGPT connectors, asset materialization, native OS
+applications, or a hostile-local-writer sandbox. Enabling local MCP application
+delegates write authority to its client; human approval remains operator/client
+governed. Six controls have canonical v4 contracts; the generated capability
+matrix distinguishes other legacy/presentational and pending capabilities.
+
+Manual screen-reader/touch/device testing, real hosted-assistant workflows and
+RADX route/migration/rollback pilots are deferred and must be tracked through
+follow-up testing. No WCAG conformance, field performance, hosted interoperability
+or complete-plan certification is implied. Automated release checks and scoped
+security review remain recorded separately. Provenance metadata is unsigned.
+
+GitHub Pages publishes only after successful main-branch CI. Its `release.json`
+binds the deployed documentation version to the checked commit; static example
+and package paths retain their repository-relative layout.

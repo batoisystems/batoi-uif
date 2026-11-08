@@ -74,7 +74,7 @@ describe('framework security policy', () => {
   });
 
   it('uses reviewed GitHub Action versions or immutable commit pins', () => {
-    const workflow = readFileSync(resolve(root, '.github/workflows/ci.yml'), 'utf8');
+    const workflow = readdirSync(resolve(root, '.github/workflows')).filter((name) => /\.ya?ml$/.test(name)).map((name) => readFileSync(resolve(root, '.github/workflows', name), 'utf8')).join('\n');
     const references = [...workflow.matchAll(/uses:\s*[^@\s]+@([^\s]+)/g)].map((match) => match[1]);
     expect(references.length).toBeGreaterThan(0);
     expect(references.every((reference) => /^v\d+(?:\.\d+(?:\.\d+)?)?$/.test(reference) || /^[a-f0-9]{40}$/.test(reference))).toBe(true);

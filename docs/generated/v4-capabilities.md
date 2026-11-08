@@ -1,6 +1,6 @@
 # UIF 4 capability and acceptance matrix
 
-Generated from the existing component contracts, actual passive-adapter map and canonical v4 manifest. Framework 4.0.0-alpha.5. A registered name or successful smoke test is not a complete implementation/conformance claim.
+Generated from the existing component contracts, actual passive-adapter map and canonical v4 manifest. Framework 4.0.0. A registered name or successful smoke test is not a complete implementation/conformance claim.
 
 | Component | Package | Status | Manual acceptance |
 | --- | --- | --- | --- |

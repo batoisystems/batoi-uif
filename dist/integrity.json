@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-alpha.5",
+  "version": "4.0.0",
   "files": {
     "index.d.ts": {
       "bytes": 799069,
@@ -20,16 +20,16 @@
       "sri": "sha384-zNUjZRGtc4A2HZFP0yWv4/GoJvnv1ie5SNnAlxsUbwHcndqqdNqDnflQTkoaaXra"
     },
     "provenance.json": {
-      "bytes": 5638,
+      "bytes": 5622,
       "gzipBytes": 1828,
-      "sha256": "ca195da89b469a23701081075d4621582e5c900363f05fd286440d72cba3791d",
-      "sri": "sha384-ppNO0LLajyQfEEOY2tU+uaXC9oHCy22ynHeNeT9YVcwMt4XbYqmg6TPw8RxffFc2"
+      "sha256": "f464a6936b31a40ed1fc1e8a7d0caf019f3d950593af73f91a05a9dfd2241d62",
+      "sri": "sha384-qgmgZ1Zeu2t6s40ZbVFqFDM9B/G23+ulsspRkA/ag6jZMGzH1biEUswsssUmWC0H"
     },
     "sbom.cdx.json": {
-      "bytes": 17785,
-      "gzipBytes": 1033,
-      "sha256": "3448c15bd0670022834ca8570aef037e2e90b251045511fa9b756c23b600506e",
-      "sri": "sha384-p7puiwBNMcDRQfEE52DH78xOZv4uQMsGcH+BAySNzKsUl7vH5r9ysWZwJmBqk46U"
+      "bytes": 16561,
+      "gzipBytes": 1025,
+      "sha256": "39d0ee396b1c9dc6ca9c294f994df2800efda8ae328744dd67334c943a26dcb5",
+      "sri": "sha384-zsqVKvoNKHXS7yV9GGdc5LbHeZjrYlO87bhTV9xK78ix2BOIWstaLhEuDTs36lqm"
     },
     "uif.css": {
       "bytes": 105192,
@@ -86,10 +86,10 @@
       "sri": "sha384-FZR3CcVaoX/CpeG4kCrISJ4kljC3rdlmyJYQLMZPQGF+k0syhZ3/Vg9hwZ5wu3a/"
     },
     "v4/manifest.json": {
-      "bytes": 11435,
-      "gzipBytes": 1926,
-      "sha256": "4493682f1cf83d0696fe2029de3688508f387f8467a0810f4edf5196b4c69017",
-      "sri": "sha384-6i950bF60f4QORe2eNvqWcDsjZQZQe9okcQO0l9zTuc7VEnxI4f2mMAm9uQJumS9"
+      "bytes": 11427,
+      "gzipBytes": 1920,
+      "sha256": "784e65d973b973a5a330569a4f44f401c446d642eab57606ef93f718cc869e38",
+      "sri": "sha384-MtLzj0XR2v1vwxGY+DhK6thkEGt57iKCUYA+oQpugRSIM1GYhYk5PUFRktrHAA3J"
     },
     "v4/mobile.css": {
       "bytes": 45656,

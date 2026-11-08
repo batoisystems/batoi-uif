@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.0.0
+
+- Release the implemented UIF 4 runtime as stable at the owner's direction, with Batoi testing-team acceptance deferred until later. This does not claim that all enhancement-plan tasks are complete.
+- Add selective component/runtime imports, cooperative application ownership, icon subsets, and essential/web/RAD/mobile/desktop JavaScript/CSS profiles with measured first-load budgets.
+- Improve strict configuration, rehydration, effect cancellation, overlay focus and race handling, and scoped governed RAD/forms/table behavior while retaining the 3.1-compatible facade and square bar-chart corners.
+- Include experimental local theme compiler, CLI, MCP and isolated studio tools, bounded typed token validation, deterministic previews and reviewed-artifact application checks.
+- Add generated contracts/examples, searchable documentation, consumer/package checks, security boundary reviews, and CI-gated GitHub Pages publication.
+- Known limitations: hosted Claude/ChatGPT/OAuth integration, asset materialization, broader canonical contract consolidation and other unfinished enhancements remain roadmap work. Manual assistive-technology/device and real RADX integration acceptance are deferred, not passed. See `docs/compatibility-and-release-policy.md#40-release-scope`.
+
 ## 4.0.0-alpha.5 — development checkpoint
 
 - Complete the independent local authoring-boundary security audit, retaining its scope and deployment limitations; no reportable vulnerability was identified.

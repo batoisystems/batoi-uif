@@ -5,6 +5,7 @@ export default [
   {
     ignores: [
       'dist/**',
+      '.pages-site/**',
       '**/dist/**',
       'node_modules/**',
       'coverage/**',
